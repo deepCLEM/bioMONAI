@@ -1,0 +1,18 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - 00_core.ipynb
+      - 01_data.ipynb
+      - 02_io.ipynb
+      - 03_losses.ipynb
+      - 04_nets.ipynb
+      - 05_transforms.ipynb
+      - 06_metrics.ipynb
+      - 07_callbacks.ipynb
+      - 08_datasets.ipynb
+      - 09_visualize.ipynb
+      - 901_tutorial_classification.ipynb
+      - 902_tutorial_classification3D.ipynb
+      - 903_tutorial_denoising.ipynb
+      - 904_tutorial_multispectral_classification.ipynb

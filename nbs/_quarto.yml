@@ -1,0 +1,70 @@
+project:
+  type: website
+
+format:
+  html:
+    theme: lumen
+    css: styles.css
+    toc: true
+    toc-depth: 4
+    html-math-method: katex
+    fontsize: 1.15rem
+    grid:
+      sidebar-width: 275px
+      body-width: 1025px
+      margin-width: 275px
+      gutter-width: 3rem
+
+website:
+  twitter-card: true
+  open-graph: true
+  repo-actions: [issue]
+  navbar:
+    search: true
+    left:
+      - text: "Blog"
+        href: https://bmandracchia.github.io
+      - text: "Resources"
+        menu:
+          - text: monai
+            icon: link
+            href: https://monai.io/
+          - text: fast.ai
+            icon: link
+            href: https://docs.fast.ai
+          - text: fastcore
+            icon: link
+            href: https://fastcore.fast.ai
+          - text: fastxtend
+            icon: link
+            href: https://fastxtend.benjaminwarner.dev
+          - text: nbdev
+            icon: link
+            href: https://nbdev.fast.ai
+          - text: "Report an Issue"
+            icon: bug
+            href: https://github.com/bmandracchia/bioMONAI/issues
+    right:
+      - icon: github
+        href: https://github.com/bmandracchia/bioMONAI/
+        aria-label: GitHub
+      - icon: twitter
+        href: https://twitter.com/
+        aria-label: Twitter
+  sidebar:
+    style: floating
+    collapse-level: 2
+  page-footer:
+    left: "Copyright © 2024 Biagio Mandracchia, MIT License"
+    right:
+      - icon: github
+        href: https://github.com/bmandracchia/bioMONAI/
+      - icon: twitter
+        href: https://twitter.com/
+  body-header: |
+    <script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer></script>
+
+link-external-newwindow: true
+    
+
+metadata-files: [nbdev.yml, sidebar.yml]

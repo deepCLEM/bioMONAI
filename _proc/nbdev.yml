@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "bioMONAI"
+  site-url: "https://bmandracchia.github.io/bioMONAI"
+  description: "Deep learning library biomedical data built on top of MONAI and fastai"
+  repo-branch: main
+  repo-url: "https://github.com/bmandracchia/bioMONAI"

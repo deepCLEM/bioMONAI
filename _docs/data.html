@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Data classes and functions">
+
+<title>bioMONAI - Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="bioMONAI - Data">
+<meta property="og:description" content="Data classes and functions">
+<meta property="og:image" content="https://bmandracchia.github.io/bioMONAI/01_data_files/figure-html/cell-38-output-1.png">
+<meta property="og:site-name" content="bioMONAI">
+<meta property="og:image:height" content="389">
+<meta property="og:image:width" content="389">
+<meta name="twitter:title" content="bioMONAI - Data">
+<meta name="twitter:description" content="Data classes and functions">
+<meta name="twitter:image" content="https://bmandracchia.github.io/bioMONAI/01_data_files/figure-html/cell-38-output-1.png">
+<meta name="twitter:image-height" content="389">
+<meta name="twitter:image-width" content="389">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">bioMONAI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://bmandracchia.github.io" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Resources</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
+        <li>
+    <a class="dropdown-item" href="https://monai.io/" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">monai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://docs.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fast.ai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastcore.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastcore</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastxtend</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://nbdev.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">nbdev</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/bmandracchia/bioMONAI/issues" rel="" target=""><i class="bi bi-bug" role="img">
+</i> 
+ <span class="dropdown-text">Report an Issue</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bmandracchia/bioMONAI/" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/" rel="" target=""><i class="bi bi-twitter" role="img" aria-label="Twitter">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./data.html">Data</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bioMONAI</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./io.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">I/O</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./losses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Loss functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Networks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./transforms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transforms</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metrics</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datasets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datasets</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./visualize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial: Image Classification</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_classification3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial: 3D Image Classification</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial Denoising</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial Multispectral Classification</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data-types" id="toc-data-types" class="nav-link active" data-scroll-target="#data-types">Data types</a>
+  <ul>
+  <li><a href="#metaresolver" id="toc-metaresolver" class="nav-link" data-scroll-target="#metaresolver">MetaResolver</a></li>
+  <li><a href="#bioimagebase" id="toc-bioimagebase" class="nav-link" data-scroll-target="#bioimagebase">BioImageBase</a></li>
+  <li><a href="#bioimage" id="toc-bioimage" class="nav-link" data-scroll-target="#bioimage">BioImage</a></li>
+  <li><a href="#bioimagestack" id="toc-bioimagestack" class="nav-link" data-scroll-target="#bioimagestack">BioImageStack</a></li>
+  <li><a href="#bioimageproject" id="toc-bioimageproject" class="nav-link" data-scroll-target="#bioimageproject">BioImageProject</a></li>
+  <li><a href="#bioimagemulti" id="toc-bioimagemulti" class="nav-link" data-scroll-target="#bioimagemulti">BioImageMulti</a></li>
+  </ul></li>
+  <li><a href="#data-conversion" id="toc-data-conversion" class="nav-link" data-scroll-target="#data-conversion">Data conversion</a>
+  <ul>
+  <li><a href="#tensor2bioimage" id="toc-tensor2bioimage" class="nav-link" data-scroll-target="#tensor2bioimage">Tensor2BioImage</a></li>
+  </ul></li>
+  <li><a href="#data-blocks-and-dataloader" id="toc-data-blocks-and-dataloader" class="nav-link" data-scroll-target="#data-blocks-and-dataloader">Data Blocks and Dataloader</a>
+  <ul>
+  <li><a href="#bioimageblock" id="toc-bioimageblock" class="nav-link" data-scroll-target="#bioimageblock">BioImageBlock</a></li>
+  <li><a href="#biodatablock" id="toc-biodatablock" class="nav-link" data-scroll-target="#biodatablock">BioDataBlock</a></li>
+  <li><a href="#biodataloaders" id="toc-biodataloaders" class="nav-link" data-scroll-target="#biodataloaders">BioDataLoaders</a></li>
+  <li><a href="#biodataloaders.from_source" id="toc-biodataloaders.from_source" class="nav-link" data-scroll-target="#biodataloaders.from_source">BioDataLoaders.from_source</a></li>
+  <li><a href="#biodataloaders.from_folder" id="toc-biodataloaders.from_folder" class="nav-link" data-scroll-target="#biodataloaders.from_folder">BioDataLoaders.from_folder</a></li>
+  <li><a href="#biodataloaders.from_df" id="toc-biodataloaders.from_df" class="nav-link" data-scroll-target="#biodataloaders.from_df">BioDataLoaders.from_df</a></li>
+  <li><a href="#biodataloaders.from_csv" id="toc-biodataloaders.from_csv" class="nav-link" data-scroll-target="#biodataloaders.from_csv">BioDataLoaders.from_csv</a></li>
+  <li><a href="#biodataloaders.class_from_folder" id="toc-biodataloaders.class_from_folder" class="nav-link" data-scroll-target="#biodataloaders.class_from_folder">BioDataLoaders.class_from_folder</a></li>
+  <li><a href="#biodataloaders.class_from_df" id="toc-biodataloaders.class_from_df" class="nav-link" data-scroll-target="#biodataloaders.class_from_df">BioDataLoaders.class_from_df</a></li>
+  <li><a href="#biodataloaders.class_from_csv" id="toc-biodataloaders.class_from_csv" class="nav-link" data-scroll-target="#biodataloaders.class_from_csv">BioDataLoaders.class_from_csv</a></li>
+  <li><a href="#biodataloaders.class_from_lists" id="toc-biodataloaders.class_from_lists" class="nav-link" data-scroll-target="#biodataloaders.class_from_lists">BioDataLoaders.class_from_lists</a></li>
+  </ul></li>
+  <li><a href="#data-getters" id="toc-data-getters" class="nav-link" data-scroll-target="#data-getters">Data getters</a>
+  <ul>
+  <li><a href="#get_gt" id="toc-get_gt" class="nav-link" data-scroll-target="#get_gt">get_gt</a></li>
+  <li><a href="#get_target" id="toc-get_target" class="nav-link" data-scroll-target="#get_target">get_target</a></li>
+  <li><a href="#get_noisy_pair" id="toc-get_noisy_pair" class="nav-link" data-scroll-target="#get_noisy_pair">get_noisy_pair</a></li>
+  </ul></li>
+  <li><a href="#data-display" id="toc-data-display" class="nav-link" data-scroll-target="#data-display">Data Display</a>
+  <ul>
+  <li><a href="#show_batch" id="toc-show_batch" class="nav-link" data-scroll-target="#show_batch">show_batch</a></li>
+  <li><a href="#show_results" id="toc-show_results" class="nav-link" data-scroll-target="#show_results">show_results</a></li>
+  </ul></li>
+  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a>
+  <ul>
+  <li><a href="#extract_patches" id="toc-extract_patches" class="nav-link" data-scroll-target="#extract_patches">extract_patches</a></li>
+  <li><a href="#save_patches_grid" id="toc-save_patches_grid" class="nav-link" data-scroll-target="#save_patches_grid">save_patches_grid</a></li>
+  <li><a href="#extract_random_patches" id="toc-extract_random_patches" class="nav-link" data-scroll-target="#extract_random_patches">extract_random_patches</a></li>
+  <li><a href="#save_patches_random" id="toc-save_patches_random" class="nav-link" data-scroll-target="#save_patches_random">save_patches_random</a></li>
+  <li><a href="#dict2string" id="toc-dict2string" class="nav-link" data-scroll-target="#dict2string">dict2string</a></li>
+  <li><a href="#remove_singleton_dims" id="toc-remove_singleton_dims" class="nav-link" data-scroll-target="#remove_singleton_dims">remove_singleton_dims</a></li>
+  <li><a href="#extract_substacks" id="toc-extract_substacks" class="nav-link" data-scroll-target="#extract_substacks">extract_substacks</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data</h1>
+</div>
+
+<div>
+  <div class="description">
+    Data classes and functions
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+<script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="data-types" class="level2">
+<h2 class="anchored" data-anchor-id="data-types">Data types</h2>
+<p>The module introduces specialized classes to represent various bioimaging data structures, facilitating seamless integration with machine learning workflows.</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L31" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="metaresolver" class="level3">
+<h3 class="anchored" data-anchor-id="metaresolver">MetaResolver</h3>
+<blockquote class="blockquote">
+<pre><code> MetaResolver (*args, **kwargs)</code></pre>
+</blockquote>
+<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#metaresolver"><code>MetaResolver</code></a> class addresses metaclass conflicts, ensuring compatibility across different data structures. This is particularly useful when integrating with libraries that have specific metaclass requirements.</em></p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L39" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bioimagebase" class="level3">
+<h3 class="anchored" data-anchor-id="bioimagebase">BioImageBase</h3>
+<blockquote class="blockquote">
+<pre><code> BioImageBase (*args, **kwargs)</code></pre>
+</blockquote>
+<p>*Serving as the foundational class for bioimaging data, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> provides core functionalities for image handling. It ensures that instances of specified types are appropriately cast to this class, maintaining consistency in data representation.</p>
+<p>Metaclass casts <code>x</code> to this class if it is of type <code>cls._bypass_type</code>.*</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L112" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bioimage" class="level3">
+<h3 class="anchored" data-anchor-id="bioimage">BioImage</h3>
+<blockquote class="blockquote">
+<pre><code> BioImage (*args, **kwargs)</code></pre>
+</blockquote>
+<p><em>A subclass of <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a>, the <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimage"><code>BioImage</code></a> class is tailored for handling both 2D and 3D image objects. It offers methods to load images from various formats and provides access to image properties such as shape and dimensions.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImage.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>torch.Size([1, 96, 512, 512])</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L148" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bioimagestack" class="level3">
+<h3 class="anchored" data-anchor-id="bioimagestack">BioImageStack</h3>
+<blockquote class="blockquote">
+<pre><code> BioImageStack (*args, **kwargs)</code></pre>
+</blockquote>
+<p><em>Designed for 3D image data, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagestack"><code>BioImageStack</code></a> extends <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to manage volumetric images effectively. It includes functionalities for slicing, visualization, and manipulation of 3D data.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageStack.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>torch.Size([1, 96, 512, 512])</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L159" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bioimageproject" class="level3">
+<h3 class="anchored" data-anchor-id="bioimageproject">BioImageProject</h3>
+<blockquote class="blockquote">
+<pre><code> BioImageProject (*args, **kwargs)</code></pre>
+</blockquote>
+<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimageproject"><code>BioImageProject</code></a> class represents a 3D image stack as a 2D image using maximum intensity projection. This is particularly useful for visualizing volumetric data in a 2D format, aiding in quick assessments and presentations.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageProject.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>a.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([1, 512, 512])</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L195" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bioimagemulti" class="level3">
+<h3 class="anchored" data-anchor-id="bioimagemulti">BioImageMulti</h3>
+<blockquote class="blockquote">
+<pre><code> BioImageMulti (*args, **kwargs)</code></pre>
+</blockquote>
+<p><em>For multi-channel 2D images, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagemulti"><code>BioImageMulti</code></a> extends <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to handle data with multiple channels, such as different fluorescence markers in microscopy images.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a 3D image stack as a multichannel image</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageMulti.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Differently from BioImageStack, here the third dimension is encoded as channels.</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>torch.Size([96, 512, 512])</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="data-conversion" class="level2">
+<h2 class="anchored" data-anchor-id="data-conversion">Data conversion</h2>
+<p>To facilitate seamless integration between tensors and bioimaging data structures, the module provides conversion utilities.</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L230" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="tensor2bioimage" class="level3">
+<h3 class="anchored" data-anchor-id="tensor2bioimage">Tensor2BioImage</h3>
+<blockquote class="blockquote">
+<pre><code> Tensor2BioImage (cls:__main__.BioImageBase=&lt;class
+                  '__main__.BioImageStack'&gt;)</code></pre>
+</blockquote>
+<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#tensor2bioimage"><code>Tensor2BioImage</code></a> transform converts tensors into <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> instances, enabling the application of bioimaging-specific methods to tensor data. This is essential for integrating deep learning models with bioimaging workflows.</em></p>
+</section>
+</section>
+<section id="data-blocks-and-dataloader" class="level2">
+<h2 class="anchored" data-anchor-id="data-blocks-and-dataloader">Data Blocks and Dataloader</h2>
+<p>The module offers classes to construct data blocks and data loaders, streamlining the preparation of datasets for machine learning models.</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L247" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="bioimageblock" class="level3">
+<h3 class="anchored" data-anchor-id="bioimageblock">BioImageBlock</h3>
+<blockquote class="blockquote">
+<pre><code> BioImageBlock (cls:__main__.BioImageBase=&lt;class '__main__.BioImage'&gt;)</code></pre>
+</blockquote>
+<p><em>A <code>TransformBlock</code> tailored for bioimaging data, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimageblock"><code>BioImageBlock</code></a> facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging.</em></p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L252" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodatablock" class="level3">
+<h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataBlock (blocks:list=(&lt;fastai.data.block.TransformBlock object at
+               0x7f30b6598150&gt;, &lt;fastai.data.block.TransformBlock object
+               at 0x7f2fc4f33cd0&gt;), dl_type:fastai.data.core.TfmdDL=None,
+               get_items=&lt;function get_image_files&gt;, get_y=None,
+               get_x=None, getters:list=None, n_inp:int=None,
+               item_tfms:list=None, batch_tfms:list=None, **kwargs)</code></pre>
+</blockquote>
+<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#biodatablock"><code>BioDataBlock</code></a> class serves as a generic container to build <code>Datasets</code> and <code>DataLoaders</code> efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>blocks</td>
+<td>list</td>
+<td>(&lt;fastai.data.block.TransformBlock object at 0x7f30b6598150&gt;, &lt;fastai.data.block.TransformBlock object at 0x7f2fc4f33cd0&gt;)</td>
+<td>One or more <code>TransformBlock</code>s</td>
+</tr>
+<tr class="even">
+<td>dl_type</td>
+<td>TfmdDL</td>
+<td>None</td>
+<td>Task specific <code>TfmdDL</code>, defaults to <code>block</code>’s dl_type or<code>TfmdDL</code></td>
+</tr>
+<tr class="odd">
+<td>get_items</td>
+<td>function</td>
+<td>get_image_files</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>get_y</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>get_x</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>getters</td>
+<td>list</td>
+<td>None</td>
+<td>Getter functions applied to results of <code>get_items</code></td>
+</tr>
+<tr class="odd">
+<td>n_inp</td>
+<td>int</td>
+<td>None</td>
+<td>Number of inputs</td>
+</tr>
+<tr class="even">
+<td>item_tfms</td>
+<td>list</td>
+<td>None</td>
+<td><code>ItemTransform</code>s, applied on an item</td>
+</tr>
+<tr class="odd">
+<td>batch_tfms</td>
+<td>list</td>
+<td>None</td>
+<td><code>Transform</code>s or <code>RandTransform</code>s, applied by batch</td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L283" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders">BioDataLoaders</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders (*loaders, path:str|pathlib.Path='.', device=None)</code></pre>
+</blockquote>
+<p><em>Basic wrapper around several <code>DataLoader</code>s with factory methods for biomedical imaging problems. Managing multiple <code>DataLoader</code> instances, <a href="https://bmandracchia.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> handles data loading for different phases of model training, such as training, validation, and testing. It ensures efficient data handling and supports various batch processing strategies.</em></p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L290" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.from_source" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.from_source">BioDataLoaders.from_source</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.from_source (data_source, show_summary:bool=False,
+                             path:str|Path='.', bs:int=64,
+                             val_bs:int=None, shuffle:bool=True,
+                             device=None)</code></pre>
+</blockquote>
+<p>*Create and return a DataLoader from a BioDataBlock using provided keyword arguments.</p>
+<p>Returns: DataLoader: A PyTorch DataLoader object populated with the data from the BioDataBlock. If show_summary is True, it also prints a summary of the datablock after creation.</p>
+<p>Example: &gt;&gt;&gt; dataloader = BioDataLoaders.from_source(data_path, show_summary=True, blocks=‘train’, dl_type=‘ImageDataLoader’)*</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data_source</td>
+<td></td>
+<td></td>
+<td>The source of the data to be loaded by the dataloader. This can be any type that is compatible with the dataloading method specified in kwargs (e.g., paths, datasets).</td>
+</tr>
+<tr class="even">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="even">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="odd">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="even">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="odd">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L329" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.from_folder" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.from_folder">BioDataLoaders.from_folder</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.from_folder (path, get_target_fn, train='train',
+                             valid='valid', valid_pct=None, seed=None,
+                             item_tfms=None, batch_tfms=None,
+                             img_cls=&lt;class '__main__.BioImage'&gt;,
+                             target_img_cls=&lt;class '__main__.BioImage'&gt;,
+                             show_summary:bool=False, bs:int=64,
+                             val_bs:int=None, shuffle:bool=True,
+                             device=None)</code></pre>
+</blockquote>
+<p><em>Create from dataset in <code>path</code> with <code>train</code> and <code>valid</code> subfolders (or provide <code>valid_pct</code>)</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="even">
+<td>get_target_fn</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>train</td>
+<td>str</td>
+<td>train</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>valid</td>
+<td>str</td>
+<td>valid</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>valid_pct</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>seed</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>item_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>batch_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>target_img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="even">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="odd">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="even">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="odd">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L347" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.from_df" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.from_df">BioDataLoaders.from_df</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.from_df (df, path='.', valid_pct=0.2, seed=None, fn_col=0,
+                         folder=None, pref=None, suff='', target_col=1,
+                         target_folder=None, target_suff='',
+                         valid_col=None, item_tfms=None, batch_tfms=None,
+                         img_cls=&lt;class '__main__.BioImage'&gt;,
+                         target_img_cls=&lt;class '__main__.BioImage'&gt;,
+                         show_summary:bool=False, bs:int=64,
+                         val_bs:int=None, shuffle:bool=True, device=None)</code></pre>
+</blockquote>
+<p><em>Create from <code>df</code> using <code>fn_col</code> and <code>target_col</code></em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>df</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="odd">
+<td>valid_pct</td>
+<td>float</td>
+<td>0.2</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>seed</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>fn_col</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>folder</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>pref</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>suff</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>target_col</td>
+<td>int</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>target_folder</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>target_suff</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>valid_col</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>item_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>batch_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>target_img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="even">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="odd">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="even">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="odd">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L372" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.from_csv" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.from_csv">BioDataLoaders.from_csv</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.from_csv (path, csv_fname='train.csv', header='path',
+                          delimiter=None, quoting=0, valid_pct=0.2,
+                          seed=None, fn_col=0, folder=None, pref=None,
+                          suff='', target_col=1, target_folder=None,
+                          target_suff='', valid_col=None, item_tfms=None,
+                          batch_tfms=None, img_cls=&lt;class
+                          '__main__.BioImage'&gt;, target_img_cls=&lt;class
+                          '__main__.BioImage'&gt;, show_summary:bool=False,
+                          bs:int=64, val_bs:int=None, shuffle:bool=True,
+                          device=None)</code></pre>
+</blockquote>
+<p><em>Create from <code>path/csv_fname</code> using <code>fn_col</code> and <code>target_col</code></em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="even">
+<td>csv_fname</td>
+<td>str</td>
+<td>train.csv</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>header</td>
+<td>str</td>
+<td>path</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>delimiter</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>quoting</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>valid_pct</td>
+<td>float</td>
+<td>0.2</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>seed</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>fn_col</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>folder</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>pref</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>suff</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>target_col</td>
+<td>int</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>target_folder</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>target_suff</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>valid_col</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>item_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>batch_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>target_img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="odd">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="even">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="odd">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="even">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L379" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.class_from_folder" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.class_from_folder">BioDataLoaders.class_from_folder</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.class_from_folder (path, train='train', valid='valid',
+                                   valid_pct=None, seed=None, vocab=None,
+                                   item_tfms=None, batch_tfms=None,
+                                   img_cls=&lt;class '__main__.BioImage'&gt;,
+                                   show_summary:bool=False, bs:int=64,
+                                   val_bs:int=None, shuffle:bool=True,
+                                   device=None)</code></pre>
+</blockquote>
+<p><em>Create from dataset in <code>path</code> with <code>train</code> and <code>valid</code> subfolders (or provide <code>valid_pct</code>)</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="even">
+<td>train</td>
+<td>str</td>
+<td>train</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>valid</td>
+<td>str</td>
+<td>valid</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>valid_pct</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>seed</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>vocab</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>item_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>batch_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="odd">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="even">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="odd">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="even">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L417" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.class_from_df" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.class_from_df">BioDataLoaders.class_from_df</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.class_from_df (df, path='.', valid_pct=0.2, seed=None,
+                               fn_col=0, folder=None, suff='',
+                               label_col=1, label_delim=None,
+                               y_block=None, valid_col=None,
+                               item_tfms=None, batch_tfms=None,
+                               img_cls=&lt;class '__main__.BioImage'&gt;,
+                               show_summary:bool=False, bs:int=64,
+                               val_bs:int=None, shuffle:bool=True,
+                               device=None)</code></pre>
+</blockquote>
+<p><em>Create from <code>df</code> using <code>fn_col</code> and <code>label_col</code></em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>df</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="odd">
+<td>valid_pct</td>
+<td>float</td>
+<td>0.2</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>seed</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>fn_col</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>folder</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>suff</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>label_col</td>
+<td>int</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>label_delim</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>y_block</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>valid_col</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>item_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>batch_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="even">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="odd">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="even">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="odd">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L439" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.class_from_csv" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.class_from_csv">BioDataLoaders.class_from_csv</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.class_from_csv (path, csv_fname='labels.csv',
+                                header='infer', delimiter=None, quoting=0,
+                                valid_pct=0.2, seed=None, fn_col=0,
+                                folder=None, suff='', label_col=1,
+                                label_delim=None, y_block=None,
+                                valid_col=None, item_tfms=None,
+                                batch_tfms=None, img_cls=&lt;class
+                                '__main__.BioImage'&gt;,
+                                show_summary:bool=False, bs:int=64,
+                                val_bs:int=None, shuffle:bool=True,
+                                device=None)</code></pre>
+</blockquote>
+<p><em>Create from <code>path/csv_fname</code> using <code>fn_col</code> and <code>label_col</code></em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="even">
+<td>csv_fname</td>
+<td>str</td>
+<td>labels.csv</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>header</td>
+<td>str</td>
+<td>infer</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>delimiter</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>quoting</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>valid_pct</td>
+<td>float</td>
+<td>0.2</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>seed</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>fn_col</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>folder</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>suff</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>label_col</td>
+<td>int</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>label_delim</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>y_block</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>valid_col</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>item_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>batch_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="odd">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="even">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="odd">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="even">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L446" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.class_from_lists" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.class_from_lists">BioDataLoaders.class_from_lists</h3>
+<blockquote class="blockquote">
+<pre><code> BioDataLoaders.class_from_lists (path, fnames, labels, valid_pct=0.2,
+                                  seed:int=None, y_block=None,
+                                  item_tfms=None, batch_tfms=None,
+                                  img_cls=&lt;class '__main__.BioImage'&gt;,
+                                  show_summary:bool=False, bs:int=64,
+                                  val_bs:int=None, shuffle:bool=True,
+                                  device=None)</code></pre>
+</blockquote>
+<p><em>Create from list of <code>fnames</code> and <code>labels</code> in <code>path</code></em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str | pathlib.Path</td>
+<td>.</td>
+<td>Path to put in <code>DataLoaders</code></td>
+</tr>
+<tr class="even">
+<td>fnames</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>labels</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>valid_pct</td>
+<td>float</td>
+<td>0.2</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>seed</td>
+<td>int</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>y_block</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>item_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>batch_tfms</td>
+<td>NoneType</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>img_cls</td>
+<td>MetaResolver</td>
+<td>BioImage</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>show_summary</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, print a summary of the BioDataBlock after creation.</td>
+</tr>
+<tr class="odd">
+<td>bs</td>
+<td>int</td>
+<td>64</td>
+<td>Size of batch</td>
+</tr>
+<tr class="even">
+<td>val_bs</td>
+<td>int</td>
+<td>None</td>
+<td>Size of batch for validation <code>DataLoader</code></td>
+</tr>
+<tr class="odd">
+<td>shuffle</td>
+<td>bool</td>
+<td>True</td>
+<td>Whether to shuffle data</td>
+</tr>
+<tr class="even">
+<td>device</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Device to put <code>DataLoaders</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="data-getters" class="level2">
+<h2 class="anchored" data-anchor-id="data-getters">Data getters</h2>
+<p>Functions to retrieve specific data components are provided, aiding in the organization and preprocessing of datasets.</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L469" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_gt" class="level3">
+<h3 class="anchored" data-anchor-id="get_gt">get_gt</h3>
+<blockquote class="blockquote">
+<pre><code> get_gt (path_gt, gt_file_name='avg50.png')</code></pre>
+</blockquote>
+<p>*The <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a> function retrieves ground truth data, essential for supervised learning tasks. It ensures that the correct labels or annotations are associated with each data sample.</p>
+<p>This function constructs a path to a ground truth file based on the given <code>path_gt</code> and <code>gt_file_name</code>.<br>
+It uses a lambda function to create a new path by appending <code>gt_file_name</code> to the parent directory of the input file, as specified by <code>path_gt</code>.</p>
+<p>Returns: callable: A function that takes a single argument (a filename) and returns a Path object representing the full path to the ground truth file. When called with a filename, this function constructs the path by combining <code>path_gt</code> or the parent directory of the filename with <code>gt_file_name</code>.*</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path_gt</td>
+<td></td>
+<td></td>
+<td>The base directory where the ground truth files are stored, or a file path from which to derive the parent directory.</td>
+</tr>
+<tr class="even">
+<td>gt_file_name</td>
+<td>str</td>
+<td>avg50.png</td>
+<td>The name of the ground truth file.</td>
+</tr>
+</tbody>
+</table>
+<p>Similar to <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a>, the <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_target"><code>get_target</code></a> function fetches target data for training, validation, or testing, facilitating the preparation of datasets for machine learning models.</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L497" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_target" class="level3">
+<h3 class="anchored" data-anchor-id="get_target">get_target</h3>
+<blockquote class="blockquote">
+<pre><code> get_target (path:str, same_filename=True, target_file_prefix='target',
+             signal_file_prefix='signal', relative_path=False)</code></pre>
+</blockquote>
+<p>*Constructs and returns functions for generating file paths to “target” files based on given input parameters.</p>
+<p>This function defines two nested helper functions within its scope:</p>
+<pre><code>- `construct_target_filename(file_name)`: Constructs a target file name by inserting the specified prefix into the original file name.
+- `generate_target_path(file_name)`: Generates a path to the target file based on whether `same_filename` is set to True or False.</code></pre>
+<p>The main function returns the appropriate helper function based on the value of <code>same_filename</code>.</p>
+<p>Returns:</p>
+<pre><code>callable: A function that takes a file name as input and returns its corresponding target file path based on the specified parameters.*</code></pre>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td>str</td>
+<td></td>
+<td>The base directory where the files are located. This should be a string representing an absolute or relative path.</td>
+</tr>
+<tr class="even">
+<td>same_filename</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, the target file name will match the original file name; otherwise, it will use the specified prefix.</td>
+</tr>
+<tr class="odd">
+<td>target_file_prefix</td>
+<td>str</td>
+<td>target</td>
+<td>The prefix to insert into the target file name if <code>same_filename</code> is False.</td>
+</tr>
+<tr class="even">
+<td>signal_file_prefix</td>
+<td>str</td>
+<td>signal</td>
+<td>The prefix used in the original file names that should be replaced by the target prefix.</td>
+</tr>
+<tr class="odd">
+<td>relative_path</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, it indicates that the path is relative to the parent folder in the path where the input files are located.</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'train_folder/target'</span>, same_filename<span class="op">=</span><span class="va">False</span>)(<span class="st">'../signal/signal01.tif'</span>))</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'target'</span>, relative_path<span class="op">=</span><span class="va">True</span>)(<span class="st">'../train_folder/signal/image01.tif'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_folder/target/target01.tif
+../train_folder/target/image01.tif</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"image_clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"image_noisy"</span>)(<span class="st">'train_folder/signal/image_noisy.tif'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_folder/GT/image_clean.tif</code></pre>
+</div>
+</div>
+<p>For tasks involving denoising or noise analysis, <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_noisy_pair"><code>get_noisy_pair</code></a> retrieves pairs of clean and noisy data, enabling the training of models to learn noise reduction.</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L551" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_noisy_pair" class="level3">
+<h3 class="anchored" data-anchor-id="get_noisy_pair">get_noisy_pair</h3>
+<blockquote class="blockquote">
+<pre><code> get_noisy_pair (fn)</code></pre>
+</blockquote>
+<p>*Get another “noisy” version of the input file by selecting a file from the same directory.</p>
+<p>This function first retrieves all image files in the directory of the input file <code>fn</code> (excluding subdirectories). It then selects one of these files at random, ensuring that it is not the original file itself to avoid creating a trivial “noisy” pair.</p>
+<p>Parameters:</p>
+<pre><code>fn (Path or str): The path to the original image file. This should be a Path object but accepts string inputs for convenience.</code></pre>
+<p>Returns:</p>
+<pre><code>Path: A Path object pointing to the selected noisy file.*</code></pre>
+</section>
+</section>
+<section id="data-display" class="level2">
+<h2 class="anchored" data-anchor-id="data-display">Data Display</h2>
+<p>Visualization functions are included to display batches of data and model results, aiding in qualitative assessments and debugging.</p>
+<section id="show_batch" class="level3">
+<h3 class="anchored" data-anchor-id="show_batch">show_batch</h3>
+<blockquote class="blockquote">
+<pre><code>show_batch (x:BioImageBase, y:BioImageBase, samples,
+            ctxs=None, max_n:int=10, nrows:int=None, ncols:int=None,
+            figsize:tuple=None, **kwargs)</code></pre>
+</blockquote>
+<p>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#show_batch"><code>show_batch</code></a> function visualizes a batch of data samples, allowing users to inspect the input data and verify preprocessing steps.</p>
+<p>Returns: List[Context]: A list of contexts after displaying the images and labels.</p>
+<table class="table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 5%">
+<col style="width: 13%">
+<col style="width: 69%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Type</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x</td>
+<td>BioImageBase</td>
+<td></td>
+<td>The input image data.</td>
+</tr>
+<tr class="even">
+<td>y</td>
+<td>BioImageBase</td>
+<td></td>
+<td>The target label data.</td>
+</tr>
+<tr class="odd">
+<td>samples</td>
+<td></td>
+<td></td>
+<td>List of sample indices to display.</td>
+</tr>
+<tr class="even">
+<td>ctxs</td>
+<td>NoneType</td>
+<td></td>
+<td>List of contexts for displaying images. If None, create new ones using <code>get_grid()</code>.</td>
+</tr>
+<tr class="odd">
+<td>max_n</td>
+<td>int</td>
+<td>10</td>
+<td>Maximum number of samples to display.</td>
+</tr>
+<tr class="even">
+<td>nrows</td>
+<td>int</td>
+<td>None</td>
+<td>Number of rows in the grid if <code>ctxs</code> are not provided.</td>
+</tr>
+<tr class="odd">
+<td>ncols</td>
+<td>int</td>
+<td>None</td>
+<td>Number of columns in the grid if <code>ctxs</code> are not provided.</td>
+</tr>
+<tr class="even">
+<td>figsize</td>
+<td>tuple</td>
+<td>None</td>
+<td>Figure size for the image display.</td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td>Additional keyword arguments.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="show_results" class="level3">
+<h3 class="anchored" data-anchor-id="show_results">show_results</h3>
+<blockquote class="blockquote">
+<pre><code>show_results (x: BioImageBase, y: BioImageBase, samples,
+              outs, ctxs=None, max_n=10, figsize=None, **kwargs)</code></pre>
+</blockquote>
+<p>After model inference, <a href="https://bmandracchia.github.io/bioMONAI/data.html#show_results"><code>show_results</code></a> displays the model’s predictions alongside the ground truth, facilitating the evaluation of model performance.</p>
+<p>Returns:</p>
+<p>List[Context]: A list of contexts after displaying the images and labels.</p>
+<table class="table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 5%">
+<col style="width: 13%">
+<col style="width: 69%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Type</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x</td>
+<td>BioImageBase</td>
+<td></td>
+<td>The input image data.</td>
+</tr>
+<tr class="even">
+<td>y</td>
+<td>BioImageBase</td>
+<td></td>
+<td>The target label data.</td>
+</tr>
+<tr class="odd">
+<td>samples</td>
+<td></td>
+<td></td>
+<td>List of sample indices to display.</td>
+</tr>
+<tr class="even">
+<td>outs</td>
+<td></td>
+<td></td>
+<td>List of output predictions corresponding to the samples.</td>
+</tr>
+<tr class="odd">
+<td>ctxs</td>
+<td>NoneType</td>
+<td></td>
+<td>List of contexts for displaying images. If None, create new ones using <code>get_grid()</code>.</td>
+</tr>
+<tr class="even">
+<td>max_n</td>
+<td>int</td>
+<td>10</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>figsize</td>
+<td>tuple</td>
+<td>None</td>
+<td>Figure size for the image display.</td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td>Additional keyword arguments.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
+<p>The module provides functions for data preprocessing, including patch extraction and dimensionality reduction, essential for preparing data for machine learning models.</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L719" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="extract_patches" class="level3">
+<h3 class="anchored" data-anchor-id="extract_patches">extract_patches</h3>
+<blockquote class="blockquote">
+<pre><code> extract_patches (data, patch_size, overlap)</code></pre>
+</blockquote>
+<p>*Extracts n-dimensional patches from the input data.</p>
+<p>Returns: - A list of patches as numpy arrays.*</p>
+<table class="table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 84%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data</td>
+<td>numpy array of the input data (n-dimensional).</td>
+</tr>
+<tr class="even">
+<td>patch_size</td>
+<td>tuple of integers defining the size of the patches in each dimension.</td>
+</tr>
+<tr class="odd">
+<td>overlap</td>
+<td>float (between 0 and 1) indicating overlap between patches.</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#extract_patches"><code>extract_patches</code></a> function divides images into smaller patches, which is useful for training models on localized regions of interest, especially when dealing with high-resolution images.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.random.rand(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">3</span>)  <span class="co"># Example 3D data</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>,<span class="dv">2</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>patches <span class="op">=</span> extract_patches(data, patch_size, overlap)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of generated patches:"</span>, <span class="bu">len</span>(patches))</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>patches[<span class="dv">0</span>].shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of generated patches: 8</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>(64, 64, 2)</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L745" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="save_patches_grid" class="level3">
+<h3 class="anchored" data-anchor-id="save_patches_grid">save_patches_grid</h3>
+<blockquote class="blockquote">
+<pre><code> save_patches_grid (data_folder, gt_folder, output_folder, patch_size,
+                    overlap, threshold=None, squeeze_input=True,
+                    squeeze_patches=False, csv_output=True,
+                    train_test_split_ratio=0.8)</code></pre>
+</blockquote>
+<p><em>Loads n-dimensional data from data_folder and gt_folder, generates patches, and saves them into individual HDF5 files. Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data_folder</td>
+<td></td>
+<td></td>
+<td>Path to the folder containing data files (n-dimensional data).</td>
+</tr>
+<tr class="even">
+<td>gt_folder</td>
+<td></td>
+<td></td>
+<td>Path to the folder containing ground truth (gt) files (n-dimensional data).</td>
+</tr>
+<tr class="odd">
+<td>output_folder</td>
+<td></td>
+<td></td>
+<td>Path to the folder where the HDF5 files will be saved.</td>
+</tr>
+<tr class="even">
+<td>patch_size</td>
+<td></td>
+<td></td>
+<td>tuple of integers defining the size of the patches.</td>
+</tr>
+<tr class="odd">
+<td>overlap</td>
+<td></td>
+<td></td>
+<td>float (between 0 and 1) defining the overlap between patches.</td>
+</tr>
+<tr class="even">
+<td>threshold</td>
+<td>NoneType</td>
+<td>None</td>
+<td>If provided, patches with a mean value below this threshold will be discarded.</td>
+</tr>
+<tr class="odd">
+<td>squeeze_input</td>
+<td>bool</td>
+<td>True</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>squeeze_patches</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>csv_output</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, a CSV file listing all patch paths is created.</td>
+</tr>
+<tr class="even">
+<td>train_test_split_ratio</td>
+<td>float</td>
+<td>0.8</td>
+<td>Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</td>
+</tr>
+</tbody>
+</table>
+<p>After extracting patches, <a href="https://bmandracchia.github.io/bioMONAI/data.html#save_patches_grid"><code>save_patches_grid</code></a> saves them in a grid format, facilitating visualization and inspection of the patches.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Processing files: 100%|██████████| 50/50 [00:01&lt;00:00, 34.41it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CSV files saved to: ./_test/train_patches.csv and ./_test/test_patches.csv</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader, split_hdf_path</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/X/1'</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="01_data_files/figure-html/cell-38-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L847" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="extract_random_patches" class="level3">
+<h3 class="anchored" data-anchor-id="extract_random_patches">extract_random_patches</h3>
+<blockquote class="blockquote">
+<pre><code> extract_random_patches (data, patch_size, num_patches)</code></pre>
+</blockquote>
+<p>*Extracts a specified number of random n-dimensional patches from the input data.</p>
+<p>Parameters: - data: numpy array of the input data (n-dimensional). - patch_size: tuple of integers defining the size of the patches in each dimension. - num_patches: number of random patches to extract.</p>
+<p>Returns: - A list of randomly cropped patches as numpy arrays.*</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L883" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="save_patches_random" class="level3">
+<h3 class="anchored" data-anchor-id="save_patches_random">save_patches_random</h3>
+<blockquote class="blockquote">
+<pre><code> save_patches_random (data_folder, gt_folder, output_folder, patch_size,
+                      num_patches, threshold=None, squeeze_input=True,
+                      squeeze_patches=False, csv_output=True,
+                      train_test_split_ratio=0.8)</code></pre>
+</blockquote>
+<p><em>Loads n-dimensional data from data_folder and gt_folder, generates random patches, and saves them into individual HDF5 files. Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data_folder</td>
+<td></td>
+<td></td>
+<td>Path to the folder containing data files (n-dimensional data).</td>
+</tr>
+<tr class="even">
+<td>gt_folder</td>
+<td></td>
+<td></td>
+<td>Path to the folder containing ground truth (gt) files (n-dimensional data).</td>
+</tr>
+<tr class="odd">
+<td>output_folder</td>
+<td></td>
+<td></td>
+<td>Path to the folder where the HDF5 files will be saved.</td>
+</tr>
+<tr class="even">
+<td>patch_size</td>
+<td></td>
+<td></td>
+<td>tuple of integers defining the size of the patches.</td>
+</tr>
+<tr class="odd">
+<td>num_patches</td>
+<td></td>
+<td></td>
+<td>number of random patches to extract per file.</td>
+</tr>
+<tr class="even">
+<td>threshold</td>
+<td>NoneType</td>
+<td>None</td>
+<td>If provided, patches with a mean value below this threshold will be discarded.</td>
+</tr>
+<tr class="odd">
+<td>squeeze_input</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, squeezes singleton dimensions in the input data.</td>
+</tr>
+<tr class="even">
+<td>squeeze_patches</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, squeezes singleton dimensions in the patches.</td>
+</tr>
+<tr class="odd">
+<td>csv_output</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, a CSV file listing all patch paths is created.</td>
+</tr>
+<tr class="even">
+<td>train_test_split_ratio</td>
+<td>float</td>
+<td>0.8</td>
+<td>Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_folder, gt_folder, output_folder, patch_size, num_patches)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Processing files: 100%|██████████| 50/50 [00:00&lt;00:00, 57.72it/s]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/X/1'</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="01_data_files/figure-html/cell-42-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L986" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="dict2string" class="level3">
+<h3 class="anchored" data-anchor-id="dict2string">dict2string</h3>
+<blockquote class="blockquote">
+<pre><code> dict2string (d, item_sep='_', key_value_sep='', pad_zeroes=None)</code></pre>
+</blockquote>
+<p>*Transforms a dictionary into a string with customizable separators and optional zero padding for integers.</p>
+<p>Parameters: d (dict): The dictionary to convert. item_sep (str): The separator between dictionary items (default is “,”). key_value_sep (str): The separator between keys and values (default is “:”). pad_zeroes (int, optional): The minimum width for integer values, padded with zeros. If None, no padding is applied.</p>
+<p>Returns: str: The formatted dictionary as a string.*</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>my_dict <span class="op">=</span> {<span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'Z'</span>: <span class="dv">30</span>, <span class="st">'S'</span>: <span class="dv">1</span>}</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dict2string(my_dict, pad_zeroes<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>C002_Z030_S001</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L1008" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="remove_singleton_dims" class="level3">
+<h3 class="anchored" data-anchor-id="remove_singleton_dims">remove_singleton_dims</h3>
+<blockquote class="blockquote">
+<pre><code> remove_singleton_dims (substack, order)</code></pre>
+</blockquote>
+<p>*Remove dimensions with a size of 1 from both the substack and the order string.</p>
+<p>Parameters: substack (np.array): The extracted substack data. order (str): The dimension order string (e.g., ‘CZYX’).</p>
+<p>Returns: substack (np.array): The substack with singleton dimensions removed. new_order (str): The updated dimension order string.*</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L1032" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="extract_substacks" class="level3">
+<h3 class="anchored" data-anchor-id="extract_substacks">extract_substacks</h3>
+<blockquote class="blockquote">
+<pre><code> extract_substacks (input_file, output_dir=None, indices=None,
+                    split_dimension=None, squeeze_dims=True, *kwargs)</code></pre>
+</blockquote>
+<p>*Extract substacks from a multidimensional OME-TIFF stack using AICSImageIO.</p>
+<p>Parameters: input_file (str): Path to the input OME-TIFF file. output_dir (str or list): Directory to save the extracted substacks. If a list, the substacks will be saved in the corresponding subdirectories from the list. indices (dict, optional): A dictionary specifying which indices to extract. Keys can include ‘C’ for channel, ‘Z’ for z-slice, ‘T’ for time point, and ‘S’ for scene. If None, all indices are extracted. split_dimension (str, optional): Dimension to split substacks along. If provided, separate substacks will be generated for each index in the split_dimension. Must be one of the keys in indices.*</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./_test_folder/"</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>subdirs <span class="op">=</span> [output_dir <span class="op">+</span> folder <span class="cf">for</span> folder <span class="kw">in</span> [<span class="st">"channel_0"</span>, <span class="st">"channel_1"</span>, <span class="st">"channel_2"</span>]]</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>subdirs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['./_test_folder/channel_0',
+ './_test_folder/channel_1',
+ './_test_folder/channel_2']</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'../_data/aics/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05.ome.tiff'</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Extracted substack saved to: ./_test_folder/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C0_Zrange(0, 35)_T0.ome.tiff</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Extracted substack saved to: ./_test_folder/C_0/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C0_Z5_T0.ome.tiff
+Extracted substack saved to: ./_test_folder/C_1/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C1_Z5_T0.ome.tiff
+Extracted substack saved to: ./_test_folder/C_2/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C2_Z5_T0.ome.tiff</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Extracted substack saved to: ./_test_folder/channel_0/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C0_Z5.ome.tiff
+Extracted substack saved to: ./_test_folder/channel_1/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C1_Z5.ome.tiff
+Extracted substack saved to: ./_test_folder/channel_2/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C2_Z5.ome.tiff</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("https:\/\/bmandracchia\.github\.io\/bioMONAI");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Copyright © 2024 Biagio Mandracchia, MIT License</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bmandracchia/bioMONAI/">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

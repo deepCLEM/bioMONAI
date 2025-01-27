@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Data transformations and augmentations for 2D and 3D BioImages">
+
+<title>bioMONAI - Transforms</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="bioMONAI - Transforms">
+<meta property="og:description" content="Data transformations and augmentations for 2D and 3D BioImages">
+<meta property="og:image" content="https://bmandracchia.github.io/bioMONAI/05_transforms_files/figure-html/cell-4-output-1.png">
+<meta property="og:site-name" content="bioMONAI">
+<meta property="og:image:height" content="382">
+<meta property="og:image:width" content="1182">
+<meta name="twitter:title" content="bioMONAI - Transforms">
+<meta name="twitter:description" content="Data transformations and augmentations for 2D and 3D BioImages">
+<meta name="twitter:image" content="https://bmandracchia.github.io/bioMONAI/05_transforms_files/figure-html/cell-4-output-1.png">
+<meta name="twitter:image-height" content="382">
+<meta name="twitter:image-width" content="1182">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">bioMONAI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://bmandracchia.github.io" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Resources</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
+        <li>
+    <a class="dropdown-item" href="https://monai.io/" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">monai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://docs.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fast.ai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastcore.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastcore</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastxtend</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://nbdev.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">nbdev</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/bmandracchia/bioMONAI/issues" rel="" target=""><i class="bi bi-bug" role="img">
+</i> 
+ <span class="dropdown-text">Report an Issue</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bmandracchia/bioMONAI/" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/" rel="" target=""><i class="bi bi-twitter" role="img" aria-label="Twitter">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./transforms.html">Transforms</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bioMONAI</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./io.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">I/O</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./losses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Loss functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Networks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./transforms.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Transforms</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metrics</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datasets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datasets</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./visualize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial: Image Classification</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_classification3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial: 3D Image Classification</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial Denoising</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial Multispectral Classification</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#size-sampling" id="toc-size-sampling" class="nav-link active" data-scroll-target="#size-sampling">Size &amp; Sampling</a>
+  <ul>
+  <li><a href="#resample" id="toc-resample" class="nav-link" data-scroll-target="#resample">Resample</a></li>
+  <li><a href="#resize" id="toc-resize" class="nav-link" data-scroll-target="#resize">Resize</a></li>
+  </ul></li>
+  <li><a href="#noise" id="toc-noise" class="nav-link" data-scroll-target="#noise">Noise</a>
+  <ul>
+  <li><a href="#randcameranoise" id="toc-randcameranoise" class="nav-link" data-scroll-target="#randcameranoise">RandCameraNoise</a></li>
+  </ul></li>
+  <li><a href="#normalization" id="toc-normalization" class="nav-link" data-scroll-target="#normalization">Normalization</a>
+  <ul>
+  <li><a href="#scaleintensity" id="toc-scaleintensity" class="nav-link" data-scroll-target="#scaleintensity">ScaleIntensity</a></li>
+  <li><a href="#scaleintensitypercentiles" id="toc-scaleintensitypercentiles" class="nav-link" data-scroll-target="#scaleintensitypercentiles">ScaleIntensityPercentiles</a></li>
+  <li><a href="#scaleintensityvariance" id="toc-scaleintensityvariance" class="nav-link" data-scroll-target="#scaleintensityvariance">ScaleIntensityVariance</a></li>
+  </ul></li>
+  <li><a href="#data-augmentation" id="toc-data-augmentation" class="nav-link" data-scroll-target="#data-augmentation">Data Augmentation</a>
+  <ul>
+  <li><a href="#randcrop2d" id="toc-randcrop2d" class="nav-link" data-scroll-target="#randcrop2d">RandCrop2D</a></li>
+  <li><a href="#randcropnd" id="toc-randcropnd" class="nav-link" data-scroll-target="#randcropnd">RandCropND</a></li>
+  <li><a href="#randflip" id="toc-randflip" class="nav-link" data-scroll-target="#randflip">RandFlip</a></li>
+  <li><a href="#randrot90" id="toc-randrot90" class="nav-link" data-scroll-target="#randrot90">RandRot90</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Transforms</h1>
+</div>
+
+<div>
+  <div class="description">
+    Data transformations and augmentations for 2D and 3D BioImages
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+<script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="size-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="size-sampling">Size &amp; Sampling</h2>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L19" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="resample" class="level3">
+<h3 class="anchored" data-anchor-id="resample">Resample</h3>
+<blockquote class="blockquote">
+<pre><code> Resample (sampling, **kwargs)</code></pre>
+</blockquote>
+<p>*A subclass of Spacing that handles image resampling based on specified sampling factors or voxel dimensions.</p>
+<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resample"><code>Resample</code></a> class inherits from <code>Spacing</code> and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.</p>
+<p>Args: sampling (int, optional): Sampling factor for isotropic resampling. Default is 1, indicating no change in resolution. **kwargs: Additional keyword arguments that can include ‘pixdim’ to specify custom voxel dimensions.</p>
+<p>Attributes: pixdim (list or tuple): The voxel dimensions of the image after resampling. If not provided during initialization, this will be determined based on the sampling factor and original image properties.*</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.core <span class="im">import</span> cells3d, img2Tensor</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> visualize_slices</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> BioImageStack(img2Tensor(cells3d()[:,<span class="dv">0</span>]))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>visualize_slices(img, showlines<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>img2 <span class="op">=</span> Resample(<span class="dv">4</span>)(img)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>visualize_slices(img2, showlines<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-4-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L58" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="resize" class="level3">
+<h3 class="anchored" data-anchor-id="resize">Resize</h3>
+<blockquote class="blockquote">
+<pre><code> Resize (size=None, **kwargs)</code></pre>
+</blockquote>
+<p>*A subclass of Reshape that handles image resizing based on specified target dimensions.</p>
+<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resize"><code>Resize</code></a> class inherits from <code>Reshape</code> and provides a flexible way to adjust the size of images by specifying either a target size or scaling factors.</p>
+<p>Args: size (int, tuple, or list, optional): Target dimensions for resizing (height, width). If its length is smaller than the spatial dimensions of the image, values will be repeated to match. If an int is provided, it will be broadcast to all spatial dimensions. Default is None, which indicates no resizing. **kwargs: Additional keyword arguments that can include scaling factors or interpolation methods.</p>
+<p>Attributes: target_size (tuple or list): The target dimensions of the image after resizing. If not provided during initialization, this will be determined based on the original image properties and optional scaling factors.*</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(img.size())</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>visualize_slices(img, showlines<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>img2 <span class="op">=</span> Resize(<span class="dv">50</span>)(img)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(img2.size())</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>visualize_slices(img2, showlines<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>torch.Size([60, 256, 256])
+torch.Size([60, 50, 50])</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-6-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-6-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="noise" class="level2">
+<h2 class="anchored" data-anchor-id="noise">Noise</h2>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L125" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="randcameranoise" class="level3">
+<h3 class="anchored" data-anchor-id="randcameranoise">RandCameraNoise</h3>
+<blockquote class="blockquote">
+<pre><code> RandCameraNoise (p:float=1.0, damp=0.01, qe=0.7, gain=2, offset=100,
+                  exp_time=0.1, dark_current=0.6, readout=1.5,
+                  bitdepth=16, seed=42, simulation=False, camera='cmos',
+                  gain_variance=0.1, offset_variance=5)</code></pre>
+</blockquote>
+<p>*Simulates camera noise by adding Poisson shot noise, dark current noise, and optionally CMOS fixed pattern noise.</p>
+<p>Returns: numpy.ndarray: The noisy image as a NumPy array with dimensions of input_image.*</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>p</td>
+<td>float</td>
+<td>1.0</td>
+<td>Probability of applying Transform</td>
+</tr>
+<tr class="even">
+<td>damp</td>
+<td>float</td>
+<td>0.01</td>
+<td>Dampening factor to prevent saturation when adding noise</td>
+</tr>
+<tr class="odd">
+<td>qe</td>
+<td>float</td>
+<td>0.7</td>
+<td>Quantum efficiency of the camera (0 to 1).</td>
+</tr>
+<tr class="even">
+<td>gain</td>
+<td>int</td>
+<td>2</td>
+<td>Camera gain factor. If an array, it should be broadcastable with input_image shape.</td>
+</tr>
+<tr class="odd">
+<td>offset</td>
+<td>int</td>
+<td>100</td>
+<td>Camera offset in ADU. If an array, it should be broadcastable with input_image shape.</td>
+</tr>
+<tr class="even">
+<td>exp_time</td>
+<td>float</td>
+<td>0.1</td>
+<td>Exposure time in seconds.</td>
+</tr>
+<tr class="odd">
+<td>dark_current</td>
+<td>float</td>
+<td>0.6</td>
+<td>Dark current per pixel in electrons/second.</td>
+</tr>
+<tr class="even">
+<td>readout</td>
+<td>float</td>
+<td>1.5</td>
+<td>Readout noise standard deviation in electrons.</td>
+</tr>
+<tr class="odd">
+<td>bitdepth</td>
+<td>int</td>
+<td>16</td>
+<td>Bit depth of the camera output.</td>
+</tr>
+<tr class="even">
+<td>seed</td>
+<td>int</td>
+<td>42</td>
+<td>Seed for random number generator for reproducibility.</td>
+</tr>
+<tr class="odd">
+<td>simulation</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, assumes input_image is already in units of photons and does not convert from electrons.</td>
+</tr>
+<tr class="even">
+<td>camera</td>
+<td>str</td>
+<td>cmos</td>
+<td>Specifies the type of camera (‘cmos’ or any other). Used to add CMOS fixed pattern noise if ‘cmos’ is specified.</td>
+</tr>
+<tr class="odd">
+<td>gain_variance</td>
+<td>float</td>
+<td>0.1</td>
+<td>Variance for the gain noise in CMOS cameras. Only applicable if camera type is ‘cmos’.</td>
+</tr>
+<tr class="even">
+<td>offset_variance</td>
+<td>int</td>
+<td>5</td>
+<td>Variance for the offset noise in CMOS cameras. Only applicable if camera type is ‘cmos’.</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>img3 <span class="op">=</span> img[<span class="dv">30</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plot_image(img3)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'cmos'</span>).encodes(img3))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'ccd'</span>, readout<span class="op">=</span><span class="dv">2</span>).encodes(img3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-10-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-10-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="normalization" class="level2">
+<h2 class="anchored" data-anchor-id="normalization">Normalization</h2>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L206" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="scaleintensity" class="level3">
+<h3 class="anchored" data-anchor-id="scaleintensity">ScaleIntensity</h3>
+<blockquote class="blockquote">
+<pre><code> ScaleIntensity (x, min=0.0, max=1.0, axis=None, eps=1e-20, dtype=&lt;class
+                 'numpy.float32'&gt;)</code></pre>
+</blockquote>
+<p><em>Image normalization.</em></p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L219" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="scaleintensitypercentiles" class="level3">
+<h3 class="anchored" data-anchor-id="scaleintensitypercentiles">ScaleIntensityPercentiles</h3>
+<blockquote class="blockquote">
+<pre><code> ScaleIntensityPercentiles (x, pmin=3, pmax=99.8, axis=None, clip=True,
+                            b_min=0.0, b_max=1.0, eps=1e-20, dtype=&lt;class
+                            'numpy.float32'&gt;)</code></pre>
+</blockquote>
+<p><em>Percentile-based image normalization.</em></p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L234" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="scaleintensityvariance" class="level3">
+<h3 class="anchored" data-anchor-id="scaleintensityvariance">ScaleIntensityVariance</h3>
+<blockquote class="blockquote">
+<pre><code> ScaleIntensityVariance (ndim=2)</code></pre>
+</blockquote>
+<p>*Scales the intensity variance of an ND image to a target value.</p>
+<p>Args: target_variance (float): The desired variance for the scaled intensities. ndim (int): Number of spatial dimensions in the image. Default is 2 for 2D images.*</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage with a random tensor of shape (1, 3, 256, 256)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">256</span>, <span class="dv">256</span>))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>transform <span class="op">=</span> ScaleIntensityVariance(ndim<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the transform to the tensor</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>scaled_tensor <span class="op">=</span> transform(rand_tensor)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original Tensor Variance:'</span>, rand_tensor.var().item())</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Scaled Tensor Variance:'</span>, scaled_tensor.var().item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Original Tensor Variance: 0.08341076225042343
+Scaled Tensor Variance: 1.0</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="data-augmentation" class="level2">
+<h2 class="anchored" data-anchor-id="data-augmentation">Data Augmentation</h2>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L275" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="randcrop2d" class="level3">
+<h3 class="anchored" data-anchor-id="randcrop2d">RandCrop2D</h3>
+<blockquote class="blockquote">
+<pre><code> RandCrop2D (size:int|tuple, lazy=False, **kwargs)</code></pre>
+</blockquote>
+<p><em>Randomly crop an image to <code>size</code></em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>size</td>
+<td>int | tuple</td>
+<td></td>
+<td>Size to crop to, duplicated if one value is specified</td>
+</tr>
+<tr class="even">
+<td>lazy</td>
+<td>bool</td>
+<td>False</td>
+<td>a flag to indicate whether this transform should execute lazily or not. Defaults to False</td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L306" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="randcropnd" class="level3">
+<h3 class="anchored" data-anchor-id="randcropnd">RandCropND</h3>
+<blockquote class="blockquote">
+<pre><code> RandCropND (size:int|tuple, lazy=False, **kwargs)</code></pre>
+</blockquote>
+<p>*Randomly crops an ND image to a specified size.</p>
+<p>This transform randomly crops an ND image to a specified size during training and performs a center crop during validation. It supports both 2D and 3D images and videos, assuming the first dimension is the batch dimension.</p>
+<p>Args: size (int or tuple): The size to crop the image to. this can have any number of dimensions. If a single value is provided, it will be duplicated for each spatial dimension, up to a maximum of 3 dimensions. **kwargs: Additional keyword arguments to be passed to the parent class.*</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>size</td>
+<td>int | tuple</td>
+<td></td>
+<td>Size to crop to, duplicated if one value is specified</td>
+</tr>
+<tr class="even">
+<td>lazy</td>
+<td>bool</td>
+<td>False</td>
+<td>a flag to indicate whether this transform should execute lazily or not. Defaults to False</td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">65</span>, <span class="dv">65</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">8</span>, <span class="op">*</span>orig_size))</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    test_eq((<span class="dv">8</span>,<span class="dv">64</span>,<span class="dv">64</span>),RandCropND((<span class="dv">64</span>,<span class="dv">64</span>))(rand_tensor).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L360" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="randflip" class="level3">
+<h3 class="anchored" data-anchor-id="randflip">RandFlip</h3>
+<blockquote class="blockquote">
+<pre><code> RandFlip (prob=0.1, spatial_axis=None, ndim=2, lazy=False, **kwargs)</code></pre>
+</blockquote>
+<p><em>Randomly flips an ND image over a specified axis.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>prob</td>
+<td>float</td>
+<td>0.1</td>
+<td>Probability of flipping</td>
+</tr>
+<tr class="even">
+<td>spatial_axis</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Spatial axes along which to flip over. Default is None. The default axis=None will flip over all of the axes of the input array.</td>
+</tr>
+<tr class="odd">
+<td>ndim</td>
+<td>int</td>
+<td>2</td>
+<td>If axis is negative it counts from the last to the first axis. If axis is a tuple of ints, flipping is performed on all of the axes specified in the tuple.</td>
+</tr>
+<tr class="even">
+<td>lazy</td>
+<td>bool</td>
+<td>False</td>
+<td>Flag to indicate whether this transform should execute lazily or not. Defaults to False</td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandFlip(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axis<span class="op">=</span><span class="va">None</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>orig tensor:  metatensor([[[0.8943, 0.3943, 0.2556, 0.8066],
+         [0.5016, 0.6177, 0.8749, 0.1229],
+         [0.9610, 0.1088, 0.5785, 0.6857],
+         [0.5776, 0.7028, 0.5421, 0.3654]]]) 
+
+metatensor([[[0.8066, 0.2556, 0.3943, 0.8943],
+         [0.1229, 0.8749, 0.6177, 0.5016],
+         [0.6857, 0.5785, 0.1088, 0.9610],
+         [0.3654, 0.5421, 0.7028, 0.5776]]])
+metatensor([[[0.8943, 0.3943, 0.2556, 0.8066],
+         [0.5016, 0.6177, 0.8749, 0.1229],
+         [0.9610, 0.1088, 0.5785, 0.6857],
+         [0.5776, 0.7028, 0.5421, 0.3654]]])
+metatensor([[[0.8066, 0.2556, 0.3943, 0.8943],
+         [0.1229, 0.8749, 0.6177, 0.5016],
+         [0.6857, 0.5785, 0.1088, 0.9610],
+         [0.3654, 0.5421, 0.7028, 0.5776]]])</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L394" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="randrot90" class="level3">
+<h3 class="anchored" data-anchor-id="randrot90">RandRot90</h3>
+<blockquote class="blockquote">
+<pre><code> RandRot90 (prob=0.1, max_k=3, spatial_axes=(0, 1), ndim=2, lazy=False,
+            **kwargs)</code></pre>
+</blockquote>
+<p><em>Randomly rotate an ND image by 90 degrees in the plane specified by axes.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>prob</td>
+<td>float</td>
+<td>0.1</td>
+<td>Probability of rotating</td>
+</tr>
+<tr class="even">
+<td>max_k</td>
+<td>int</td>
+<td>3</td>
+<td>Max number of times to rotate by 90 degrees</td>
+</tr>
+<tr class="odd">
+<td>spatial_axes</td>
+<td>tuple</td>
+<td>(0, 1)</td>
+<td>Spatial axes along which to rotate. Default: (0, 1), this is the first two axis in spatial dimensions.</td>
+</tr>
+<tr class="even">
+<td>ndim</td>
+<td>int</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>lazy</td>
+<td>bool</td>
+<td>False</td>
+<td>Flag to indicate whether this transform should execute lazily or not. Defaults to False</td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRot90(prob<span class="op">=</span><span class="fl">.75</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>orig tensor:  metatensor([[[0.3961, 0.2351, 0.4363, 0.3366],
+         [0.9416, 0.8529, 0.8646, 0.0091],
+         [0.5012, 0.9804, 0.8109, 0.1094],
+         [0.9639, 0.5107, 0.4666, 0.8632]]]) 
+
+metatensor([[[0.3961, 0.2351, 0.4363, 0.3366],
+         [0.9416, 0.8529, 0.8646, 0.0091],
+         [0.5012, 0.9804, 0.8109, 0.1094],
+         [0.9639, 0.5107, 0.4666, 0.8632]]])
+metatensor([[[0.9639, 0.5012, 0.9416, 0.3961],
+         [0.5107, 0.9804, 0.8529, 0.2351],
+         [0.4666, 0.8109, 0.8646, 0.4363],
+         [0.8632, 0.1094, 0.0091, 0.3366]]])
+metatensor([[[0.8632, 0.4666, 0.5107, 0.9639],
+         [0.1094, 0.8109, 0.9804, 0.5012],
+         [0.0091, 0.8646, 0.8529, 0.9416],
+         [0.3366, 0.4363, 0.2351, 0.3961]]])</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("https:\/\/bmandracchia\.github\.io\/bioMONAI");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Copyright © 2024 Biagio Mandracchia, MIT License</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bmandracchia/bioMONAI/">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

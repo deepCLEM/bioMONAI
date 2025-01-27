@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Download and store datasets">
+
+<title>bioMONAI - Datasets</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="bioMONAI - Datasets">
+<meta property="og:description" content="Download and store datasets">
+<meta property="og:site-name" content="bioMONAI">
+<meta name="twitter:title" content="bioMONAI - Datasets">
+<meta name="twitter:description" content="Download and store datasets">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">bioMONAI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://bmandracchia.github.io" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Resources</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
+        <li>
+    <a class="dropdown-item" href="https://monai.io/" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">monai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://docs.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fast.ai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastcore.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastcore</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastxtend</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://nbdev.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">nbdev</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/bmandracchia/bioMONAI/issues" rel="" target=""><i class="bi bi-bug" role="img">
+</i> 
+ <span class="dropdown-text">Report an Issue</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bmandracchia/bioMONAI/" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/" rel="" target=""><i class="bi bi-twitter" role="img" aria-label="Twitter">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./datasets.html">Datasets</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bioMONAI</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./io.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">I/O</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./losses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Loss functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Networks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./transforms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transforms</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metrics</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datasets.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Datasets</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./visualize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial: Image Classification</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_classification3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial: 3D Image Classification</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial Denoising</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial Multispectral Classification</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#medmnist-datasets" id="toc-medmnist-datasets" class="nav-link active" data-scroll-target="#medmnist-datasets">MedMNIST Datasets</a></li>
+  <li><a href="#download_medmnist" id="toc-download_medmnist" class="nav-link" data-scroll-target="#download_medmnist">download_medmnist</a></li>
+  <li><a href="#medmnist2df" id="toc-medmnist2df" class="nav-link" data-scroll-target="#medmnist2df">medmnist2df</a></li>
+  <li><a href="#download-data-via-pooch" id="toc-download-data-via-pooch" class="nav-link" data-scroll-target="#download-data-via-pooch">Download data via Pooch</a></li>
+  <li><a href="#download_file" id="toc-download_file" class="nav-link" data-scroll-target="#download_file">download_file</a></li>
+  <li><a href="#download_dataset" id="toc-download_dataset" class="nav-link" data-scroll-target="#download_dataset">download_dataset</a></li>
+  <li><a href="#download_dataset_from_csv" id="toc-download_dataset_from_csv" class="nav-link" data-scroll-target="#download_dataset_from_csv">download_dataset_from_csv</a></li>
+  <li><a href="#download-data-via-quiltt4" id="toc-download-data-via-quiltt4" class="nav-link" data-scroll-target="#download-data-via-quiltt4">Download data via Quilt/T4</a></li>
+  <li><a href="#aics_pipeline" id="toc-aics_pipeline" class="nav-link" data-scroll-target="#aics_pipeline">aics_pipeline</a></li>
+  <li><a href="#dataset-manifest" id="toc-dataset-manifest" class="nav-link" data-scroll-target="#dataset-manifest">Dataset Manifest</a></li>
+  <li><a href="#manifest2csv" id="toc-manifest2csv" class="nav-link" data-scroll-target="#manifest2csv">manifest2csv</a></li>
+  <li><a href="#split_dataframe" id="toc-split_dataframe" class="nav-link" data-scroll-target="#split_dataframe">split_dataframe</a></li>
+  <li><a href="#add_columns_to_csv" id="toc-add_columns_to_csv" class="nav-link" data-scroll-target="#add_columns_to_csv">add_columns_to_csv</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Datasets</h1>
+</div>
+
+<div>
+  <div class="description">
+    Download and store datasets
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+<script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="medmnist-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="medmnist-datasets">MedMNIST Datasets</h3>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L26" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="download_medmnist" class="level3">
+<h3 class="anchored" data-anchor-id="download_medmnist">download_medmnist</h3>
+<blockquote class="blockquote">
+<pre><code> download_medmnist (dataset:str, output_dir:str='.',
+                    download_only:bool=False, save_images:bool=True)</code></pre>
+</blockquote>
+<p>*Downloads the specified MedMNIST dataset and saves the training, validation, and test datasets into the specified output directory. Images are saved as .png for 2D data and multi-page .tiff for 3D data, organized into folders named after their labels.</p>
+<p>Args: - dataset: The MedMNIST dataset name (e.g., ‘pathmnist’, ‘bloodmnist’, etc.). - output_dir: Path where the images will be saved. - download_only: If True, only downloads the dataset, no processing or saving. - save_images: If True, save the images in the specified output directory.</p>
+<p>Returns: - None, saves images in the specified output directory if save_images is True.*</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dataset</td>
+<td>str</td>
+<td></td>
+<td>The name of the MedMNIST dataset (e.g., ‘pathmnist’, ‘bloodmnist’, etc.).</td>
+</tr>
+<tr class="even">
+<td>output_dir</td>
+<td>str</td>
+<td>.</td>
+<td>The path to the directory where the datasets will be saved.</td>
+</tr>
+<tr class="odd">
+<td>download_only</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, only download the dataset into the output directory without processing.</td>
+</tr>
+<tr class="even">
+<td>save_images</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, save the images into the output directory as .png (2D datasets) or multipage .tiff (3D datasets) files.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L133" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="medmnist2df" class="level3">
+<h3 class="anchored" data-anchor-id="medmnist2df">medmnist2df</h3>
+<blockquote class="blockquote">
+<pre><code> medmnist2df (train_dataset, val_dataset=None, test_dataset=None,
+              mode='RGB')</code></pre>
+</blockquote>
+<p>*Convert MedMNIST datasets to DataFrames, with images as PIL Image objects and labels as DataFrame columns.</p>
+<p>Missing datasets (if None) are represented by None in the return tuple.*</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>train_dataset</td>
+<td></td>
+<td></td>
+<td>MedMNIST training dataset with images and labels</td>
+</tr>
+<tr class="even">
+<td>val_dataset</td>
+<td>NoneType</td>
+<td>None</td>
+<td>(Optional) MedMNIST validation dataset with images and labels</td>
+</tr>
+<tr class="odd">
+<td>test_dataset</td>
+<td>NoneType</td>
+<td>None</td>
+<td>(Optional) MedMNIST test dataset with images and labels</td>
+</tr>
+<tr class="even">
+<td>mode</td>
+<td>str</td>
+<td>RGB</td>
+<td>Mode for PIL Image conversion, e.g., ‘RGB’, ‘L’</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>(&lt;class ‘pandas.core.frame.DataFrame’&gt;, &lt;class ‘pandas.core.frame.DataFrame’&gt;, &lt;class ‘pandas.core.frame.DataFrame’&gt;)</strong></td>
+<td></td>
+<td><strong>(df_train, df_val, df_test): DataFrames with columns ‘image’ and ‘label’</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="download-data-via-pooch" class="level3">
+<h3 class="anchored" data-anchor-id="download-data-via-pooch">Download data via Pooch</h3>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L161" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="download_file" class="level3">
+<h3 class="anchored" data-anchor-id="download_file">download_file</h3>
+<blockquote class="blockquote">
+<pre><code> download_file (url, output_dir='data', extract=True, hash=None,
+                extract_dir=None)</code></pre>
+</blockquote>
+<p>*Download and optionally decompress a single file using Pooch.</p>
+<p>Parameters: url (str): Direct URL to the file to be downloaded. output_dir (str): The directory where the downloaded file will be saved. extract (bool): If True, decompresses the file if it’s in a compressed format.*</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L197" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="download_dataset" class="level3">
+<h3 class="anchored" data-anchor-id="download_dataset">download_dataset</h3>
+<blockquote class="blockquote">
+<pre><code> download_dataset (base_url, expected_checksums, file_names, output_dir,
+                   processor=None)</code></pre>
+</blockquote>
+<p>*Download a dataset using Pooch and save it to the specified output directory.</p>
+<p>Parameters: base_url (str): The base URL from which the files will be downloaded. expected_checksums (dict): A dictionary mapping file names to their expected checksums. file_names (dict): A dictionary mapping task identifiers to file names. output_dir (str): The directory where the downloaded files will be saved. processor (callable, optional): A function to process the downloaded data. Defaults to None.*</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L226" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="download_dataset_from_csv" class="level3">
+<h3 class="anchored" data-anchor-id="download_dataset_from_csv">download_dataset_from_csv</h3>
+<blockquote class="blockquote">
+<pre><code> download_dataset_from_csv (csv_file, base_url, output_dir,
+                            processor=None, rows=None, prepend_mdf5=True)</code></pre>
+</blockquote>
+<p>*Download a dataset using Pooch and save it to the specified output directory, reading file names and checksums from a CSV file.</p>
+<p>Parameters: csv_file (str): Path to the CSV file containing file names and checksums. base_url (str): The base URL from which the files will be downloaded. output_dir (str): The directory where the downloaded files will be saved. processor (callable, optional): A function to process the downloaded data. Defaults to None. rows (list of int, optional): Specific row indices to download. If None, download all rows. Defaults to None.*</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the directory where you want to save the downloaded files</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>output_directory <span class="op">=</span> <span class="st">"./_test_folder"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the base URL for the MSD dataset</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">'https://s3.ap-northeast-1.wasabisys.com/gigadb-datasets/live/pub/10.5524/100001_101000/100888/'</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>download_dataset_from_csv(<span class="st">'./data_examples/FMD_dataset_info.csv'</span>, base_url, output_directory, rows<span class="op">=</span>[<span class="dv">6</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The dataset has been successfully downloaded and saved to: ./_test_folder</code></pre>
+</div>
+</div>
+</section>
+<section id="download-data-via-quiltt4" class="level3">
+<h3 class="anchored" data-anchor-id="download-data-via-quiltt4">Download data via Quilt/T4</h3>
+<p>Allen Institute Cell Science (AICS)</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L269" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="aics_pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="aics_pipeline">aics_pipeline</h3>
+<blockquote class="blockquote">
+<pre><code> aics_pipeline (n_images_to_download=40, image_save_dir=None)</code></pre>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>image_target_paths, data_manifest <span class="op">=</span> aics_pipeline(<span class="dv">1</span>, <span class="st">"../_data/aics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading manifest: 100%|██████████| 77165/77165 [00:01&lt;00:00, 44.8k/s]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(image_target_paths)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>data_manifest.to_csv(<span class="st">'../_data/aics/aics_dataset.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['../_data/aics/6677e50c_3500001004_100X_20170623_5-Scene-1-P24-E06.ome.tiff']</code></pre>
+</div>
+</div>
+</section>
+<section id="dataset-manifest" class="level3">
+<h3 class="anchored" data-anchor-id="dataset-manifest">Dataset Manifest</h3>
+<p>Make a manifest of all of the files in csv form</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L312" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="manifest2csv" class="level3">
+<h3 class="anchored" data-anchor-id="manifest2csv">manifest2csv</h3>
+<blockquote class="blockquote">
+<pre><code> manifest2csv (signal, target, paths=None, train_fraction=0.8,
+               data_save_path='./', train='train.csv', test='test.csv',
+               identifier=None)</code></pre>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>manifest2csv(data_manifest[<span class="st">"ChannelNumberBrightfield"</span>],data_manifest[<span class="st">"ChannelNumber405"</span>], image_target_paths, data_save_path<span class="op">=</span><span class="st">'./data_examples/'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L342" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="split_dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="split_dataframe">split_dataframe</h3>
+<blockquote class="blockquote">
+<pre><code> split_dataframe (input_data, train_fraction=0.7, valid_fraction=0.1,
+                  split_column=None, stratify=False, add_is_valid=False,
+                  train_path='train.csv', test_path='test.csv',
+                  valid_path='valid.csv', data_save_path=None)</code></pre>
+</blockquote>
+<p>*Splits a DataFrame or CSV file into train, test, and optional validation sets.</p>
+<p>Parameters: - input_data (str or pd.DataFrame): Path to CSV file or a DataFrame. - train_fraction (float): Proportion of data to use for the training set (0 &lt; train_fraction &lt; 1). - valid_fraction (float): Proportion of data to use for the validation set (0 &lt;= valid_fraction &lt; 1). - split_column (str, optional): Column name that indicates pre-defined split (‘train’, ‘test’, ‘validation’ values expected). - stratify (bool): If True, stratify by split_column during random split if no predefined split is present. - add_is_valid (bool): If True, adds ‘is_valid’ column in the train set to mark validation samples. - train_path (str): Path to save the training CSV file. - test_path (str): Path to save the test CSV file. - valid_path (str): Path to save the validation CSV file, if created separately.*</p>
+<hr>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L420" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="add_columns_to_csv" class="level3">
+<h3 class="anchored" data-anchor-id="add_columns_to_csv">add_columns_to_csv</h3>
+<blockquote class="blockquote">
+<pre><code> add_columns_to_csv (csv_path, column_data, output_path=None)</code></pre>
+</blockquote>
+<p>*Adds one or more new columns to an existing CSV file.</p>
+<p>Parameters: - csv_path (str): Path to the input CSV file. - column_data (dict): Dictionary where keys are column names and values are column data. Each value can be a scalar (single value for all rows) or a list matching the number of rows. - output_path (str, optional): Path to save the updated CSV file. If None, it overwrites the input CSV file.*</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("https:\/\/bmandracchia\.github\.io\/bioMONAI");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Copyright © 2024 Biagio Mandracchia, MIT License</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bmandracchia/bioMONAI/">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>
