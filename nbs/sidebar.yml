@@ -12,7 +12,9 @@ website:
       - 07_callbacks.ipynb
       - 08_datasets.ipynb
       - 09_visualize.ipynb
-      - 901_tutorial_classification.ipynb
-      - 902_tutorial_classification3D.ipynb
-      - 903_tutorial_denoising.ipynb
-      - 904_tutorial_multispectral_classification.ipynb
+      - section: tutorials
+        contents:
+          - tutorials/901_tutorial_classification.ipynb
+          - tutorials/902_tutorial_classification3D.ipynb
+          - tutorials/903_tutorial_denoising.ipynb
+          - tutorials/904_tutorial_multispectral_classification.ipynb
