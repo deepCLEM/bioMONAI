@@ -3,7 +3,7 @@ project:
 
 format:
   html:
-    theme: minty
+    theme: superhero
     css: styles.css
     toc: true
     toc-depth: 4
