@@ -3,7 +3,7 @@ project:
 
 format:
   html:
-    theme: lumen
+    theme: minty
     css: styles.css
     toc: true
     toc-depth: 4
@@ -23,7 +23,7 @@ website:
     search: true
     left:
       - text: "Blog"
-        href: https://bmandracchia.github.io
+        href: https://deepclem.github.io
       - text: "Resources"
         menu:
           - text: monai
@@ -43,10 +43,10 @@ website:
             href: https://nbdev.fast.ai
           - text: "Report an Issue"
             icon: bug
-            href: https://github.com/bmandracchia/bioMONAI/issues
+            href: https://github.com/deepCLEM/bioMONAI/issues
     right:
       - icon: github
-        href: https://github.com/bmandracchia/bioMONAI/
+        href: https://github.com/deepCLEM/bioMONAI/
         aria-label: GitHub
       - icon: twitter
         href: https://twitter.com/
@@ -58,7 +58,7 @@ website:
     left: "Copyright © 2024 Biagio Mandracchia, MIT License"
     right:
       - icon: github
-        href: https://github.com/bmandracchia/bioMONAI/
+        href: https://github.com/deepCLEM/bioMONAI/
       - icon: twitter
         href: https://twitter.com/
   body-header: |
