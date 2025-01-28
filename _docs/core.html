@@ -99,15 +99,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="styles.css">
 <meta property="og:title" content="bioMONAI - Core">
 <meta property="og:description" content="bioMONAI core functions">
-<meta property="og:image" content="https://bmandracchia.github.io/bioMONAI/00_core_files/figure-html/cell-16-output-1.png">
+<meta property="og:image" content="https://bmandracchia.github.io/bioMONAI/00_core_files/figure-html/cell-17-output-1.png">
 <meta property="og:site-name" content="bioMONAI">
 <meta property="og:image:height" content="563">
-<meta property="og:image:width" content="702">
+<meta property="og:image:width" content="693">
 <meta name="twitter:title" content="bioMONAI - Core">
 <meta name="twitter:description" content="bioMONAI core functions">
-<meta name="twitter:image" content="https://bmandracchia.github.io/bioMONAI/00_core_files/figure-html/cell-16-output-1.png">
+<meta name="twitter:image" content="https://bmandracchia.github.io/bioMONAI/00_core_files/figure-html/cell-17-output-1.png">
 <meta name="twitter:image-height" content="563">
-<meta name="twitter:image-width" content="702">
+<meta name="twitter:image-width" content="693">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -1009,17 +1009,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> compute_losses (predictions, targets, loss_fn)</code></pre>
 </blockquote>
 <p><em>Compute the loss for each prediction-target pair.</em></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>stats</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="00_core_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
+<p><img src="00_core_files/figure-html/cell-17-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 <hr>
@@ -1126,7 +1126,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                                 show_table=True, show_results=True,
                                 as_dataframe=True, cmap=&lt;matplotlib.colors
                                 .LinearSegmentedColormap object at
-                                0x7f511ba62cd0&gt;)</code></pre>
+                                0x7f85b2512fd0&gt;)</code></pre>
 </blockquote>
 <p><em>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</em></p>
 <table class="table">
@@ -1214,7 +1214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td>cmap</td>
 <td>LinearSegmentedColormap</td>
-<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7f511ba62cd0&gt;</td>
+<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7f85b2512fd0&gt;</td>
 <td>Color map for the confusion matrix plot.</td>
 </tr>
 </tbody>

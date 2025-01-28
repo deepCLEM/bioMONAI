@@ -321,16 +321,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#crossentropylossflat3d" id="toc-crossentropylossflat3d" class="nav-link" data-scroll-target="#crossentropylossflat3d">CrossEntropyLossFlat3D</a></li>
   <li><a href="#diceloss" id="toc-diceloss" class="nav-link" data-scroll-target="#diceloss">DiceLoss</a></li>
   <li><a href="#fourier-ring-correlation" id="toc-fourier-ring-correlation" class="nav-link" data-scroll-target="#fourier-ring-correlation">Fourier Ring Correlation</a></li>
-  <li><a href="#frcloss" id="toc-frcloss" class="nav-link" data-scroll-target="#frcloss">FRCLoss</a>
-  <ul>
-  <li><a href="#args" id="toc-args" class="nav-link" data-scroll-target="#args">Args:</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns:</a></li>
-  </ul></li>
-  <li><a href="#fcrcutoff" id="toc-fcrcutoff" class="nav-link" data-scroll-target="#fcrcutoff">FCRCutoff</a>
-  <ul>
-  <li><a href="#args-1" id="toc-args-1" class="nav-link" data-scroll-target="#args-1">Args:</a></li>
-  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns:</a></li>
-  </ul></li>
+  <li><a href="#frcloss" id="toc-frcloss" class="nav-link" data-scroll-target="#frcloss">FRCLoss</a></li>
+  <li><a href="#fcrcutoff" id="toc-fcrcutoff" class="nav-link" data-scroll-target="#fcrcutoff">FCRCutoff</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -428,7 +420,61 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<table class="table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>spatial_dims</td>
+<td>int</td>
+<td>2</td>
+<td>Number of spatial dimensions.</td>
+</tr>
+<tr class="even">
+<td>window_size</td>
+<td>int</td>
+<td>8</td>
+<td>Size of the Gaussian filter for SSIM.</td>
+</tr>
+<tr class="odd">
+<td>sigma</td>
+<td>float</td>
+<td>1.5</td>
+<td>Standard deviation of the Gaussian filter.</td>
+</tr>
+<tr class="even">
+<td>reduction</td>
+<td>str</td>
+<td>mean</td>
+<td>Specifies the reduction to apply to the output (‘mean’, ‘sum’, or ‘none’).</td>
+</tr>
+<tr class="odd">
+<td>levels</td>
+<td>int</td>
+<td>3</td>
+<td>Number of scales to use for MS-SSIM.</td>
+</tr>
+<tr class="even">
+<td>weights</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Weights to apply to each scale. If None, default values are used.</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>msssim_loss <span class="op">=</span> MSSSIMLoss(levels<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ssim_loss <span class="op">=</span> SSIMLoss(<span class="dv">2</span>)</span>
@@ -469,7 +515,67 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<table class="table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>spatial_dims</td>
+<td>int</td>
+<td>2</td>
+<td>Number of spatial dimensions.</td>
+</tr>
+<tr class="even">
+<td>alpha</td>
+<td>float</td>
+<td>0.025</td>
+<td>Weighting factor between MS-SSIM and L1 loss.</td>
+</tr>
+<tr class="odd">
+<td>window_size</td>
+<td>int</td>
+<td>8</td>
+<td>Size of the Gaussian filter for SSIM.</td>
+</tr>
+<tr class="even">
+<td>sigma</td>
+<td>float</td>
+<td>1.5</td>
+<td>Standard deviation of the Gaussian filter.</td>
+</tr>
+<tr class="odd">
+<td>reduction</td>
+<td>str</td>
+<td>mean</td>
+<td>Specifies the reduction to apply to the output (‘mean’, ‘sum’, or ‘none’).</td>
+</tr>
+<tr class="even">
+<td>levels</td>
+<td>int</td>
+<td>3</td>
+<td>Number of scales to use for MS-SSIM.</td>
+</tr>
+<tr class="odd">
+<td>weights</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Weights to apply to each scale. If None, default values are used.</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>msssiml1_loss <span class="op">=</span> MSSSIML1Loss(alpha<span class="op">=</span><span class="fl">0.025</span>, window_size<span class="op">=</span><span class="dv">11</span>, sigma<span class="op">=</span><span class="fl">1.5</span>, levels<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>input_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)  <span class="co"># Batch of 4 grayscale images (1 channel)</span></span>
@@ -511,7 +617,67 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<table class="table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>spatial_dims</td>
+<td>int</td>
+<td>2</td>
+<td>Number of spatial dimensions.</td>
+</tr>
+<tr class="even">
+<td>alpha</td>
+<td>float</td>
+<td>0.1</td>
+<td>Weighting factor between MS-SSIM and L2 loss.</td>
+</tr>
+<tr class="odd">
+<td>window_size</td>
+<td>int</td>
+<td>11</td>
+<td>Size of the Gaussian window for SSIM.</td>
+</tr>
+<tr class="even">
+<td>sigma</td>
+<td>float</td>
+<td>1.5</td>
+<td>Standard deviation of the Gaussian.</td>
+</tr>
+<tr class="odd">
+<td>reduction</td>
+<td>str</td>
+<td>mean</td>
+<td>Specifies the reduction to apply to the output (‘mean’, ‘sum’, or ‘none’).</td>
+</tr>
+<tr class="even">
+<td>levels</td>
+<td>int</td>
+<td>3</td>
+<td>Number of scales to use for MS-SSIM.</td>
+</tr>
+<tr class="odd">
+<td>weights</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Weights to apply to each scale. If None, default values are used.</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>msssim_l2_loss <span class="op">=</span> MSSSIML2Loss()</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example output with even dimensions</span></span>
@@ -549,6 +715,24 @@ class Model(nn.Module):
 <p>The Dice coefficient is a measure of overlap between two samples. It ranges from 0 (no overlap) to 1 (perfect overlap). The Dice loss is computed as 1 - Dice coefficient, so it ranges from 1 (no overlap) to 0 (perfect overlap).</p>
 <p>Attributes: smooth (float): A smoothing factor to avoid division by zero and ensure numerical stability.</p>
 <p>Methods: forward(inputs, targets): Computes the Dice loss between the predicted probabilities (inputs) and the ground truth (targets).*</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>smooth</td>
+<td>int</td>
+<td>1</td>
+<td>Smoothing factor to avoid division by zero</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inputs and targets must be equally dimensional tensors</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> randn, randint</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -579,17 +763,27 @@ class Model(nn.Module):
 <pre><code> FRCLoss (image1, image2)</code></pre>
 </blockquote>
 <p>*Compute the Fourier Ring Correlation (FRC) loss between two images.</p>
-<section id="args" class="level4">
-<h4 class="anchored" data-anchor-id="args">Args:</h4>
-<pre><code>- image1 (torch.Tensor): The first input image.
-- image2 (torch.Tensor): The second input image.</code></pre>
-</section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns:</h4>
-<pre><code>- torch.Tensor: The FRC loss.*</code></pre>
+<p>Returns: - torch.Tensor: The FRC loss.*</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>image1</td>
+<td>The first input image.</td>
+</tr>
+<tr class="even">
+<td>image2</td>
+<td>The second input image.</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/losses.py#L355" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
 </section>
 <section id="fcrcutoff" class="level3">
 <h3 class="anchored" data-anchor-id="fcrcutoff">FCRCutoff</h3>
@@ -597,17 +791,27 @@ class Model(nn.Module):
 <pre><code> FCRCutoff (image1, image2)</code></pre>
 </blockquote>
 <p>*Calculate the cutoff frequency at when Fourier ring correlation drops to 1/7.</p>
-<section id="args-1" class="level4">
-<h4 class="anchored" data-anchor-id="args-1">Args:</h4>
-<pre><code>- image1 (torch.Tensor): The first input image.
-- image2 (torch.Tensor): The second input image.</code></pre>
-</section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns:</h4>
-<pre><code>- float: The cutoff frequency.*</code></pre>
+<p>Returns: - float: The cutoff frequency.*</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>image1</td>
+<td>The first input image.</td>
+</tr>
+<tr class="even">
+<td>image2</td>
+<td>The second input image.</td>
+</tr>
+</tbody>
+</table>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

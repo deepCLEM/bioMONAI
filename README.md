@@ -23,7 +23,7 @@ collaboration in biomedical research.
 ![](./data_examples/Fig_bioMONAI.png)
 
 For more information, bioMONAI documentation can be found
-[here](https://bmandracchia.github.io/bioMONAI/).
+[here](https://deepclem.github.io/bioMONAI/).
 
 ## Table of Contents
 
