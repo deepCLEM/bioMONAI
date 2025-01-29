@@ -451,8 +451,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> DnCNN (spatial_dims=2, in_channels=1, out_channels=1, num_of_layers=9,
         features=64, kernel_size=3)</code></pre>
 </blockquote>
-<p>*A Deep Neural Network for Image Denoising (DnCNN) model.</p>
-<p>Args: spatial_dims (int, optional): The number of spatial dimensions. Default is 2. in_channels (int, optional): The number of input channels. Default is 1 (grayscale image). out_channels (int, optional): The number of output channels. Default is 1 (denoised image). num_of_layers (int, optional): The number of convolutional layers in the network. Default is 9. features (int, optional): The number of feature maps in the first layer and subsequent layers. Default is 64. kernel_size (int or tuple, optional): The size of the convolution kernel. Default is 3.*</p>
+<p><em>A Deep Neural Network for Image Denoising (DnCNN) model.</em></p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>spatial_dims</td>
+<td>int</td>
+<td>2</td>
+<td>Number of spatial dimensions</td>
+</tr>
+<tr class="even">
+<td>in_channels</td>
+<td>int</td>
+<td>1</td>
+<td>Number of input channels</td>
+</tr>
+<tr class="odd">
+<td>out_channels</td>
+<td>int</td>
+<td>1</td>
+<td>Number of output channels</td>
+</tr>
+<tr class="even">
+<td>num_of_layers</td>
+<td>int</td>
+<td>9</td>
+<td>Number of convolutional layers</td>
+</tr>
+<tr class="odd">
+<td>features</td>
+<td>int</td>
+<td>64</td>
+<td>Number of feature maps</td>
+</tr>
+<tr class="even">
+<td>kernel_size</td>
+<td>int</td>
+<td>3</td>
+<td>Size of the convolution kernel</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -474,6 +521,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> interpolate (x:torch.Tensor, size:Union[List[int],Tuple[int,...]],
               dims:int)</code></pre>
 </blockquote>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x</td>
+<td>Tensor</td>
+<td>Input tensor</td>
+</tr>
+<tr class="even">
+<td>size</td>
+<td>Union</td>
+<td>Size of the output tensor</td>
+</tr>
+<tr class="odd">
+<td>dims</td>
+<td>int</td>
+<td>Number of spatial dimensions</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Tensor</strong></td>
+<td><strong>Output tensor</strong></td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/nets.py#L147" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -482,6 +560,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> get_padding (kernel_size:int, dilation:int)</code></pre>
 </blockquote>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>kernel_size</td>
+<td>int</td>
+<td>Size of the convolution kernel</td>
+</tr>
+<tr class="even">
+<td>dilation</td>
+<td>int</td>
+<td>Dilation rate</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>int</strong></td>
+<td><strong>Padding size</strong></td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/nets.py#L135" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -525,7 +629,79 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<table class="table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>config</td>
+<td>DeeplabConfig</td>
+<td></td>
+<td>Configuration for the Deeplab model</td>
+</tr>
+<tr class="even">
+<td>inplanes</td>
+<td>int</td>
+<td></td>
+<td>Number of input channels</td>
+</tr>
+<tr class="odd">
+<td>planes</td>
+<td>int</td>
+<td></td>
+<td>Number of output channels</td>
+</tr>
+<tr class="even">
+<td>reps</td>
+<td>int</td>
+<td></td>
+<td>Number of convolutional layers</td>
+</tr>
+<tr class="odd">
+<td>stride</td>
+<td>int</td>
+<td>1</td>
+<td>Stride for the convolution</td>
+</tr>
+<tr class="even">
+<td>dilation</td>
+<td>int</td>
+<td>1</td>
+<td>Dilation rate for the convolution</td>
+</tr>
+<tr class="odd">
+<td>start_with_relu</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, start with a ReLU activation</td>
+</tr>
+<tr class="even">
+<td>grow_first</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, increase the number of channels in the first convolution</td>
+</tr>
+<tr class="odd">
+<td>is_last</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, add a convolution layer at the end</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/nets.py#L159" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -553,7 +729,67 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<table class="table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>config</td>
+<td>DeeplabConfig</td>
+<td></td>
+<td>Configuration for the Deeplab model</td>
+</tr>
+<tr class="even">
+<td>inplanes</td>
+<td>int</td>
+<td></td>
+<td>Number of input channels</td>
+</tr>
+<tr class="odd">
+<td>planes</td>
+<td>int</td>
+<td></td>
+<td>Number of output channels</td>
+</tr>
+<tr class="even">
+<td>kernel_size</td>
+<td>int</td>
+<td>3</td>
+<td>Size of the convolution kernel</td>
+</tr>
+<tr class="odd">
+<td>stride</td>
+<td>int</td>
+<td>1</td>
+<td>Stride for the convolution</td>
+</tr>
+<tr class="even">
+<td>dilation</td>
+<td>int</td>
+<td>1</td>
+<td>Dilation rate for the convolution</td>
+</tr>
+<tr class="odd">
+<td>bias</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, add a bias term</td>
+</tr>
+<tr class="even">
+<td>norm</td>
+<td>Optional</td>
+<td>None</td>
+<td>Type of normalization layer</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="aligned-xception" class="level3">
 <h3 class="anchored" data-anchor-id="aligned-xception">Aligned Xception</h3>
@@ -582,7 +818,23 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<table class="table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>config</td>
+<td>DeeplabConfig</td>
+<td>Configuration for the Deeplab model</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="aspp" class="level3">
 <h3 class="anchored" data-anchor-id="aspp">ASPP</h3>
@@ -612,7 +864,38 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<table class="table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>config</td>
+<td>DeeplabConfig</td>
+<td>Configuration for the Deeplab model</td>
+</tr>
+<tr class="even">
+<td>inplanes</td>
+<td>int</td>
+<td>Number of input channels</td>
+</tr>
+<tr class="odd">
+<td>planes</td>
+<td>int</td>
+<td>Number of output channels</td>
+</tr>
+<tr class="even">
+<td>dilation</td>
+<td>int</td>
+<td>Dilation rate for the convolution</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="deeplab-v3-1" class="level3">
 <h3 class="anchored" data-anchor-id="deeplab-v3-1">DeepLab V3</h3>
@@ -778,15 +1061,49 @@ All tests passed successfully!</code></pre>
 <blockquote class="blockquote">
 <pre><code> MambaLayer (dim, d_state=16, d_conv=4, expand=2)</code></pre>
 </blockquote>
-<p>*A custom neural network layer that incorporates the Mamba block from the Mamba model, along with layer normalization and optional mixed precision handling.</p>
-<p>Args: dim (int): The dimension of the input tensor. This is typically the feature size. d_state (int, optional): Expansion factor for the state in the Mamba block. Default is 16. d_conv (int, optional): Width of the local convolution in the Mamba block. Default is 4. expand (int, optional): Factor by which to expand the dimensions in the Mamba block. Default is 2.</p>
-<p>Attributes: dim (int): The dimension of the input tensor. norm (nn.LayerNorm): Layer normalization applied to the input tensor before processing. mamba (Mamba): The core Mamba block which performs spatial-spectral transformations.</p>
-<p>Methods: forward(x): Defines the computation performed at every call.</p>
-<pre><code>    Args:
-        x (torch.Tensor): Input tensor of shape [batch_size, dim, height, width].
-
-    Returns:
-        torch.Tensor: Output tensor after applying Mamba block and normalization.*</code></pre>
+<p><em>A custom neural network layer that incorporates the Mamba block from the Mamba model, along with layer normalization and optional mixed precision handling.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dim</td>
+<td></td>
+<td></td>
+<td>Dimension of the input tensor</td>
+</tr>
+<tr class="even">
+<td>d_state</td>
+<td>int</td>
+<td>16</td>
+<td>Expansion factor for the state in the Mamba block</td>
+</tr>
+<tr class="odd">
+<td>d_conv</td>
+<td>int</td>
+<td>4</td>
+<td>Width of the local convolution in the Mamba block</td>
+</tr>
+<tr class="even">
+<td>expand</td>
+<td>int</td>
+<td>2</td>
+<td>Factor by which to expand the dimensions in the Mamba block</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/nets.py#L468" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -805,28 +1122,25 @@ All tests passed successfully!</code></pre>
          deep_supr_num:int=1, res_block:bool=False, trans_bias:bool=False)</code></pre>
 </blockquote>
 <p>*A custom subclass of DynUNet that integrates the Mamba layer into the model’s bottleneck.</p>
-<p>This class inherits from <code>DynUNet</code> and adds a specific bottleneck structure containing a convolution block followed by a MambaLayer.</p>
-<p>Methods: get_bottleneck(): Constructs and returns the bottleneck part of the network, which includes a convolution block followed by a MambaLayer.</p>
-<pre><code>    Returns:
-        nn.Sequential: A PyTorch sequential container holding the convolution block and the MambaLayer for the bottleneck.*</code></pre>
+<p>This class inherits from <code>DynUNet</code> and adds a specific bottleneck structure containing a convolution block followed by a MambaLayer.*</p>
 <section id="example-1" class="level4">
 <h4 class="anchored" data-anchor-id="example-1">Example</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> DynUNet(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>])</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> DynUNet(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>])</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch.Size([16, 1, 32, 64])</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>).cuda()</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> UMamba(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>]).cuda()</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>).cuda()</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> UMamba(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>]).cuda()</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch.Size([16, 1, 32, 64])</code></pre>
 </div>

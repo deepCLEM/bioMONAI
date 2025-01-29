@@ -376,9 +376,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> Resample (sampling, **kwargs)</code></pre>
 </blockquote>
 <p>*A subclass of Spacing that handles image resampling based on specified sampling factors or voxel dimensions.</p>
-<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resample"><code>Resample</code></a> class inherits from <code>Spacing</code> and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.</p>
-<p>Args: sampling (int, optional): Sampling factor for isotropic resampling. Default is 1, indicating no change in resolution. **kwargs: Additional keyword arguments that can include ‘pixdim’ to specify custom voxel dimensions.</p>
-<p>Attributes: pixdim (list or tuple): The voxel dimensions of the image after resampling. If not provided during initialization, this will be determined based on the sampling factor and original image properties.*</p>
+<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resample"><code>Resample</code></a> class inherits from <code>Spacing</code> and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.*</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sampling</td>
+<td>Sampling factor for isotropic resampling</td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.core <span class="im">import</span> cells3d, img2Tensor</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> visualize_slices</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

@@ -363,8 +363,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                     download_only:bool=False, save_images:bool=True)</code></pre>
 </blockquote>
 <p>*Downloads the specified MedMNIST dataset and saves the training, validation, and test datasets into the specified output directory. Images are saved as .png for 2D data and multi-page .tiff for 3D data, organized into folders named after their labels.</p>
-<p>Args: - dataset: The MedMNIST dataset name (e.g., ‘pathmnist’, ‘bloodmnist’, etc.). - output_dir: Path where the images will be saved. - download_only: If True, only downloads the dataset, no processing or saving. - save_images: If True, save the images in the specified output directory.</p>
-<p>Returns: - None, saves images in the specified output directory if save_images is True.*</p>
+<p>Returns: None, saves images in the specified output directory if save_images is True.*</p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -478,8 +477,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> download_file (url, output_dir='data', extract=True, hash=None,
                 extract_dir=None)</code></pre>
 </blockquote>
-<p>*Download and optionally decompress a single file using Pooch.</p>
-<p>Parameters: url (str): Direct URL to the file to be downloaded. output_dir (str): The directory where the downloaded file will be saved. extract (bool): If True, decompresses the file if it’s in a compressed format.*</p>
+<p><em>Download and optionally decompress a single file using Pooch.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>url</td>
+<td></td>
+<td></td>
+<td>The URL of the file to be downloaded</td>
+</tr>
+<tr class="even">
+<td>output_dir</td>
+<td>str</td>
+<td>data</td>
+<td>The directory where the downloaded file will be saved</td>
+</tr>
+<tr class="odd">
+<td>extract</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, decompresses the file if it’s in a compressed format</td>
+</tr>
+<tr class="even">
+<td>hash</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Optional: You can add a checksum for integrity verification</td>
+</tr>
+<tr class="odd">
+<td>extract_dir</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Directory to extract the files to</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L197" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -489,8 +535,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> download_dataset (base_url, expected_checksums, file_names, output_dir,
                    processor=None)</code></pre>
 </blockquote>
-<p>*Download a dataset using Pooch and save it to the specified output directory.</p>
-<p>Parameters: base_url (str): The base URL from which the files will be downloaded. expected_checksums (dict): A dictionary mapping file names to their expected checksums. file_names (dict): A dictionary mapping task identifiers to file names. output_dir (str): The directory where the downloaded files will be saved. processor (callable, optional): A function to process the downloaded data. Defaults to None.*</p>
+<p><em>Download a dataset using Pooch and save it to the specified output directory.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>base_url</td>
+<td></td>
+<td></td>
+<td>The base URL from which the files will be downloaded.</td>
+</tr>
+<tr class="even">
+<td>expected_checksums</td>
+<td></td>
+<td></td>
+<td>A dictionary mapping file names to their expected checksums.</td>
+</tr>
+<tr class="odd">
+<td>file_names</td>
+<td></td>
+<td></td>
+<td>A dictionary mapping task identifiers to file names.</td>
+</tr>
+<tr class="even">
+<td>output_dir</td>
+<td></td>
+<td></td>
+<td>The directory where the downloaded files will be saved.</td>
+</tr>
+<tr class="odd">
+<td>processor</td>
+<td>NoneType</td>
+<td>None</td>
+<td>A function to process the downloaded data.</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L226" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -500,8 +593,61 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> download_dataset_from_csv (csv_file, base_url, output_dir,
                             processor=None, rows=None, prepend_mdf5=True)</code></pre>
 </blockquote>
-<p>*Download a dataset using Pooch and save it to the specified output directory, reading file names and checksums from a CSV file.</p>
-<p>Parameters: csv_file (str): Path to the CSV file containing file names and checksums. base_url (str): The base URL from which the files will be downloaded. output_dir (str): The directory where the downloaded files will be saved. processor (callable, optional): A function to process the downloaded data. Defaults to None. rows (list of int, optional): Specific row indices to download. If None, download all rows. Defaults to None.*</p>
+<p><em>Download a dataset using Pooch and save it to the specified output directory, reading file names and checksums from a CSV file.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>csv_file</td>
+<td></td>
+<td></td>
+<td>Path to the CSV file containing file names and checksums.</td>
+</tr>
+<tr class="even">
+<td>base_url</td>
+<td></td>
+<td></td>
+<td>The base URL from which the files will be downloaded.</td>
+</tr>
+<tr class="odd">
+<td>output_dir</td>
+<td></td>
+<td></td>
+<td>The directory where the downloaded files will be saved.</td>
+</tr>
+<tr class="even">
+<td>processor</td>
+<td>NoneType</td>
+<td>None</td>
+<td>A function to process the downloaded data.</td>
+</tr>
+<tr class="odd">
+<td>rows</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Specific row indices to download. If None, download all rows.</td>
+</tr>
+<tr class="even">
+<td>prepend_mdf5</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, prepend ‘md5:’ to the checksums.</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the directory where you want to save the downloaded files</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>output_directory <span class="op">=</span> <span class="st">"./_test_folder"</span></span>
@@ -523,19 +669,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="aics_pipeline" class="level3">
 <h3 class="anchored" data-anchor-id="aics_pipeline">aics_pipeline</h3>
 <blockquote class="blockquote">
-<pre><code> aics_pipeline (n_images_to_download=40, image_save_dir=None)</code></pre>
+<pre><code> aics_pipeline (n_images_to_download=40, image_save_dir=None,
+                col='SourceReadPath')</code></pre>
 </blockquote>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>n_images_to_download</td>
+<td>int</td>
+<td>40</td>
+<td>Number of images to download</td>
+</tr>
+<tr class="even">
+<td>image_save_dir</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Directory to save the images</td>
+</tr>
+<tr class="odd">
+<td>col</td>
+<td>str</td>
+<td>SourceReadPath</td>
+<td>Column name for image paths</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>image_target_paths, data_manifest <span class="op">=</span> aics_pipeline(<span class="dv">1</span>, <span class="st">"../_data/aics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading manifest: 100%|██████████| 77165/77165 [00:01&lt;00:00, 44.8k/s]</code></pre>
+<pre><code>Loading manifest: 100%|██████████| 77165/77165 [00:01&lt;00:00, 45.2k/s]</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(image_target_paths)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>data_manifest.to_csv(<span class="st">'../_data/aics/aics_dataset.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>['../_data/aics/6677e50c_3500001004_100X_20170623_5-Scene-1-P24-E06.ome.tiff']</code></pre>
+<pre><code>['../_data/aics/9e5d8f2e_3500001004_100X_20170623_5-Scene-1-P24-E06.czi_nucWholeIndexImageScale.tiff', '../_data/aics/77a69ff1_3500001004_100X_20170623_5-Scene-3-P26-F05.czi_nucWholeIndexImageScale.tiff']</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>image_target_paths, data_manifest <span class="op">=</span> aics_pipeline(<span class="dv">1</span>, <span class="st">"../_data/aics"</span>, col<span class="op">=</span><span class="st">"NucleusSegmentationReadPath"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading manifest: 100%|██████████| 77165/77165 [00:01&lt;00:00, 46.5k/s]
+100%|██████████| 491k/491k [00:02&lt;00:00, 171kB/s] </code></pre>
 </div>
 </div>
 </section>
@@ -553,7 +737,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                identifier=None)</code></pre>
 </blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>manifest2csv(data_manifest[<span class="st">"ChannelNumberBrightfield"</span>],data_manifest[<span class="st">"ChannelNumber405"</span>], image_target_paths, data_save_path<span class="op">=</span><span class="st">'./data_examples/'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>manifest2csv(data_manifest[<span class="st">"ChannelNumberBrightfield"</span>],data_manifest[<span class="st">"ChannelNumber405"</span>], image_target_paths, data_save_path<span class="op">=</span><span class="st">'./data_examples/'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L342" target="_blank" style="float:right; font-size:smaller">source</a></p>
@@ -566,8 +750,85 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                   train_path='train.csv', test_path='test.csv',
                   valid_path='valid.csv', data_save_path=None)</code></pre>
 </blockquote>
-<p>*Splits a DataFrame or CSV file into train, test, and optional validation sets.</p>
-<p>Parameters: - input_data (str or pd.DataFrame): Path to CSV file or a DataFrame. - train_fraction (float): Proportion of data to use for the training set (0 &lt; train_fraction &lt; 1). - valid_fraction (float): Proportion of data to use for the validation set (0 &lt;= valid_fraction &lt; 1). - split_column (str, optional): Column name that indicates pre-defined split (‘train’, ‘test’, ‘validation’ values expected). - stratify (bool): If True, stratify by split_column during random split if no predefined split is present. - add_is_valid (bool): If True, adds ‘is_valid’ column in the train set to mark validation samples. - train_path (str): Path to save the training CSV file. - test_path (str): Path to save the test CSV file. - valid_path (str): Path to save the validation CSV file, if created separately.*</p>
+<p><em>Splits a DataFrame or CSV file into train, test, and optional validation sets.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>input_data</td>
+<td></td>
+<td></td>
+<td>Path to CSV file or DataFrame</td>
+</tr>
+<tr class="even">
+<td>train_fraction</td>
+<td>float</td>
+<td>0.7</td>
+<td>Proportion of data to use for the training set</td>
+</tr>
+<tr class="odd">
+<td>valid_fraction</td>
+<td>float</td>
+<td>0.1</td>
+<td>Proportion of data to use for the validation set</td>
+</tr>
+<tr class="even">
+<td>split_column</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Column name that indicates pre-defined split</td>
+</tr>
+<tr class="odd">
+<td>stratify</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, stratify by split_column during random split</td>
+</tr>
+<tr class="even">
+<td>add_is_valid</td>
+<td>bool</td>
+<td>False</td>
+<td>If True, adds ‘is_valid’ column in the train set to mark validation samples</td>
+</tr>
+<tr class="odd">
+<td>train_path</td>
+<td>str</td>
+<td>train.csv</td>
+<td>Path to save the training CSV file</td>
+</tr>
+<tr class="even">
+<td>test_path</td>
+<td>str</td>
+<td>test.csv</td>
+<td>Path to save the test CSV file</td>
+</tr>
+<tr class="odd">
+<td>valid_path</td>
+<td>str</td>
+<td>valid.csv</td>
+<td>Path to save the validation CSV file</td>
+</tr>
+<tr class="even">
+<td>data_save_path</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Path to save the data files</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L420" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -576,8 +837,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> add_columns_to_csv (csv_path, column_data, output_path=None)</code></pre>
 </blockquote>
-<p>*Adds one or more new columns to an existing CSV file.</p>
-<p>Parameters: - csv_path (str): Path to the input CSV file. - column_data (dict): Dictionary where keys are column names and values are column data. Each value can be a scalar (single value for all rows) or a list matching the number of rows. - output_path (str, optional): Path to save the updated CSV file. If None, it overwrites the input CSV file.*</p>
+<p><em>Adds one or more new columns to an existing CSV file.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>csv_path</td>
+<td></td>
+<td></td>
+<td>Path to the input CSV file</td>
+</tr>
+<tr class="even">
+<td>column_data</td>
+<td></td>
+<td></td>
+<td>Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.</td>
+</tr>
+<tr class="odd">
+<td>output_path</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Path to save the updated CSV file. If None, it overwrites the input CSV file.</td>
+</tr>
+</tbody>
+</table>
 
 
 </section>
