@@ -413,7 +413,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L58" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="resize" class="level3">
 <h3 class="anchored" data-anchor-id="resize">Resize</h3>
@@ -475,7 +475,7 @@ torch.Size([60, 50, 50])</code></pre>
 <section id="noise" class="level2">
 <h2 class="anchored" data-anchor-id="noise">Noise</h2>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L125" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L103" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="randcameranoise" class="level3">
 <h3 class="anchored" data-anchor-id="randcameranoise">RandCameraNoise</h3>
 <blockquote class="blockquote">
@@ -600,27 +600,27 @@ torch.Size([60, 50, 50])</code></pre>
 <div class="cell-output cell-output-display">
 <p><img src="05_transforms_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
 </div>
-<div class="cell-output cell-output-display">
-<p><img src="05_transforms_files/figure-html/cell-10-output-2.png" class="img-fluid"></p>
-</div>
-<div class="cell-output cell-output-display">
-<p><img src="05_transforms_files/figure-html/cell-10-output-3.png" class="img-fluid"></p>
-</div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Noisy image simulating a CMOS camera</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'cmos'</span>).encodes(img3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
+</div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Noisy image simulating a CCD camera</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'ccd'</span>, readout<span class="op">=</span><span class="dv">2</span>).encodes(img3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
 </div>
 </section>
 </section>
 <section id="normalization" class="level2">
 <h2 class="anchored" data-anchor-id="normalization">Normalization</h2>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L206" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L189" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="scaleintensity" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensity">ScaleIntensity</h3>
 <blockquote class="blockquote">
@@ -683,7 +683,7 @@ torch.Size([60, 50, 50])</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L219" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L208" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="scaleintensitypercentiles" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensitypercentiles">ScaleIntensityPercentiles</h3>
@@ -766,7 +766,7 @@ torch.Size([60, 50, 50])</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L234" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L232" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="scaleintensityvariance" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensityvariance">ScaleIntensityVariance</h3>
@@ -816,8 +816,8 @@ torch.Size([60, 50, 50])</code></pre>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original Tensor Variance:'</span>, rand_tensor.var().item())</span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Scaled Tensor Variance:'</span>, scaled_tensor.var().item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Original Tensor Variance: 0.08341076225042343
-Scaled Tensor Variance: 1.0</code></pre>
+<pre><code>Original Tensor Variance: 0.08352072536945343
+Scaled Tensor Variance: 0.9999999403953552</code></pre>
 </div>
 </div>
 </section>
@@ -825,7 +825,7 @@ Scaled Tensor Variance: 1.0</code></pre>
 <section id="data-augmentation" class="level2">
 <h2 class="anchored" data-anchor-id="data-augmentation">Data Augmentation</h2>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L275" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L271" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="randcrop2d" class="level3">
 <h3 class="anchored" data-anchor-id="randcrop2d">RandCrop2D</h3>
 <blockquote class="blockquote">
@@ -869,7 +869,7 @@ Scaled Tensor Variance: 1.0</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L306" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L302" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randcropnd" class="level3">
 <h3 class="anchored" data-anchor-id="randcropnd">RandCropND</h3>
@@ -923,7 +923,7 @@ Scaled Tensor Variance: 1.0</code></pre>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    test_eq((<span class="dv">8</span>,<span class="dv">64</span>,<span class="dv">64</span>),RandCropND((<span class="dv">64</span>,<span class="dv">64</span>))(rand_tensor).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L360" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L350" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randflip" class="level3">
 <h3 class="anchored" data-anchor-id="randflip">RandFlip</h3>
@@ -989,27 +989,27 @@ Scaled Tensor Variance: 1.0</code></pre>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandFlip(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axis<span class="op">=</span><span class="va">None</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.8943, 0.3943, 0.2556, 0.8066],
-         [0.5016, 0.6177, 0.8749, 0.1229],
-         [0.9610, 0.1088, 0.5785, 0.6857],
-         [0.5776, 0.7028, 0.5421, 0.3654]]]) 
+<pre><code>orig tensor:  metatensor([[[0.4648, 0.4394, 0.0145, 0.4412],
+         [0.2723, 0.8205, 0.4727, 0.9594],
+         [0.6661, 0.9815, 0.9765, 0.4414],
+         [0.2815, 0.6184, 0.0845, 0.0834]]]) 
 
-metatensor([[[0.8066, 0.2556, 0.3943, 0.8943],
-         [0.1229, 0.8749, 0.6177, 0.5016],
-         [0.6857, 0.5785, 0.1088, 0.9610],
-         [0.3654, 0.5421, 0.7028, 0.5776]]])
-metatensor([[[0.8943, 0.3943, 0.2556, 0.8066],
-         [0.5016, 0.6177, 0.8749, 0.1229],
-         [0.9610, 0.1088, 0.5785, 0.6857],
-         [0.5776, 0.7028, 0.5421, 0.3654]]])
-metatensor([[[0.8066, 0.2556, 0.3943, 0.8943],
-         [0.1229, 0.8749, 0.6177, 0.5016],
-         [0.6857, 0.5785, 0.1088, 0.9610],
-         [0.3654, 0.5421, 0.7028, 0.5776]]])</code></pre>
+metatensor([[[0.2815, 0.6184, 0.0845, 0.0834],
+         [0.6661, 0.9815, 0.9765, 0.4414],
+         [0.2723, 0.8205, 0.4727, 0.9594],
+         [0.4648, 0.4394, 0.0145, 0.4412]]])
+metatensor([[[0.0834, 0.0845, 0.6184, 0.2815],
+         [0.4414, 0.9765, 0.9815, 0.6661],
+         [0.9594, 0.4727, 0.8205, 0.2723],
+         [0.4412, 0.0145, 0.4394, 0.4648]]])
+metatensor([[[0.4648, 0.4394, 0.0145, 0.4412],
+         [0.2723, 0.8205, 0.4727, 0.9594],
+         [0.6661, 0.9815, 0.9765, 0.4414],
+         [0.2815, 0.6184, 0.0845, 0.0834]]])</code></pre>
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L394" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L383" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randrot90" class="level3">
 <h3 class="anchored" data-anchor-id="randrot90">RandRot90</h3>
@@ -1082,23 +1082,23 @@ metatensor([[[0.8066, 0.2556, 0.3943, 0.8943],
 <span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRot90(prob<span class="op">=</span><span class="fl">.75</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.3961, 0.2351, 0.4363, 0.3366],
-         [0.9416, 0.8529, 0.8646, 0.0091],
-         [0.5012, 0.9804, 0.8109, 0.1094],
-         [0.9639, 0.5107, 0.4666, 0.8632]]]) 
+<pre><code>orig tensor:  metatensor([[[0.6143, 0.4423, 0.1837, 0.9712],
+         [0.5201, 0.4463, 0.2429, 0.4175],
+         [0.7642, 0.9752, 0.8923, 0.8719],
+         [0.0691, 0.7557, 0.9410, 0.0721]]]) 
 
-metatensor([[[0.3961, 0.2351, 0.4363, 0.3366],
-         [0.9416, 0.8529, 0.8646, 0.0091],
-         [0.5012, 0.9804, 0.8109, 0.1094],
-         [0.9639, 0.5107, 0.4666, 0.8632]]])
-metatensor([[[0.9639, 0.5012, 0.9416, 0.3961],
-         [0.5107, 0.9804, 0.8529, 0.2351],
-         [0.4666, 0.8109, 0.8646, 0.4363],
-         [0.8632, 0.1094, 0.0091, 0.3366]]])
-metatensor([[[0.8632, 0.4666, 0.5107, 0.9639],
-         [0.1094, 0.8109, 0.9804, 0.5012],
-         [0.0091, 0.8646, 0.8529, 0.9416],
-         [0.3366, 0.4363, 0.2351, 0.3961]]])</code></pre>
+metatensor([[[0.9712, 0.4175, 0.8719, 0.0721],
+         [0.1837, 0.2429, 0.8923, 0.9410],
+         [0.4423, 0.4463, 0.9752, 0.7557],
+         [0.6143, 0.5201, 0.7642, 0.0691]]])
+metatensor([[[0.9712, 0.4175, 0.8719, 0.0721],
+         [0.1837, 0.2429, 0.8923, 0.9410],
+         [0.4423, 0.4463, 0.9752, 0.7557],
+         [0.6143, 0.5201, 0.7642, 0.0691]]])
+metatensor([[[0.0721, 0.9410, 0.7557, 0.0691],
+         [0.8719, 0.8923, 0.9752, 0.7642],
+         [0.4175, 0.2429, 0.4463, 0.5201],
+         [0.9712, 0.1837, 0.4423, 0.6143]]])</code></pre>
 </div>
 </div>
 

@@ -1009,10 +1009,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> compute_losses (predictions, targets, loss_fn)</code></pre>
 </blockquote>
 <p><em>Compute the loss for each prediction-target pair.</em></p>
-<div class="cell">
+<div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
@@ -1028,8 +1028,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="evaluate_model" class="level3">
 <h3 class="anchored" data-anchor-id="evaluate_model">evaluate_model</h3>
 <blockquote class="blockquote">
-<pre><code> evaluate_model (trainer, test_data:fastai.data.core.DataLoaders=None,
-                 loss=None, metrics=None, bw_method=0.3, show_graph=True,
+<pre><code> evaluate_model (trainer:fastai.learner.Learner,
+                 test_data:fastai.data.core.DataLoaders=None, loss=None,
+                 metrics=None, bw_method=0.3, show_graph=True,
                  show_table=True, show_results=True, as_dataframe=True,
                  cmap='magma')</code></pre>
 </blockquote>
@@ -1052,7 +1053,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>trainer</td>
-<td></td>
+<td>Learner</td>
 <td></td>
 <td>The model trainer object with a get_preds method.</td>
 </tr>
@@ -1126,7 +1127,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                                 show_table=True, show_results=True,
                                 as_dataframe=True, cmap=&lt;matplotlib.colors
                                 .LinearSegmentedColormap object at
-                                0x7f0ea719f8d0&gt;)</code></pre>
+                                0x7f57d42ab990&gt;)</code></pre>
 </blockquote>
 <p><em>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</em></p>
 <table class="table">
@@ -1214,7 +1215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td>cmap</td>
 <td>LinearSegmentedColormap</td>
-<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7f0ea719f8d0&gt;</td>
+<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7f57d42ab990&gt;</td>
 <td>Color map for the confusion matrix plot.</td>
 </tr>
 </tbody>
