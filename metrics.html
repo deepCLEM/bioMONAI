@@ -284,27 +284,13 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#radial-mask" id="toc-radial-mask" class="nav-link" data-scroll-target="#radial-mask">Radial mask</a></li>
   </ul></li>
-  <li><a href="#radial_mask" id="toc-radial_mask" class="nav-link" data-scroll-target="#radial_mask">radial_mask</a>
-  <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters:</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns:</a></li>
-  </ul></li>
+  <li><a href="#radial_mask" id="toc-radial_mask" class="nav-link" data-scroll-target="#radial_mask">radial_mask</a></li>
   <li><a href="#get_radial_masks" id="toc-get_radial_masks" class="nav-link" data-scroll-target="#get_radial_masks">get_radial_masks</a>
   <ul>
-  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters:</a></li>
-  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns:</a></li>
   <li><a href="#fourier-ring-correlation-1" id="toc-fourier-ring-correlation-1" class="nav-link" data-scroll-target="#fourier-ring-correlation-1">Fourier ring correlation</a></li>
   </ul></li>
-  <li><a href="#get_fourier_ring_correlations" id="toc-get_fourier_ring_correlations" class="nav-link" data-scroll-target="#get_fourier_ring_correlations">get_fourier_ring_correlations</a>
-  <ul>
-  <li><a href="#args" id="toc-args" class="nav-link" data-scroll-target="#args">Args:</a></li>
-  <li><a href="#returns-2" id="toc-returns-2" class="nav-link" data-scroll-target="#returns-2">Returns:</a></li>
-  </ul></li>
-  <li><a href="#frcmetric" id="toc-frcmetric" class="nav-link" data-scroll-target="#frcmetric">FRCMetric</a>
-  <ul>
-  <li><a href="#args-1" id="toc-args-1" class="nav-link" data-scroll-target="#args-1">Args:</a></li>
-  <li><a href="#returns-3" id="toc-returns-3" class="nav-link" data-scroll-target="#returns-3">Returns:</a></li>
-  </ul></li>
+  <li><a href="#get_fourier_ring_correlations" id="toc-get_fourier_ring_correlations" class="nav-link" data-scroll-target="#get_fourier_ring_correlations">get_fourier_ring_correlations</a></li>
+  <li><a href="#frcmetric" id="toc-frcmetric" class="nav-link" data-scroll-target="#frcmetric">FRCMetric</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -388,22 +374,7 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> radial_mask (r, cx=128, cy=128, sx=256, sy=256, delta=1)</code></pre>
 </blockquote>
 <p>*Generate a radial mask.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters:</h4>
-<ul>
-<li>r (int or float): Radius of the circular mask.</li>
-<li>cx (int, optional): X-coordinate of the center of the circular mask. Defaults to 128.</li>
-<li>cy (int, optional): Y-coordinate of the center of the circular mask. Defaults to 128.</li>
-<li>sx (int, optional): Array of x-coordinates forming a grid. Defaults to 256.</li>
-<li>sy (int, optional): Array of y-coordinates forming a grid. Defaults to 256.</li>
-<li>delta (int or float, optional): Thickness adjustment for the circular mask. Defaults to 1.</li>
-</ul>
-</section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns:</h4>
-<ul>
-<li>numpy.ndarray: Radial mask.*</li>
-</ul>
+<p>Returns: - numpy.ndarray: Radial mask.*</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -436,25 +407,24 @@ ul.task-list li input[type="checkbox"] {
 <td>sx</td>
 <td>int</td>
 <td>256</td>
-<td></td>
+<td>Size of the x-axis</td>
 </tr>
 <tr class="odd">
 <td>sy</td>
 <td>int</td>
 <td>256</td>
-<td></td>
+<td>Size of the y-axis</td>
 </tr>
 <tr class="even">
 <td>delta</td>
 <td>int</td>
 <td>1</td>
-<td></td>
+<td>Thickness adjustment for the circular mask</td>
 </tr>
 </tbody>
 </table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/metrics.py#L92" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
 </section>
 <section id="get_radial_masks" class="level3">
 <h3 class="anchored" data-anchor-id="get_radial_masks">get_radial_masks</h3>
@@ -462,17 +432,25 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> get_radial_masks (width, height)</code></pre>
 </blockquote>
 <p>*Generates a set of radial masks and corresponding to spatial frequencies.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters:</h4>
-<pre><code>- width (int): Width of the image.
-- height (int): Height of the image.</code></pre>
-</section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns:</h4>
-<pre><code>tuple: A tuple containing:
-    - numpy.ndarray: Array of radial masks.
-    - numpy.ndarray: Array of spatial frequencies corresponding to the masks.*</code></pre>
-</section>
+<p>Returns: tuple: A tuple containing: - numpy.ndarray: Array of radial masks. - numpy.ndarray: Array of spatial frequencies corresponding to the masks.*</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>width</td>
+<td>Width of the image</td>
+</tr>
+<tr class="even">
+<td>height</td>
+<td>Height of the image</td>
+</tr>
+</tbody>
+</table>
 <section id="fourier-ring-correlation-1" class="level4">
 <h4 class="anchored" data-anchor-id="fourier-ring-correlation-1">Fourier ring correlation</h4>
 <hr>
@@ -485,19 +463,27 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> get_fourier_ring_correlations (image1, image2)</code></pre>
 </blockquote>
 <p>*Compute Fourier Ring Correlation (FRC) between two images.</p>
-<section id="args" class="level4">
-<h4 class="anchored" data-anchor-id="args">Args:</h4>
-<pre><code>- image1 (torch.Tensor): First input image.
-- image2 (torch.Tensor): Second input image.</code></pre>
-</section>
-<section id="returns-2" class="level4">
-<h4 class="anchored" data-anchor-id="returns-2">Returns:</h4>
-<pre><code>tuple: A tuple containing:
-    - torch.Tensor: Fourier Ring Correlation values.
-    - torch.Tensor: Array of spatial frequencies.*</code></pre>
+<p>Returns: tuple: A tuple containing: - torch.Tensor: Fourier Ring Correlation values. - torch.Tensor: Array of spatial frequencies.*</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>image1</td>
+<td>First input image</td>
+</tr>
+<tr class="even">
+<td>image2</td>
+<td>Second input image</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/metrics.py#L195" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
 </section>
 <section id="frcmetric" class="level3">
 <h3 class="anchored" data-anchor-id="frcmetric">FRCMetric</h3>
@@ -505,18 +491,28 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> FRCMetric (image1, image2)</code></pre>
 </blockquote>
 <p>*Compute the area under the Fourier Ring Correlation (FRC) curve between two images.</p>
-<section id="args-1" class="level4">
-<h4 class="anchored" data-anchor-id="args-1">Args:</h4>
-<pre><code>- image1 (torch.Tensor): The first input image.
-- image2 (torch.Tensor): The second input image.</code></pre>
-</section>
-<section id="returns-3" class="level4">
-<h4 class="anchored" data-anchor-id="returns-3">Returns:</h4>
-<pre><code>- float: The area under the FRC curve.*</code></pre>
+<p>Returns: - float: The area under the FRC curve.*</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>image1</td>
+<td>First input image</td>
+</tr>
+<tr class="even">
+<td>image2</td>
+<td>Second input image</td>
+</tr>
+</tbody>
+</table>
 <hr>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

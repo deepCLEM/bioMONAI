@@ -673,6 +673,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                 col='SourceReadPath')</code></pre>
 </blockquote>
 <table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
 <thead>
 <tr class="header">
 <th></th>
@@ -698,7 +704,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>col</td>
 <td>str</td>
 <td>SourceReadPath</td>
-<td>Column name for image paths</td>
+<td>Column name for image paths in the data manifest</td>
 </tr>
 </tbody>
 </table>
@@ -725,7 +731,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="dataset-manifest" class="level3">
 <h3 class="anchored" data-anchor-id="dataset-manifest">Dataset Manifest</h3>
-<p>Make a manifest of all of the files in csv form</p>
+<p>Utilities to make a list of all of the files of the train and test dataset in csv form.</p>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/datasets.py#L312" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -736,6 +742,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                data_save_path='./', train='train.csv', test='test.csv',
                identifier=None)</code></pre>
 </blockquote>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>signal</td>
+<td></td>
+<td></td>
+<td>List of paths to signal images</td>
+</tr>
+<tr class="even">
+<td>target</td>
+<td></td>
+<td></td>
+<td>List of paths to target images</td>
+</tr>
+<tr class="odd">
+<td>paths</td>
+<td>NoneType</td>
+<td>None</td>
+<td>List of paths to images</td>
+</tr>
+<tr class="even">
+<td>train_fraction</td>
+<td>float</td>
+<td>0.8</td>
+<td>Fraction of data to use for training</td>
+</tr>
+<tr class="odd">
+<td>data_save_path</td>
+<td>str</td>
+<td>./</td>
+<td>Path to save the CSV files</td>
+</tr>
+<tr class="even">
+<td>train</td>
+<td>str</td>
+<td>train.csv</td>
+<td>Name of the training CSV file</td>
+</tr>
+<tr class="odd">
+<td>test</td>
+<td>str</td>
+<td>test.csv</td>
+<td>Name of the test CSV file</td>
+</tr>
+<tr class="even">
+<td>identifier</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Identifier to add to the paths</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>manifest2csv(data_manifest[<span class="st">"ChannelNumberBrightfield"</span>],data_manifest[<span class="st">"ChannelNumber405"</span>], image_target_paths, data_save_path<span class="op">=</span><span class="st">'./data_examples/'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
