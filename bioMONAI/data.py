@@ -295,12 +295,9 @@ class BioDataLoaders(DataLoaders):
         """
         Create and return a DataLoader from a BioDataBlock using provided keyword arguments.
         
-        Returns:
-            DataLoader: A PyTorch DataLoader object populated with the data from the BioDataBlock.
+        Returns a  DataLoader: A PyTorch DataLoader object populated with the data from the BioDataBlock.
                         If show_summary is True, it also prints a summary of the datablock after creation.
         
-        Example:
-            >>> dataloader = BioDataLoaders.from_source(data_path, show_summary=True, blocks='train', dl_type='ImageDataLoader')
         """
         # Define the keys for BioDataBlock operations
         datablock_ops_keys = ['blocks','dl_type','get_items','get_y','get_x','getters','n_inp','item_tfms','batch_tfms','splitter']
@@ -477,8 +474,7 @@ def get_gt(path_gt, # The base directory where the ground truth files are stored
     It uses a lambda function to create a new path by appending `gt_file_name` to 
     the parent directory of the input file, as specified by `path_gt`.
     
-    Returns:
-        callable: A function that takes a single argument (a filename) and returns a Path object 
+    Returns a callable: A function that takes a single argument (a filename) and returns a Path object 
                    representing the full path to the ground truth file. When called with a filename, 
                    this function constructs the path by combining `path_gt` or the parent directory of 
                    the filename with `gt_file_name`. 
@@ -509,8 +505,7 @@ def get_target(path:str, # The base directory where the files are located. This 
     
     The main function returns the appropriate helper function based on the value of `same_filename`.
     
-    Returns: \n
-        callable: A function that takes a file name as input and returns its corresponding target file path based on the specified parameters.
+    Returns a callable: A function that takes a file name as input and returns its corresponding target file path based on the specified parameters.
     
     """
     # Define a function to construct the target file name based on input parameters
@@ -844,14 +839,12 @@ def save_patches_grid(data_folder, # Path to the folder containing data files (n
 
 
 # %% ../nbs/01_data.ipynb 62
-def extract_random_patches(data, patch_size, num_patches):
+def extract_random_patches(data, # numpy array of the input data (n-dimensional).
+                           patch_size, # tuple of integers defining the size of the patches in each dimension.
+                           num_patches, # number of random patches to extract.
+                           ):
     """
     Extracts a specified number of random n-dimensional patches from the input data.
-    
-    Parameters:
-    - data: numpy array of the input data (n-dimensional).
-    - patch_size: tuple of integers defining the size of the patches in each dimension.
-    - num_patches: number of random patches to extract.
     
     Returns:
     - A list of randomly cropped patches as numpy arrays.
@@ -983,18 +976,15 @@ def save_patches_random(data_folder,                # Path to the folder contain
 
 
 # %% ../nbs/01_data.ipynb 66
-def dict2string(d, item_sep="_", key_value_sep="", pad_zeroes=None):
+def dict2string(d, # The dictionary to convert.
+                item_sep="_", # The separator between dictionary items (default is ", ").
+                key_value_sep="", # The separator between keys and values (default is ": ").
+                pad_zeroes=None, # The minimum width for integer values, padded with zeros. If None, no padding is applied.
+                ):
     """
     Transforms a dictionary into a string with customizable separators and optional zero padding for integers.
-    
-    Parameters:
-        d (dict): The dictionary to convert.
-        item_sep (str): The separator between dictionary items (default is ", ").
-        key_value_sep (str): The separator between keys and values (default is ": ").
-        pad_zeroes (int, optional): The minimum width for integer values, padded with zeros. If None, no padding is applied.
-        
-    Returns:
-        str: The formatted dictionary as a string.
+
+    Returns the formatted dictionary as a string.
     """
     def format_value(value):
         if isinstance(value, int) and pad_zeroes is not None:
@@ -1005,15 +995,13 @@ def dict2string(d, item_sep="_", key_value_sep="", pad_zeroes=None):
 
 
 # %% ../nbs/01_data.ipynb 68
-def remove_singleton_dims(substack, order):
+def remove_singleton_dims(substack, # The extracted substack data.
+                          order, # The dimension order string (e.g., 'CZYX').
+                          ):
     """
     Remove dimensions with a size of 1 from both the substack and the order string.
 
-    Parameters:
-        substack (np.array): The extracted substack data.
-        order (str): The dimension order string (e.g., 'CZYX').
-    
-    Returns:
+    Returns: \n
         substack (np.array): The substack with singleton dimensions removed.
         new_order (str): The updated dimension order string.
     """
@@ -1029,20 +1017,15 @@ def remove_singleton_dims(substack, order):
     return substack, new_order
 
 # %% ../nbs/01_data.ipynb 69
-def extract_substacks(input_file, output_dir=None, indices=None, split_dimension=None, squeeze_dims=True, *kwargs):
+def extract_substacks(input_file, # Path to the input OME-TIFF file.
+                      output_dir=None, # Directory to save the extracted substacks. If a list, the substacks will be saved in the corresponding subdirectories from the list.
+                      indices=None,# A dictionary specifying which indices to extract. Keys can include 'C' for channel, 'Z' for z-slice, 'T' for time point, and 'S' for scene. If None, all indices are extracted.
+                      split_dimension=None,# Dimension to split substacks along. If provided, separate substacks will be generated for each index in the split_dimension. Must be one of the keys in indices.
+                      squeeze_dims=True, # Dimension to squeeze substacks along. 
+                      *kwargs):
     """
     Extract substacks from a multidimensional OME-TIFF stack using AICSImageIO.
 
-    Parameters:
-        input_file (str): Path to the input OME-TIFF file.
-        output_dir (str or list): Directory to save the extracted substacks. If a list, the substacks
-                                  will be saved in the corresponding subdirectories from the list.
-        indices (dict, optional): A dictionary specifying which indices to extract.
-                                  Keys can include 'C' for channel, 'Z' for z-slice,
-                                  'T' for time point, and 'S' for scene. If None, all indices are extracted.
-        split_dimension (str, optional): Dimension to split substacks along. If provided, separate
-                                         substacks will be generated for each index in the split_dimension.
-                                         Must be one of the keys in indices.
     """
     # Load the OME-TIFF file
     image = AICSImage(input_file)
@@ -1073,10 +1056,11 @@ def extract_substacks(input_file, output_dir=None, indices=None, split_dimension
         if output_dir is not None and isinstance(output_dir, list):
             if len(output_dir) != len(split_indices):
                 if len(output_dir) == 1:
-                    output_dir_list = [os.path.join(output_dir, f"{split_dimension}_{i}") for i in split_indices]
+                    output_dir_list = [os.path.join(output_dir[0], f"{split_dimension}_{i}") for i in split_indices]
                 else:
                     raise ValueError(f"The number of subdirectories in output_dir ({len(output_dir)}) does not match the number of substacks ({len(split_indices)}).")
-            output_dir_list = output_dir
+            else:
+                output_dir_list = output_dir
         elif output_dir is not None:
             output_dir_list = [output_dir] * len(split_indices)
         else:

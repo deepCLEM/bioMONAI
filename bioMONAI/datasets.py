@@ -33,14 +33,7 @@ def download_medmnist(dataset: str, # The name of the MedMNIST dataset (e.g., 'p
     into the specified output directory. Images are saved as .png for 2D data and multi-page .tiff for 3D data,
     organized into folders named after their labels.
 
-    Args:
-    - dataset: The MedMNIST dataset name (e.g., 'pathmnist', 'bloodmnist', etc.).
-    - output_dir: Path where the images will be saved.
-    - download_only: If True, only downloads the dataset, no processing or saving.
-    - save_images: If True, save the images in the specified output directory.
-
-    Returns:
-    - None, saves images in the specified output directory if save_images is True.
+    Returns: None, saves images in the specified output directory if save_images is True.
     """
 
     # Check if the dataset is available in the MedMNIST information dictionary
@@ -158,14 +151,15 @@ def medmnist2df(train_dataset,     # MedMNIST training dataset with images and l
 
 
 # %% ../nbs/08_datasets.ipynb 8
-def download_file(url, output_dir="data", extract=True, hash=None, extract_dir=None):
+def download_file(url, # The URL of the file to be downloaded
+                  output_dir="data", # The directory where the downloaded file will be saved
+                  extract=True, # If True, decompresses the file if it's in a compressed format
+                  hash=None, # Optional: You can add a checksum for integrity verification
+                  extract_dir=None, # Directory to extract the files to
+                  ):
     """
     Download and optionally decompress a single file using Pooch.
-    
-    Parameters:
-        url (str): Direct URL to the file to be downloaded.
-        output_dir (str): The directory where the downloaded file will be saved.
-        extract (bool): If True, decompresses the file if it's in a compressed format.
+
     """
     # Create the output directory if it does not exist
     os.makedirs(output_dir, exist_ok=True)
@@ -194,16 +188,15 @@ def download_file(url, output_dir="data", extract=True, hash=None, extract_dir=N
 
 
 # %% ../nbs/08_datasets.ipynb 9
-def download_dataset(base_url, expected_checksums, file_names, output_dir, processor=None):
+def download_dataset(base_url, # The base URL from which the files will be downloaded.
+                     expected_checksums, #  A dictionary mapping file names to their expected checksums.
+                     file_names, # A dictionary mapping task identifiers to file names.
+                     output_dir, # The directory where the downloaded files will be saved.
+                     processor=None, # A function to process the downloaded data.
+                     ):
     """
     Download a dataset using Pooch and save it to the specified output directory.
-    
-    Parameters:
-        base_url (str): The base URL from which the files will be downloaded.
-        expected_checksums (dict): A dictionary mapping file names to their expected checksums.
-        file_names (dict): A dictionary mapping task identifiers to file names.
-        output_dir (str): The directory where the downloaded files will be saved.
-        processor (callable, optional): A function to process the downloaded data. Defaults to None.
+
     """
     # Create a Pooch object with the base URL, output directory, and expected checksums
     pooch_instance = pooch_create(
@@ -223,16 +216,16 @@ def download_dataset(base_url, expected_checksums, file_names, output_dir, proce
 
 
 # %% ../nbs/08_datasets.ipynb 11
-def download_dataset_from_csv(csv_file, base_url, output_dir, processor=None, rows=None, prepend_mdf5=True):
+def download_dataset_from_csv(csv_file, # Path to the CSV file containing file names and checksums.
+                              base_url, # The base URL from which the files will be downloaded.
+                              output_dir, # The directory where the downloaded files will be saved.
+                              processor=None, # A function to process the downloaded data.
+                              rows=None, # Specific row indices to download. If None, download all rows.
+                              prepend_mdf5=True, # If True, prepend 'md5:' to the checksums.
+                              ):
     """
     Download a dataset using Pooch and save it to the specified output directory, reading file names and checksums from a CSV file.
 
-    Parameters:
-        csv_file (str): Path to the CSV file containing file names and checksums.
-        base_url (str): The base URL from which the files will be downloaded.
-        output_dir (str): The directory where the downloaded files will be saved.
-        processor (callable, optional): A function to process the downloaded data. Defaults to None.
-        rows (list of int, optional): Specific row indices to download. If None, download all rows. Defaults to None.
     """
     # Read the CSV file
     df = pd.read_csv(csv_file)
@@ -266,7 +259,10 @@ def download_dataset_from_csv(csv_file, base_url, output_dir, processor=None, ro
 
 
 # %% ../nbs/08_datasets.ipynb 15
-def aics_pipeline(n_images_to_download=40, image_save_dir=None): 
+def aics_pipeline(n_images_to_download=40, # Number of images to download
+                  image_save_dir=None, # Directory to save the images
+                  col="SourceReadPath", # Column name for image paths in the data manifest
+                  ): 
     # Set default save directory if not provided
     if image_save_dir is None:
         image_save_dir = os.getcwd()
@@ -288,7 +284,7 @@ def aics_pipeline(n_images_to_download=40, image_save_dir=None):
     data_manifest = data_manifest.iloc[:n_images_to_download]
 
     # Get source and target paths
-    image_source_paths = data_manifest["SourceReadPath"]
+    image_source_paths = data_manifest[col]
     image_target_paths = [os.path.join(image_save_dir, os.path.basename(image_source_path)) 
                           for image_source_path in image_source_paths]
 
@@ -308,8 +304,16 @@ def aics_pipeline(n_images_to_download=40, image_save_dir=None):
     return downloaded_image_paths, data_manifest
 
 
-# %% ../nbs/08_datasets.ipynb 20
-def manifest2csv(signal, target, paths=None, train_fraction=0.8, data_save_path='./', train='train.csv', test='test.csv', identifier=None):
+# %% ../nbs/08_datasets.ipynb 21
+def manifest2csv(signal,                # List of paths to signal images
+                 target,                # List of paths to target images
+                 paths=None,            # List of paths to images
+                 train_fraction=0.8,    # Fraction of data to use for training
+                 data_save_path='./',   # Path to save the CSV files
+                 train='train.csv',     # Name of the training CSV file
+                 test='test.csv',       # Name of the test CSV file
+                 identifier=None,       # Identifier to add to the paths
+                 ):
     
     if paths is None:
         df = pd.DataFrame(columns=["path_signal", "path_target"])
@@ -338,21 +342,21 @@ def manifest2csv(signal, target, paths=None, train_fraction=0.8, data_save_path=
     df_test.to_csv(data_save_path+test, index=False)
     df_train.to_csv(data_save_path+train, index=False)
 
-# %% ../nbs/08_datasets.ipynb 22
-def split_dataframe(input_data, train_fraction=0.7, valid_fraction=0.1, split_column=None, stratify=False, add_is_valid=False, train_path="train.csv", test_path="test.csv", valid_path="valid.csv", data_save_path=None):
+# %% ../nbs/08_datasets.ipynb 23
+def split_dataframe(input_data, # Path to CSV file or DataFrame
+                    train_fraction=0.7, # Proportion of data to use for the training set
+                    valid_fraction=0.1, # Proportion of data to use for the validation set
+                    split_column=None, # Column name that indicates pre-defined split
+                    stratify=False, # If True, stratify by split_column during random split
+                    add_is_valid=False, # If True, adds 'is_valid' column in the train set to mark validation samples
+                    train_path="train.csv", # Path to save the training CSV file
+                    test_path="test.csv", # Path to save the test CSV file
+                    valid_path="valid.csv", # Path to save the validation CSV file
+                    data_save_path=None, # Path to save the data files
+                    ):
     """
     Splits a DataFrame or CSV file into train, test, and optional validation sets.
 
-    Parameters:
-    - input_data (str or pd.DataFrame): Path to CSV file or a DataFrame.
-    - train_fraction (float): Proportion of data to use for the training set (0 < train_fraction < 1).
-    - valid_fraction (float): Proportion of data to use for the validation set (0 <= valid_fraction < 1).
-    - split_column (str, optional): Column name that indicates pre-defined split ('train', 'test', 'validation' values expected).
-    - stratify (bool): If True, stratify by split_column during random split if no predefined split is present.
-    - add_is_valid (bool): If True, adds 'is_valid' column in the train set to mark validation samples.
-    - train_path (str): Path to save the training CSV file.
-    - test_path (str): Path to save the test CSV file.
-    - valid_path (str): Path to save the validation CSV file, if created separately.
     """
     # Load data
     if isinstance(input_data, str):
@@ -416,17 +420,14 @@ def split_dataframe(input_data, train_fraction=0.7, valid_fraction=0.1, split_co
         print(f"'is_valid' column added to '{train_path}' for validation samples.")
 
 
-# %% ../nbs/08_datasets.ipynb 23
-def add_columns_to_csv(csv_path, column_data, output_path=None):
+# %% ../nbs/08_datasets.ipynb 24
+def add_columns_to_csv(csv_path, # Path to the input CSV file
+                       column_data, # Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.
+                       output_path=None, # Path to save the updated CSV file. If None, it overwrites the input CSV file.
+                       ):
     """
     Adds one or more new columns to an existing CSV file.
 
-    Parameters:
-    - csv_path (str): Path to the input CSV file.
-    - column_data (dict): Dictionary where keys are column names and values are column data.
-      Each value can be a scalar (single value for all rows) or a list matching the number of rows.
-    - output_path (str, optional): Path to save the updated CSV file.
-      If None, it overwrites the input CSV file.
     """
     # Load the CSV file into a DataFrame
     df = pd.read_csv(csv_path)

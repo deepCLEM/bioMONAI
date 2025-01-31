@@ -273,14 +273,14 @@ def display_statistics_table(stats, fn_name='', as_dataframe=True):
         header.set_text_props(weight="bold")
         plt.show()
 
-# %% ../nbs/00_core.ipynb 28
+# %% ../nbs/00_core.ipynb 29
 # Retrieve the 'coolwarm' colormap
 coolwarm = plt.get_cmap('coolwarm')
 # Create a new colormap using only the warm colors
 warm_cmap = LinearSegmentedColormap.from_list('warm_coolwarm', coolwarm(np.linspace(0.5, 1, coolwarm.N // 2)))
 
-# %% ../nbs/00_core.ipynb 29
-def evaluate_model(trainer,                                 # The model trainer object with a get_preds method.
+# %% ../nbs/00_core.ipynb 30
+def evaluate_model(trainer:Learner,                                 # The model trainer object with a get_preds method.
                    test_data:DataLoaders=None,              # DataLoader containing test data.
                    loss=None,                               # Loss function to evaluate prediction-target pairs.
                    metrics=None,                            # Single metric or a list of metrics to evaluate. 
@@ -340,7 +340,7 @@ def evaluate_model(trainer,                                 # The model trainer 
     return out
 
 
-# %% ../nbs/00_core.ipynb 30
+# %% ../nbs/00_core.ipynb 31
 def evaluate_classification_model(trainer:Learner,              # The trained model (learner) to evaluate.
                                   test_data:DataLoaders=None,   # DataLoader with test data for evaluation. If None, the validation dataset is used.
                                   loss_fn=None,                 # Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.
@@ -352,7 +352,7 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
                                   show_table=True,              # Boolean flag to show the statistics table.
                                   show_results=True,            # Boolean flag to show model results on test data. 
                                   as_dataframe=True,            # Boolean flag to display table as a DataFrame. 
-                                  cmap=warm_cmap,             # Color map for the confusion matrix plot. 
+                                  cmap=warm_cmap,               # Color map for the confusion matrix plot. 
                                   ):
     """
     Evaluates a classification model by displaying results, confusion matrix, and most confused classes.
@@ -415,7 +415,7 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     return out
 
 
-# %% ../nbs/00_core.ipynb 33
+# %% ../nbs/00_core.ipynb 34
 def attributesFromDict(d):
     """
     The `attributesFromDict` function simplifies the conversion of dictionary keys and values into object attributes, allowing dynamic attribute creation for configuration objects. This utility is handy for initializing model or dataset configurations directly from dictionaries, improving code readability and maintainability.
@@ -424,14 +424,14 @@ def attributesFromDict(d):
     for n, v in d.items():
         setattr(self, n, v)
 
-# %% ../nbs/00_core.ipynb 34
+# %% ../nbs/00_core.ipynb 35
 def get_device():
     return torch_device("cuda" if is_cuda_available() else "cpu")
 
-# %% ../nbs/00_core.ipynb 35
+# %% ../nbs/00_core.ipynb 36
 def img2float(image, force_copy=False):
     return util.img_as_float(image, force_copy=force_copy)
 
-# %% ../nbs/00_core.ipynb 36
+# %% ../nbs/00_core.ipynb 37
 def img2Tensor(image):
     return torchTensor(img2float(image))

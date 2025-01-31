@@ -22,24 +22,14 @@ class Resample(Transform):
     
     The `Resample` class inherits from `Spacing` and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.
     
-    Args:
-        sampling (int, optional): Sampling factor for isotropic resampling. Default is 1, indicating no change in resolution.
-        **kwargs: Additional keyword arguments that can include 'pixdim' to specify custom voxel dimensions.
-        
-    Attributes:
-        pixdim (list or tuple): The voxel dimensions of the image after resampling. If not provided during initialization, this will be determined based on the sampling factor and original image properties.
-    
-    
     """
     
-    def __init__(self, sampling, **kwargs):
+    def __init__(self, sampling, # Sampling factor for isotropic resampling
+                 **kwargs, # Additional keyword arguments that can include 'pixdim' to specify custom voxel dimensions
+                 ):
         """
         Initializes the Resample class instance.
-        
-        Args:
-            sampling (int, optional): Sampling factor for isotropic resampling. Default is 1.
-            **kwargs: Additional keyword arguments that can include 'pixdim' to specify custom voxel dimensions.
-            
+                    
         If 'pixdim' is provided in kwargs, it will be used directly; otherwise, the sampling factor will determine the new voxel dimensions.
         
         The Spacing class from which Resample inherits is initialized with either the provided pixdim or calculated based on the sampling factor and original image properties.
@@ -60,22 +50,14 @@ class Resize(Transform):
     A subclass of Reshape that handles image resizing based on specified target dimensions.
 
     The `Resize` class inherits from `Reshape` and provides a flexible way to adjust the size of images by specifying either a target size or scaling factors.
-
-    Args:
-        size (int, tuple, or list, optional): Target dimensions for resizing (height, width). If its length is smaller than the spatial dimensions of the image, values will be repeated to match. If an int is provided, it will be broadcast to all spatial dimensions. Default is None, which indicates no resizing.
-        **kwargs: Additional keyword arguments that can include scaling factors or interpolation methods.
-
-    Attributes:
-        target_size (tuple or list): The target dimensions of the image after resizing. If not provided during initialization, this will be determined based on the original image properties and optional scaling factors.
+    
     """
 
-    def __init__(self, size=None, **kwargs):
+    def __init__(self, size=None, # Target dimensions for resizing (height, width). If its length is smaller than the spatial dimensions, values will be repeated. If an int is provided, it will be broadcast to all spatial dimensions.
+                 **kwargs, # Additional keyword arguments that can include scaling factors or interpolation methods.
+                 ):
         """
         Initializes the Resize class instance.
-
-        Args:
-            size (int, tuple, or list, optional): Target dimensions for resizing (height, width). If its length is smaller than the spatial dimensions, values will be repeated. If an int is provided, it will be broadcast to all spatial dimensions.
-            **kwargs: Additional keyword arguments that can include scaling factors or interpolation methods.
 
         If 'size' is provided, it will be used directly to resize the image; otherwise, scaling factors or default values will determine the new dimensions.
 
@@ -84,13 +66,11 @@ class Resize(Transform):
         self.size = size
         self.kwargs = kwargs
 
-    def _expand_size(self, size, spatial_dims):
+    def _expand_size(self, size, # The target size provided.
+                     spatial_dims, # Number of spatial dimensions in the image.
+                     ):
         """
         Expands the size to match the spatial dimensions by repeating values if necessary or broadcasting if size is an int.
-
-        Args:
-            size (int, list, or tuple): The target size provided.
-            spatial_dims (int): Number of spatial dimensions in the image.
 
         Returns:
             list: Expanded size matching the spatial dimensions.
@@ -104,12 +84,10 @@ class Resize(Transform):
             size.extend(size)
         return size[:spatial_dims]
 
-    def encodes(self, img: BioImageBase):
+    def encodes(self, img: BioImageBase, # The input image to resize.
+                ):
         """
         Resizes the given image to the target dimensions.
-
-        Args:
-            img (BioImageBase): The input image to resize.
 
         Returns:
             BioImageBase: The resized image.
@@ -192,8 +170,13 @@ class RandCameraNoise(RandTransform):
         return bioimagetype(adu)
 
 
-# %% ../nbs/05_transforms.ipynb 16
-def _scale_intensity_range(x, mi, ma, eps=1e-20, dtype=np_float32):
+# %% ../nbs/05_transforms.ipynb 18
+def _scale_intensity_range(x,   # The input image to scale.
+                           mi,  # The minimum intensity value.
+                           ma,  # The maximum intensity value.
+                           eps=1e-20, # A small value to prevent division by zero.
+                           dtype=np_float32, # The data type to use for the output image.
+                           ):
     if dtype is not None:
         x = x.astype(dtype, copy=False)
         mi = dtype(mi) if isscalar(mi) else mi.astype(dtype, copy=False)
@@ -202,10 +185,16 @@ def _scale_intensity_range(x, mi, ma, eps=1e-20, dtype=np_float32):
         x = (x - mi) / (ma - mi + eps)
     return x
 
-# %% ../nbs/05_transforms.ipynb 17
+# %% ../nbs/05_transforms.ipynb 19
 class ScaleIntensity(Transform):
     """Image normalization."""
-    def __init__(x, min=0.0, max=1.0, axis=None, eps=1e-20, dtype=np_float32):
+    def __init__(x,                 # The input image to scale.
+                 min=0.0,           # The minimum intensity value.
+                 max=1.0,           # The maximum intensity value.
+                 axis=None,         # The axis or axes along which to compute the minimum and maximum values.
+                 eps=1e-20,         # A small value to prevent division by zero.
+                 dtype=np_float32,  # The data type to use for the output image.
+                 ):
         store_attr()
 
     def encodes(self, x: BioImageBase):
@@ -215,10 +204,19 @@ class ScaleIntensity(Transform):
         y += self.min
         return bioimagetype(y)
 
-# %% ../nbs/05_transforms.ipynb 18
+# %% ../nbs/05_transforms.ipynb 20
 class ScaleIntensityPercentiles(Transform):
     """Percentile-based image normalization."""
-    def __init__(x, pmin=3, pmax=99.8, axis=None, clip=True, b_min=0.0, b_max=1.0, eps=1e-20, dtype=np_float32):
+    def __init__(x,                 # The input image to scale.
+                 pmin=3,            # The minimum percentile value.
+                 pmax=99.8,         # The maximum percentile value.
+                 axis=None,         # The axis or axes along which to compute the minimum and maximum values.
+                 clip=True,         # If True, clips the output values to the specified range.
+                 b_min=0.0,         # The minimum intensity value.
+                 b_max=1.0,         # The maximum intensity value.
+                 eps=1e-20,         # A small value to prevent division by zero.
+                 dtype=np_float32,  # The data type to use for the output image.
+                 ):
         store_attr()
 
     def encodes(self, x: BioImageBase):
@@ -230,16 +228,14 @@ class ScaleIntensityPercentiles(Transform):
         return bioimagetype(_scale_intensity_range(x, mi, ma, eps=self.eps, dtype=self.dtype))
 
 
-# %% ../nbs/05_transforms.ipynb 19
+# %% ../nbs/05_transforms.ipynb 21
 class ScaleIntensityVariance(Transform):
     """
     Scales the intensity variance of an ND image to a target value.
-    
-    Args:
-        target_variance (float): The desired variance for the scaled intensities.
-        ndim (int): Number of spatial dimensions in the image. Default is 2 for 2D images.
     """
-    def __init__(self, ndim=2):
+    def __init__(self, target_variance=1.0, # The desired variance for the scaled intensities.
+                 ndim=2, # Number of spatial dimensions in the image.
+                 ):
         store_attr()
         
     def encodes(self, x: BioImageBase):
@@ -248,7 +244,7 @@ class ScaleIntensityVariance(Transform):
         mean, variance = torch.mean(x), torch.var(x)
         
         # Calculate the scaling factor based on the ratio of target to current variance
-        scale_factor = (1.0 / variance).sqrt()
+        scale_factor = (self.target_variance / variance).sqrt()
         
         # Apply the scaling factor to each channel in the image
         if x.ndim == self.ndim + 1:  # Check if it's a multi-channel image (e.g., RGB)
@@ -260,7 +256,7 @@ class ScaleIntensityVariance(Transform):
         return bioimagetype(x)
 
 
-# %% ../nbs/05_transforms.ipynb 22
+# %% ../nbs/05_transforms.ipynb 24
 def _process_sz(size, ndim=3):
     if isinstance(size,int): 
         size=(size,)*ndim
@@ -271,7 +267,7 @@ def _get_sz(x):
     if not isinstance(x, Tensor): return fastuple(x.size)
     return fastuple(getattr(x, 'img_size', getattr(x, 'sz', (x.shape[1:])))) # maybe it should swap x and y axes 
 
-# %% ../nbs/05_transforms.ipynb 24
+# %% ../nbs/05_transforms.ipynb 26
 class RandCrop2D(RandTransform):
     "Randomly crop an image to `size`"
     split_idx,order = None,1
@@ -302,7 +298,7 @@ class RandCrop2D(RandTransform):
         bioimagetype = type(x)
         return bioimagetype(SpatialCrop(roi_center=self.ctr, roi_size=self.size, lazy=self.lazy)(x))
 
-# %% ../nbs/05_transforms.ipynb 25
+# %% ../nbs/05_transforms.ipynb 27
 class RandCropND(RandTransform):
     """
     Randomly crops an ND image to a specified size.
@@ -310,12 +306,6 @@ class RandCropND(RandTransform):
     This transform randomly crops an ND image to a specified size during training and performs
     a center crop during validation. It supports both 2D and 3D images and videos, assuming
     the first dimension is the batch dimension.
-
-    Args:
-        size (int or tuple): The size to crop the image to. this can have any number of dimensions. 
-                             If a single value is provided, it will be duplicated for each spatial 
-                             dimension, up to a maximum of 3 dimensions.
-        **kwargs: Additional keyword arguments to be passed to the parent class.
     """
 
     split_idx,order = None,1
@@ -356,11 +346,10 @@ class RandCropND(RandTransform):
         return bioimagetype(SpatialCrop(roi_start=self.tl, roi_end=self.br, lazy=self.lazy)(x))
     
 
-# %% ../nbs/05_transforms.ipynb 27
+# %% ../nbs/05_transforms.ipynb 29
 class RandFlip(RandTransform):
     """
     Randomly flips an ND image over a specified axis.
-
     """
 
     split_idx,order = None,1
@@ -369,7 +358,7 @@ class RandFlip(RandTransform):
                  prob = 0.1,            # Probability of flipping
                  spatial_axis = None,   # Spatial axes along which to flip over. Default is None. The default axis=None will flip over all of the axes of the input array. 
                                         # If axis is negative it counts from the last to the first axis. If axis is a tuple of ints, flipping is performed on all of the axes specified in the tuple.
-                 ndim = 2,
+                 ndim = 2,              # Number of spatial dimensions in the image 
                  lazy = False,          # Flag to indicate whether this transform should execute lazily or not. Defaults to False
                  **kwargs):
         store_attr()
@@ -390,7 +379,7 @@ class RandFlip(RandTransform):
         else:
             return bioimagetype(x)
 
-# %% ../nbs/05_transforms.ipynb 29
+# %% ../nbs/05_transforms.ipynb 31
 class RandRot90(RandTransform):
     """
     Randomly rotate an ND image by 90 degrees in the plane specified by axes.

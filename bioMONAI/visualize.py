@@ -21,15 +21,10 @@ from .core import torchTensor, tensor, delegates, torch_from_numpy, hasattrs, im
 from .io import tiff2torch
 
 # %% ../nbs/09_visualize.ipynb 6
-def plot_image(values):
+def plot_image(values, # A 2D array of pixel values representing the image.
+               ):
     """
     Plot a 2D image using Matplotlib. The function assumes that 'values' is a 2D array representing an image, typically in grayscale.
-    
-    Parameters:
-        values (numpy.ndarray): A 2D array of pixel values representing the image.
-    
-    Returns:
-        None
     """
     # Create a figure with Matplotlib
     fig = plt.figure()
@@ -50,13 +45,17 @@ def plot_image(values):
 
 # %% ../nbs/09_visualize.ipynb 9
 @delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
-def show_multichannel(img, ax=None, figsize=None, title=None, max_slices=3, ctx=None, layout='horizontal', num_cols=3, **kwargs):
+def show_multichannel(img,                  # A tensor or numpy array representing a multi-channel image.
+                      ax=None,              # The Matplotlib axis to use for plotting.
+                      figsize=None,         # The size of the figure.
+                      title=None,           # The title of the image.
+                      max_slices=3,         # The maximum number of slices to display.
+                      ctx=None,             # The context to use for plotting.
+                      layout='horizontal',  # The layout type: 'horizontal', 'square', or 'multirow'.
+                      num_cols=3,           # The number of columns for the 'multirow' layout. Ignored for other layouts.
+                      **kwargs):
     """
     Show multi-channel CYX image with options for horizontal, square, or multi-row layout.
-    
-    Parameters:
-        layout (str): Layout type - "horizontal", "square", or "multirow".
-        num_cols (int): Number of columns for the "multirow" layout. Ignored for other layouts.
     """
     # Check if the image has the as_tensor attribute
     if hasattr(img, 'as_tensor'):
@@ -143,24 +142,17 @@ def _fig_bounds(x):
     return min(15, max(1,r))
 
 # %% ../nbs/09_visualize.ipynb 13
-def mosaic_image_3d(t: (np.ndarray, torchTensor),
-                  axis: int = 0,
-                  figsize: tuple = (15,15),
-                  cmap: str = 'gray',
-                  nrow: int = 10,
-                  alpha = 1.,
-                  return_grid = False,
-                  add_to_existing = False,
+def mosaic_image_3d(t: (np.ndarray, torchTensor),   # 3D image to plot
+                  axis: int = 0,                    # axis to split 3D array to 2D images
+                  figsize: tuple = (15,15),         # size of the figure
+                  cmap: str = 'gray',               # colormap to use
+                  nrow: int = 10,                   # number of images per row
+                  alpha = 1.,                       # transparency of the image
+                  return_grid = False,              # return the grid for further processing
+                  add_to_existing = False,          # add to existing figure
                   **kwargs):
     '''
     Plots 2D slices of a 3D image alongside a prior specified axis.
-    Args:
-        t: a 3D numpy.ndarray or torch.Tensor
-        axis: axis to split 3D array to 2D images
-        figsize, cmap: passed to plt.imshow
-        nrow: passed to torchvision.utils.make_grid
-        return_grid: Whether the grid should be returned for further processing or if the plot should be displayed.
-        add_to_existing: if set to true, no new figure will be created. Used for mask overlays
     '''
     if isinstance(t, np.ndarray): 
         t = tensor(t)
@@ -198,18 +190,17 @@ def mosaic_image_3d(t: (np.ndarray, torchTensor),
 
 # %% ../nbs/09_visualize.ipynb 14
 @delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
-def show_images_grid(images, ax=None, ncols=10, figsize=None, title=None, spacing=0.02, max_slices=3, ctx=None, **kwargs):
+def show_images_grid(images,            # A list of images to display.
+                     ax=None,           # The Matplotlib axis to use for plotting.
+                     ncols=10,          # The number of columns in the grid.
+                     figsize=None,      # The size of the figure.
+                     title=None,        # The title of the image.
+                     spacing=0.02,      # The spacing between subplots.
+                     max_slices=3,      # The maximum number of slices to display.
+                     ctx=None,          # The context to use for plotting.
+                     **kwargs):
     """
     Show a list of images arranged in a grid.
-
-    Parameters:
-    - images: list of images to display.
-    - ncols (int): number of columns in the grid.
-    - figsize (tuple, optional): figure size in inches.
-    - title (list, optional): list of titles corresponding to each image.
-    - spacing (float, optional): spacing between subplots.
-    - ctx: additional context passed to the `plt.Axes.imshow` function.
-    - **kwargs: additional keyword arguments passed to `plt.Axes.imshow`.
 
     Returns:
     - axes: matplotlib axes containing the grid of images.
@@ -270,16 +261,16 @@ def show_images_grid(images, ax=None, ncols=10, figsize=None, title=None, spacin
     return ax
 
 # %% ../nbs/09_visualize.ipynb 18
-def show_plane(ax, plane, cmap="gray", title=None, lines=None, linestyle='--', linecolor='white'):
+def show_plane(ax,                  # The axis object to display the slice on.
+               plane,               # A 2D numpy array representing the slice of the image tensor.
+               cmap="gray",         # Colormap to use for displaying the image.
+               title=None,          # Title for the plot.
+               lines=None,          # A list of indices where dashed lines should be drawn on the plane.
+               linestyle='--',      # The style of the dashed lines.
+               linecolor='white',   # The color of the dashed lines.
+               ):
     """
     Display a slice of the image tensor on a given axis with optional dashed lines.
-    
-    Parameters:
-        ax (matplotlib.axes._subplots.AxesSubplot): The axis object to display the slice on.
-        plane (numpy.ndarray): A 2D numpy array representing the slice of the image tensor.
-        cmap (str, optional): Colormap to use for displaying the image. Defaults to "gray".
-        title (str, optional): Title for the plot. Defaults to None.
-        dashed_lines (list, optional): A list of indices where dashed lines should be drawn on the plane.
     """
     ax.imshow(plane, cmap=cmap)
     ax.set_axis_off()
@@ -294,13 +285,12 @@ def show_plane(ax, plane, cmap="gray", title=None, lines=None, linestyle='--', l
 
 
 # %% ../nbs/09_visualize.ipynb 19
-def visualize_slices(data, planes=None, showlines=True, **kwargs):
+def visualize_slices(data,          # A 3D numpy array representing the image tensor.
+                     planes=None,   # A tuple containing the indices of the planes to visualize.
+                     showlines=True,# Whether to show dashed lines on the planes, rows, and columns.
+                     **kwargs):
     """
     Visualize slices of a 3D image tensor along its planes, rows, and columns.
-    
-    Parameters:
-        data (numpy.ndarray): A 3D numpy array representing the image tensor.
-        planes (tuple): A tuple containing the indices of the planes to visualize. If None, defaults to middle slices.
     """
     if planes:
         z, y, x = planes
@@ -329,16 +319,11 @@ def visualize_slices(data, planes=None, showlines=True, **kwargs):
 
 
 # %% ../nbs/09_visualize.ipynb 22
-def slice_explorer(data, order='CZYX', **kwargs):
+def slice_explorer(data,            # A 3D numpy array representing the image tensor.
+                   order='CZYX',    # The order of dimensions in the data.
+                   **kwargs):
     """
     Visualizes the provided data using Plotly's interactive imshow function with animation support.
-    
-    Args:
-        data (np.array or pd.DataFrame): The data to be visualized, typically a 2D array representing an image sequence.
-        order (str): The order of dimensions in the data (e.g., 'CZYX').
-        
-    Returns:
-        None: Displays the plot directly.
     """
 
     # Handle 4D data with channel dimension
@@ -381,21 +366,16 @@ def slice_explorer(data, order='CZYX', **kwargs):
     pio.show(fig)
 
 # %% ../nbs/09_visualize.ipynb 25
-def plot_volume(values, opacity=0.1, min=0.1, max=0.8, surface_count=5, width=800, height=600):
+def plot_volume(values,             # A 3D array of pixel values representing the volume.
+                opacity=0.1,        # Opacity level for the surfaces in the volume plot.
+                min=0.1,            # Minimum threshold multiplier for the visualization.
+                max=0.8,            # Maximum threshold multiplier for the visualization.
+                surface_count=5,    # Number of surfaces to display in the volume plot.
+                width=800,          # Width of the plotted figure.
+                height=600,         # Height of the plotted figure.
+                ):
     """
-    Plot a 3D volume using Plotly. The function assumes that 'values' is a 3D array representing the volume data.
-    
-    Parameters:
-        values (numpy.ndarray): A 3D array of pixel values representing the volume.
-        opacity (float, optional): Opacity level for the surfaces in the volume plot. Defaults to 0.1.
-        min (float, optional): Minimum threshold multiplier for the visualization. Defaults to 0.1.
-        max (float, optional): Maximum threshold multiplier for the visualization. Defaults to 0.8.
-        surface_count (int, optional): Number of surfaces to display in the volume plot. Defaults to 5.
-        width (int, optional): Width of the plotted figure. Defaults to 800.
-        height (int, optional): Height of the plotted figure. Defaults to 600.
-    
-    Returns:
-        None
+    Interactive visualization of a 3D volume using Plotly. The function assumes that 'values' is a 3D array representing the volume data.
     """
     # Generate coordinates based on the shape of the values array
     X, Y, Z = np.mgrid[0:values.shape[0], 0:values.shape[1], 0:values.shape[2]]

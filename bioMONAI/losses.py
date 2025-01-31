@@ -57,16 +57,16 @@ class CombinedLoss:
 
 # %% ../nbs/03_losses.ipynb 10
 class MSSSIMLoss(torch.nn.Module):
-    def __init__(self, spatial_dims=2, window_size: int = 8, sigma: float = 1.5, reduction: str = "mean", levels: int = 3, weights=None):
+    def __init__(self, spatial_dims=2, # Number of spatial dimensions.
+                 window_size: int = 8, # Size of the Gaussian filter for SSIM.
+                 sigma: float = 1.5, # Standard deviation of the Gaussian filter.
+                 reduction: str = "mean", # Specifies the reduction to apply to the output ('mean', 'sum', or 'none').
+                 levels: int = 3, # Number of scales to use for MS-SSIM.
+                 weights=None, # Weights to apply to each scale. If None, default values are used.
+                 ):
         """
         Multi-Scale Structural Similarity (MSSSIM) Loss using MONAI's SSIMLoss as the base.
 
-        Args:
-            window_size (int): Size of the Gaussian window for SSIM.
-            sigma (float): Standard deviation of the Gaussian.
-            reduction (str): Specifies the reduction to apply to the output ('mean', 'sum', or 'none').
-            levels (int): Number of scales to use for MS-SSIM.
-            weights (list): Weights to apply to each scale. If None, default values are used.
         """
         super(MSSSIMLoss, self).__init__()
         self.ssim = SSIMLoss(spatial_dims, win_size=window_size, kernel_sigma=sigma, reduction="none")
@@ -115,19 +115,17 @@ class MSSSIMLoss(torch.nn.Module):
 
 # %% ../nbs/03_losses.ipynb 12
 class MSSSIML1Loss(torch.nn.Module):
-    def __init__(self, spatial_dims=2, alpha: float = 0.025, window_size: int = 8, sigma: float = 1.5, 
-                 reduction: str = "mean", levels: int = 3, weights=None):
+    def __init__(self, spatial_dims=2, # Number of spatial dimensions.
+                 alpha: float = 0.025, #  Weighting factor between MS-SSIM and L1 loss.
+                 window_size: int = 8, # Size of the Gaussian filter for SSIM.
+                 sigma: float = 1.5, # Standard deviation of the Gaussian filter.
+                 reduction: str = "mean", # Specifies the reduction to apply to the output ('mean', 'sum', or 'none').
+                 levels: int = 3, # Number of scales to use for MS-SSIM.
+                 weights=None, # Weights to apply to each scale. If None, default values are used.
+                 ):
         """
         Multi-Scale Structural Similarity (MSSSIM) with Gaussian-weighted L1 Loss.
 
-        Args:
-            spatial_dims (int): Number of spatial dimensions (2 or 3).
-            alpha (float): Weighting factor between MS-SSIM and L1 loss.
-            window_size (int): Size of the Gaussian window for SSIM.
-            sigma (float): Standard deviation of the Gaussian.
-            reduction (str): Specifies the reduction to apply to the output ('mean', 'sum', or 'none').
-            levels (int): Number of scales to use for MS-SSIM.
-            weights (list): Weights to apply to each scale. If None, default values are used.
         """
         super(MSSSIML1Loss, self).__init__()
         self.msssim = MSSSIMLoss(spatial_dims=spatial_dims, window_size=window_size, sigma=sigma, 
@@ -192,17 +190,17 @@ class MSSSIML1Loss(torch.nn.Module):
 
 # %% ../nbs/03_losses.ipynb 14
 class MSSSIML2Loss(torch.nn.Module):
-    def __init__(self, spatial_dims=2, alpha: float = 0.1, window_size: int = 11, sigma: float = 1.5, reduction: str = "mean", levels: int = 3, weights=None):
+    def __init__(self, spatial_dims=2, # Number of spatial dimensions.
+                 alpha: float = 0.1,# Weighting factor between MS-SSIM and L2 loss.
+                 window_size: int = 11,# Size of the Gaussian window for SSIM.
+                 sigma: float = 1.5,# Standard deviation of the Gaussian.
+                 reduction: str = "mean",# Specifies the reduction to apply to the output ('mean', 'sum', or 'none').
+                 levels: int = 3,# Number of scales to use for MS-SSIM.
+                 weights=None,# Weights to apply to each scale. If None, default values are used.
+                 ):
         """
-        Multi-Scale Structural Similarity (MSSSIM) with Gaussian-weighted L1 Loss.
+        Multi-Scale Structural Similarity (MSSSIM) with Gaussian-weighted L2 Loss.
 
-        Args:
-            alpha (float): Weighting factor between MS-SSIM and L1 loss. Controls the balance between the two losses.
-            window_size (int): Size of the Gaussian window for SSIM.
-            sigma (float): Standard deviation of the Gaussian.
-            reduction (str): Specifies the reduction to apply to the output ('mean', 'sum', or 'none').
-            levels (int): Number of scales to use for MS-SSIM.
-            weights (list): Weights to apply to each scale. If None, default values are used.
         """
         super(MSSSIML2Loss, self).__init__()
         self.msssim = MSSSIMLoss(spatial_dims=spatial_dims, window_size=window_size, sigma=sigma, reduction="none", levels=levels, weights=weights)
@@ -301,14 +299,12 @@ class DiceLoss(nn.Module):
             and the ground truth (targets).
     """
 
-    def __init__(self, smooth=1):
+    def __init__(self, smooth=1, # Smoothing factor to avoid division by zero
+                 ):
 
         """
         Initializes the DiceLoss instance with a smoothing factor.
 
-        Args:
-            smooth (float): A smoothing factor to avoid division by zero and ensure numerical stability.
-                            Default is 1.
         """
         super(DiceLoss, self).__init__()
         self.smooth = smooth
@@ -335,16 +331,14 @@ class DiceLoss(nn.Module):
         
 
 # %% ../nbs/03_losses.ipynb 22
-def FRCLoss(image1, image2):
+def FRCLoss(image1,# The first input image.
+            image2,# The second input image.
+            ):
 
     """
     Compute the Fourier Ring Correlation (FRC) loss between two images.
 
-    #### Args:
-        - image1 (torch.Tensor): The first input image.
-        - image2 (torch.Tensor): The second input image.
-
-    #### Returns:
+    Returns:
         - torch.Tensor: The FRC loss.
     """
     
@@ -352,17 +346,15 @@ def FRCLoss(image1, image2):
     
 
 # %% ../nbs/03_losses.ipynb 23
-def FCRCutoff(image1,image2):
+def FCRCutoff(image1,# The first input image.
+             image2,# The second input image.
+             ):
 
 
     """
     Calculate the cutoff frequency at when Fourier ring correlation drops to 1/7.
 
-    #### Args:
-        - image1 (torch.Tensor): The first input image.
-        - image2 (torch.Tensor): The second input image.
-
-    #### Returns:
+    Returns:
         - float: The cutoff frequency.
     """
 

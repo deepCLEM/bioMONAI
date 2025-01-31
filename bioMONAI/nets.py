@@ -70,16 +70,15 @@ import torch.nn as nn
 class DnCNN(nn.Module):
     """
     A Deep Neural Network for Image Denoising (DnCNN) model.
-    
-    Args:
-        spatial_dims (int, optional): The number of spatial dimensions. Default is 2.
-        in_channels (int, optional): The number of input channels. Default is 1 (grayscale image).
-        out_channels (int, optional): The number of output channels. Default is 1 (denoised image).
-        num_of_layers (int, optional): The number of convolutional layers in the network. Default is 9.
-        features (int, optional): The number of feature maps in the first layer and subsequent layers. Default is 64.
-        kernel_size (int or tuple, optional): The size of the convolution kernel. Default is 3.
+
     """
-    def __init__(self, spatial_dims=2, in_channels=1, out_channels=1, num_of_layers=9, features=64, kernel_size=3):
+    def __init__(self, spatial_dims=2, # Number of spatial dimensions
+                 in_channels=1, # Number of input channels
+                 out_channels=1, # Number of output channels
+                 num_of_layers=9, # Number of convolutional layers
+                 features=64, # Number of feature maps
+                 kernel_size=3, # Size of the convolution kernel
+                 ):
         super(DnCNN, self).__init__()
         
         # Create a list to hold the layers of the network
@@ -111,12 +110,10 @@ class DnCNN(nn.Module):
         # Convert the list of layers into a sequential container
         self.dncnn = nn.Sequential(*layers)
         
-    def forward(self, x):
+    def forward(self, x, # Input image tensor with shape [batch_size, in_channels, height, width].
+                ):
         """
         Forward pass of the DnCNN model.
-        
-        Args:
-            x (torch.Tensor): The input image tensor with shape [batch_size, in_channels, height, width].
         
         Returns:
             torch.Tensor: The denoised output image tensor with shape [batch_size, out_channels, height, width].
@@ -133,21 +130,26 @@ class DnCNN(nn.Module):
 # %% ../nbs/04_nets.ipynb 14
 @dataclass
 class DeeplabConfig:
-    dimensions: int
-    in_channels: int
-    out_channels: int
-    backbone: str = "xception" 
-    pretrained: bool = False
-    middle_flow_blocks: int = 16
-    aspp_dilations: List[int] = field(default_factory=lambda: [1, 6, 12, 18])
-    entry_block3_stride: int = 2
-    middle_block_dilation: int = 1
-    exit_block_dilations: Tuple[int, int] = (1, 2)
+    dimensions: int # Number of spatial dimensions
+    in_channels: int # Number of input channels
+    out_channels: int # Number of output channels
+    backbone: str = "xception" # Backbone model for the encoder
+    pretrained: bool = False # If True, use a pretrained backbone
+    middle_flow_blocks: int = 16 # Number of middle flow blocks
+    aspp_dilations: List[int] = field(default_factory=lambda: [1, 6, 12, 18]) # Dilation rates for the ASPP module
+    entry_block3_stride: int = 2 # Stride for the third entry block
+    middle_block_dilation: int = 1 # Dilation rate for the middle block
+    exit_block_dilations: Tuple[int, int] = (1, 2) # Dilation rates for the exit block
 
-def get_padding(kernel_size: int, dilation: int) -> int:
+def get_padding(kernel_size: int, # Size of the convolution kernel
+                dilation: int, # Dilation rate
+                ) -> int: # Padding size
     return (kernel_size - 1) * dilation // 2
     
-def interpolate(x: torch_Tensor, size: Union[List[int], Tuple[int, ...]], dims: int) -> torch_Tensor:
+def interpolate(x: torch_Tensor, # Input tensor
+                size: Union[List[int], Tuple[int, ...]], # Size of the output tensor
+                dims: int, # Number of spatial dimensions
+                ) -> torch_Tensor: # Output tensor
     if dims == 2:
         return F.interpolate(x, size=size, mode='bilinear', align_corners=True)
     elif dims == 3:
@@ -157,8 +159,15 @@ def interpolate(x: torch_Tensor, size: Union[List[int], Tuple[int, ...]], dims: 
 
 # %% ../nbs/04_nets.ipynb 17
 class SeparableConv(nn.Module):
-    def __init__(self, config: DeeplabConfig, inplanes: int, planes: int, kernel_size: int = 3, stride: int = 1, 
-                 dilation: int = 1, bias: bool = False, norm: Optional[str] = None):
+    def __init__(self, config: DeeplabConfig, # Configuration for the Deeplab model
+                 inplanes: int, # Number of input channels
+                 planes: int, # Number of output channels
+                 kernel_size: int = 3, # Size of the convolution kernel
+                 stride: int = 1,  # Stride for the convolution
+                 dilation: int = 1, # Dilation rate for the convolution
+                 bias: bool = False, # If True, add a bias term
+                 norm: Optional[str] = None, # Type of normalization layer
+                 ):
         super().__init__()
         self.conv1 = Convolution(
             spatial_dims=config.dimensions, 
@@ -190,9 +199,16 @@ class SeparableConv(nn.Module):
         return x
 
 class Block(nn.Module):
-    def __init__(self, config: DeeplabConfig, inplanes: int, planes: int, reps: int, stride: int = 1, 
-                 dilation: int = 1, start_with_relu: bool = True, grow_first: bool = True, 
-                 is_last: bool = False):
+    def __init__(self, config: DeeplabConfig, # Configuration for the Deeplab model
+                 inplanes: int, # Number of input channels
+                 planes: int, # Number of output channels
+                 reps: int, # Number of convolutional layers
+                 stride: int = 1,  # Stride for the convolution
+                 dilation: int = 1, # Dilation rate for the convolution
+                 start_with_relu: bool = True, # If True, start with a ReLU activation
+                 grow_first: bool = True, # If True, increase the number of channels in the first convolution
+                 is_last: bool = False, # If True, add a convolution layer at the end
+                 ):
         super().__init__()
         if planes != inplanes or stride != 1:
             self.skip = Convolution(config.dimensions, inplanes, planes, kernel_size=1, bias=False, 
@@ -239,7 +255,8 @@ class Block(nn.Module):
 
 # %% ../nbs/04_nets.ipynb 19
 class Xception(nn.Module):
-    def __init__(self, config: DeeplabConfig):
+    def __init__(self, config: DeeplabConfig, # Configuration for the Deeplab model
+                 ):
         super().__init__()
         self.config = config
 
@@ -297,7 +314,11 @@ class Xception(nn.Module):
 
 # %% ../nbs/04_nets.ipynb 21
 class ASPP_module(nn.Module):
-    def __init__(self, config: DeeplabConfig, inplanes: int, planes: int, dilation: int):
+    def __init__(self, config: DeeplabConfig, # Configuration for the Deeplab model
+                 inplanes: int,               # Number of input channels
+                 planes: int,                 # Number of output channels
+                 dilation: int,               # Dilation rate for the convolution
+                 ):
         super().__init__()
         kernel_size = 1 if dilation == 1 else 3
         padding = 0 if dilation == 1 else dilation
@@ -400,34 +421,18 @@ class MambaLayer(nn.Module):
     """
     A custom neural network layer that incorporates the Mamba block from the Mamba model, 
     along with layer normalization and optional mixed precision handling.
-    
-    Args:
-        dim (int): The dimension of the input tensor. This is typically the feature size.
-        d_state (int, optional): Expansion factor for the state in the Mamba block. Default is 16.
-        d_conv (int, optional): Width of the local convolution in the Mamba block. Default is 4.
-        expand (int, optional): Factor by which to expand the dimensions in the Mamba block. Default is 2.
-    
-    Attributes:
-        dim (int): The dimension of the input tensor.
-        norm (nn.LayerNorm): Layer normalization applied to the input tensor before processing.
-        mamba (Mamba): The core Mamba block which performs spatial-spectral transformations.
-    
-    Methods:
-        forward(x): 
-            Defines the computation performed at every call.
-            
-            Args:
-                x (torch.Tensor): Input tensor of shape [batch_size, dim, height, width].
-                
-            Returns:
-                torch.Tensor: Output tensor after applying Mamba block and normalization.
+
     """
     
-    def __init__(self, dim, d_state=16, d_conv=4, expand=2):
+    def __init__(self, dim,  # Dimension of the input tensor
+                 d_state=16, # Expansion factor for the state in the Mamba block
+                 d_conv=4,   # Width of the local convolution in the Mamba block
+                 expand=2,   # Factor by which to expand the dimensions in the Mamba block
+                 ):
         super().__init__()
-        self.dim = dim
-        self.norm = nn.LayerNorm(dim)
-        self.mamba = Mamba(
+        self.dim = dim                      # Dimension of the input tensor
+        self.norm = nn.LayerNorm(dim)       # Layer normalization
+        self.mamba = Mamba(                 # Mamba block
             d_model=dim,  # Model dimension d_model
             d_state=d_state,  # SSM state expansion factor
             d_conv=d_conv,  # Local convolution width
@@ -435,13 +440,11 @@ class MambaLayer(nn.Module):
         )
     
     @autocast(enabled=False)
-    def forward(self, x):
+    def forward(self, x, # Input tensor of shape [batch_size, dim, height, width].
+                ):
         """
         Forward pass of the MambaLayer. Applies layer normalization and optionally converts input precision.
-        
-        Args:
-            x (torch.Tensor): Input tensor of shape [batch_size, dim, height, width].
-            
+   
         Returns:
             torch.Tensor: Output tensor after applying Mamba block and normalization.
         """
@@ -471,12 +474,6 @@ class UMamba(DynUNet):
     
     This class inherits from `DynUNet` and adds a specific bottleneck structure containing a convolution block followed by a MambaLayer.
     
-    Methods:
-        get_bottleneck():
-            Constructs and returns the bottleneck part of the network, which includes a convolution block followed by a MambaLayer.
-            
-            Returns:
-                nn.Sequential: A PyTorch sequential container holding the convolution block and the MambaLayer for the bottleneck.
     """
     
     def get_bottleneck(self):

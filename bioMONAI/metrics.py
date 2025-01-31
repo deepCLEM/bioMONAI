@@ -49,26 +49,18 @@ def PSNRMetric(max_val, **kwargs):
 
 
 # %% ../nbs/06_metrics.ipynb 7
-def radial_mask(r, # Radius of the radial mask
+def radial_mask(r,      # Radius of the radial mask
                 cx=128, # X coordinate mask center
                 cy=128, # Y coordinate maske center
-                sx=256, 
-                sy=256, 
-                delta=1,
+                sx=256, # Size of the x-axis
+                sy=256, # Size of the y-axis
+                delta=1,# Thickness adjustment for the circular mask
                ):
 
     """
     Generate a radial mask.
 
-    #### Parameters:
-       - r (int or float): Radius of the circular mask.
-       - cx (int, optional): X-coordinate of the center of the circular mask. Defaults to 128.
-       - cy (int, optional): Y-coordinate of the center of the circular mask. Defaults to 128.
-       - sx (int, optional): Array of x-coordinates forming a grid. Defaults to 256.
-       - sy (int, optional): Array of y-coordinates forming a grid. Defaults to 256.
-       - delta (int or float, optional): Thickness adjustment for the circular mask. Defaults to 1.
-
-    #### Returns:
+    Returns:
        - numpy.ndarray: Radial mask.
     """
     
@@ -89,16 +81,14 @@ def radial_mask(r, # Radius of the radial mask
 
 
 # %% ../nbs/06_metrics.ipynb 8
-def get_radial_masks(width, height):
+def get_radial_masks(width, # Width of the image
+                     height, # Height of the image
+                     ):
 
     """
     Generates a set of radial masks and corresponding to spatial frequencies.
 
-    #### Parameters:
-        - width (int): Width of the image.
-        - height (int): Height of the image.
-
-    #### Returns:
+    Returns:
         tuple: A tuple containing:
             - numpy.ndarray: Array of radial masks.
             - numpy.ndarray: Array of spatial frequencies corresponding to the masks.
@@ -122,16 +112,14 @@ def get_radial_masks(width, height):
 
 
 # %% ../nbs/06_metrics.ipynb 10
-def get_fourier_ring_correlations(image1, image2):
+def get_fourier_ring_correlations(image1, # First input image
+                                  image2, # Second input image
+                                  ):
   
     """
     Compute Fourier Ring Correlation (FRC) between two images.
 
-    #### Args:
-        - image1 (torch.Tensor): First input image.
-        - image2 (torch.Tensor): Second input image.
-
-    #### Returns:
+    Returns:
         tuple: A tuple containing:
             - torch.Tensor: Fourier Ring Correlation values.
             - torch.Tensor: Array of spatial frequencies.
@@ -192,17 +180,15 @@ def get_fourier_ring_correlations(image1, image2):
     return FRC , spatial_frequency
 
 # %% ../nbs/06_metrics.ipynb 11
-def FRCMetric(image1, image2):
+def FRCMetric(image1, # First input image
+              image2, # Second input image
+              ):
 
 
     """
     Compute the area under the Fourier Ring Correlation (FRC) curve between two images.
 
-    #### Args:
-        - image1 (torch.Tensor): The first input image.
-        - image2 (torch.Tensor): The second input image.
-
-    #### Returns:
+    Returns:
         - float: The area under the FRC curve.
     """
 
