@@ -132,6 +132,6 @@ If you have any questions or need further assistance, please open an
 issue on GitHub or contact us directly at:
 
 - Project Lead: [Biagio Mandracchia](mailto:biagio.mandracchia@uva.es)
-- Contributors: [Sara Cruz-Adrados](mailto:sara.cruz.adrados@uva.es)
+- Contributors: [Sara Cruz-Adrados](mailto:sara.cruz.adrados@uva.es),
   [Juan Pita-López](mailto:juan.pita@uva.es), [Rosa-María
   Menchón-Lara](mailto:rosamaria.menchon@uva.es)
