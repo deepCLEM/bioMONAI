@@ -44,7 +44,7 @@ To install the bioMONAI environment, follow these steps:
 1.  **Clone the repository:**
 
     ``` bash
-    git clone https://github.com/bmandracchia/biomonai.git
+    git clone https://github.com/deepclem/biomonai.git
     cd biomonai
     ```
 
@@ -63,14 +63,14 @@ To install the bioMONAI environment, follow these steps:
 
 ## Getting Started
 
-To get started with bioMONAI, the best way is to try out our tutorials,
-which will walk you through model training for various tasks like
-classification, regression, and segmentation.
+To get started with bioMONAI, we recommend exploring our tutorials,
+which guide you through model training for various tasks such as
+classification and denoising.
 
-| Notebook                                                                                                                                       | Open in Colab                                                                                                                                                                            |
-|:-----------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Tutorial classification](https://nbviewer.org/github.com/bmandracchia/bioMONAI/nightly/nbs/904_denoising_tutorial.ipynb) <br>(to be updated.) | [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/bmandracchia/bioMONAI/nightly/nbs/904_denoising_tutorial.ipynb) |
-| [Tutorial denoising 2D](https://nbviewer.org/github.com/bmandracchia/bioMONAI/nightly/nbs/904_denoising_tutorial.ipynb) <br>(to be updated.)   | [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/bmandracchia/bioMONAI/nightly/nbs/904_denoising_tutorial.ipynb) |
+| Notebook                                                                                                                                                                                                                                                                                                                                                                                                                        | Open in Colab                                                                                                                                                                       |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Tutorial: Classification 2D](https://github.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/901_tutorial_classification.ipynb) <br> This notebook provides a comprehensive guide on training deep learning models for 2D image classification tasks, covering data loading, preprocessing, model building, training, and evaluation.                                                                                             | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/901_tutorial_classification.ipynb) |
+| [Tutorial: Denoising 2D](https://github.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb) <br> This notebook offers a detailed guide on applying deep learning techniques to denoise biological microscopy images. It covers data preparation, model architecture, training processes, and evaluation methods, providing a comprehensive resource for enhancing image quality in biological research. | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb)      |
 
 ## Usage
 
@@ -132,5 +132,6 @@ If you have any questions or need further assistance, please open an
 issue on GitHub or contact us directly at:
 
 - Project Lead: [Biagio Mandracchia](mailto:biagio.mandracchia@uva.es)
-- Contributors: [Juan Pita-López](mailto:juan.pita@uva.es), [Rosa-María
+- Contributors: [Sara Cruz-Adrados](mailto:sara.cruz.adrados@uva.es)
+  [Juan Pita-López](mailto:juan.pita@uva.es), [Rosa-María
   Menchón-Lara](mailto:rosamaria.menchon@uva.es)

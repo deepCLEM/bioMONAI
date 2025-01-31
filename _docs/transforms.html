@@ -421,9 +421,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> Resize (size=None, **kwargs)</code></pre>
 </blockquote>
 <p>*A subclass of Reshape that handles image resizing based on specified target dimensions.</p>
-<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resize"><code>Resize</code></a> class inherits from <code>Reshape</code> and provides a flexible way to adjust the size of images by specifying either a target size or scaling factors.</p>
-<p>Args: size (int, tuple, or list, optional): Target dimensions for resizing (height, width). If its length is smaller than the spatial dimensions of the image, values will be repeated to match. If an int is provided, it will be broadcast to all spatial dimensions. Default is None, which indicates no resizing. **kwargs: Additional keyword arguments that can include scaling factors or interpolation methods.</p>
-<p>Attributes: target_size (tuple or list): The target dimensions of the image after resizing. If not provided during initialization, this will be determined based on the original image properties and optional scaling factors.*</p>
+<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resize"><code>Resize</code></a> class inherits from <code>Reshape</code> and provides a flexible way to adjust the size of images by specifying either a target size or scaling factors.*</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>size</td>
+<td>NoneType</td>
+<td>None</td>
+<td>Target dimensions for resizing (height, width). If its length is smaller than the spatial dimensions, values will be repeated. If an int is provided, it will be broadcast to all spatial dimensions.</td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(img.size())</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>visualize_slices(img, showlines<span class="op">=</span><span class="va">False</span>)</span>
@@ -567,9 +595,8 @@ torch.Size([60, 50, 50])</code></pre>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>img3 <span class="op">=</span> img[<span class="dv">30</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plot_image(img3)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'cmos'</span>).encodes(img3))</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'ccd'</span>, readout<span class="op">=</span><span class="dv">2</span>).encodes(img3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original clean image</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plot_image(img3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="05_transforms_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
 </div>
@@ -579,6 +606,14 @@ torch.Size([60, 50, 50])</code></pre>
 <div class="cell-output cell-output-display">
 <p><img src="05_transforms_files/figure-html/cell-10-output-3.png" class="img-fluid"></p>
 </div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Noisy image simulating a CMOS camera</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'cmos'</span>).encodes(img3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Noisy image simulating a CCD camera</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plot_image(RandCameraNoise(camera <span class="op">=</span> <span class="st">'ccd'</span>, readout<span class="op">=</span><span class="dv">2</span>).encodes(img3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -593,6 +628,60 @@ torch.Size([60, 50, 50])</code></pre>
                  'numpy.float32'&gt;)</code></pre>
 </blockquote>
 <p><em>Image normalization.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x</td>
+<td></td>
+<td></td>
+<td>The input image to scale.</td>
+</tr>
+<tr class="even">
+<td>min</td>
+<td>float</td>
+<td>0.0</td>
+<td>The minimum intensity value.</td>
+</tr>
+<tr class="odd">
+<td>max</td>
+<td>float</td>
+<td>1.0</td>
+<td>The maximum intensity value.</td>
+</tr>
+<tr class="even">
+<td>axis</td>
+<td>NoneType</td>
+<td>None</td>
+<td>The axis or axes along which to compute the minimum and maximum values.</td>
+</tr>
+<tr class="odd">
+<td>eps</td>
+<td>float</td>
+<td>1e-20</td>
+<td>A small value to prevent division by zero.</td>
+</tr>
+<tr class="even">
+<td>dtype</td>
+<td>type</td>
+<td>float32</td>
+<td>The data type to use for the output image.</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L219" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -604,27 +693,128 @@ torch.Size([60, 50, 50])</code></pre>
                             'numpy.float32'&gt;)</code></pre>
 </blockquote>
 <p><em>Percentile-based image normalization.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x</td>
+<td></td>
+<td></td>
+<td>The input image to scale.</td>
+</tr>
+<tr class="even">
+<td>pmin</td>
+<td>int</td>
+<td>3</td>
+<td>The minimum percentile value.</td>
+</tr>
+<tr class="odd">
+<td>pmax</td>
+<td>float</td>
+<td>99.8</td>
+<td>The maximum percentile value.</td>
+</tr>
+<tr class="even">
+<td>axis</td>
+<td>NoneType</td>
+<td>None</td>
+<td>The axis or axes along which to compute the minimum and maximum values.</td>
+</tr>
+<tr class="odd">
+<td>clip</td>
+<td>bool</td>
+<td>True</td>
+<td>If True, clips the output values to the specified range.</td>
+</tr>
+<tr class="even">
+<td>b_min</td>
+<td>float</td>
+<td>0.0</td>
+<td>The minimum intensity value.</td>
+</tr>
+<tr class="odd">
+<td>b_max</td>
+<td>float</td>
+<td>1.0</td>
+<td>The maximum intensity value.</td>
+</tr>
+<tr class="even">
+<td>eps</td>
+<td>float</td>
+<td>1e-20</td>
+<td>A small value to prevent division by zero.</td>
+</tr>
+<tr class="odd">
+<td>dtype</td>
+<td>type</td>
+<td>float32</td>
+<td>The data type to use for the output image.</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L234" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="scaleintensityvariance" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensityvariance">ScaleIntensityVariance</h3>
 <blockquote class="blockquote">
-<pre><code> ScaleIntensityVariance (ndim=2)</code></pre>
+<pre><code> ScaleIntensityVariance (target_variance=1.0, ndim=2)</code></pre>
 </blockquote>
-<p>*Scales the intensity variance of an ND image to a target value.</p>
-<p>Args: target_variance (float): The desired variance for the scaled intensities. ndim (int): Number of spatial dimensions in the image. Default is 2 for 2D images.*</p>
+<p><em>Scales the intensity variance of an ND image to a target value.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>target_variance</td>
+<td>float</td>
+<td>1.0</td>
+<td>The desired variance for the scaled intensities.</td>
+</tr>
+<tr class="even">
+<td>ndim</td>
+<td>int</td>
+<td>2</td>
+<td>Number of spatial dimensions in the image.</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage with a random tensor of shape (1, 3, 256, 256)</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">256</span>, <span class="dv">256</span>))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>transform <span class="op">=</span> ScaleIntensityVariance(ndim<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the transform to the tensor</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>scaled_tensor <span class="op">=</span> transform(rand_tensor)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original Tensor Variance:'</span>, rand_tensor.var().item())</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Scaled Tensor Variance:'</span>, scaled_tensor.var().item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage with a random tensor of shape (1, 3, 256, 256)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">256</span>, <span class="dv">256</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>transform <span class="op">=</span> ScaleIntensityVariance(ndim<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the transform to the tensor</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>scaled_tensor <span class="op">=</span> transform(rand_tensor)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original Tensor Variance:'</span>, rand_tensor.var().item())</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Scaled Tensor Variance:'</span>, scaled_tensor.var().item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Original Tensor Variance: 0.08341076225042343
 Scaled Tensor Variance: 1.0</code></pre>
@@ -687,8 +877,7 @@ Scaled Tensor Variance: 1.0</code></pre>
 <pre><code> RandCropND (size:int|tuple, lazy=False, **kwargs)</code></pre>
 </blockquote>
 <p>*Randomly crops an ND image to a specified size.</p>
-<p>This transform randomly crops an ND image to a specified size during training and performs a center crop during validation. It supports both 2D and 3D images and videos, assuming the first dimension is the batch dimension.</p>
-<p>Args: size (int or tuple): The size to crop the image to. this can have any number of dimensions. If a single value is provided, it will be duplicated for each spatial dimension, up to a maximum of 3 dimensions. **kwargs: Additional keyword arguments to be passed to the parent class.*</p>
+<p>This transform randomly crops an ND image to a specified size during training and performs a center crop during validation. It supports both 2D and 3D images and videos, assuming the first dimension is the batch dimension.*</p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -726,12 +915,12 @@ Scaled Tensor Variance: 1.0</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">65</span>, <span class="dv">65</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">8</span>, <span class="op">*</span>orig_size))</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    test_eq((<span class="dv">8</span>,<span class="dv">64</span>,<span class="dv">64</span>),RandCropND((<span class="dv">64</span>,<span class="dv">64</span>))(rand_tensor).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">65</span>, <span class="dv">65</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">8</span>, <span class="op">*</span>orig_size))</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    test_eq((<span class="dv">8</span>,<span class="dv">64</span>,<span class="dv">64</span>),RandCropND((<span class="dv">64</span>,<span class="dv">64</span>))(rand_tensor).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 <p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L360" target="_blank" style="float:right; font-size:smaller">source</a></p>
@@ -774,7 +963,7 @@ Scaled Tensor Variance: 1.0</code></pre>
 <td>ndim</td>
 <td>int</td>
 <td>2</td>
-<td>If axis is negative it counts from the last to the first axis. If axis is a tuple of ints, flipping is performed on all of the axes specified in the tuple.</td>
+<td>Number of spatial dimensions in the image</td>
 </tr>
 <tr class="even">
 <td>lazy</td>
@@ -791,14 +980,14 @@ Scaled Tensor Variance: 1.0</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandFlip(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axis<span class="op">=</span><span class="va">None</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandFlip(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axis<span class="op">=</span><span class="va">None</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>orig tensor:  metatensor([[[0.8943, 0.3943, 0.2556, 0.8066],
          [0.5016, 0.6177, 0.8749, 0.1229],
@@ -884,14 +1073,14 @@ metatensor([[[0.8066, 0.2556, 0.3943, 0.8943],
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRot90(prob<span class="op">=</span><span class="fl">.75</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRot90(prob<span class="op">=</span><span class="fl">.75</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>orig tensor:  metatensor([[[0.3961, 0.2351, 0.4363, 0.3366],
          [0.9416, 0.8529, 0.8646, 0.0091],
