@@ -1,6 +1,7 @@
 _data/
 nbs/_test*
 *._fuse_hidden*
+*.code-workspace
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
