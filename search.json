@@ -242,7 +242,7 @@
     "href": "index.html#overview",
     "title": "bioMONAI",
     "section": "Overview",
-    "text": "Overview\nbioMONAI is a low-code Python-based platform for developing and deploying deep learning models in biomedical imaging built on top of the MONAI framework, fastai, and TorchIO. This project aims to facilitate interoperability, reproducibility, and community collaboration in biomedical research.\n\nFor more information, bioMONAI documentation can be found here."
+    "text": "Overview\nbioMONAI is a low-code Python-based platform for developing and deploying deep learning models in biomedical imaging built on top of the MONAI framework, fastai, and TorchIO. This project aims to facilitate interoperability, reproducibility, and community collaboration in biomedical research."
   },
   {
     "objectID": "index.html#table-of-contents",
