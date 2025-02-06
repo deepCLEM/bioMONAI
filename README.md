@@ -4,7 +4,7 @@
 
 ![](nbs/data_examples/logo_bioMONAI_full.png)
 
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://bmandracchia.github.io/bioMONAI/)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://deepclem.github.io/bioMONAI/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![Jupyter
@@ -21,9 +21,6 @@ facilitate interoperability, reproducibility, and community
 collaboration in biomedical research.
 
 ![](nbs/data_examples/Fig_bioMONAI.png)
-
-For more information, bioMONAI documentation can be found
-[here](https://deepclem.github.io/bioMONAI/).
 
 ## Table of Contents
 
