@@ -1,1 +1,1 @@
-Sitemap: https://bmandracchia.github.io/bioMONAI/sitemap.xml
+Sitemap: https://deepCLEM.github.io/bioMONAI/sitemap.xml

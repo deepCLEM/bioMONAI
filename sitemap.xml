@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/nets.html</loc>
-    <lastmod>2025-01-31T12:30:32.608Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/nets.html</loc>
+    <lastmod>2025-02-06T10:13:17.336Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/core.html</loc>
-    <lastmod>2025-01-31T12:30:31.676Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/core.html</loc>
+    <lastmod>2025-02-06T10:13:16.388Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/datasets.html</loc>
-    <lastmod>2025-01-31T12:30:30.580Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/datasets.html</loc>
+    <lastmod>2025-02-06T10:13:15.300Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/visualize.html</loc>
-    <lastmod>2025-01-31T12:30:29.760Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/visualize.html</loc>
+    <lastmod>2025-02-06T10:13:14.460Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/Tutorials/tutorial_classification3d.html</loc>
-    <lastmod>2025-01-31T12:30:27.960Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_classification3d.html</loc>
+    <lastmod>2025-02-06T10:13:12.600Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/Tutorials/tutorial_denoising.html</loc>
-    <lastmod>2025-01-31T12:30:27.104Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_denoising.html</loc>
+    <lastmod>2025-02-06T10:13:11.732Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/metrics.html</loc>
-    <lastmod>2025-01-31T12:30:25.036Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/metrics.html</loc>
+    <lastmod>2025-02-06T10:13:09.664Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/losses.html</loc>
-    <lastmod>2025-01-31T12:30:24.148Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/losses.html</loc>
+    <lastmod>2025-02-06T10:13:08.776Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/transforms.html</loc>
-    <lastmod>2025-01-31T12:30:24.752Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/transforms.html</loc>
+    <lastmod>2025-02-06T10:13:09.380Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/data.html</loc>
-    <lastmod>2025-01-31T12:30:26.440Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/data.html</loc>
+    <lastmod>2025-02-06T10:13:11.052Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/Tutorials/tutorial_classification.html</loc>
-    <lastmod>2025-01-31T12:30:27.576Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_classification.html</loc>
+    <lastmod>2025-02-06T10:13:12.216Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/Tutorials/tutorial_multispectral_classification.html</loc>
-    <lastmod>2025-01-31T12:30:28.296Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_multispectral_classification.html</loc>
+    <lastmod>2025-02-06T10:13:12.988Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/index.html</loc>
-    <lastmod>2025-01-31T12:30:30.068Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/index.html</loc>
+    <lastmod>2025-02-06T10:13:14.784Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/io.html</loc>
-    <lastmod>2025-01-31T12:30:30.936Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/io.html</loc>
+    <lastmod>2025-02-06T10:13:15.656Z</lastmod>
   </url>
   <url>
-    <loc>https://bmandracchia.github.io/bioMONAI/callbacks.html</loc>
-    <lastmod>2025-01-31T12:30:32.048Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/callbacks.html</loc>
+    <lastmod>2025-02-06T10:13:16.768Z</lastmod>
   </url>
 </urlset>

@@ -99,13 +99,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="styles.css">
 <meta property="og:title" content="bioMONAI - Data">
 <meta property="og:description" content="Data classes and functions">
-<meta property="og:image" content="https://bmandracchia.github.io/bioMONAI/01_data_files/figure-html/cell-38-output-1.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/01_data_files/figure-html/cell-38-output-1.png">
 <meta property="og:site-name" content="bioMONAI">
 <meta property="og:image:height" content="389">
 <meta property="og:image:width" content="389">
 <meta name="twitter:title" content="bioMONAI - Data">
 <meta name="twitter:description" content="Data classes and functions">
-<meta name="twitter:image" content="https://bmandracchia.github.io/bioMONAI/01_data_files/figure-html/cell-38-output-1.png">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/01_data_files/figure-html/cell-38-output-1.png">
 <meta name="twitter:image-height" content="389">
 <meta name="twitter:image-width" content="389">
 <meta name="twitter:card" content="summary_large_image">
@@ -364,7 +364,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#extract_substacks" id="toc-extract_substacks" class="nav-link" data-scroll-target="#extract_substacks">extract_substacks</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -396,32 +396,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="data-types">Data types</h2>
 <p>The module introduces specialized classes to represent various bioimaging data structures, facilitating seamless integration with machine learning workflows.</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L31" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L31" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="metaresolver" class="level3">
 <h3 class="anchored" data-anchor-id="metaresolver">MetaResolver</h3>
 <blockquote class="blockquote">
 <pre><code> MetaResolver (*args, **kwargs)</code></pre>
 </blockquote>
-<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#metaresolver"><code>MetaResolver</code></a> class addresses metaclass conflicts, ensuring compatibility across different data structures. This is particularly useful when integrating with libraries that have specific metaclass requirements.</em></p>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#metaresolver"><code>MetaResolver</code></a> class addresses metaclass conflicts, ensuring compatibility across different data structures. This is particularly useful when integrating with libraries that have specific metaclass requirements.</em></p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L39" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L39" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioimagebase" class="level3">
 <h3 class="anchored" data-anchor-id="bioimagebase">BioImageBase</h3>
 <blockquote class="blockquote">
 <pre><code> BioImageBase (*args, **kwargs)</code></pre>
 </blockquote>
-<p>*Serving as the foundational class for bioimaging data, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> provides core functionalities for image handling. It ensures that instances of specified types are appropriately cast to this class, maintaining consistency in data representation.</p>
+<p>*Serving as the foundational class for bioimaging data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> provides core functionalities for image handling. It ensures that instances of specified types are appropriately cast to this class, maintaining consistency in data representation.</p>
 <p>Metaclass casts <code>x</code> to this class if it is of type <code>cls._bypass_type</code>.*</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L112" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L112" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioimage" class="level3">
 <h3 class="anchored" data-anchor-id="bioimage">BioImage</h3>
 <blockquote class="blockquote">
 <pre><code> BioImage (*args, **kwargs)</code></pre>
 </blockquote>
-<p><em>A subclass of <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a>, the <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimage"><code>BioImage</code></a> class is tailored for handling both 2D and 3D image objects. It offers methods to load images from various formats and provides access to image properties such as shape and dimensions.</em></p>
+<p><em>A subclass of <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a>, the <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimage"><code>BioImage</code></a> class is tailored for handling both 2D and 3D image objects. It offers methods to load images from various formats and provides access to image properties such as shape and dimensions.</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImage.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -430,14 +430,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L148" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L148" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioimagestack" class="level3">
 <h3 class="anchored" data-anchor-id="bioimagestack">BioImageStack</h3>
 <blockquote class="blockquote">
 <pre><code> BioImageStack (*args, **kwargs)</code></pre>
 </blockquote>
-<p><em>Designed for 3D image data, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagestack"><code>BioImageStack</code></a> extends <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to manage volumetric images effectively. It includes functionalities for slicing, visualization, and manipulation of 3D data.</em></p>
+<p><em>Designed for 3D image data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagestack"><code>BioImageStack</code></a> extends <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to manage volumetric images effectively. It includes functionalities for slicing, visualization, and manipulation of 3D data.</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageStack.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -446,14 +446,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L159" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L159" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioimageproject" class="level3">
 <h3 class="anchored" data-anchor-id="bioimageproject">BioImageProject</h3>
 <blockquote class="blockquote">
 <pre><code> BioImageProject (*args, **kwargs)</code></pre>
 </blockquote>
-<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimageproject"><code>BioImageProject</code></a> class represents a 3D image stack as a 2D image using maximum intensity projection. This is particularly useful for visualizing volumetric data in a 2D format, aiding in quick assessments and presentations.</em></p>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimageproject"><code>BioImageProject</code></a> class represents a 3D image stack as a 2D image using maximum intensity projection. This is particularly useful for visualizing volumetric data in a 2D format, aiding in quick assessments and presentations.</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageProject.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>a.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -462,14 +462,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L195" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L195" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioimagemulti" class="level3">
 <h3 class="anchored" data-anchor-id="bioimagemulti">BioImageMulti</h3>
 <blockquote class="blockquote">
 <pre><code> BioImageMulti (*args, **kwargs)</code></pre>
 </blockquote>
-<p><em>For multi-channel 2D images, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagemulti"><code>BioImageMulti</code></a> extends <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to handle data with multiple channels, such as different fluorescence markers in microscopy images.</em></p>
+<p><em>For multi-channel 2D images, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagemulti"><code>BioImageMulti</code></a> extends <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to handle data with multiple channels, such as different fluorescence markers in microscopy images.</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a 3D image stack as a multichannel image</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageMulti.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
@@ -485,41 +485,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="data-conversion">Data conversion</h2>
 <p>To facilitate seamless integration between tensors and bioimaging data structures, the module provides conversion utilities.</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L230" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L230" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="tensor2bioimage" class="level3">
 <h3 class="anchored" data-anchor-id="tensor2bioimage">Tensor2BioImage</h3>
 <blockquote class="blockquote">
 <pre><code> Tensor2BioImage (cls:__main__.BioImageBase=&lt;class
                   '__main__.BioImageStack'&gt;)</code></pre>
 </blockquote>
-<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#tensor2bioimage"><code>Tensor2BioImage</code></a> transform converts tensors into <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> instances, enabling the application of bioimaging-specific methods to tensor data. This is essential for integrating deep learning models with bioimaging workflows.</em></p>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#tensor2bioimage"><code>Tensor2BioImage</code></a> transform converts tensors into <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> instances, enabling the application of bioimaging-specific methods to tensor data. This is essential for integrating deep learning models with bioimaging workflows.</em></p>
 </section>
 </section>
 <section id="data-blocks-and-dataloader" class="level2">
 <h2 class="anchored" data-anchor-id="data-blocks-and-dataloader">Data Blocks and Dataloader</h2>
 <p>The module offers classes to construct data blocks and data loaders, streamlining the preparation of datasets for machine learning models.</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L247" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L247" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="bioimageblock" class="level3">
 <h3 class="anchored" data-anchor-id="bioimageblock">BioImageBlock</h3>
 <blockquote class="blockquote">
 <pre><code> BioImageBlock (cls:__main__.BioImageBase=&lt;class '__main__.BioImage'&gt;)</code></pre>
 </blockquote>
-<p><em>A <code>TransformBlock</code> tailored for bioimaging data, <a href="https://bmandracchia.github.io/bioMONAI/data.html#bioimageblock"><code>BioImageBlock</code></a> facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging.</em></p>
+<p><em>A <code>TransformBlock</code> tailored for bioimaging data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimageblock"><code>BioImageBlock</code></a> facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging.</em></p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L252" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L252" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodatablock" class="level3">
 <h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
 <blockquote class="blockquote">
 <pre><code> BioDataBlock (blocks:list=(&lt;fastai.data.block.TransformBlock object at
-               0x7f8c50c22410&gt;, &lt;fastai.data.block.TransformBlock object
-               at 0x7f8c3f7276d0&gt;), dl_type:fastai.data.core.TfmdDL=None,
+               0x7fd5d7d29a10&gt;, &lt;fastai.data.block.TransformBlock object
+               at 0x7fd4e69b3250&gt;), dl_type:fastai.data.core.TfmdDL=None,
                get_items=&lt;function get_image_files&gt;, get_y=None,
                get_x=None, getters:list=None, n_inp:int=None,
                item_tfms:list=None, batch_tfms:list=None, **kwargs)</code></pre>
 </blockquote>
-<p><em>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#biodatablock"><code>BioDataBlock</code></a> class serves as a generic container to build <code>Datasets</code> and <code>DataLoaders</code> efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.</em></p>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodatablock"><code>BioDataBlock</code></a> class serves as a generic container to build <code>Datasets</code> and <code>DataLoaders</code> efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.</em></p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -539,7 +539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>blocks</td>
 <td>list</td>
-<td>(&lt;fastai.data.block.TransformBlock object at 0x7f8c50c22410&gt;, &lt;fastai.data.block.TransformBlock object at 0x7f8c3f7276d0&gt;)</td>
+<td>(&lt;fastai.data.block.TransformBlock object at 0x7fd5d7d29a10&gt;, &lt;fastai.data.block.TransformBlock object at 0x7fd4e69b3250&gt;)</td>
 <td>One or more <code>TransformBlock</code>s</td>
 </tr>
 <tr class="even">
@@ -599,16 +599,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L283" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L283" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders">BioDataLoaders</h3>
 <blockquote class="blockquote">
 <pre><code> BioDataLoaders (*loaders, path:str|pathlib.Path='.', device=None)</code></pre>
 </blockquote>
-<p><em>Basic wrapper around several <code>DataLoader</code>s with factory methods for biomedical imaging problems. Managing multiple <code>DataLoader</code> instances, <a href="https://bmandracchia.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> handles data loading for different phases of model training, such as training, validation, and testing. It ensures efficient data handling and supports various batch processing strategies.</em></p>
+<p><em>Basic wrapper around several <code>DataLoader</code>s with factory methods for biomedical imaging problems. Managing multiple <code>DataLoader</code> instances, <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> handles data loading for different phases of model training, such as training, validation, and testing. It ensures efficient data handling and supports various batch processing strategies.</em></p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L290" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L290" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.from_source" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.from_source">BioDataLoaders.from_source</h3>
@@ -681,7 +681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L329" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L326" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.from_folder" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.from_folder">BioDataLoaders.from_folder</h3>
@@ -805,7 +805,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L347" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L344" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.from_df" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.from_df">BioDataLoaders.from_df</h3>
@@ -965,7 +965,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L372" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L369" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.from_csv" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.from_csv">BioDataLoaders.from_csv</h3>
@@ -1145,7 +1145,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L379" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L376" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.class_from_folder" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.class_from_folder">BioDataLoaders.class_from_folder</h3>
@@ -1262,7 +1262,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L417" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L414" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.class_from_df" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.class_from_df">BioDataLoaders.class_from_df</h3>
@@ -1411,7 +1411,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L439" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L436" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.class_from_csv" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.class_from_csv">BioDataLoaders.class_from_csv</h3>
@@ -1580,7 +1580,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L446" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L443" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="biodataloaders.class_from_lists" class="level3">
 <h3 class="anchored" data-anchor-id="biodataloaders.class_from_lists">BioDataLoaders.class_from_lists</h3>
@@ -1702,13 +1702,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="data-getters">Data getters</h2>
 <p>Functions to retrieve specific data components are provided, aiding in the organization and preprocessing of datasets.</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L469" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L466" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="get_gt" class="level3">
 <h3 class="anchored" data-anchor-id="get_gt">get_gt</h3>
 <blockquote class="blockquote">
 <pre><code> get_gt (path_gt, gt_file_name='avg50.png')</code></pre>
 </blockquote>
-<p>*The <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a> function retrieves ground truth data, essential for supervised learning tasks. It ensures that the correct labels or annotations are associated with each data sample.</p>
+<p>*The <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a> function retrieves ground truth data, essential for supervised learning tasks. It ensures that the correct labels or annotations are associated with each data sample.</p>
 <p>This function constructs a path to a ground truth file based on the given <code>path_gt</code> and <code>gt_file_name</code>.<br>
 It uses a lambda function to create a new path by appending <code>gt_file_name</code> to the parent directory of the input file, as specified by <code>path_gt</code>.</p>
 <p>Returns a callable: A function that takes a single argument (a filename) and returns a Path object representing the full path to the ground truth file. When called with a filename, this function constructs the path by combining <code>path_gt</code> or the parent directory of the filename with <code>gt_file_name</code>.*</p>
@@ -1742,9 +1742,9 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tr>
 </tbody>
 </table>
-<p>Similar to <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a>, the <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_target"><code>get_target</code></a> function fetches target data for training, validation, or testing, facilitating the preparation of datasets for machine learning models.</p>
+<p>Similar to <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a>, the <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_target"><code>get_target</code></a> function fetches target data for training, validation, or testing, facilitating the preparation of datasets for machine learning models.</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L497" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L493" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_target" class="level3">
 <h3 class="anchored" data-anchor-id="get_target">get_target</h3>
@@ -1820,9 +1820,9 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <pre><code>train_folder/GT/image_clean.tif</code></pre>
 </div>
 </div>
-<p>For tasks involving denoising or noise analysis, <a href="https://bmandracchia.github.io/bioMONAI/data.html#get_noisy_pair"><code>get_noisy_pair</code></a> retrieves pairs of clean and noisy data, enabling the training of models to learn noise reduction.</p>
+<p>For tasks involving denoising or noise analysis, <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_noisy_pair"><code>get_noisy_pair</code></a> retrieves pairs of clean and noisy data, enabling the training of models to learn noise reduction.</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L551" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L546" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_noisy_pair" class="level3">
 <h3 class="anchored" data-anchor-id="get_noisy_pair">get_noisy_pair</h3>
@@ -1847,7 +1847,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
             ctxs=None, max_n:int=10, nrows:int=None, ncols:int=None,
             figsize:tuple=None, **kwargs)</code></pre>
 </blockquote>
-<p>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#show_batch"><code>show_batch</code></a> function visualizes a batch of data samples, allowing users to inspect the input data and verify preprocessing steps.</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#show_batch"><code>show_batch</code></a> function visualizes a batch of data samples, allowing users to inspect the input data and verify preprocessing steps.</p>
 <p>Returns: List[Context]: A list of contexts after displaying the images and labels.</p>
 <table class="table">
 <colgroup>
@@ -1928,7 +1928,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <pre><code>show_results (x: BioImageBase, y: BioImageBase, samples,
               outs, ctxs=None, max_n=10, figsize=None, **kwargs)</code></pre>
 </blockquote>
-<p>After model inference, <a href="https://bmandracchia.github.io/bioMONAI/data.html#show_results"><code>show_results</code></a> displays the model’s predictions alongside the ground truth, facilitating the evaluation of model performance.</p>
+<p>After model inference, <a href="https://deepCLEM.github.io/bioMONAI/data.html#show_results"><code>show_results</code></a> displays the model’s predictions alongside the ground truth, facilitating the evaluation of model performance.</p>
 <p>Returns:</p>
 <p>List[Context]: A list of contexts after displaying the images and labels.</p>
 <table class="table">
@@ -2003,7 +2003,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>The module provides functions for data preprocessing, including patch extraction and dimensionality reduction, essential for preparing data for machine learning models.</p>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L719" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L714" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="extract_patches" class="level3">
 <h3 class="anchored" data-anchor-id="extract_patches">extract_patches</h3>
 <blockquote class="blockquote">
@@ -2037,7 +2037,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tr>
 </tbody>
 </table>
-<p>The <a href="https://bmandracchia.github.io/bioMONAI/data.html#extract_patches"><code>extract_patches</code></a> function divides images into smaller patches, which is useful for training models on localized regions of interest, especially when dealing with high-resolution images.</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#extract_patches"><code>extract_patches</code></a> function divides images into smaller patches, which is useful for training models on localized regions of interest, especially when dealing with high-resolution images.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.random.rand(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">3</span>)  <span class="co"># Example 3D data</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>,<span class="dv">2</span>)</span>
@@ -2053,7 +2053,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L745" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L740" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="save_patches_grid" class="level3">
 <h3 class="anchored" data-anchor-id="save_patches_grid">save_patches_grid</h3>
@@ -2142,7 +2142,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tr>
 </tbody>
 </table>
-<p>After extracting patches, <a href="https://bmandracchia.github.io/bioMONAI/data.html#save_patches_grid"><code>save_patches_grid</code></a> saves them in a grid format, facilitating visualization and inspection of the patches.</p>
+<p>After extracting patches, <a href="https://deepCLEM.github.io/bioMONAI/data.html#save_patches_grid"><code>save_patches_grid</code></a> saves them in a grid format, facilitating visualization and inspection of the patches.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
@@ -2151,7 +2151,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 50/50 [00:01&lt;00:00, 37.51it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 50/50 [00:01&lt;00:00, 34.76it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test/train_patches.csv and ./_test/test_patches.csv</code></pre>
@@ -2171,7 +2171,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L847" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L842" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="extract_random_patches" class="level3">
 <h3 class="anchored" data-anchor-id="extract_random_patches">extract_random_patches</h3>
@@ -2207,7 +2207,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L883" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L876" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="save_patches_random" class="level3">
 <h3 class="anchored" data-anchor-id="save_patches_random">save_patches_random</h3>
@@ -2304,7 +2304,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
 <span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_folder, gt_folder, output_folder, patch_size, num_patches)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 50/50 [00:00&lt;00:00, 57.88it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 50/50 [00:00&lt;00:00, 57.41it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test2/train_patches.csv and ./_test2/test_patches.csv</code></pre>
@@ -2320,7 +2320,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L986" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L979" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dict2string" class="level3">
 <h3 class="anchored" data-anchor-id="dict2string">dict2string</h3>
@@ -2380,7 +2380,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L1008" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L998" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="remove_singleton_dims" class="level3">
 <h3 class="anchored" data-anchor-id="remove_singleton_dims">remove_singleton_dims</h3>
@@ -2410,7 +2410,7 @@ new_order (str): The updated dimension order string.*</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/data.py#L1032" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L1020" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="extract_substacks" class="level3">
 <h3 class="anchored" data-anchor-id="extract_substacks">extract_substacks</h3>
@@ -2755,7 +2755,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp("https:\/\/bmandracchia\.github\.io\/bioMONAI");
+      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }

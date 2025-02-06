@@ -99,13 +99,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="styles.css">
 <meta property="og:title" content="bioMONAI">
 <meta property="og:description" content="Deep learning library for biomedical data built on top of MONAI and fastai">
-<meta property="og:image" content="https://bmandracchia.github.io/bioMONAI/data_examples/logo_bioMONAI_full.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/data_examples/logo_bioMONAI_full.png">
 <meta property="og:site-name" content="bioMONAI">
 <meta property="og:image:height" content="148">
 <meta property="og:image:width" content="595">
 <meta name="twitter:title" content="bioMONAI">
 <meta name="twitter:description" content="Deep learning library for biomedical data built on top of MONAI and fastai">
-<meta name="twitter:image" content="https://bmandracchia.github.io/bioMONAI/data_examples/logo_bioMONAI_full.png">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/data_examples/logo_bioMONAI_full.png">
 <meta name="twitter:image-height" content="148">
 <meta name="twitter:image-width" content="595">
 <meta name="twitter:card" content="summary_large_image">
@@ -324,7 +324,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">License</a></li>
   <li><a href="#contact" id="toc-contact" class="nav-link" data-scroll-target="#contact">Contact</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -397,17 +397,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th style="text-align: left;">Notebook</th>
-<th style="text-align: left;">Open in Colab</th>
+<th style="text-align: center;">Open in Colab</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;"><a href="https://github.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/901_tutorial_classification.ipynb">Tutorial: Classification 2D</a> <br> This notebook provides a comprehensive guide on training deep learning models for 2D image classification tasks, covering data loading, preprocessing, model building, training, and evaluation.</td>
-<td style="text-align: left;"><a href="https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/901_tutorial_classification.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid" alt="Open in Colab"></a></td>
+<td style="text-align: center;"><a href="https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/901_tutorial_classification.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid" alt="Open in Colab"></a></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><a href="https://github.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb">Tutorial: Denoising 2D</a> <br> This notebook offers a detailed guide on applying deep learning techniques to denoise biological microscopy images. It covers data preparation, model architecture, training processes, and evaluation methods, providing a comprehensive resource for enhancing image quality in biological research.</td>
-<td style="text-align: left;"><a href="https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid" alt="Open in Colab"></a></td>
+<td style="text-align: center;"><a href="https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid" alt="Open in Colab"></a></td>
 </tr>
 </tbody>
 </table>
@@ -430,11 +430,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><strong>Clone your fork:</strong></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/your_username/biomonai.git</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> biomonai</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Create a new Conda environment and install dependencies:</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">--file</span> bioMONAI-env.yml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Create a new branch for your changes:</strong></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> feature/new-feature</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> feature/new-feature</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Activate the environment and install MONAI in dev mode:</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate bioMONAI-env</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-e</span> .<span class="pp">[</span><span class="ss">dev</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Make your changes and commit them:</strong></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"Add new feature: &lt;feature description&gt;"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"Add new feature: &lt;feature description&gt;"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Push to your fork and create a pull request on GitHub.</strong></p></li>
 <li><p><strong>Wait for the review, and merge if everything looks good!</strong></p></li>
 </ol>
@@ -688,7 +693,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp("https:\/\/bmandracchia\.github\.io\/bioMONAI");
+      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
