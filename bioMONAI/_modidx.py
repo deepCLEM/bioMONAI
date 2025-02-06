@@ -2,8 +2,8 @@
 
 d = { 'settings': { 'branch': 'main',
                 'doc_baseurl': '/bioMONAI',
-                'doc_host': 'https://bmandracchia.github.io',
-                'git_url': 'https://github.com/bmandracchia/bioMONAI',
+                'doc_host': 'https://deepCLEM.github.io',
+                'git_url': 'https://github.com/deepCLEM/bioMONAI',
                 'lib_path': 'bioMONAI'},
   'syms': { 'bioMONAI.callbacks': { 'bioMONAI.callbacks.MeanLossGraphCallback': ( 'callbacks.html#meanlossgraphcallback',
                                                                                   'bioMONAI/callbacks.py'),

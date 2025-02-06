@@ -99,13 +99,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="styles.css">
 <meta property="og:title" content="bioMONAI - Transforms">
 <meta property="og:description" content="Data transformations and augmentations for 2D and 3D BioImages">
-<meta property="og:image" content="https://bmandracchia.github.io/bioMONAI/05_transforms_files/figure-html/cell-4-output-1.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/05_transforms_files/figure-html/cell-4-output-1.png">
 <meta property="og:site-name" content="bioMONAI">
 <meta property="og:image:height" content="382">
 <meta property="og:image:width" content="1182">
 <meta name="twitter:title" content="bioMONAI - Transforms">
 <meta name="twitter:description" content="Data transformations and augmentations for 2D and 3D BioImages">
-<meta name="twitter:image" content="https://bmandracchia.github.io/bioMONAI/05_transforms_files/figure-html/cell-4-output-1.png">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/05_transforms_files/figure-html/cell-4-output-1.png">
 <meta name="twitter:image-height" content="382">
 <meta name="twitter:image-width" content="1182">
 <meta name="twitter:card" content="summary_large_image">
@@ -338,7 +338,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#randrot90" id="toc-randrot90" class="nav-link" data-scroll-target="#randrot90">RandRot90</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/bmandracchia/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -369,14 +369,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="size-sampling" class="level2">
 <h2 class="anchored" data-anchor-id="size-sampling">Size &amp; Sampling</h2>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L19" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L19" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="resample" class="level3">
 <h3 class="anchored" data-anchor-id="resample">Resample</h3>
 <blockquote class="blockquote">
 <pre><code> Resample (sampling, **kwargs)</code></pre>
 </blockquote>
 <p>*A subclass of Spacing that handles image resampling based on specified sampling factors or voxel dimensions.</p>
-<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resample"><code>Resample</code></a> class inherits from <code>Spacing</code> and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.*</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#resample"><code>Resample</code></a> class inherits from <code>Spacing</code> and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.*</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -413,7 +413,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="resize" class="level3">
 <h3 class="anchored" data-anchor-id="resize">Resize</h3>
@@ -421,7 +421,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> Resize (size=None, **kwargs)</code></pre>
 </blockquote>
 <p>*A subclass of Reshape that handles image resizing based on specified target dimensions.</p>
-<p>The <a href="https://bmandracchia.github.io/bioMONAI/transforms.html#resize"><code>Resize</code></a> class inherits from <code>Reshape</code> and provides a flexible way to adjust the size of images by specifying either a target size or scaling factors.*</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#resize"><code>Resize</code></a> class inherits from <code>Reshape</code> and provides a flexible way to adjust the size of images by specifying either a target size or scaling factors.*</p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -475,7 +475,7 @@ torch.Size([60, 50, 50])</code></pre>
 <section id="noise" class="level2">
 <h2 class="anchored" data-anchor-id="noise">Noise</h2>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L103" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L103" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="randcameranoise" class="level3">
 <h3 class="anchored" data-anchor-id="randcameranoise">RandCameraNoise</h3>
 <blockquote class="blockquote">
@@ -620,7 +620,7 @@ torch.Size([60, 50, 50])</code></pre>
 <section id="normalization" class="level2">
 <h2 class="anchored" data-anchor-id="normalization">Normalization</h2>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L189" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L189" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="scaleintensity" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensity">ScaleIntensity</h3>
 <blockquote class="blockquote">
@@ -683,7 +683,7 @@ torch.Size([60, 50, 50])</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L208" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L208" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="scaleintensitypercentiles" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensitypercentiles">ScaleIntensityPercentiles</h3>
@@ -766,7 +766,7 @@ torch.Size([60, 50, 50])</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L232" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L232" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="scaleintensityvariance" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensityvariance">ScaleIntensityVariance</h3>
@@ -825,7 +825,7 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 <section id="data-augmentation" class="level2">
 <h2 class="anchored" data-anchor-id="data-augmentation">Data Augmentation</h2>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L271" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L271" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="randcrop2d" class="level3">
 <h3 class="anchored" data-anchor-id="randcrop2d">RandCrop2D</h3>
 <blockquote class="blockquote">
@@ -869,7 +869,7 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L302" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L302" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randcropnd" class="level3">
 <h3 class="anchored" data-anchor-id="randcropnd">RandCropND</h3>
@@ -923,7 +923,7 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    test_eq((<span class="dv">8</span>,<span class="dv">64</span>,<span class="dv">64</span>),RandCropND((<span class="dv">64</span>,<span class="dv">64</span>))(rand_tensor).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L350" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L350" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randflip" class="level3">
 <h3 class="anchored" data-anchor-id="randflip">RandFlip</h3>
@@ -1009,7 +1009,7 @@ metatensor([[[0.4648, 0.4394, 0.0145, 0.4412],
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/bmandracchia/bioMONAI/blob/main/bioMONAI/transforms.py#L383" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L383" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randrot90" class="level3">
 <h3 class="anchored" data-anchor-id="randrot90">RandRot90</h3>
@@ -1339,7 +1339,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp("https:\/\/bmandracchia\.github\.io\/bioMONAI");
+      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
