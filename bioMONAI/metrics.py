@@ -6,7 +6,7 @@
 __all__ = ['SSIMMetric', 'MSEMetric', 'MAEMetric', 'RMSEMetric', 'PSNRMetric', 'radial_mask', 'get_radial_masks',
            'get_fourier_ring_correlations', 'FRCMetric']
 
-# %% ../nbs/06_metrics.ipynb 3
+# %% ../nbs/06_metrics.ipynb 4
 import numpy as np
 from numpy import trapz
 
@@ -18,9 +18,15 @@ from fastai.vision.all import AvgMetric
 from monai.losses import SSIMLoss
 from monai.metrics import PSNRMetric as _PSNR, RMSEMetric as _RMSE, MSEMetric as _MSE, MAEMetric as _MAE, SSIMMetric as _SSIM
 
+from sklearn.datasets import load_iris
+import matplotlib.pyplot as plt
+from sklearn.model_selection import StratifiedKFold
+from sklearn import svm
+from sklearn.metrics import RocCurveDisplay, auc
+
 from .core import torch_from_numpy
 
-# %% ../nbs/06_metrics.ipynb 4
+# %% ../nbs/06_metrics.ipynb 5
 def SSIMMetric(spatial_dims=3, **kwargs):
     def SSIM(x, y):
         return _SSIM(spatial_dims, **kwargs)(x,y).mean()
@@ -48,7 +54,7 @@ def PSNRMetric(max_val, **kwargs):
 
 
 
-# %% ../nbs/06_metrics.ipynb 7
+# %% ../nbs/06_metrics.ipynb 12
 def radial_mask(r,      # Radius of the radial mask
                 cx=128, # X coordinate mask center
                 cy=128, # Y coordinate maske center
@@ -80,7 +86,7 @@ def radial_mask(r,      # Radius of the radial mask
     return ind1 * ind2
 
 
-# %% ../nbs/06_metrics.ipynb 8
+# %% ../nbs/06_metrics.ipynb 13
 def get_radial_masks(width, # Width of the image
                      height, # Height of the image
                      ):
@@ -111,7 +117,7 @@ def get_radial_masks(width, # Width of the image
     return radial_masks, spatial_freq
 
 
-# %% ../nbs/06_metrics.ipynb 10
+# %% ../nbs/06_metrics.ipynb 15
 def get_fourier_ring_correlations(image1, # First input image
                                   image2, # Second input image
                                   ):
@@ -179,7 +185,7 @@ def get_fourier_ring_correlations(image1, # First input image
 
     return FRC , spatial_frequency
 
-# %% ../nbs/06_metrics.ipynb 11
+# %% ../nbs/06_metrics.ipynb 16
 def FRCMetric(image1, # First input image
               image2, # Second input image
               ):
