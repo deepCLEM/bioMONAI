@@ -513,8 +513,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
 <blockquote class="blockquote">
 <pre><code> BioDataBlock (blocks:list=(&lt;fastai.data.block.TransformBlock object at
-               0x7fd5d7d29a10&gt;, &lt;fastai.data.block.TransformBlock object
-               at 0x7fd4e69b3250&gt;), dl_type:fastai.data.core.TfmdDL=None,
+               0x7fa8e2496e90&gt;, &lt;fastai.data.block.TransformBlock object
+               at 0x7fa8d12a48d0&gt;), dl_type:fastai.data.core.TfmdDL=None,
                get_items=&lt;function get_image_files&gt;, get_y=None,
                get_x=None, getters:list=None, n_inp:int=None,
                item_tfms:list=None, batch_tfms:list=None, **kwargs)</code></pre>
@@ -539,7 +539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>blocks</td>
 <td>list</td>
-<td>(&lt;fastai.data.block.TransformBlock object at 0x7fd5d7d29a10&gt;, &lt;fastai.data.block.TransformBlock object at 0x7fd4e69b3250&gt;)</td>
+<td>(&lt;fastai.data.block.TransformBlock object at 0x7fa8e2496e90&gt;, &lt;fastai.data.block.TransformBlock object at 0x7fa8d12a48d0&gt;)</td>
 <td>One or more <code>TransformBlock</code>s</td>
 </tr>
 <tr class="even">
@@ -2144,14 +2144,15 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </table>
 <p>After extracting patches, <a href="https://deepCLEM.github.io/bioMONAI/data.html#save_patches_grid"><code>save_patches_grid</code></a> saves them in a grid format, facilitating visualization and inspection of the patches.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 50/50 [00:01&lt;00:00, 34.76it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 35.05it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test/train_patches.csv and ./_test/test_patches.csv</code></pre>
@@ -2297,14 +2298,14 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'/home/biagio/Code/Noise2Model/_data/Confocal_BPAE_B/raw/1'</span></span>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
 <span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
 <span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
 <span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_folder, gt_folder, output_folder, patch_size, num_patches)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 50/50 [00:00&lt;00:00, 57.41it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 62.06it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test2/train_patches.csv and ./_test2/test_patches.csv</code></pre>
@@ -2491,30 +2492,30 @@ new_order (str): The updated dimension order string.*</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'../_data/aics/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05.ome.tiff'</span></span>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'./data_examples/2155a4fe_3500000635_100X_20170227_E08_P21.ome.tiff'</span></span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
 <span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Extracted substack saved to: ./_test_folder/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C0_Zrange(0, 35)_T0.ome.tiff</code></pre>
+<pre><code>Extracted substack saved to: ./_test_folder/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Zrange(0, 35)_T0.ome.tiff</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
 <span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Extracted substack saved to: ./_test_folder/C_0/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C0_Z5_T0.ome.tiff
-Extracted substack saved to: ./_test_folder/C_1/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C1_Z5_T0.ome.tiff
-Extracted substack saved to: ./_test_folder/C_2/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C2_Z5_T0.ome.tiff</code></pre>
+<pre><code>Extracted substack saved to: ./_test_folder/C_0/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Z5_T0.ome.tiff
+Extracted substack saved to: ./_test_folder/C_1/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C1_Z5_T0.ome.tiff
+Extracted substack saved to: ./_test_folder/C_2/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C2_Z5_T0.ome.tiff</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
 <span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Extracted substack saved to: ./_test_folder/channel_0/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C0_Z5.ome.tiff
-Extracted substack saved to: ./_test_folder/channel_1/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C1_Z5.ome.tiff
-Extracted substack saved to: ./_test_folder/channel_2/2cad3afd_3500001004_100X_20170623_5-Scene-6-P29-F05_substack_C2_Z5.ome.tiff</code></pre>
+<pre><code>Extracted substack saved to: ./_test_folder/channel_0/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Z5.ome.tiff
+Extracted substack saved to: ./_test_folder/channel_1/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C1_Z5.ome.tiff
+Extracted substack saved to: ./_test_folder/channel_2/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C2_Z5.ome.tiff</code></pre>
 </div>
 </div>
 

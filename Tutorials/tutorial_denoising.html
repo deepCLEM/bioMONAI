@@ -319,9 +319,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#download-data" id="toc-download-data" class="nav-link active" data-scroll-target="#download-data">Download Data</a></li>
-  <li><a href="#create-dataloader" id="toc-create-dataloader" class="nav-link" data-scroll-target="#create-dataloader">Create Dataloader</a></li>
-  <li><a href="#load-and-train-a-2d-model" id="toc-load-and-train-a-2d-model" class="nav-link" data-scroll-target="#load-and-train-a-2d-model">Load and train a 2D model</a></li>
-  <li><a href="#test-data" id="toc-test-data" class="nav-link" data-scroll-target="#test-data">Test data</a></li>
+  <li><a href="#prepare-data-for-training" id="toc-prepare-data-for-training" class="nav-link" data-scroll-target="#prepare-data-for-training">Prepare Data for Training</a></li>
+  <li><a href="#visualize-a-batch-of-training-data" id="toc-visualize-a-batch-of-training-data" class="nav-link" data-scroll-target="#visualize-a-batch-of-training-data">Visualize a Batch of Training Data</a></li>
+  <li><a href="#define-and-train-the-model" id="toc-define-and-train-the-model" class="nav-link" data-scroll-target="#define-and-train-the-model">Define and Train the Model</a></li>
+  <li><a href="#show-results" id="toc-show-results" class="nav-link" data-scroll-target="#show-results">Show Results</a></li>
+  <li><a href="#save-the-trained-model" id="toc-save-the-trained-model" class="nav-link" data-scroll-target="#save-the-trained-model">Save the Trained Model</a></li>
+  <li><a href="#evaluate-the-model-on-test-data" id="toc-evaluate-the-model-on-test-data" class="nav-link" data-scroll-target="#evaluate-the-model-on-test-data">Evaluate the Model on Test Data</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -375,6 +378,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="download-data" class="level3">
 <h3 class="anchored" data-anchor-id="download-data">Download Data</h3>
+<p>In the next cell, we will download the dataset required for this tutorial. The dataset is hosted online, and we will use the <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#download_file"><code>download_file</code></a> function from the <code>bioMONAI</code> library to download and extract the files.</p>
+<blockquote class="blockquote">
+<ul>
+<li>You can change the <code>output_directory</code> variable to specify a different directory where you want to save the downloaded files.</li>
+<li>The <code>url</code> variable contains the link to the dataset. If you have a different dataset, you can replace this URL with the link to your dataset.</li>
+<li>By default, we are downloading only the first two images. You can modify the code to download more images if needed.</li>
+</ul>
+</blockquote>
+<p>Make sure you have enough storage space in the specified directory before downloading the dataset.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the directory where you want to save the downloaded files</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>output_directory <span class="op">=</span> <span class="st">"../_data/U2OS"</span></span>
@@ -389,8 +401,21 @@ Decompression (if needed) has been handled automatically.</code></pre>
 </div>
 </div>
 </section>
-<section id="create-dataloader" class="level3">
-<h3 class="anchored" data-anchor-id="create-dataloader">Create Dataloader</h3>
+<section id="prepare-data-for-training" class="level3">
+<h3 class="anchored" data-anchor-id="prepare-data-for-training">Prepare Data for Training</h3>
+<p>In the next cell, we will prepare the data for training. We will specify the path to the training images and define the batch size and patch size. Additionally, we will apply several transformations to the images to augment the dataset and improve the model’s robustness.</p>
+<ul>
+<li><code>X_path</code>: The path to the directory containing the low-resolution training images.</li>
+<li><code>bs</code>: The batch size, which determines the number of images processed together in one iteration.</li>
+<li><code>patch_size</code>: The size of the patches to be extracted from the images.</li>
+<li><code>itemTfms</code>: A list of item-level transformations applied to each image, including random cropping, rotation, and flipping.</li>
+<li><code>batchTfms</code>: A list of batch-level transformations applied to each batch of images, including intensity scaling.</li>
+<li><code>get_target_fn</code>: A function to get the corresponding ground truth images for the low-resolution images.</li>
+</ul>
+<blockquote class="blockquote">
+<p>You can customize the following parameters to suit your needs: - Change the <code>X_path</code> variable to point to a different dataset. - Adjust the <code>bs</code> and <code>patch_size</code> variables to match your hardware capabilities and model requirements. - Modify the transformations in <code>itemTfms</code> and <code>batchTfms</code> to include other augmentations or preprocessing steps.</p>
+</blockquote>
+<p>After defining these parameters and transformations, we will create a <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> object to load the training and validation datasets.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/train/low/'</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -403,14 +428,14 @@ Decompression (if needed) has been handled automatically.</code></pre>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>get_target_fn <span class="op">=</span> get_target(<span class="st">'GT'</span>, same_filename<span class="op">=</span><span class="va">True</span>, relative_path<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_folder(</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    X_path, </span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    get_target_fn, </span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    valid_pct<span class="op">=</span><span class="fl">0.05</span>, </span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">42</span>, </span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    item_tfms<span class="op">=</span>itemTfms,</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span>batchTfms, </span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    bs <span class="op">=</span> bs,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    X_path,                 <span class="co"># input images</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    get_target_fn,          <span class="co"># target images</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    valid_pct<span class="op">=</span><span class="fl">0.05</span>,         <span class="co"># percentage of data for the validation set</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">42</span>,                <span class="co"># seed for random number generator  </span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    item_tfms<span class="op">=</span>itemTfms,     <span class="co"># item transformations</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span>batchTfms,   <span class="co"># batch transformations</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,     <span class="co"># print summary of the dataset</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    bs <span class="op">=</span> bs,                <span class="co"># batch size</span></span>
 <span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
@@ -420,6 +445,17 @@ Decompression (if needed) has been handled automatically.</code></pre>
 validation images: 122</code></pre>
 </div>
 </div>
+</section>
+<section id="visualize-a-batch-of-training-data" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-a-batch-of-training-data">Visualize a Batch of Training Data</h3>
+<p>In the next cell, we will visualize a batch of training data to get an idea of what the images look like after applying the transformations. This step is crucial to ensure that the data augmentation and preprocessing steps are working as expected.</p>
+<ul>
+<li><code>data.show_batch(cmap='magma')</code>: This function will display a batch of images from the training dataset using the ‘magma’ colormap.</li>
+</ul>
+<blockquote class="blockquote">
+<p>Change the <code>cmap</code> parameter to use a different colormap (e.g., ‘gray’, ‘viridis’, ‘plasma’) based on your preference.</p>
+</blockquote>
+<p>Visualizing the data helps in understanding the dataset better and ensures that the transformations are applied correctly.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -427,8 +463,21 @@ validation images: 122</code></pre>
 </div>
 </div>
 </section>
-<section id="load-and-train-a-2d-model" class="level3">
-<h3 class="anchored" data-anchor-id="load-and-train-a-2d-model">Load and train a 2D model</h3>
+<section id="define-and-train-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="define-and-train-the-model">Define and Train the Model</h3>
+<p>In the next cell, we will define a 2D U-Net model using the <code>create_unet_model</code> function from the <code>bioMONAI</code> library. The U-Net model is a popular architecture for image segmentation tasks, and it can be customized to suit various applications.</p>
+<ul>
+<li><code>resnet34</code>: The backbone of the U-Net model. You can replace this with other backbones like <code>resnet18</code>, <code>resnet50</code>, etc., depending on your requirements.</li>
+<li><code>1</code>: The number of output channels. For grayscale images, this should be set to 1. For RGB images, set it to 3.</li>
+<li><code>(128,128)</code>: The input size of the images. Adjust this based on the size of your input images.</li>
+<li><code>True</code>: Whether to use pre-trained weights for the backbone. Set this to <code>False</code> if you want to train the model from scratch.</li>
+<li><code>n_in=1</code>: The number of input channels. For grayscale images, this should be set to 1. For RGB images, set it to 3.</li>
+<li><code>cut=7</code>: The layer at which to cut the backbone. Adjust this based on the architecture of the backbone.</li>
+</ul>
+<blockquote class="blockquote">
+<p>You can customize the following parameters to suit your needs: - Change the backbone to a different architecture. - Adjust the input and output channels based on your dataset. - Modify the input size to match the dimensions of your images. - Set <code>pretrained</code> to <code>False</code> if you want to train the model from scratch.</p>
+</blockquote>
+<p>After defining the model, we will proceed to train it using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class. The training process involves fine-tuning the model for a specified number of epochs and evaluating its performance on the validation dataset.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.nets <span class="im">import</span> create_unet_model, resnet34</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -988,6 +1037,14 @@ validation images: 122</code></pre>
 <p><img src="903_tutorial_denoising_files/figure-html/cell-10-output-6.png" class="img-fluid"></p>
 </div>
 </div>
+</section>
+<section id="show-results" class="level3">
+<h3 class="anchored" data-anchor-id="show-results">Show Results</h3>
+<p>In the next cell, we will visualize the results of the trained model on a batch of validation data. This step helps in understanding how well the model has learned to denoise the images.</p>
+<ul>
+<li><code>trainer.show_results(cmap='magma')</code>: This function will display a batch of images from the validation dataset along with their corresponding denoised outputs using the ‘magma’ colormap.</li>
+</ul>
+<p>Visualizing the results helps in assessing the performance of the model and identifying any areas that may need further improvement.m</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -1015,13 +1072,33 @@ validation images: 122</code></pre>
 <p><img src="903_tutorial_denoising_files/figure-html/cell-11-output-3.png" class="img-fluid"></p>
 </div>
 </div>
+</section>
+<section id="save-the-trained-model" class="level3">
+<h3 class="anchored" data-anchor-id="save-the-trained-model">Save the Trained Model</h3>
+<p>In the next cell, we will save the trained model to a file. This step is crucial to preserve the model’s weights and architecture, allowing you to load and use the model later without retraining it.</p>
+<ul>
+<li><code>trainer.save('tmp-model')</code>: This function saves the model to a file named ‘tmp-model’. You can change the filename to something more descriptive based on your project.</li>
+</ul>
+<blockquote class="blockquote">
+<p>Suggestions for customization: - Change the filename to include details like the model architecture, dataset, or date (e.g., ‘unet_resnet34_U2OS_2023’). - Save the model in a specific directory by providing the full path (e.g., ‘models/unet_resnet34_U2OS_2023’). - Save additional information like training history, metrics, or configuration settings in a separate file for better reproducibility.</p>
+</blockquote>
+<p>Saving the model ensures that you can easily share it with others or deploy it in a production environment without needing to retrain it.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('tmp-model')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="test-data" class="level3">
-<h3 class="anchored" data-anchor-id="test-data">Test data</h3>
-<p>Evaluate the performance of the selected model on unseen data. It’s important to not touch this data until you have fine tuned your model to get an unbiased evaluation!</p>
+<section id="evaluate-the-model-on-test-data" class="level3">
+<h3 class="anchored" data-anchor-id="evaluate-the-model-on-test-data">Evaluate the Model on Test Data</h3>
+<p>In the next cell, we will evaluate the performance of the trained model on unseen test data. This step is crucial to get an unbiased evaluation of the model’s performance and understand how well it generalizes to new data.</p>
+<ul>
+<li><code>test_X_path</code>: The path to the directory containing the low-resolution test images.</li>
+<li><code>test_data</code>: A <code>DataLoader</code> object created from the test images.</li>
+<li><code>evaluate_model(trainer, test_data, metrics=SSIMMetric(2))</code>: This function evaluates the model on the test dataset using the specified metrics (in this case, SSIM).</li>
+</ul>
+<blockquote class="blockquote">
+<p>Suggestions for customization: - Change the <code>test_X_path</code> variable to point to a different test dataset. - Add more metrics to the <code>metrics</code> parameter to get a comprehensive evaluation (e.g., <code>MSEMetric()</code>, <code>MAEMetric()</code>). - Save the evaluation results to a file for further analysis or reporting.</p>
+</blockquote>
+<p>Evaluating the model on test data helps in understanding its performance in real-world scenarios and identifying any areas that may need further improvement.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>test_X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/test/low/'</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
