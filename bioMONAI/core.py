@@ -8,7 +8,7 @@ __all__ = ['coolwarm', 'warm_cmap', 'read_yaml', 'dictlist_to_funclist', 'fastTr
            'evaluate_model', 'evaluate_classification_model', 'attributesFromDict', 'get_device', 'img2float',
            'img2Tensor']
 
-# %% ../nbs/00_core.ipynb 6
+# %% ../nbs/00_core.ipynb 5
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -30,11 +30,11 @@ from skimage.data import cells3d
 
 import yaml
 
-# %% ../nbs/00_core.ipynb 7
+# %% ../nbs/00_core.ipynb 6
 from torch import squeeze as torchsqueeze, max as torchmax, from_numpy as torch_from_numpy, device as torch_device
 from torch.cuda import is_available as is_cuda_available
 
-# %% ../nbs/00_core.ipynb 8
+# %% ../nbs/00_core.ipynb 7
 from collections.abc import MutableSequence
 from typing import MutableSequence
     
@@ -52,14 +52,14 @@ import torch.optim as toptim
 from .datasets import download_medmnist
 
 
-# %% ../nbs/00_core.ipynb 23
+# %% ../nbs/00_core.ipynb 22
 def read_yaml(yaml_path):
     "Reads a YAML file and returns its contents as a dictionary"
     with open(yaml_path, 'r') as file:
         config = yaml.safe_load(file)
     return config 
 
-# %% ../nbs/00_core.ipynb 24
+# %% ../nbs/00_core.ipynb 23
 def dictlist_to_funclist(transform_dicts):
     transforms = []
     for trans in transform_dicts:
@@ -73,7 +73,7 @@ def dictlist_to_funclist(transform_dicts):
 
     return transforms
 
-# %% ../nbs/00_core.ipynb 25
+# %% ../nbs/00_core.ipynb 24
 class fastTrainer(Learner):
     """
     A custom implementation of the FastAI Learner class for training models in bioinformatics applications.
@@ -201,7 +201,7 @@ class fastTrainer(Learner):
             csv_log = csv_log, show_graph = show_graph, show_summary = show_summary          
         )        
 
-# %% ../nbs/00_core.ipynb 31
+# %% ../nbs/00_core.ipynb 30
 def _add_norm(dls, meta, pretrained, n_in=3):
     if not pretrained: return
     stats = meta.get('stats')
@@ -217,7 +217,7 @@ def _timm_norm(dls, cfg, pretrained, n_in=3):
         tfm = Normalize.from_stats(cfg['mean'],cfg['std'])
         dls.add_tfms([tfm],'after_batch')
 
-# %% ../nbs/00_core.ipynb 32
+# %% ../nbs/00_core.ipynb 31
 @delegates(create_vision_model)
 def visionTrainer(  dataloaders: DataLoaders, # The DataLoader objects containing training and validation datasets.
                     model: callable, # A callable model that will be trained on the dataset.
@@ -280,7 +280,7 @@ def visionTrainer(  dataloaders: DataLoaders, # The DataLoader objects containin
     store_attr('model,normalize,n_out,pretrained', self=trainer, **kwargs)
     return trainer
 
-# %% ../nbs/00_core.ipynb 34
+# %% ../nbs/00_core.ipynb 33
 def compute_losses(predictions, targets, loss_fn):
     """
     Compute the loss for each prediction-target pair.
@@ -388,13 +388,13 @@ def display_statistics_table(stats, fn_name='', as_dataframe=True):
         header.set_text_props(weight="bold")
         plt.show()
 
-# %% ../nbs/00_core.ipynb 37
+# %% ../nbs/00_core.ipynb 36
 # Retrieve the 'coolwarm' colormap
 coolwarm = plt.get_cmap('coolwarm')
 # Create a new colormap using only the warm colors
 warm_cmap = LinearSegmentedColormap.from_list('warm_coolwarm', coolwarm(np.linspace(0.5, 1, coolwarm.N // 2)))
 
-# %% ../nbs/00_core.ipynb 38
+# %% ../nbs/00_core.ipynb 37
 def evaluate_model(trainer:Learner,                                 # The model trainer object with a get_preds method.
                    test_data:DataLoaders=None,              # DataLoader containing test data.
                    loss=None,                               # Loss function to evaluate prediction-target pairs.
@@ -455,7 +455,7 @@ def evaluate_model(trainer:Learner,                                 # The model 
     return out
 
 
-# %% ../nbs/00_core.ipynb 39
+# %% ../nbs/00_core.ipynb 38
 def evaluate_classification_model(trainer:Learner,              # The trained model (learner) to evaluate.
                                   test_data:DataLoaders=None,   # DataLoader with test data for evaluation. If None, the validation dataset is used.
                                   loss_fn=None,                 # Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.
@@ -530,7 +530,7 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     return out
 
 
-# %% ../nbs/00_core.ipynb 42
+# %% ../nbs/00_core.ipynb 41
 def attributesFromDict(d):
     """
     The `attributesFromDict` function simplifies the conversion of dictionary keys and values into object attributes, allowing dynamic attribute creation for configuration objects. This utility is handy for initializing model or dataset configurations directly from dictionaries, improving code readability and maintainability.
@@ -539,14 +539,14 @@ def attributesFromDict(d):
     for n, v in d.items():
         setattr(self, n, v)
 
-# %% ../nbs/00_core.ipynb 43
+# %% ../nbs/00_core.ipynb 42
 def get_device():
     return torch_device("cuda" if is_cuda_available() else "cpu")
 
-# %% ../nbs/00_core.ipynb 44
+# %% ../nbs/00_core.ipynb 43
 def img2float(image, force_copy=False):
     return util.img_as_float(image, force_copy=force_copy)
 
-# %% ../nbs/00_core.ipynb 45
+# %% ../nbs/00_core.ipynb 44
 def img2Tensor(image):
     return torchTensor(img2float(image))
