@@ -1,0 +1,111 @@
+# --------------------------------------------------------------------------------------------------
+# ---------- SAMPLE YAML FILE FOR CONFIGURING BOTH THE DATALOADING AND TRAINING PROCESSES ----------
+# --------------------------------------------------------------------------------------------------
+
+# DISCLAIMER: the values displayed in this file are the established default ones within the code, 
+# except for metrics and callbacks, whose default value is None, as a basic example is needed to
+# know the correct formatting for each of them. 
+
+# --------------------------------------------------------------------------------------------------
+
+  
+# DATALOADER CONFIGURATION: ----------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
+# ---------- SAMPLE YAML FILE FOR CONFIGURING BOTH THE DATALOADING AND TRAINING PROCESSES ----------
+# --------------------------------------------------------------------------------------------------
+
+# DISCLAIMER: the values displayed in this file are the established default ones within the code, 
+# except for metrics and callbacks, whose default value is None, as a basic example is needed to
+# know the correct formatting for each of them. 
+
+# --------------------------------------------------------------------------------------------------
+
+# DATALOADER CONFIGURATION: ----------------------------------------------------------------------
+bs: 32 # Set to 32 due to the example the configuration is used on, although the default is 64
+val_bs: 32
+path: '.'
+train: 'train'
+valid: 'val'
+shuffle_train: true
+shuffle: true
+val_shuffle: true
+n: None
+dl_type: None
+device: None
+drop_last: false
+num_workers: None
+verbose: false
+pin_memory: false
+timeout: 0
+batch_size: None
+indexed: None
+persistent_workers: false
+pin_memory_device: ''
+wif: None
+before_iter: None
+after_item: None
+before_batch: None
+after_batch: None
+after_iter: None
+create_batches: None
+create_item: None
+create_batch: None
+retain: None
+get_idxs: None
+sample: None
+shuffle_fn: None
+do_batch: None
+item_tfms: 
+  - Resize:
+      size: [256, 256]
+batch_tfms: None
+splitter: None
+get_items: None
+get_y: None
+get_x: None
+getters: None
+n_inp: None
+# ------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------
+
+
+# TRAINER CONFIGURATION: ---------------------------------------------------------------------------
+# Loss function
+loss_fn: None
+
+# Optimizer
+optimizer: Adam
+
+# Learning rate
+lr: 0.01
+
+# Metrics: A function, and two class based metrics (with and without parameters) are specified.
+metrics:
+  - accuracy
+  - BalancedAccuracy: {}
+  - Precision:
+      average: 'macro'
+
+
+# Other relevant configuration options
+csv_log: false
+show_graph: true
+show_summary: false
+
+# Callbacks
+callbacks:
+  - SaveModelCallback:
+      monitor: 'accuracy'
+      fname: 'models'
+      reset_on_fit: true
+
+wd: None 
+wd_bn_bias: None
+train_bn: true
+moms: (0.95,0.85,0.95)
+default_cbs: true 
+path: None
+model_dir: 'models'
+# ------------------------------------------------------------------------------------------------
+

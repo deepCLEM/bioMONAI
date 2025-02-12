@@ -4,7 +4,7 @@
 
 ![](nbs/data_examples/logo_bioMONAI_full.png)
 
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://bmandracchia.github.io/bioMONAI/)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://deepclem.github.io/bioMONAI/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![Jupyter
@@ -21,9 +21,6 @@ facilitate interoperability, reproducibility, and community
 collaboration in biomedical research.
 
 ![](nbs/data_examples/Fig_bioMONAI.png)
-
-For more information, bioMONAI documentation can be found
-[here](https://deepclem.github.io/bioMONAI/).
 
 ## Table of Contents
 
@@ -67,10 +64,10 @@ To get started with bioMONAI, we recommend exploring our tutorials,
 which guide you through model training for various tasks such as
 classification and denoising.
 
-| Notebook                                                                                                                                                                                                                                                                                                                                                                                                                        | Open in Colab                                                                                                                                                                       |
-|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Notebook                                                                                                                                                                                                                                                                                                                                                                                                                        |                                                                                    Open in Colab                                                                                    |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | [Tutorial: Classification 2D](https://github.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/901_tutorial_classification.ipynb) <br> This notebook provides a comprehensive guide on training deep learning models for 2D image classification tasks, covering data loading, preprocessing, model building, training, and evaluation.                                                                                             | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/901_tutorial_classification.ipynb) |
-| [Tutorial: Denoising 2D](https://github.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb) <br> This notebook offers a detailed guide on applying deep learning techniques to denoise biological microscopy images. It covers data preparation, model architecture, training processes, and evaluation methods, providing a comprehensive resource for enhancing image quality in biological research. | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb)      |
+| [Tutorial: Denoising 2D](https://github.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb) <br> This notebook offers a detailed guide on applying deep learning techniques to denoise biological microscopy images. It covers data preparation, model architecture, training processes, and evaluation methods, providing a comprehensive resource for enhancing image quality in biological research. |   [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/deepCLEM/bioMONAI/blob/main/nbs/Tutorials/903_tutorial_denoising.ipynb)    |
 
 ## Usage
 
@@ -101,22 +98,35 @@ nbs, follow these steps:
     cd biomonai
     ```
 
-3.  **Create a new branch for your changes:**
+3.  **Create a new Conda environment and install dependencies:**
+
+    ``` bash
+    conda env create --file bioMONAI-env.yml
+    ```
+
+4.  **Create a new branch for your changes:**
 
     ``` bash
     git checkout -b feature/new-feature
     ```
 
-4.  **Make your changes and commit them:**
+5.  **Activate the environment and install MONAI in dev mode:**
+
+    ``` bash
+    conda activate bioMONAI-env
+    pip install -e .[dev]
+    ```
+
+6.  **Make your changes and commit them:**
 
     ``` bash
     git add .
     git commit -m "Add new feature: <feature description>"
     ```
 
-5.  **Push to your fork and create a pull request on GitHub.**
+7.  **Push to your fork and create a pull request on GitHub.**
 
-6.  **Wait for the review, and merge if everything looks good!**
+8.  **Wait for the review, and merge if everything looks good!**
 
 ## License
 
