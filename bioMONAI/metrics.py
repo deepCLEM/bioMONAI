@@ -6,7 +6,7 @@
 __all__ = ['SSIMMetric', 'MSEMetric', 'MAEMetric', 'RMSEMetric', 'PSNRMetric', 'radial_mask', 'get_radial_masks',
            'get_fourier_ring_correlations', 'FRCMetric']
 
-# %% ../nbs/06_metrics.ipynb 4
+# %% ../nbs/06_metrics.ipynb 3
 import numpy as np
 from numpy import trapz
 
@@ -26,7 +26,7 @@ from sklearn.metrics import RocCurveDisplay, auc
 
 from .core import torch_from_numpy
 
-# %% ../nbs/06_metrics.ipynb 5
+# %% ../nbs/06_metrics.ipynb 4
 def SSIMMetric(spatial_dims=3, **kwargs):
     def SSIM(x, y):
         return _SSIM(spatial_dims, **kwargs)(x,y).mean()
@@ -54,7 +54,7 @@ def PSNRMetric(max_val, **kwargs):
 
 
 
-# %% ../nbs/06_metrics.ipynb 12
+# %% ../nbs/06_metrics.ipynb 11
 def radial_mask(r,      # Radius of the radial mask
                 cx=128, # X coordinate mask center
                 cy=128, # Y coordinate maske center
@@ -86,7 +86,7 @@ def radial_mask(r,      # Radius of the radial mask
     return ind1 * ind2
 
 
-# %% ../nbs/06_metrics.ipynb 13
+# %% ../nbs/06_metrics.ipynb 12
 def get_radial_masks(width, # Width of the image
                      height, # Height of the image
                      ):
@@ -117,7 +117,7 @@ def get_radial_masks(width, # Width of the image
     return radial_masks, spatial_freq
 
 
-# %% ../nbs/06_metrics.ipynb 15
+# %% ../nbs/06_metrics.ipynb 14
 def get_fourier_ring_correlations(image1, # First input image
                                   image2, # Second input image
                                   ):
@@ -185,7 +185,7 @@ def get_fourier_ring_correlations(image1, # First input image
 
     return FRC , spatial_frequency
 
-# %% ../nbs/06_metrics.ipynb 16
+# %% ../nbs/06_metrics.ipynb 15
 def FRCMetric(image1, # First input image
               image2, # Second input image
               ):

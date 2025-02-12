@@ -20,7 +20,8 @@ from aicsimageio.writers import OmeTiffWriter
 from sklearn.model_selection import train_test_split
 from torch import stack as torch_stack
 
-from .core import MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform, torchsqueeze, Path, List, L, torchmax, randint, typedispatch
+from .datasets import download_medmnist
+from .core import MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform, fastTrainer, torchsqueeze, Path, List, L, torchmax, randint, typedispatch, dictlist_to_funclist, read_yaml
 from .io import image_reader
 from .visualize import show_images_grid, show_multichannel
 
@@ -226,7 +227,7 @@ class BioImageMulti(BioImageBase):
         return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
         
 
-# %% ../nbs/01_data.ipynb 20
+# %% ../nbs/01_data.ipynb 21
 class Tensor2BioImage(DisplayedTransform):
     """
     The `Tensor2BioImage` transform converts tensors into `BioImageBase` instances, enabling the application of bioimaging-specific methods to tensor data. 
@@ -243,12 +244,12 @@ class Tensor2BioImage(DisplayedTransform):
         if isinstance(o, torchTensor):
             return self.cls(o)
 
-# %% ../nbs/01_data.ipynb 23
+# %% ../nbs/01_data.ipynb 24
 def BioImageBlock(cls:BioImageBase=BioImage):
     "A `TransformBlock` tailored for bioimaging data, `BioImageBlock` facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging."
     return TransformBlock(type_tfms=[cls.create, Tensor2BioImage(cls)]) # IntToFloatTensor
 
-# %% ../nbs/01_data.ipynb 24
+# %% ../nbs/01_data.ipynb 25
 class BioDataBlock(DataBlock):
     """ 
     The `BioDataBlock` class serves as a generic container to build `Datasets` and `DataLoaders` efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.
@@ -279,7 +280,7 @@ class BioDataBlock(DataBlock):
             )
         
 
-# %% ../nbs/01_data.ipynb 25
+# %% ../nbs/01_data.ipynb 26
 class BioDataLoaders(DataLoaders):
     """
     Basic wrapper around several `DataLoader`s with factory methods for biomedical imaging problems.
@@ -454,15 +455,106 @@ class BioDataLoaders(DataLoaders):
             'path':         path,
             }
         return cls.from_source((fnames, labels), **ops, **kwargs)
+    
+    @classmethod
+    def from_yaml(cls, data_source, yaml_path, show_summary:bool=False):
+
+        "Create from `yaml_path` where `yaml_path` is a yaml file"
+
+
+        # Read the yaml file to obtain a dictionary with the configuration
+        config = read_yaml(yaml_path)
+        
+        # Turn string Nones into Nonetype and remove keys where the value is set to Nonetype
+        config = {key: (None if value == "None" else value) for key, value in config.items()}
+
+        # DEFINE THE KEYS THAT ARE AVAILABLE FOR USE 
+        # Define the keys used by fastTrainer
+        fastrainer_ops_keys = ['loss_fn', 'optimizer', 'lr', 'splitter', 'callbacks', 'metrics', 'path', 'model_dir', 'wd', 
+                               'wd_bn_bias', 'train_bn', 'moms', 'default_cbs']
+        
+        # Define the keys used by biodataloader
+        biodataloader_ops_keys = ['bs', 'shuffle_train', 'shuffle', 'val_shuffle', 'n', 'path', 'dl_type', 'dl_kwargs', 'device', 
+                                  'drop_last', 'val_bs', 'num_workers', 'verbose', 'do_setup', 'pin_memory', 'timeout', 'batch_size', 
+                                  'indexed', 'persistent_workers', 'pin_memory_device', 'wif', 'before_iter', 'after_item', 'before_batch', 
+                                  'after_batch', 'after_iter', 'create_batches', 'create_item', 'create_batch', 'retain', 'get_idxs', 'sample', 
+                                  'shuffle_fn', 'do_batch']
+
+        # Define the keys used by biodatablocks
+        biodatablocks_ops_keys = ['blocks','dl_type','get_items','get_y','get_x','getters','n_inp','item_tfms','batch_tfms','splitter']
+
+
+        # FILTER THE YAML FILE TO ONLY INCLUDE THE KEYS THE VALID KEYS
+        biodatablock_ops = {key: value for key, value in config.items() if key in biodatablocks_ops_keys}
+        biodataloader_ops = {key: value for key, value in config.items() if key in biodataloader_ops_keys}
+
+
+        # Obtain and define default values for the splitter within the BioDataBlock
+        train = config.get('train', 'train') 
+        valid = config.get('valid', 'val')  
+        valid_pct = config.get('valid_pct', None) 
+        seed = config.get('seed', None) 
+        
+
+        # Initialize the splitter
+        if valid_pct is not None:
+            splitter = RandomSplitter(valid_pct, seed=seed)
+            get_items = get_image_files  
+        else:
+            splitter = GrandparentSplitter(train_name=train, valid_name=valid)
+            get_items = partial(get_image_files, folders=[train, valid])  
+
+        # Turn item_tfms and batch_tfms into lists of functions 
+        item_tfms = config.get('item_tfms', None)
+        if item_tfms is not None:
+            item_tfms = dictlist_to_funclist(item_tfms)
+
+        batch_tfms = config.get('batch_tfms', None)
+        if batch_tfms is not None:   
+            batch_tfms = dictlist_to_funclist(batch_tfms)
+
+        # Update biodatablock_ops with the splitter
+        biodatablock_ops.update({
+            "blocks": (BioImageBlock(cls=BioImage), CategoryBlock),
+            "get_items": get_items,
+            "splitter": splitter,
+            "get_y": parent_label,
+            "item_tfms": item_tfms,
+            "batch_tfms": batch_tfms
+        })
+
+         # Optionally print a summary of the BioDataBlock if show_summary is True
+        if show_summary:
+            bs = biodataloader_ops['bs'] if biodataloader_ops['bs'] is not None else 1
+            print(datablock.summary(data_source, bs=bs))
+        
+        
+        biodatablock_ops = {key: value for key, value in biodatablock_ops.items() if value is not None}
+
+        biodataloader_ops = {key: value for key, value in biodataloader_ops.items() if value is not None}
+        
+        # Create BioDataBlock
+        datablock = BioDataBlock(**biodatablock_ops)
+
+        # Unpack biodataloader_ops directly (including bs)
+        dataloder = datablock.dataloaders(data_source, **biodataloader_ops)
+
+
+       
+        return dataloder
 
 BioDataLoaders.class_from_csv = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_csv)
 BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_func)(BioDataLoaders.class_from_path_re)
 
 
-# %% ../nbs/01_data.ipynb 35
+# %% ../nbs/01_data.ipynb 36
+from monai.networks.nets import SEResNet50
+from fastai.vision.all import Resize
+
+# %% ../nbs/01_data.ipynb 39
 from fastai.vision.all import get_image_files
 
-# %% ../nbs/01_data.ipynb 36
+# %% ../nbs/01_data.ipynb 40
 def get_gt(path_gt, # The base directory where the ground truth files are stored, or a file path from which to derive the parent directory.
            gt_file_name="avg50.png", # The name of the ground truth file.
            ):
@@ -489,7 +581,7 @@ def get_gt(path_gt, # The base directory where the ground truth files are stored
     return _fn
 
 
-# %% ../nbs/01_data.ipynb 38
+# %% ../nbs/01_data.ipynb 42
 def get_target(path:str, # The base directory where the files are located. This should be a string representing an absolute or relative path.
                same_filename=True, #If True, the target file name will match the original file name; otherwise, it will use the specified prefix. 
                target_file_prefix="target", # The prefix to insert into the target file name if `same_filename` is False. 
@@ -542,7 +634,7 @@ def get_target(path:str, # The base directory where the files are located. This 
 
 
 
-# %% ../nbs/01_data.ipynb 42
+# %% ../nbs/01_data.ipynb 46
 def get_noisy_pair(fn):
     """
     Get another "noisy" version of the input file by selecting a file from the same directory.
@@ -572,7 +664,7 @@ def get_noisy_pair(fn):
     return fn2
 
 
-# %% ../nbs/01_data.ipynb 45
+# %% ../nbs/01_data.ipynb 49
 @typedispatch
 def show_batch(x: BioImageBase,     # The input image data.
                y: BioImageBase,     # The target image data.
@@ -602,10 +694,10 @@ def show_batch(x: BioImageBase,     # The input image data.
     return ctxs
 
 
-# %% ../nbs/01_data.ipynb 46
+# %% ../nbs/01_data.ipynb 50
 from fastai.vision.all import TensorCategory
 
-# %% ../nbs/01_data.ipynb 47
+# %% ../nbs/01_data.ipynb 51
 @typedispatch
 def show_batch(x: BioImageBase,      # The input image data.
                y: TensorCategory,    # The target data (categorical labels).
@@ -645,7 +737,7 @@ def show_batch(x: BioImageBase,      # The input image data.
 
 
 
-# %% ../nbs/01_data.ipynb 49
+# %% ../nbs/01_data.ipynb 53
 @typedispatch
 def show_results(x: BioImageBase, # The input image data.
                  y: BioImageBase, # The target label data.
@@ -676,7 +768,7 @@ def show_results(x: BioImageBase, # The input image data.
     return ctxs
 
 
-# %% ../nbs/01_data.ipynb 50
+# %% ../nbs/01_data.ipynb 54
 @typedispatch
 def show_results(x: BioImageBase,       # The input image data.
                 y: TensorCategory,      # The target data (categorical labels).
@@ -710,7 +802,7 @@ def show_results(x: BioImageBase,       # The input image data.
     return ctxs
 
 
-# %% ../nbs/01_data.ipynb 54
+# %% ../nbs/01_data.ipynb 58
 def extract_patches(data, # numpy array of the input data (n-dimensional).
                     patch_size, # tuple of integers defining the size of the patches in each dimension.
                     overlap, # float (between 0 and 1) indicating overlap between patches.
@@ -736,7 +828,7 @@ def extract_patches(data, # numpy array of the input data (n-dimensional).
     
     return patches
 
-# %% ../nbs/01_data.ipynb 57
+# %% ../nbs/01_data.ipynb 61
 def save_patches_grid(data_folder, # Path to the folder containing data files (n-dimensional data).
                       gt_folder, # Path to the folder containing ground truth (gt) files (n-dimensional data).
                       output_folder, # Path to the folder where the HDF5 files will be saved.
@@ -838,7 +930,7 @@ def save_patches_grid(data_folder, # Path to the folder containing data files (n
             print(f"CSV file saved to: {csv_path}")
 
 
-# %% ../nbs/01_data.ipynb 62
+# %% ../nbs/01_data.ipynb 66
 def extract_random_patches(data, # numpy array of the input data (n-dimensional).
                            patch_size, # tuple of integers defining the size of the patches in each dimension.
                            num_patches, # number of random patches to extract.
@@ -872,7 +964,7 @@ def extract_random_patches(data, # numpy array of the input data (n-dimensional)
     return patches
 
 
-# %% ../nbs/01_data.ipynb 63
+# %% ../nbs/01_data.ipynb 67
 def save_patches_random(data_folder,                # Path to the folder containing data files (n-dimensional data).
                         gt_folder,                  # Path to the folder containing ground truth (gt) files (n-dimensional data).
                         output_folder,              # Path to the folder where the HDF5 files will be saved.
@@ -975,7 +1067,7 @@ def save_patches_random(data_folder,                # Path to the folder contain
             print(f"CSV file saved to: {csv_path}")
 
 
-# %% ../nbs/01_data.ipynb 66
+# %% ../nbs/01_data.ipynb 70
 def dict2string(d, # The dictionary to convert.
                 item_sep="_", # The separator between dictionary items (default is ", ").
                 key_value_sep="", # The separator between keys and values (default is ": ").
@@ -994,7 +1086,7 @@ def dict2string(d, # The dictionary to convert.
     return item_sep.join(f"{k}{key_value_sep}{format_value(v)}" for k, v in d.items())
 
 
-# %% ../nbs/01_data.ipynb 68
+# %% ../nbs/01_data.ipynb 72
 def remove_singleton_dims(substack, # The extracted substack data.
                           order, # The dimension order string (e.g., 'CZYX').
                           ):
@@ -1016,7 +1108,7 @@ def remove_singleton_dims(substack, # The extracted substack data.
     substack = substack.reshape(new_shape)  # Remove singleton dimensions
     return substack, new_order
 
-# %% ../nbs/01_data.ipynb 69
+# %% ../nbs/01_data.ipynb 73
 def extract_substacks(input_file, # Path to the input OME-TIFF file.
                       output_dir=None, # Directory to save the extracted substacks. If a list, the substacks will be saved in the corresponding subdirectories from the list.
                       indices=None,# A dictionary specifying which indices to extract. Keys can include 'C' for channel, 'Z' for z-slice, 'T' for time point, and 'S' for scene. If None, all indices are extracted.
