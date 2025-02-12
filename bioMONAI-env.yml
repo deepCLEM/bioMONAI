@@ -1,4 +1,4 @@
-name: biomonai
+name: bioMONAI-env
 channels:
   - pytorch
   - nvidia
@@ -22,4 +22,4 @@ dependencies:
   - ipykernel
   - ipywidgets  
   - cudatoolkit=11.8
-prefix: /home/biagio/miniconda3/envs/biomonai
+prefix: /home/biagio/miniconda3/envs/bioMONAI-env
