@@ -227,7 +227,7 @@ class BioImageMulti(BioImageBase):
         return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
         
 
-# %% ../nbs/01_data.ipynb 21
+# %% ../nbs/01_data.ipynb 19
 class Tensor2BioImage(DisplayedTransform):
     """
     The `Tensor2BioImage` transform converts tensors into `BioImageBase` instances, enabling the application of bioimaging-specific methods to tensor data. 
@@ -244,12 +244,12 @@ class Tensor2BioImage(DisplayedTransform):
         if isinstance(o, torchTensor):
             return self.cls(o)
 
-# %% ../nbs/01_data.ipynb 24
+# %% ../nbs/01_data.ipynb 22
 def BioImageBlock(cls:BioImageBase=BioImage):
     "A `TransformBlock` tailored for bioimaging data, `BioImageBlock` facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging."
     return TransformBlock(type_tfms=[cls.create, Tensor2BioImage(cls)]) # IntToFloatTensor
 
-# %% ../nbs/01_data.ipynb 25
+# %% ../nbs/01_data.ipynb 23
 class BioDataBlock(DataBlock):
     """ 
     The `BioDataBlock` class serves as a generic container to build `Datasets` and `DataLoaders` efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.
@@ -280,7 +280,7 @@ class BioDataBlock(DataBlock):
             )
         
 
-# %% ../nbs/01_data.ipynb 26
+# %% ../nbs/01_data.ipynb 24
 class BioDataLoaders(DataLoaders):
     """
     Basic wrapper around several `DataLoader`s with factory methods for biomedical imaging problems.
@@ -547,14 +547,13 @@ BioDataLoaders.class_from_csv = delegates(to=BioDataLoaders.class_from_df)(BioDa
 BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_func)(BioDataLoaders.class_from_path_re)
 
 
-# %% ../nbs/01_data.ipynb 36
-from monai.networks.nets import SEResNet50
-from fastai.vision.all import Resize
+# %% ../nbs/01_data.ipynb 34
+# from monai.networks.nets import SEResNet50
 
-# %% ../nbs/01_data.ipynb 39
+# %% ../nbs/01_data.ipynb 37
 from fastai.vision.all import get_image_files
 
-# %% ../nbs/01_data.ipynb 40
+# %% ../nbs/01_data.ipynb 38
 def get_gt(path_gt, # The base directory where the ground truth files are stored, or a file path from which to derive the parent directory.
            gt_file_name="avg50.png", # The name of the ground truth file.
            ):
@@ -581,7 +580,7 @@ def get_gt(path_gt, # The base directory where the ground truth files are stored
     return _fn
 
 
-# %% ../nbs/01_data.ipynb 42
+# %% ../nbs/01_data.ipynb 40
 def get_target(path:str, # The base directory where the files are located. This should be a string representing an absolute or relative path.
                same_filename=True, #If True, the target file name will match the original file name; otherwise, it will use the specified prefix. 
                target_file_prefix="target", # The prefix to insert into the target file name if `same_filename` is False. 
@@ -634,7 +633,7 @@ def get_target(path:str, # The base directory where the files are located. This 
 
 
 
-# %% ../nbs/01_data.ipynb 46
+# %% ../nbs/01_data.ipynb 44
 def get_noisy_pair(fn):
     """
     Get another "noisy" version of the input file by selecting a file from the same directory.
@@ -664,7 +663,7 @@ def get_noisy_pair(fn):
     return fn2
 
 
-# %% ../nbs/01_data.ipynb 49
+# %% ../nbs/01_data.ipynb 47
 @typedispatch
 def show_batch(x: BioImageBase,     # The input image data.
                y: BioImageBase,     # The target image data.
@@ -694,10 +693,10 @@ def show_batch(x: BioImageBase,     # The input image data.
     return ctxs
 
 
-# %% ../nbs/01_data.ipynb 50
+# %% ../nbs/01_data.ipynb 48
 from fastai.vision.all import TensorCategory
 
-# %% ../nbs/01_data.ipynb 51
+# %% ../nbs/01_data.ipynb 49
 @typedispatch
 def show_batch(x: BioImageBase,      # The input image data.
                y: TensorCategory,    # The target data (categorical labels).
@@ -737,7 +736,7 @@ def show_batch(x: BioImageBase,      # The input image data.
 
 
 
-# %% ../nbs/01_data.ipynb 53
+# %% ../nbs/01_data.ipynb 51
 @typedispatch
 def show_results(x: BioImageBase, # The input image data.
                  y: BioImageBase, # The target label data.
@@ -768,7 +767,7 @@ def show_results(x: BioImageBase, # The input image data.
     return ctxs
 
 
-# %% ../nbs/01_data.ipynb 54
+# %% ../nbs/01_data.ipynb 52
 @typedispatch
 def show_results(x: BioImageBase,       # The input image data.
                 y: TensorCategory,      # The target data (categorical labels).
@@ -802,7 +801,7 @@ def show_results(x: BioImageBase,       # The input image data.
     return ctxs
 
 
-# %% ../nbs/01_data.ipynb 58
+# %% ../nbs/01_data.ipynb 56
 def extract_patches(data, # numpy array of the input data (n-dimensional).
                     patch_size, # tuple of integers defining the size of the patches in each dimension.
                     overlap, # float (between 0 and 1) indicating overlap between patches.
@@ -828,7 +827,7 @@ def extract_patches(data, # numpy array of the input data (n-dimensional).
     
     return patches
 
-# %% ../nbs/01_data.ipynb 61
+# %% ../nbs/01_data.ipynb 59
 def save_patches_grid(data_folder, # Path to the folder containing data files (n-dimensional data).
                       gt_folder, # Path to the folder containing ground truth (gt) files (n-dimensional data).
                       output_folder, # Path to the folder where the HDF5 files will be saved.
@@ -930,7 +929,7 @@ def save_patches_grid(data_folder, # Path to the folder containing data files (n
             print(f"CSV file saved to: {csv_path}")
 
 
-# %% ../nbs/01_data.ipynb 66
+# %% ../nbs/01_data.ipynb 64
 def extract_random_patches(data, # numpy array of the input data (n-dimensional).
                            patch_size, # tuple of integers defining the size of the patches in each dimension.
                            num_patches, # number of random patches to extract.
@@ -964,7 +963,7 @@ def extract_random_patches(data, # numpy array of the input data (n-dimensional)
     return patches
 
 
-# %% ../nbs/01_data.ipynb 67
+# %% ../nbs/01_data.ipynb 65
 def save_patches_random(data_folder,                # Path to the folder containing data files (n-dimensional data).
                         gt_folder,                  # Path to the folder containing ground truth (gt) files (n-dimensional data).
                         output_folder,              # Path to the folder where the HDF5 files will be saved.
@@ -1067,7 +1066,7 @@ def save_patches_random(data_folder,                # Path to the folder contain
             print(f"CSV file saved to: {csv_path}")
 
 
-# %% ../nbs/01_data.ipynb 70
+# %% ../nbs/01_data.ipynb 68
 def dict2string(d, # The dictionary to convert.
                 item_sep="_", # The separator between dictionary items (default is ", ").
                 key_value_sep="", # The separator between keys and values (default is ": ").
@@ -1086,7 +1085,7 @@ def dict2string(d, # The dictionary to convert.
     return item_sep.join(f"{k}{key_value_sep}{format_value(v)}" for k, v in d.items())
 
 
-# %% ../nbs/01_data.ipynb 72
+# %% ../nbs/01_data.ipynb 70
 def remove_singleton_dims(substack, # The extracted substack data.
                           order, # The dimension order string (e.g., 'CZYX').
                           ):
@@ -1108,7 +1107,7 @@ def remove_singleton_dims(substack, # The extracted substack data.
     substack = substack.reshape(new_shape)  # Remove singleton dimensions
     return substack, new_order
 
-# %% ../nbs/01_data.ipynb 73
+# %% ../nbs/01_data.ipynb 71
 def extract_substacks(input_file, # Path to the input OME-TIFF file.
                       output_dir=None, # Directory to save the extracted substacks. If a list, the substacks will be saved in the corresponding subdirectories from the list.
                       indices=None,# A dictionary specifying which indices to extract. Keys can include 'C' for channel, 'Z' for z-slice, 'T' for time point, and 'S' for scene. If None, all indices are extracted.
