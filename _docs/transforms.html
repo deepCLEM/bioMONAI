@@ -324,6 +324,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#noise" id="toc-noise" class="nav-link" data-scroll-target="#noise">Noise</a>
   <ul>
   <li><a href="#randcameranoise" id="toc-randcameranoise" class="nav-link" data-scroll-target="#randcameranoise">RandCameraNoise</a></li>
+  <li><a href="#blur" id="toc-blur" class="nav-link" data-scroll-target="#blur">Blur</a></li>
   </ul></li>
   <li><a href="#normalization" id="toc-normalization" class="nav-link" data-scroll-target="#normalization">Normalization</a>
   <ul>
@@ -337,10 +338,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#randcropnd" id="toc-randcropnd" class="nav-link" data-scroll-target="#randcropnd">RandCropND</a></li>
   <li><a href="#randflip" id="toc-randflip" class="nav-link" data-scroll-target="#randflip">RandFlip</a></li>
   <li><a href="#randrot90" id="toc-randrot90" class="nav-link" data-scroll-target="#randrot90">RandRot90</a></li>
-  </ul></li>
-  <li><a href="#utilities" id="toc-utilities" class="nav-link" data-scroll-target="#utilities">Utilities</a>
-  <ul>
-  <li><a href="#apply_transforms" id="toc-apply_transforms" class="nav-link" data-scroll-target="#apply_transforms">apply_transforms</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
@@ -649,21 +646,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cell-15" class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Blur(RandTransform):</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Apply Gaussian blur to the image."""</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    split_idx,order <span class="op">=</span> <span class="va">None</span>,<span class="dv">1</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, sigma<span class="op">=</span><span class="fl">1.0</span>, ksize<span class="op">=</span><span class="dv">5</span>, prob<span class="op">=</span><span class="fl">0.5</span>):</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        store_attr()</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.p <span class="op">=</span> prob</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> encodes(<span class="va">self</span>, x: BioImageBase):</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        bioimagetype <span class="op">=</span> <span class="bu">type</span>(x)</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> bioimagetype(GaussianSmooth(<span class="va">self</span>.sigma)(x))</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> encodes(<span class="va">self</span>, x: np.ndarray):</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> cv2.GaussianBlur(x, (<span class="va">self</span>.ksize, <span class="va">self</span>.ksize), <span class="va">self</span>.sigma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<hr>
+</section>
+<section id="blur" class="level3">
+<h3 class="anchored" data-anchor-id="blur">Blur</h3>
+<blockquote class="blockquote">
+<pre><code> Blur (sigma=1.0, ksize=5, prob=0.5)</code></pre>
+</blockquote>
+<p>Apply Gaussian blur to the image.</p>
 <div id="cell-16" class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a random NumPy array </span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>random_array <span class="op">=</span> np.random.rand(<span class="dv">64</span>, <span class="dv">64</span>)</span>
@@ -1216,17 +1206,6 @@ metatensor([[[0.1055, 0.3825, 0.6611, 0.1851],
          [0.1817, 0.2890, 0.7556, 0.6961]]])</code></pre>
 </div>
 </div>
-</section>
-</section>
-<section id="utilities" class="level2">
-<h2 class="anchored" data-anchor-id="utilities">Utilities</h2>
-<hr>
-<section id="apply_transforms" class="level3">
-<h3 class="anchored" data-anchor-id="apply_transforms">apply_transforms</h3>
-<blockquote class="blockquote">
-<pre><code> apply_transforms (image, transforms)</code></pre>
-</blockquote>
-<p>Apply a list of transformations, ensuring at least one is applied.</p>
 
 
 </section>

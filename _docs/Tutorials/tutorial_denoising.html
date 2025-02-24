@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Tutorial denoising">
+<meta name="description" content="Tutorial denoising: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for 2D microscopy image denoising tasks.">
 
 <title>Denoising – bioMONAI</title>
 <style>
@@ -108,10 +108,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <link rel="stylesheet" href="../styles.css">
 <meta property="og:title" content="Denoising – bioMONAI">
-<meta property="og:description" content="Tutorial denoising">
+<meta property="og:description" content="Tutorial denoising: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for 2D microscopy image denoising tasks.">
 <meta property="og:site_name" content="bioMONAI">
 <meta name="twitter:title" content="Denoising – bioMONAI">
-<meta name="twitter:description" content="Tutorial denoising">
+<meta name="twitter:description" content="Tutorial denoising: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for 2D microscopy image denoising tasks.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -339,7 +339,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div>
   <div class="description">
-    Tutorial denoising
+    Tutorial denoising: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for 2D microscopy image denoising tasks.
   </div>
 </div>
 
@@ -397,10 +397,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'http://csbdeep.bioimagecomputing.com/example_data/snr_7_binning_2.zip'</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Download only the first two images</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>download_file(url, output_directory, extract<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>extract_directory <span class="op">=</span> download_file(url, output_directory, extract<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Unzipping contents of '/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip' to '/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/ttt'</code></pre>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The file has been downloaded and saved to: ../_data/U2OS
-Decompression (if needed) has been handled automatically.</code></pre>
+<pre><code>The file has been downloaded and saved to: /home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS
+Extracted files have been saved to: /home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/ttt</code></pre>
+</div>
+</div>
+<div id="cell-8" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">'/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS'</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>downloaded_file <span class="op">=</span> <span class="st">'/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/dewd$de/dwedwed/dewdwe.tif'</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>output_dir_len <span class="op">=</span> <span class="bu">len</span>(Path(os.path.abspath(output_dir)).parts)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(output_dir_len)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>file0 <span class="op">=</span> os.path.abspath(downloaded_file)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(Path(file0).parts)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>extract_dir <span class="op">=</span> os.path.join(<span class="op">*</span>Path(file0).parts[<span class="dv">0</span>:output_dir_len<span class="op">+</span><span class="dv">1</span>])</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#extract_dir = Path('/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS').parts[0:11]</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#print(os.path.join(*extract_dir))</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(extract_dir)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>10
+('/', 'home', 'export', 'personal', 'miguel', 'git_projects', 'bioMONAI', 'nbs', '_data', 'U2OS', '128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip', 'dewd$de', 'dwedwed', 'dewdwe.tif')
+/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip</code></pre>
 </div>
 </div>
 </section>
@@ -419,30 +442,30 @@ Decompression (if needed) has been handled automatically.</code></pre>
 <p>You can customize the following parameters to suit your needs: - Change the <code>X_path</code> variable to point to a different dataset. - Adjust the <code>bs</code> and <code>patch_size</code> variables to match your hardware capabilities and model requirements. - Modify the transformations in <code>itemTfms</code> and <code>batchTfms</code> to include other augmentations or preprocessing steps.</p>
 </blockquote>
 <p>After defining these parameters and transformations, we will create a <code>BioDataLoaders</code> object to load the training and validation datasets.</p>
-<div id="cell-8" class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/train/low/'</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>bs <span class="op">=</span> <span class="dv">32</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> <span class="dv">96</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>itemTfms <span class="op">=</span> [RandCropND(patch_size), RandRot90(prob<span class="op">=</span><span class="fl">.75</span>), RandFlip(prob<span class="op">=</span><span class="fl">0.75</span>)]</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>batchTfms <span class="op">=</span> [ScaleIntensityPercentiles()]</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>get_target_fn <span class="op">=</span> get_target(<span class="st">'GT'</span>, same_filename<span class="op">=</span><span class="va">True</span>, relative_path<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_folder(</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    X_path,                 <span class="co"># input images</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    get_target_fn,          <span class="co"># target images</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    valid_pct<span class="op">=</span><span class="fl">0.05</span>,         <span class="co"># percentage of data for the validation set</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">42</span>,                <span class="co"># seed for random number generator  </span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    item_tfms<span class="op">=</span>itemTfms,     <span class="co"># item transformations</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span>batchTfms,   <span class="co"># batch transformations</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,     <span class="co"># print summary of the dataset</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    bs <span class="op">=</span> bs,                <span class="co"># batch size</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-11" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/train/low/'</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>bs <span class="op">=</span> <span class="dv">32</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> <span class="dv">96</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>itemTfms <span class="op">=</span> [RandCropND(patch_size), RandRot90(prob<span class="op">=</span><span class="fl">.75</span>), RandFlip(prob<span class="op">=</span><span class="fl">0.75</span>)]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>batchTfms <span class="op">=</span> [ScaleIntensityPercentiles()]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>get_target_fn <span class="op">=</span> get_target(<span class="st">'GT'</span>, same_filename<span class="op">=</span><span class="va">True</span>, relative_path<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_folder(</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    X_path,                 <span class="co"># input images</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    get_target_fn,          <span class="co"># target images</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    valid_pct<span class="op">=</span><span class="fl">0.05</span>,         <span class="co"># percentage of data for the validation set</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">42</span>,                <span class="co"># seed for random number generator  </span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    item_tfms<span class="op">=</span>itemTfms,     <span class="co"># item transformations</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span>batchTfms,   <span class="co"># batch transformations</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,     <span class="co"># print summary of the dataset</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    bs <span class="op">=</span> bs,                <span class="co"># batch size</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>train images: 2335 
 validation images: 122</code></pre>
@@ -459,12 +482,12 @@ validation images: 122</code></pre>
 <p>Change the <code>cmap</code> parameter to use a different colormap (e.g., ‘gray’, ‘viridis’, ‘plasma’) based on your preference.</p>
 </blockquote>
 <p>Visualizing the data helps in understanding the dataset better and ensures that the transformations are applied correctly.</p>
-<div id="cell-10" class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-13" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="903_tutorial_denoising_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -485,20 +508,20 @@ validation images: 122</code></pre>
 <p>You can customize the following parameters to suit your needs: - Change the backbone to a different architecture. - Adjust the input and output channels based on your dataset. - Modify the input size to match the dimensions of your images. - Set <code>pretrained</code> to <code>False</code> if you want to train the model from scratch.</p>
 </blockquote>
 <p>After defining the model, we will proceed to train it using the <code>fastTrainer</code> class. The training process involves fine-tuning the model for a specified number of epochs and evaluating its performance on the validation dataset.</p>
-<div id="cell-12" class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.nets <span class="im">import</span> create_unet_model, resnet34</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> create_unet_model(resnet34, <span class="dv">1</span>, (<span class="dv">128</span>,<span class="dv">128</span>), <span class="va">True</span>, n_in<span class="op">=</span><span class="dv">1</span>, cut<span class="op">=</span><span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-15" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.nets <span class="im">import</span> create_unet_model, resnet34</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> create_unet_model(resnet34, <span class="dv">1</span>, (<span class="dv">128</span>,<span class="dv">128</span>), <span class="va">True</span>, n_in<span class="op">=</span><span class="dv">1</span>, cut<span class="op">=</span><span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-13" class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CombinedLoss(mse_weight<span class="op">=</span><span class="fl">0.8</span>, mae_weight<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [MSEMetric(), MAEMetric(), SSIMMetric(<span class="dv">2</span>)]</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CombinedLoss(mse_weight<span class="op">=</span><span class="fl">0.8</span>, mae_weight<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [MSEMetric(), MAEMetric(), SSIMMetric(<span class="dv">2</span>)]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-14" class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">50</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-17" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">50</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -555,7 +578,7 @@ validation images: 122</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-10-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="903_tutorial_denoising_files/figure-html/cell-13-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1047,7 +1070,7 @@ validation images: 122</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-10-output-6.png" class="img-fluid figure-img"></p>
+<p><img src="903_tutorial_denoising_files/figure-html/cell-13-output-6.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1060,8 +1083,8 @@ validation images: 122</code></pre>
 <li><code>trainer.show_results(cmap='magma')</code>: This function will display a batch of images from the validation dataset along with their corresponding denoised outputs using the ‘magma’ colormap.</li>
 </ul>
 <p>Visualizing the results helps in assessing the performance of the model and identifying any areas that may need further improvement.m</p>
-<div id="cell-16" class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1086,7 +1109,7 @@ validation images: 122</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-11-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="903_tutorial_denoising_files/figure-html/cell-14-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1102,8 +1125,8 @@ validation images: 122</code></pre>
 <p>Suggestions for customization: - Change the filename to include details like the model architecture, dataset, or date (e.g., ‘unet_resnet34_U2OS_2023’). - Save the model in a specific directory by providing the full path (e.g., ‘models/unet_resnet34_U2OS_2023’). - Save additional information like training history, metrics, or configuration settings in a separate file for better reproducibility.</p>
 </blockquote>
 <p>Saving the model ensures that you can easily share it with others or deploy it in a production environment without needing to retrain it.</p>
-<div id="cell-18" class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('tmp-model')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-21" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('tmp-model')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="evaluate-the-model-on-test-data" class="level3">
@@ -1118,12 +1141,12 @@ validation images: 122</code></pre>
 <p>Suggestions for customization: - Change the <code>test_X_path</code> variable to point to a different test dataset. - Add more metrics to the <code>metrics</code> parameter to get a comprehensive evaluation (e.g., <code>MSEMetric()</code>, <code>MAEMetric()</code>). - Save the evaluation results to a file for further analysis or reporting.</p>
 </blockquote>
 <p>Evaluating the model on test data helps in understanding its performance in real-world scenarios and identifying any areas that may need further improvement.</p>
-<div id="cell-20" class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>test_X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/test/low/'</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.test_dl(get_image_files(test_X_path), with_labels<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>evaluate_model(trainer, test_data, metrics<span class="op">=</span>SSIMMetric(<span class="dv">2</span>))<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-23" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>test_X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/test/low/'</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.test_dl(get_image_files(test_X_path), with_labels<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>evaluate_model(trainer, test_data, metrics<span class="op">=</span>SSIMMetric(<span class="dv">2</span>))<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1169,14 +1192,14 @@ validation images: 122</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-13-output-5.png" class="img-fluid figure-img"></p>
+<p><img src="903_tutorial_denoising_files/figure-html/cell-16-output-5.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-13-output-6.png" class="img-fluid figure-img"></p>
+<p><img src="903_tutorial_denoising_files/figure-html/cell-16-output-6.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1232,7 +1255,7 @@ validation images: 122</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-13-output-8.png" class="img-fluid figure-img"></p>
+<p><img src="903_tutorial_denoising_files/figure-html/cell-16-output-8.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
