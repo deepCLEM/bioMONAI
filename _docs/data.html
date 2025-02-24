@@ -510,8 +510,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
 <blockquote class="blockquote">
 <pre><code> BioDataBlock (blocks:list=(&lt;fastai.data.block.TransformBlock object at
-               0x7ff92f32ee10&gt;, &lt;fastai.data.block.TransformBlock object
-               at 0x7ff92f32f590&gt;), dl_type:fastai.data.core.TfmdDL=None,
+               0x7fdfd48070d0&gt;, &lt;fastai.data.block.TransformBlock object
+               at 0x7fdfd4807410&gt;), dl_type:fastai.data.core.TfmdDL=None,
                get_items=&lt;function get_image_files&gt;, get_y=None,
                get_x=None, getters:list=None, n_inp:int=None,
                item_tfms:list=None, batch_tfms:list=None, **kwargs)</code></pre>
@@ -536,7 +536,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>blocks</td>
 <td>list</td>
-<td>(&lt;fastai.data.block.TransformBlock object at 0x7ff92f32ee10&gt;, &lt;fastai.data.block.TransformBlock object at 0x7ff92f32f590&gt;)</td>
+<td>(&lt;fastai.data.block.TransformBlock object at 0x7fdfd48070d0&gt;, &lt;fastai.data.block.TransformBlock object at 0x7fdfd4807410&gt;)</td>
 <td>One or more <code>TransformBlock</code>s</td>
 </tr>
 <tr class="even">
@@ -2075,7 +2075,8 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <pre><code> save_patches_grid (data_folder, gt_folder, output_folder, patch_size,
                     overlap, threshold=None, squeeze_input=True,
                     squeeze_patches=False, csv_output=True,
-                    train_test_split_ratio=0.8)</code></pre>
+                    train_test_split_ratio=0.8, tfms_before:List=None,
+                    tfms_after:List=None)</code></pre>
 </blockquote>
 <p>Loads n-dimensional data from data_folder and gt_folder, generates patches, and saves them into individual HDF5 files. Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</p>
 <table class="caption-top table">
@@ -2134,13 +2135,13 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <td>squeeze_input</td>
 <td>bool</td>
 <td>True</td>
-<td></td>
+<td>If True, squeeze the input data to remove single-dimensional entries.</td>
 </tr>
 <tr class="even">
 <td>squeeze_patches</td>
 <td>bool</td>
 <td>False</td>
-<td></td>
+<td>If True, squeeze the patches to remove single-dimensional entries.</td>
 </tr>
 <tr class="odd">
 <td>csv_output</td>
@@ -2154,37 +2155,68 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <td>0.8</td>
 <td>Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</td>
 </tr>
+<tr class="odd">
+<td>tfms_before</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply before extracting patches.</td>
+</tr>
+<tr class="even">
+<td>tfms_after</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply after extracting patches.</td>
+</tr>
 </tbody>
 </table>
 <p>After extracting patches, <code>save_patches_grid</code> saves them in a grid format, facilitating visualization and inspection of the patches.</p>
 <div id="cell-55" class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> Blur</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-56" class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_after<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 11.29it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 26.92it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test/train_patches.csv and ./_test/test_patches.csv</code></pre>
 </div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
 </div>
-<div id="cell-56" class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader, split_hdf_path</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="cell-57" class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/X/1'</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader, split_hdf_path</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-58" class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/X/1'</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="01_data_files/figure-html/cell-39-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="01_data_files/figure-html/cell-40-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-59" class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/y/1'</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_files/figure-html/cell-41-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -2194,10 +2226,10 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <section id="extract_random_patches" class="level3">
 <h3 class="anchored" data-anchor-id="extract_random_patches">extract_random_patches</h3>
 <blockquote class="blockquote">
-<pre><code> extract_random_patches (data, patch_size, num_patches)</code></pre>
+<pre><code> extract_random_patches (data_tuple, patch_size, num_patches)</code></pre>
 </blockquote>
-<p>Extracts a specified number of random n-dimensional patches from the input data.</p>
-<p>Returns: - A list of randomly cropped patches as numpy arrays.</p>
+<p>Extracts a specified number of random n-dimensional patches from the input data and ground truth data.</p>
+<p>Returns: - A tuple of lists containing randomly cropped patches as numpy arrays (input_patches, gt_patches).</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 15%">
@@ -2211,8 +2243,8 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </thead>
 <tbody>
 <tr class="odd">
-<td>data</td>
-<td>numpy array of the input data (n-dimensional).</td>
+<td>data_tuple</td>
+<td>tuple of numpy arrays (input data, ground truth data).</td>
 </tr>
 <tr class="even">
 <td>patch_size</td>
@@ -2232,7 +2264,8 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <pre><code> save_patches_random (data_folder, gt_folder, output_folder, patch_size,
                       num_patches, threshold=None, squeeze_input=True,
                       squeeze_patches=False, csv_output=True,
-                      train_test_split_ratio=0.8)</code></pre>
+                      train_test_split_ratio=0.8, tfms_before:List=None,
+                      tfms_after:List=None)</code></pre>
 </blockquote>
 <p>Loads n-dimensional data from data_folder and gt_folder, generates random patches, and saves them into individual HDF5 files. Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</p>
 <table class="caption-top table">
@@ -2311,17 +2344,29 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <td>0.8</td>
 <td>Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</td>
 </tr>
+<tr class="odd">
+<td>tfms_before</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply before extracting patches.</td>
+</tr>
+<tr class="even">
+<td>tfms_after</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply after extracting patches.</td>
+</tr>
 </tbody>
 </table>
-<div id="cell-60" class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_folder, gt_folder, output_folder, patch_size, num_patches)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-62" class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_folder, gt_folder, output_folder, patch_size, num_patches, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_after<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 54.39it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 54.34it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test2/train_patches.csv and ./_test2/test_patches.csv</code></pre>
@@ -2330,15 +2375,28 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <pre><code></code></pre>
 </div>
 </div>
-<div id="cell-61" class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/X/1'</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-63" class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/X/1'</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="01_data_files/figure-html/cell-43-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="01_data_files/figure-html/cell-45-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-64" class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/y/1'</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_files/figure-html/cell-46-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -2394,10 +2452,10 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tr>
 </tbody>
 </table>
-<div id="cell-63" class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>my_dict <span class="op">=</span> {<span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'Z'</span>: <span class="dv">30</span>, <span class="st">'S'</span>: <span class="dv">1</span>}</span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dict2string(my_dict, pad_zeroes<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-66" class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>my_dict <span class="op">=</span> {<span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'Z'</span>: <span class="dv">30</span>, <span class="st">'S'</span>: <span class="dv">1</span>}</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dict2string(my_dict, pad_zeroes<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>C002_Z030_S001</code></pre>
 </div>
@@ -2494,44 +2552,44 @@ new_order (str): The updated dimension order string.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="cell-66" class="cell">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./_test_folder/"</span></span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>subdirs <span class="op">=</span> [output_dir <span class="op">+</span> folder <span class="cf">for</span> folder <span class="kw">in</span> [<span class="st">"channel_0"</span>, <span class="st">"channel_1"</span>, <span class="st">"channel_2"</span>]]</span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>subdirs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-69" class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./_test_folder/"</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>subdirs <span class="op">=</span> [output_dir <span class="op">+</span> folder <span class="cf">for</span> folder <span class="kw">in</span> [<span class="st">"channel_0"</span>, <span class="st">"channel_1"</span>, <span class="st">"channel_2"</span>]]</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>subdirs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <pre><code>['./_test_folder/channel_0',
  './_test_folder/channel_1',
  './_test_folder/channel_2']</code></pre>
 </div>
 </div>
-<div id="cell-67" class="cell">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>[os.path.join([output_dir][<span class="dv">0</span>], <span class="ss">f"</span><span class="sc">{</span>subdirs[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>ii<span class="sc">}</span><span class="ss">"</span>) <span class="cf">for</span> ii <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-70" class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>[os.path.join([output_dir][<span class="dv">0</span>], <span class="ss">f"</span><span class="sc">{</span>subdirs[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>ii<span class="sc">}</span><span class="ss">"</span>) <span class="cf">for</span> ii <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <pre><code>['./_test_folder/./_test_folder/channel_0_0',
  './_test_folder/./_test_folder/channel_0_1']</code></pre>
 </div>
 </div>
-<div id="cell-68" class="cell">
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'./data_examples/2155a4fe_3500000635_100X_20170227_E08_P21.ome.tiff'</span></span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-71" class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'./data_examples/2155a4fe_3500000635_100X_20170227_E08_P21.ome.tiff'</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Extracted substack saved to: ./_test_folder/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Zrange(0, 35)_T0.ome.tiff</code></pre>
 </div>
 </div>
-<div id="cell-69" class="cell">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-72" class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Extracted substack saved to: ./_test_folder/C_0/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Z5_T0.ome.tiff
 Extracted substack saved to: ./_test_folder/C_1/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C1_Z5_T0.ome.tiff
 Extracted substack saved to: ./_test_folder/C_2/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C2_Z5_T0.ome.tiff</code></pre>
 </div>
 </div>
-<div id="cell-70" class="cell">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
-<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-73" class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Extracted substack saved to: ./_test_folder/channel_0/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Z5.ome.tiff
 Extracted substack saved to: ./_test_folder/channel_1/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C1_Z5.ome.tiff
