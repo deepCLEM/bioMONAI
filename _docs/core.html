@@ -105,12 +105,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/00_core_files/figure-html/cell-14-output-4.png">
 <meta property="og:site-name" content="bioMONAI">
 <meta property="og:image:height" content="351">
-<meta property="og:image:width" content="503">
+<meta property="og:image:width" content="516">
 <meta name="twitter:title" content="bioMONAI - Core">
 <meta name="twitter:description" content="bioMONAI core functions">
 <meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/00_core_files/figure-html/cell-14-output-4.png">
 <meta name="twitter:image-height" content="351">
-<meta name="twitter:image-width" content="503">
+<meta name="twitter:image-width" content="516">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -746,10 +746,10 @@ Datasets downloaded to _data/bloodmnist
 Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'The BloodMNIST is based on a dataset of individual normal cells, captured from individuals without infection, hematologic or oncologic disease and free of any pharmacologic treatment at the moment of blood collection. It contains a total of 17,092 images and is organized into 8 classes. We split the source dataset with a ratio of 7:1:2 into training, validation and test set. The source images with resolution 3×360×363 pixels are center-cropped into 3×200×200, and then resized into 3×28×28.', 'url': 'https://zenodo.org/records/10519652/files/bloodmnist.npz?download=1', 'MD5': '7053d0359d879ad8a5505303e11de1dc', 'url_64': 'https://zenodo.org/records/10519652/files/bloodmnist_64.npz?download=1', 'MD5_64': '2b94928a2ae4916078ca51e05b6b800b', 'url_128': 'https://zenodo.org/records/10519652/files/bloodmnist_128.npz?download=1', 'MD5_128': 'adace1e0ed228fccda1f39692059dd4c', 'url_224': 'https://zenodo.org/records/10519652/files/bloodmnist_224.npz?download=1', 'MD5_224': 'b718ff6835fcbdb22ba9eacccd7b2601', 'task': 'multi-class', 'label': {'0': 'basophil', '1': 'eosinophil', '2': 'erythroblast', '3': 'immature granulocytes(myelocytes, metamyelocytes and promyelocytes)', '4': 'lymphocyte', '5': 'monocyte', '6': 'neutrophil', '7': 'platelet'}, 'n_channels': 3, 'n_samples': {'train': 11959, 'val': 1712, 'test': 3421}, 'license': 'CC BY 4.0'}</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>100%|██████████| 35461855/35461855 [00:18&lt;00:00, 1909171.32it/s]
-100%|██████████| 11959/11959 [00:01&lt;00:00, 6790.50it/s]
-100%|██████████| 1712/1712 [00:00&lt;00:00, 6626.54it/s]
-100%|██████████| 3421/3421 [00:00&lt;00:00, 6661.45it/s]</code></pre>
+<pre><code>100%|██████████| 35461855/35461855 [00:09&lt;00:00, 3590813.84it/s]
+100%|██████████| 11959/11959 [00:02&lt;00:00, 4998.88it/s]
+100%|██████████| 1712/1712 [00:00&lt;00:00, 5081.19it/s]
+100%|██████████| 3421/3421 [00:00&lt;00:00, 5037.19it/s]</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -766,18 +766,15 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                   in_channels<span class="op">=</span><span class="dv">3</span>,   </span>
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                   num_classes<span class="op">=</span><span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>CUDA initialization: CUDA unknown error - this may be due to an incorrectly set up environment, e.g. changing env variable CUDA_VISIBLE_DEVICES after program start. Setting the available devices to be zero. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343995622/work/c10/cuda/CUDAFunctions.cpp:109.)</code></pre>
-</div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer with configuration from a YAML file </span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"./data_examples/sample_config.yml"</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer with configuration from a YAML file </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"./data_examples/sample_config.yml"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -812,18 +809,18 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>0.903920</td>
-<td>2.669662</td>
-<td>0.428738</td>
-<td>0.350407</td>
-<td>0.716215</td>
-<td>01:30</td>
+<td>0.957569</td>
+<td>0.669474</td>
+<td>0.755841</td>
+<td>0.682645</td>
+<td>0.767054</td>
+<td>00:12</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Better model found at epoch 0 with accuracy value: 0.4287383258342743.</code></pre>
+<pre><code>Better model found at epoch 0 with accuracy value: 0.7558411359786987.</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="00_core_files/figure-html/cell-14-output-4.png" class="img-fluid"></p>
@@ -1152,14 +1149,14 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 </blockquote>
 <p><em>Compute the loss for each prediction-target pair.</em></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="00_core_files/figure-html/cell-23-output-1.png" class="img-fluid"></p>
 </div>
@@ -1270,7 +1267,7 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
                                 show_table=True, show_results=True,
                                 as_dataframe=True, cmap=&lt;matplotlib.colors
                                 .LinearSegmentedColormap object at
-                                0x7f89f548d210&gt;)</code></pre>
+                                0x7fafd788fe10&gt;)</code></pre>
 </blockquote>
 <p><em>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</em></p>
 <table class="table">
@@ -1358,7 +1355,7 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 <tr class="even">
 <td>cmap</td>
 <td>LinearSegmentedColormap</td>
-<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7f89f548d210&gt;</td>
+<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7fafd788fe10&gt;</td>
 <td>Color map for the confusion matrix plot.</td>
 </tr>
 </tbody>
@@ -1431,8 +1428,8 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 
