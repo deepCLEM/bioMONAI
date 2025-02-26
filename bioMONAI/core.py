@@ -6,7 +6,7 @@
 __all__ = ['coolwarm', 'warm_cmap', 'read_yaml', 'dictlist_to_funclist', 'fastTrainer', 'visionTrainer', 'compute_losses',
            'compute_metric', 'calculate_statistics', 'format_sig', 'plot_histogram_and_kde', 'display_statistics_table',
            'evaluate_model', 'evaluate_classification_model', 'attributesFromDict', 'get_device', 'img2float',
-           'img2Tensor']
+           'img2Tensor', 'apply_transforms']
 
 # %% ../nbs/00_core.ipynb 5
 import numpy as np
@@ -23,7 +23,7 @@ from monai.utils import set_determinism
 import torch.nn.functional as F
 from torch.nn.init import kaiming_normal_
 
-from random import randint
+from random import randint, random as rand, choice
 
 from skimage import util
 from skimage.data import cells3d
@@ -550,3 +550,32 @@ def img2float(image, force_copy=False):
 # %% ../nbs/00_core.ipynb 44
 def img2Tensor(image):
     return torchTensor(img2float(image))
+
+# %% ../nbs/00_core.ipynb 45
+def apply_transforms(image,         # The image to transform
+                     transforms,    # A list of transformations to apply
+                     ):
+    """Apply a list of transformations, ensuring at least one is applied."""
+    if not transforms:
+        return image  # Return the original image if no transforms are provided
+    
+    # Randomly select transformations to apply
+    applied_transforms = [t for t in transforms if rand() < t.p]
+    # Ensure at least one transformation is applied
+    if not applied_transforms:
+        applied_transforms.append(choice(transforms))
+    
+    def apply_transform_to_image(img, transform):
+        return transform.encodes(img) # Explicitly call encodes() to ensure that the transform is applied
+    
+    # Apply transformations
+    if isinstance(image, tuple):
+        image1, image2 = image
+        for transform in applied_transforms:
+            image1 = apply_transform_to_image(image1, transform)
+            image2 = apply_transform_to_image(image2, transform)
+        return image1, image2
+    else:
+        for transform in applied_transforms:
+            image = apply_transform_to_image(image, transform)
+        return image

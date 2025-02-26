@@ -21,7 +21,7 @@ from sklearn.model_selection import train_test_split
 from torch import stack as torch_stack
 
 from .datasets import download_medmnist
-from .core import MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform, fastTrainer, torchsqueeze, Path, List, L, torchmax, randint, typedispatch, dictlist_to_funclist, read_yaml
+from .core import MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform, fastTrainer, torchsqueeze, Path, List, L, torchmax, randint, typedispatch, dictlist_to_funclist, read_yaml,  apply_transforms
 from .io import image_reader
 from .visualize import show_images_grid, show_multichannel
 
@@ -828,16 +828,18 @@ def extract_patches(data, # numpy array of the input data (n-dimensional).
     return patches
 
 # %% ../nbs/01_data.ipynb 59
-def save_patches_grid(data_folder, # Path to the folder containing data files (n-dimensional data).
-                      gt_folder, # Path to the folder containing ground truth (gt) files (n-dimensional data).
-                      output_folder, # Path to the folder where the HDF5 files will be saved.
-                      patch_size, # tuple of integers defining the size of the patches.
-                      overlap, # float (between 0 and 1) defining the overlap between patches.
-                      threshold=None, # If provided, patches with a mean value below this threshold will be discarded.
-                      squeeze_input=True, #
-                      squeeze_patches=False, #
-                      csv_output=True, # If True, a CSV file listing all patch paths is created.
-                      train_test_split_ratio=0.8, # Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).
+def save_patches_grid(data_folder,                   # Path to the folder containing data files (n-dimensional data).
+                      gt_folder,                     # Path to the folder containing ground truth (gt) files (n-dimensional data).
+                      output_folder,                 # Path to the folder where the HDF5 files will be saved.
+                      patch_size,                    # tuple of integers defining the size of the patches.
+                      overlap,                       # float (between 0 and 1) defining the overlap between patches.
+                      threshold=None,                # If provided, patches with a mean value below this threshold will be discarded.
+                      squeeze_input=True,            # If True, squeeze the input data to remove single-dimensional entries. 
+                      squeeze_patches=False,         # If True, squeeze the patches to remove single-dimensional entries.
+                      csv_output=True,               # If True, a CSV file listing all patch paths is created.
+                      train_test_split_ratio=0.8,    # Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).
+                      tfms_before: List = None,      # List of transforms to apply before extracting patches.
+                      tfms_after: List = None,       # List of transforms to apply after extracting patches.
                       ):
     """
     Loads n-dimensional data from data_folder and gt_folder, generates patches, and saves them into individual HDF5 files.
@@ -873,6 +875,10 @@ def save_patches_grid(data_folder, # Path to the folder containing data files (n
         if data.shape != gt.shape:
             raise ValueError(f"Shape mismatch between {data_file_name} and {gt_file_name}")
         
+        # Apply transforms before extracting patches
+        if tfms_before is not None:
+            data, gt = apply_transforms((data, gt), tfms_before)
+        
         # Extract patches from both datasets
         data_patches_nd = extract_patches(data, patch_size, overlap)
         gt_patches_nd = extract_patches(gt, patch_size, overlap)
@@ -895,6 +901,10 @@ def save_patches_grid(data_folder, # Path to the folder containing data files (n
                 # Calculate the mean of the patch and discard if below threshold (if provided)
                 if threshold is not None and np.mean(data_patch) < threshold:
                     continue  # Skip this patch
+                
+                # Apply transforms after extracting patches
+                if tfms_after is not None:
+                    data_patch, gt_patch = apply_transforms((data_patch, gt_patch), tfms_after)
                 
                 hf.create_dataset(f'X/{patch_counter}', data=data_patch)
                 hf.create_dataset(f'y/{patch_counter}', data=gt_patch)
@@ -929,41 +939,49 @@ def save_patches_grid(data_folder, # Path to the folder containing data files (n
             print(f"CSV file saved to: {csv_path}")
 
 
-# %% ../nbs/01_data.ipynb 64
-def extract_random_patches(data, # numpy array of the input data (n-dimensional).
+# %% ../nbs/01_data.ipynb 66
+def extract_random_patches(data_tuple, # tuple of numpy arrays (input data, ground truth data).
                            patch_size, # tuple of integers defining the size of the patches in each dimension.
                            num_patches, # number of random patches to extract.
                            ):
     """
-    Extracts a specified number of random n-dimensional patches from the input data.
+    Extracts a specified number of random n-dimensional patches from the input data and ground truth data.
     
     Returns:
-    - A list of randomly cropped patches as numpy arrays.
+    - A tuple of lists containing randomly cropped patches as numpy arrays (input_patches, gt_patches).
     """
-    data_shape = data.shape
-    ndim = len(data_shape)
+    input_data, gt_data = data_tuple
+    input_shape = input_data.shape
+    gt_shape = gt_data.shape
+    
+    if input_shape != gt_shape:
+        raise ValueError("Input data and ground truth data must have the same shape.")
+    
+    ndim = len(input_shape)
     
     # Ensure patch size fits within the data dimensions
     for dim in range(ndim):
-        if patch_size[dim] > data_shape[dim]:
-            raise ValueError(f"Patch size {patch_size[dim]} exceeds data dimension {data_shape[dim]} in dimension {dim}")
+        if patch_size[dim] > input_shape[dim]:
+            raise ValueError(f"Patch size {patch_size[dim]} exceeds data dimension {input_shape[dim]} in dimension {dim}")
     
-    patches = []
+    input_patches = []
+    gt_patches = []
     
     for _ in range(num_patches):
         # Randomly select the starting point for each dimension
-        start_coords = [random.randint(0, data_shape[dim] - patch_size[dim]) for dim in range(ndim)]
+        start_coords = [random.randint(0, input_shape[dim] - patch_size[dim]) for dim in range(ndim)]
         
         # Create slices for the selected patch
         patch_slices = tuple(slice(start_coords[dim], start_coords[dim] + patch_size[dim]) for dim in range(ndim))
         
-        # Extract the patch and add to the list
-        patches.append(data[patch_slices])
+        # Extract the patch and add to the lists
+        input_patches.append(input_data[patch_slices])
+        gt_patches.append(gt_data[patch_slices])
     
-    return patches
+    return input_patches, gt_patches
 
 
-# %% ../nbs/01_data.ipynb 65
+# %% ../nbs/01_data.ipynb 67
 def save_patches_random(data_folder,                # Path to the folder containing data files (n-dimensional data).
                         gt_folder,                  # Path to the folder containing ground truth (gt) files (n-dimensional data).
                         output_folder,              # Path to the folder where the HDF5 files will be saved.
@@ -974,6 +992,8 @@ def save_patches_random(data_folder,                # Path to the folder contain
                         squeeze_patches=False,      # If True, squeezes singleton dimensions in the patches.
                         csv_output=True,            # If True, a CSV file listing all patch paths is created.
                         train_test_split_ratio=0.8, # Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).
+                        tfms_before: List =None,           # List of transforms to apply before extracting patches.
+                        tfms_after: List =None,            # List of transforms to apply after extracting patches.
                         ):
     """
     Loads n-dimensional data from data_folder and gt_folder, generates random patches, and saves them into individual HDF5 files.
@@ -1010,14 +1030,17 @@ def save_patches_random(data_folder,                # Path to the folder contain
         if data.shape != gt.shape:
             raise ValueError(f"Shape mismatch between {data_file_name} and {gt_file_name}")
         
+        # Apply transforms before extracting patches
+        if tfms_before is not None:
+            data, gt = apply_transforms((data, gt), tfms_before)
+        
         # Extract random patches from both datasets
-        data_patches_nd = extract_random_patches(data, patch_size, num_patches)
-        gt_patches_nd = extract_random_patches(gt, patch_size, num_patches)
+        data_patches_nd, gt_patches_nd = extract_random_patches((data,gt), patch_size, num_patches)
         
         if squeeze_patches:
             data_patches_nd = np.squeeze(data_patches_nd)
             gt_patches_nd = np.squeeze(gt_patches_nd)
-            
+              
         # Create a new HDF5 file for this pair of files
         hdf5_filename = os.path.join(output_folder, f"{os.path.splitext(data_file_name)[0]}_random_patches.h5")
         
@@ -1033,6 +1056,10 @@ def save_patches_random(data_folder,                # Path to the folder contain
                 if threshold is not None and np.mean(data_patch) < threshold:
                     continue  # Skip this patch
                 
+                # Apply transforms after extracting patches
+                if tfms_after is not None:
+                    data_patch, gt_patch = apply_transforms((data_patch, gt_patch), tfms_after)
+            
                 hf.create_dataset(f'X/{patch_counter}', data=data_patch)
                 hf.create_dataset(f'y/{patch_counter}', data=gt_patch)
                 
@@ -1066,7 +1093,7 @@ def save_patches_random(data_folder,                # Path to the folder contain
             print(f"CSV file saved to: {csv_path}")
 
 
-# %% ../nbs/01_data.ipynb 68
+# %% ../nbs/01_data.ipynb 71
 def dict2string(d, # The dictionary to convert.
                 item_sep="_", # The separator between dictionary items (default is ", ").
                 key_value_sep="", # The separator between keys and values (default is ": ").
@@ -1085,7 +1112,7 @@ def dict2string(d, # The dictionary to convert.
     return item_sep.join(f"{k}{key_value_sep}{format_value(v)}" for k, v in d.items())
 
 
-# %% ../nbs/01_data.ipynb 70
+# %% ../nbs/01_data.ipynb 73
 def remove_singleton_dims(substack, # The extracted substack data.
                           order, # The dimension order string (e.g., 'CZYX').
                           ):
@@ -1107,7 +1134,7 @@ def remove_singleton_dims(substack, # The extracted substack data.
     substack = substack.reshape(new_shape)  # Remove singleton dimensions
     return substack, new_order
 
-# %% ../nbs/01_data.ipynb 71
+# %% ../nbs/01_data.ipynb 74
 def extract_substacks(input_file, # Path to the input OME-TIFF file.
                       output_dir=None, # Directory to save the extracted substacks. If a list, the substacks will be saved in the corresponding subdirectories from the list.
                       indices=None,# A dictionary specifying which indices to extract. Keys can include 'C' for channel, 'Z' for z-slice, 'T' for time point, and 'S' for scene. If None, all indices are extracted.
