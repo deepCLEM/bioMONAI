@@ -386,7 +386,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="download-and-store-the-dataset" class="level3">
 <h3 class="anchored" data-anchor-id="download-and-store-the-dataset">Download and store the dataset</h3>
 <p>These lines of code will download the SynapseMNIST3D dataset and set up the paths for training, validation, and test datasets.</p>
-<p>The <code>download_medmnist</code> function is used to download the dataset, and the paths are organized to easily access different parts of the dataset for training, validation, and testing purposes. The <code>data_path</code> is updated to point to the ‘synapsemnist3d’ directory, and then separate paths are created for the ‘train’, ‘val’, and ‘test’ subdirectories. This organization helps in easily accessing the different parts of the dataset for training, validation, and testing purposes.</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#download_medmnist"><code>download_medmnist</code></a> function is used to download the dataset, and the paths are organized to easily access different parts of the dataset for training, validation, and testing purposes. The <code>data_path</code> is updated to point to the ‘synapsemnist3d’ directory, and then separate paths are created for the ‘train’, ‘val’, and ‘test’ subdirectories. This organization helps in easily accessing the different parts of the dataset for training, validation, and testing purposes.</p>
 <p>You can customize the <code>data_flag</code> to download different datasets available in the MedMNIST collection. Additionally, you can modify the <code>data_path</code> to change the location where the dataset is stored. If you have a specific directory structure in mind, ensure that the paths for <code>train_path</code>, <code>val_path</code>, and <code>test_path</code> correctly reflect your desired organization. This flexibility allows you to adapt the code to various datasets and storage requirements.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data_flag <span class="op">=</span> <span class="st">'synapsemnist3d'</span></span>
@@ -408,7 +408,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="customize-dataloader" class="level3">
 <h3 class="anchored" data-anchor-id="customize-dataloader">Customize DataLoader</h3>
-<p>In the next cell, we will create a DataLoader for the SynapseMNIST3D dataset. The <code>BioDataLoaders.class_from_folder()</code> method is used to load the dataset from the specified paths and apply transformations to the images.</p>
+<p>In the next cell, we will create a DataLoader for the SynapseMNIST3D dataset.</p>
+<p>The <code>BioDataLoaders.class_from_folder()</code> method is used to load the dataset from the specified paths and apply transformations to the images. This method is designed for classification tasks and datasets organized in folders. Indeed, it assumes that the images are organized in subfolders whose names represents the image labels.</p>
 <p>We will set the batch size to 8 and apply the following transformations: - <code>ScaleIntensity()</code>: Scales the intensity of the images. - <code>RandRot90(prob=0.5, spatial_axes=(1,2))</code>: Randomly rotates the images by 90 degrees with a probability of 0.5 along the specified spatial axes. - <code>Resize(32)</code>: Resizes the images to 32x32x32.</p>
 <p>You can customize the DataLoader by changing the batch size, adding or removing transformations, or modifying the paths to the dataset. For example, you can increase the batch size for faster training or add more complex transformations to augment the dataset.</p>
 <p>The <code>show_summary</code> parameter is set to <code>True</code> to display a summary of the dataset and transformations applied.</p>
@@ -422,7 +423,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>vocab</code>: The vocabulary or labels for the dataset.</li>
 <li><code>item_tfms</code>: A list of transformations to apply to each image individually. Examples include <code>ScaleIntensity()</code>, <code>RandRot90()</code>, and <code>Resize()</code>.</li>
 <li><code>batch_tfms</code>: A list of transformations to apply to a batch of images. This can be set to <code>None</code> if no batch transformations are needed.</li>
-<li><code>img_cls</code>: The class to use for loading images. For 3D images, this is typically <code>BioImageStack</code>.</li>
+<li><code>img_cls</code>: The class to use for loading images. For 3D images, this is typically <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagestack"><code>BioImageStack</code></a>.</li>
 <li><code>bs</code>: The batch size, which determines how many images are processed together in each batch.</li>
 <li><code>show_summary</code>: A boolean flag to display a summary of the dataset and the transformations applied.</li>
 </ul>
@@ -460,7 +461,7 @@ validation images: 177</code></pre>
 </section>
 <section id="display-a-batch-of-images" class="level3">
 <h3 class="anchored" data-anchor-id="display-a-batch-of-images">Display a Batch of Images</h3>
-<p>In the next cell, we will display a batch of images from the training dataset using the <code>show_batch</code> method of the <code>BioDataLoaders</code> class. This method helps visualize the images and their corresponding labels, providing an overview of the dataset.</p>
+<p>In the next cell, we will display a batch of images from the training dataset using the <a href="https://deepCLEM.github.io/bioMONAI/data.html#show_batch"><code>show_batch</code></a> method of the <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> class. This method helps visualize the images and their corresponding labels, providing an overview of the dataset.</p>
 <p>You can customize the display by modifying the following parameters: - <code>max_n</code>: The maximum number of images to display in the batch. By default, it shows all images in the batch. - <code>nrows</code>: The number of rows to use for displaying the images. This can be adjusted to control the layout of the images. - <code>ncols</code>: The number of columns to use for displaying the images. This can be adjusted to control the layout of the images. - <code>figsize</code>: The size of the figure used to display the images. This can be adjusted to make the images larger or smaller.</p>
 <p>For example, you can set <code>max_n=4</code> to display only 4 images from the batch, or set <code>figsize=(10, 10)</code> to increase the size of the displayed images.</p>
 <p>This visualization step is useful for verifying that the images have been loaded and transformed correctly before proceeding with model training.</p>
@@ -476,14 +477,14 @@ validation images: 177</code></pre>
 </section>
 <section id="train-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="train-the-model">Train the Model</h3>
-<p>In the next cell, we will initialize and train a 3D model using the <code>fastTrainer</code> class. The model architecture used is <code>SEResNet50</code>, which is a 3D version of the SE-ResNet50 model. This model is well-suited for 3D image classification tasks.</p>
-<p>We will use the following components: - <code>SEResNet50</code>: The model architecture with 3D spatial dimensions, 1 input channel, and 2 output classes. - <code>CrossEntropyLossFlat</code>: The loss function used for training the model. - <code>BalancedAccuracy</code>: The metric used to evaluate the model’s performance. - <code>fastTrainer</code>: A custom trainer class to handle the training process.</p>
+<p>In the next cell, we will initialize and train a 3D model using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class. The model architecture used is <code>SEResNet50</code>, which is a 3D version of the SE-ResNet50 model. This model is well-suited for 3D image classification tasks.</p>
+<p>We will use the following components: - <code>SEResNet50</code>: The model architecture with 3D spatial dimensions, 1 input channel, and 2 output classes. - <code>CrossEntropyLossFlat</code>: The loss function used for training the model. - <code>BalancedAccuracy</code>: The metric used to evaluate the model’s performance. - <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a>: A custom trainer class to handle the training process.</p>
 <p>The <code>trainer.fit(20)</code> method will train the model for 20 epochs.</p>
 <p>You can customize the training process by modifying the following parameters: - <code>model</code>: Change the model architecture to another 3D model, such as <code>DenseNet169</code>. - <code>loss_fn</code>: Use a different loss function, such as <code>FocalLoss</code>. - <code>metrics</code>: Add more metrics to evaluate the model, such as <code>Precision</code> or <code>Recall</code>. - <code>show_summary</code>: Set to <code>False</code> if you do not want to display the model summary. - <code>find_lr</code>: Set to <code>False</code> if you do not want to find the optimal learning rate.</p>
 <p>For example, you can add more metrics to the <code>metrics</code> list to get a more comprehensive evaluation of the model’s performance.</p>
 <p>You can customize the training process by modifying the following parameters: - <code>epochs</code>: Change the number of epochs to train the model for a different duration. For example, you can set it to 50 or 100 epochs. - <code>lr</code>: Adjust the learning rate to control the speed at which the model learns. A lower learning rate can lead to more stable training, while a higher learning rate can speed up the process but may cause instability. - <code>callbacks</code>: Add custom callbacks to monitor the training process, such as early stopping or learning rate schedulers.</p>
 <p>For example, you can add an early stopping callback to stop training if the validation loss does not improve for a certain number of epochs. This can help prevent overfitting and save training time.</p>
-<p>Additionally, you can experiment with different learning rates to find the optimal value for your dataset. The <code>find_lr</code> parameter in the <code>fastTrainer</code> class can help you automatically find a suitable learning rate.</p>
+<p>Additionally, you can experiment with different learning rates to find the optimal value for your dataset. The <code>find_lr</code> parameter in the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class can help you automatically find a suitable learning rate.</p>
 <p>By customizing these parameters, you can fine-tune the training process to achieve better performance and adapt the model to your specific dataset and requirements.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> SEResNet50</span>
@@ -1160,7 +1161,7 @@ Inferred learning rate:  8e-05</code></pre>
 </section>
 <section id="evaluate-the-model-on-validation-data" class="level3">
 <h3 class="anchored" data-anchor-id="evaluate-the-model-on-validation-data">Evaluate the Model on Validation Data</h3>
-<p>In this step, we will evaluate the trained model on the validation dataset using the <code>evaluate_classification_model</code> function. This function computes the specified metrics and provides insights into the model’s performance. Additionally, it can display the most confused classes to help identify areas for improvement.</p>
+<p>In this step, we will evaluate the trained model on the validation dataset using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function. This function computes the specified metrics and provides insights into the model’s performance. Additionally, it can display the most confused classes to help identify areas for improvement.</p>
 <blockquote class="blockquote">
 <ul>
 <li>You can customize the <code>metrics</code> parameter to include other evaluation metrics relevant to your task.</li>
@@ -1550,7 +1551,7 @@ Most Confused Classes:
 </section>
 <section id="save-the-trained-model" class="level3">
 <h3 class="anchored" data-anchor-id="save-the-trained-model">Save the Trained Model</h3>
-<p>In the next cell, we will save the trained model to a file using the <code>save</code> method of the <code>fastTrainer</code> class. This step is important to preserve the trained model so that it can be loaded and used later without retraining.</p>
+<p>In the next cell, we will save the trained model to a file using the <code>save</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class. This step is important to preserve the trained model so that it can be loaded and used later without retraining.</p>
 <p>You can customize the saving process by modifying the following parameters: - <code>file_name</code>: Change the name of the file to save the model with a different name. For example, you can set it to ‘final_model’ or ‘best_model’. - <code>path</code>: Specify a different path to save the model in a different directory. This is useful if you want to organize your saved models in a specific folder.</p>
 <p>For example, you can set <code>file_name='final_model'</code> to save the model with the name ‘final_model.pth’, or set <code>path='../models/'</code> to save the model in the ‘models’ directory.</p>
 <p>By customizing these parameters, you can ensure that the model is saved with a meaningful name and in an organized manner, making it easier to manage and retrieve the model for future use.</p>
@@ -1576,8 +1577,8 @@ Most Confused Classes:
 <pre><code>test images: 352</code></pre>
 </div>
 </div>
-<p>In the next cell, we will evaluate the performance of the trained model on the test dataset using the <code>evaluate_classification_model</code> function. This function will compute various evaluation metrics and display the results.</p>
-<p>You can customize the evaluation process by modifying the following parameters: - <code>show_graph</code>: Set to <code>True</code> to display a graph of the evaluation metrics. This can help visualize the model’s performance. - <code>show_results</code>: Set to <code>True</code> to display the results of the evaluation, including the predicted labels and ground truth labels.</p>
+<p>In the next cell, we will evaluate the performance of the trained model on the test dataset using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function. This function will compute various evaluation metrics and display the results.</p>
+<p>You can customize the evaluation process by modifying the following parameters: - <code>show_graph</code>: Set to <code>True</code> to display a graph of the evaluation metrics. This can help visualize the model’s performance. - <a href="https://deepCLEM.github.io/bioMONAI/data.html#show_results"><code>show_results</code></a>: Set to <code>True</code> to display the results of the evaluation, including the predicted labels and ground truth labels.</p>
 <p>For example, you can set <code>show_graph=True</code> to visualize the evaluation metrics, or set <code>show_results=True</code> to see the detailed results of the evaluation.</p>
 <p>By customizing these parameters, you can gain a deeper understanding of the model’s performance and identify areas for improvement. This step is crucial for fine-tuning the model and ensuring that it generalizes well to unseen data.</p>
 <div class="cell">
@@ -1736,7 +1737,7 @@ Most Confused Classes:
 </section>
 <section id="load-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="load-the-model">Load the Model</h3>
-<p>In this step, we will load the previously trained model using the <code>load</code> method of the <code>visionTrainer</code> class. In this example, we will:</p>
+<p>In this step, we will load the previously trained model using the <code>load</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#visiontrainer"><code>visionTrainer</code></a> class. In this example, we will:</p>
 <blockquote class="blockquote">
 <ul>
 <li>Create a trainer instance and load the previously saved model.</li>
