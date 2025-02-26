@@ -44,7 +44,7 @@ def write_image(data, file_path, dimension_order="TCZYX"):
         print(f"An error occurred while saving the image: {e}")
 
 
-# %% ../nbs/02_io.ipynb 9
+# %% ../nbs/02_io.ipynb 10
 def tiff2torch(file_path: str):
     '''
     Load tiff into pytorch tensor
@@ -54,7 +54,7 @@ def tiff2torch(file_path: str):
     img = np.array(tiff.imread(file_path))
     return torch_from_numpy(img)
 
-# %% ../nbs/02_io.ipynb 10
+# %% ../nbs/02_io.ipynb 11
 def string2dict(input_string:str):
     # Create an empty dictionary
     result_dict = {}
@@ -77,7 +77,7 @@ def string2dict(input_string:str):
                 
     return result_dict
 
-# %% ../nbs/02_io.ipynb 11
+# %% ../nbs/02_io.ipynb 12
 def split_path(file_path, # The path to the file to split
                    exts:(L, list)=['.ome.tiff', '.tiff', '.tif', '.png'] # List of filename extensions 
                    ):
@@ -92,7 +92,7 @@ def split_path(file_path, # The path to the file to split
         ind_dict = string2dict(p[1])
     return path, ind_dict
 
-# %% ../nbs/02_io.ipynb 12
+# %% ../nbs/02_io.ipynb 13
 class aics_image_reader():
     def __init__(self,
                  ind_dict=None, # Dictionary indicating the channels to load
@@ -149,7 +149,7 @@ class aics_image_reader():
         return data, affine
 
 
-# %% ../nbs/02_io.ipynb 15
+# %% ../nbs/02_io.ipynb 16
 def split_hdf_path(file_path, # The path to the HDF5 file to split
                    hdf5_exts:(L, list)=['.h5','.hdf5'] # List of filename extensions 
                    ):
@@ -165,7 +165,7 @@ def split_hdf_path(file_path, # The path to the HDF5 file to split
         patch = int(patch)
     return path, dataset, patch
 
-# %% ../nbs/02_io.ipynb 16
+# %% ../nbs/02_io.ipynb 17
 class hdf5_reader():
     def __init__(self,
                  dataset=None, # The dataset to load
@@ -210,7 +210,7 @@ class hdf5_reader():
         return data, affine
 
 
-# %% ../nbs/02_io.ipynb 23
+# %% ../nbs/02_io.ipynb 24
 def _preprocess(obj, # The object to preprocess
                 reorder, # Whether to reorder the object
                 resample # Whether to resample the object
@@ -239,7 +239,7 @@ def _preprocess(obj, # The object to preprocess
     return obj, original_size
 
 
-# %% ../nbs/02_io.ipynb 25
+# %% ../nbs/02_io.ipynb 26
 def _load_and_preprocess(file_path, # Image file path
                          reorder=False, # Whether to reorder data for canonical (RAS+) orientation
                          resample=False, # Whether to resample image to different voxel sizes and dimensions
@@ -289,7 +289,7 @@ def _load_and_preprocess(file_path, # Image file path
     return org_img, input_img, org_size
 
 
-# %% ../nbs/02_io.ipynb 28
+# %% ../nbs/02_io.ipynb 29
 def _multi_sequence(image_paths: (L, list), # List of image paths (e.g., T1, T2, T1CE, DWI)
                    dtype=torchTensor, # Desired datatype for output
                    only_tensor: bool = True, # Whether to return only image tensor
@@ -324,7 +324,7 @@ def _multi_sequence(image_paths: (L, list), # List of image paths (e.g., T1, T2,
     input_img.set_data(tensor)
     return org_img, input_img, org_size
 
-# %% ../nbs/02_io.ipynb 32
+# %% ../nbs/02_io.ipynb 33
 def image_reader(file_path: (str, Path, L, list), # Path to the image
                dtype=torchTensor, # Datatype for the return value. Defaults to torchTensor
                only_tensor: bool = True, # To return only an image tensor

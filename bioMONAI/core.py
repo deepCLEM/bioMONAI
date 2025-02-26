@@ -73,7 +73,7 @@ def dictlist_to_funclist(transform_dicts):
 
     return transforms
 
-# %% ../nbs/00_core.ipynb 24
+# %% ../nbs/00_core.ipynb 25
 class fastTrainer(Learner):
     """
     A custom implementation of the FastAI Learner class for training models in bioinformatics applications.
@@ -201,7 +201,7 @@ class fastTrainer(Learner):
             csv_log = csv_log, show_graph = show_graph, show_summary = show_summary          
         )        
 
-# %% ../nbs/00_core.ipynb 30
+# %% ../nbs/00_core.ipynb 31
 def _add_norm(dls, meta, pretrained, n_in=3):
     if not pretrained: return
     stats = meta.get('stats')
@@ -217,7 +217,7 @@ def _timm_norm(dls, cfg, pretrained, n_in=3):
         tfm = Normalize.from_stats(cfg['mean'],cfg['std'])
         dls.add_tfms([tfm],'after_batch')
 
-# %% ../nbs/00_core.ipynb 31
+# %% ../nbs/00_core.ipynb 33
 @delegates(create_vision_model)
 def visionTrainer(  dataloaders: DataLoaders, # The DataLoader objects containing training and validation datasets.
                     model: callable, # A callable model that will be trained on the dataset.
@@ -280,7 +280,7 @@ def visionTrainer(  dataloaders: DataLoaders, # The DataLoader objects containin
     store_attr('model,normalize,n_out,pretrained', self=trainer, **kwargs)
     return trainer
 
-# %% ../nbs/00_core.ipynb 33
+# %% ../nbs/00_core.ipynb 36
 def compute_losses(predictions, targets, loss_fn):
     """
     Compute the loss for each prediction-target pair.
@@ -388,13 +388,13 @@ def display_statistics_table(stats, fn_name='', as_dataframe=True):
         header.set_text_props(weight="bold")
         plt.show()
 
-# %% ../nbs/00_core.ipynb 36
+# %% ../nbs/00_core.ipynb 39
 # Retrieve the 'coolwarm' colormap
 coolwarm = plt.get_cmap('coolwarm')
 # Create a new colormap using only the warm colors
 warm_cmap = LinearSegmentedColormap.from_list('warm_coolwarm', coolwarm(np.linspace(0.5, 1, coolwarm.N // 2)))
 
-# %% ../nbs/00_core.ipynb 37
+# %% ../nbs/00_core.ipynb 41
 def evaluate_model(trainer:Learner,                                 # The model trainer object with a get_preds method.
                    test_data:DataLoaders=None,              # DataLoader containing test data.
                    loss=None,                               # Loss function to evaluate prediction-target pairs.
@@ -455,7 +455,7 @@ def evaluate_model(trainer:Learner,                                 # The model 
     return out
 
 
-# %% ../nbs/00_core.ipynb 38
+# %% ../nbs/00_core.ipynb 42
 def evaluate_classification_model(trainer:Learner,              # The trained model (learner) to evaluate.
                                   test_data:DataLoaders=None,   # DataLoader with test data for evaluation. If None, the validation dataset is used.
                                   loss_fn=None,                 # Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.
@@ -530,7 +530,7 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     return out
 
 
-# %% ../nbs/00_core.ipynb 41
+# %% ../nbs/00_core.ipynb 45
 def attributesFromDict(d):
     """
     The `attributesFromDict` function simplifies the conversion of dictionary keys and values into object attributes, allowing dynamic attribute creation for configuration objects. This utility is handy for initializing model or dataset configurations directly from dictionaries, improving code readability and maintainability.
@@ -539,19 +539,29 @@ def attributesFromDict(d):
     for n, v in d.items():
         setattr(self, n, v)
 
-# %% ../nbs/00_core.ipynb 42
+# %% ../nbs/00_core.ipynb 46
 def get_device():
+    """
+    The `get_device` function is used to detect if the device the code is executed in has got a CUDA-enabled GPU available. 
+    If it doesn’t, it returns CPU. 
+    """ 
     return torch_device("cuda" if is_cuda_available() else "cpu")
 
-# %% ../nbs/00_core.ipynb 43
+# %% ../nbs/00_core.ipynb 47
 def img2float(image, force_copy=False):
+    """
+    The `img2float` function turns an image into float representation.
+    """
     return util.img_as_float(image, force_copy=force_copy)
 
-# %% ../nbs/00_core.ipynb 44
+# %% ../nbs/00_core.ipynb 48
 def img2Tensor(image):
+    """
+    The `img2Tensor` function turns an image into tensor representation after turning it first into float representation. 
+    """
     return torchTensor(img2float(image))
 
-# %% ../nbs/00_core.ipynb 45
+# %% ../nbs/00_core.ipynb 49
 def apply_transforms(image,         # The image to transform
                      transforms,    # A list of transformations to apply
                      ):

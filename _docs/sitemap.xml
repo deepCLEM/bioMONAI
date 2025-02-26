@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_multispectral_classification.html</loc>
-    <lastmod>2025-02-24T16:46:36.960Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_classification3d.html</loc>
-    <lastmod>2025-02-24T18:11:57.763Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/index.html</loc>
-    <lastmod>2025-02-24T18:11:57.749Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/datasets.html</loc>
-    <lastmod>2025-02-24T16:46:36.700Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/metrics.html</loc>
-    <lastmod>2025-02-24T16:46:36.699Z</lastmod>
-  </url>
-  <url>
     <loc>https://deepCLEM.github.io/bioMONAI/nets.html</loc>
-    <lastmod>2025-02-24T16:46:36.693Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/io.html</loc>
-    <lastmod>2025-02-24T16:46:36.692Z</lastmod>
+    <lastmod>2025-02-26T08:52:00.252Z</lastmod>
   </url>
   <url>
     <loc>https://deepCLEM.github.io/bioMONAI/core.html</loc>
-    <lastmod>2025-02-24T18:12:00.320Z</lastmod>
+    <lastmod>2025-02-26T08:51:59.328Z</lastmod>
   </url>
   <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/data.html</loc>
-    <lastmod>2025-02-24T18:12:00.355Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/losses.html</loc>
-    <lastmod>2025-02-24T16:46:36.693Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/transforms.html</loc>
-    <lastmod>2025-02-24T18:12:00.239Z</lastmod>
-  </url>
-  <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/callbacks.html</loc>
-    <lastmod>2025-02-24T16:46:36.700Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/datasets.html</loc>
+    <lastmod>2025-02-26T08:51:58.152Z</lastmod>
   </url>
   <url>
     <loc>https://deepCLEM.github.io/bioMONAI/visualize.html</loc>
-    <lastmod>2025-02-24T16:46:36.928Z</lastmod>
+    <lastmod>2025-02-26T08:51:57.328Z</lastmod>
   </url>
   <url>
-    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_classification.html</loc>
-    <lastmod>2025-02-24T18:11:57.742Z</lastmod>
+    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_classification3d.html</loc>
+    <lastmod>2025-02-26T08:51:55.252Z</lastmod>
   </url>
   <url>
     <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_denoising.html</loc>
-    <lastmod>2025-02-24T18:11:57.811Z</lastmod>
+    <lastmod>2025-02-26T08:51:54.120Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/metrics.html</loc>
+    <lastmod>2025-02-26T08:51:51.800Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/losses.html</loc>
+    <lastmod>2025-02-26T08:51:50.852Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/transforms.html</loc>
+    <lastmod>2025-02-26T08:51:51.484Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/data.html</loc>
+    <lastmod>2025-02-26T08:51:53.292Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_classification.html</loc>
+    <lastmod>2025-02-26T08:51:54.548Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/Tutorials/tutorial_multispectral_classification.html</loc>
+    <lastmod>2025-02-26T08:51:55.884Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/index.html</loc>
+    <lastmod>2025-02-26T08:51:57.640Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/io.html</loc>
+    <lastmod>2025-02-26T08:51:58.508Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/callbacks.html</loc>
+    <lastmod>2025-02-26T08:51:59.708Z</lastmod>
   </url>
 </urlset>
