@@ -325,7 +325,6 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="training-callbacks">Training Callbacks</h2>
 <p>Callbacks that add functionlities during the training phase, including Callbacks that make decisions depending how a monitored metric/loss behaves</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/callbacks.py#L17" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="meanlossgraphcallback" class="level3">
 <h3 class="anchored" data-anchor-id="meanlossgraphcallback">MeanLossGraphCallback</h3>
 <blockquote class="blockquote">
@@ -342,7 +341,7 @@ ul.task-list li input[type="checkbox"] {
                         after_cancel_epoch=None, after_epoch=None,
                         after_cancel_fit=None, after_fit=None)</code></pre>
 </blockquote>
-<p><em>Update a graph of training and validation loss</em></p>
+<p>Update a graph of training and validation loss</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/training.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -351,7 +350,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> ShortEpochCallback (pct=0.01, short_valid=True)</code></pre>
 </blockquote>
-<p><em>Fit just <code>pct</code> of an epoch, then stop</em></p>
+<p>Fit just <code>pct</code> of an epoch, then stop</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/training.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -360,7 +359,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> GradientAccumulation (n_acc=32)</code></pre>
 </blockquote>
-<p><em>Accumulate gradients before updating weights</em></p>
+<p>Accumulate gradients before updating weights</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/tracker.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -370,7 +369,7 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> EarlyStoppingCallback (monitor='valid_loss', comp=None, min_delta=0.0,
                         patience=1, reset_on_fit=True)</code></pre>
 </blockquote>
-<p><em>A <code>TrackerCallback</code> that terminates training when monitored quantity stops improving.</em></p>
+<p>A <code>TrackerCallback</code> that terminates training when monitored quantity stops improving.</p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -429,7 +428,7 @@ ul.task-list li input[type="checkbox"] {
                     fname='model', every_epoch=False, at_end=False,
                     with_opt=False, reset_on_fit=True)</code></pre>
 </blockquote>
-<p><em>A <code>TrackerCallback</code> that saves the model’s best during training and loads it at the end.</em></p>
+<p>A <code>TrackerCallback</code> that saves the model’s best during training and loads it at the end.</p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -505,7 +504,7 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> ReduceLROnPlateau (monitor='valid_loss', comp=None, min_delta=0.0,
                     patience=1, factor=10.0, min_lr=0, reset_on_fit=True)</code></pre>
 </blockquote>
-<p><em>A <code>TrackerCallback</code> that reduces learning rate when a metric has stopped improving.</em></p>
+<p>A <code>TrackerCallback</code> that reduces learning rate when a metric has stopped improving.</p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -578,7 +577,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> ParamScheduler (scheds)</code></pre>
 </blockquote>
-<p><em>Schedule hyper-parameters according to <code>scheds</code></em></p>
+<p>Schedule hyper-parameters according to <code>scheds</code></p>
 <p><code>scheds</code> is a dictionary with one key for each hyper-parameter you want to schedule, with either a scheduler or a list of schedulers as values (in the second case, the list must have the same length as the the number of parameters groups of the optimizer).</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/schedule.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
@@ -588,7 +587,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> SchedCos (start, end)</code></pre>
 </blockquote>
-<p><em>Cosine schedule function from <code>start</code> to <code>end</code></em></p>
+<p>Cosine schedule function from <code>start</code> to <code>end</code></p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/schedule.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -597,7 +596,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> SchedExp (start, end)</code></pre>
 </blockquote>
-<p><em>Exponential schedule function from <code>start</code> to <code>end</code></em></p>
+<p>Exponential schedule function from <code>start</code> to <code>end</code></p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/schedule.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -606,7 +605,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> SchedLin (start, end)</code></pre>
 </blockquote>
-<p><em>Linear schedule function from <code>start</code> to <code>end</code></em></p>
+<p>Linear schedule function from <code>start</code> to <code>end</code></p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/schedule.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -615,7 +614,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> SchedNo (start, end)</code></pre>
 </blockquote>
-<p><em>Constant schedule function with <code>start</code> value</em></p>
+<p>Constant schedule function with <code>start</code> value</p>
 
 
 </section>

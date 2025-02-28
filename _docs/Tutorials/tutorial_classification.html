@@ -323,9 +323,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#visualize-a-batch-of-images" id="toc-visualize-a-batch-of-images" class="nav-link" data-scroll-target="#visualize-a-batch-of-images">Visualize a Batch of Images</a></li>
   <li><a href="#train-the-model" id="toc-train-the-model" class="nav-link" data-scroll-target="#train-the-model">Train the Model</a></li>
   <li><a href="#evaluate-the-model-on-validation-data" id="toc-evaluate-the-model-on-validation-data" class="nav-link" data-scroll-target="#evaluate-the-model-on-validation-data">Evaluate the Model on Validation Data</a></li>
-  <li><a href="#save-the-model" id="toc-save-the-model" class="nav-link" data-scroll-target="#save-the-model">Save the model</a></li>
-  <li><a href="#save-the-model-1" id="toc-save-the-model-1" class="nav-link" data-scroll-target="#save-the-model-1">Save the Model</a></li>
+  <li><a href="#save-the-model" id="toc-save-the-model" class="nav-link" data-scroll-target="#save-the-model">Save the Model</a></li>
   <li><a href="#evaluate-the-model-on-test-data" id="toc-evaluate-the-model-on-test-data" class="nav-link" data-scroll-target="#evaluate-the-model-on-test-data">Evaluate the Model on Test Data</a></li>
+  <li><a href="#load-the-model" id="toc-load-the-model" class="nav-link" data-scroll-target="#load-the-model">Load the Model</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -379,7 +379,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In this step, we will download the BloodMNIST dataset using the <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#download_medmnist"><code>download_medmnist</code></a> function from bioMONAI. This function will download the dataset and provide information about it. The dataset will be stored in the specified path. You can customize the path or dataset name as needed. Additionally, you can explore other datasets available in the MedMNIST collection by changing the dataset name in the <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#download_medmnist"><code>download_medmnist</code></a> function.</p>
 </blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'../_data/medmnist_data/'</span></span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> Path(<span class="st">'../_data/medmnist_data/'</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>info <span class="op">=</span> download_medmnist(<span class="st">'bloodmnist'</span>, image_path, download_only<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Dataset 'bloodmnist' is already downloaded and available in '../_data/medmnist_data/bloodmnist'.</code></pre>
@@ -388,35 +388,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="create-dataloader" class="level3">
 <h3 class="anchored" data-anchor-id="create-dataloader">Create DataLoader</h3>
-<p>In this step, we will customize the DataLoader for the BloodMNIST dataset. The DataLoader is responsible for loading the data during training and validation. We will define the data loading strategy using the <code>BioDataLoaders.from_source()</code> method, configured with the arguments specified in <code>data_ops</code>. You can customize the following parameters to suit your needs:</p>
-<ul>
-<li><code>batch_size</code>: The number of samples per batch. Adjust this based on your GPU memory capacity.</li>
-<li><code>item_tfms</code>: List of item-level transformations to apply to the images. You can add or modify transformations to augment your dataset.</li>
-<li><code>splitter</code>: The method to split the dataset into training and validation sets. You can customize the split strategy if needed.</li>
-</ul>
+<p>In this step, we will customize the DataLoader for the BloodMNIST dataset. The DataLoader is responsible for loading the data during training and validation. We will define the data loading strategy using the <code>BioDataLoaders.from_source()</code> method, which is is the most general method to deal with various kinds of data and tasks. We will configure the dataloader with the arguments specified in <code>data_ops</code>.</p>
 <blockquote class="blockquote">
+<p>You can customize the following parameters to suit your needs: - <code>batch_size</code>: The number of samples per batch. Adjust this based on your GPU memory capacity. - <code>item_tfms</code>: List of item-level transformations to apply to the images. You can add or modify transformations to augment your dataset. - <code>splitter</code>: The method to split the dataset into training and validation sets. You can customize the split strategy if needed.</p>
 <p>Feel free to experiment with different configurations to improve model performance or adapt to different datasets.</p>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">32</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> Path(image_path)<span class="op">/</span><span class="st">'bloodmnist'</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>path_train <span class="op">=</span> path<span class="op">/</span><span class="st">'train'</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>path_val <span class="op">=</span> path<span class="op">/</span><span class="st">'val'</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> image_path<span class="op">/</span><span class="st">'bloodmnist'</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>train_path <span class="op">=</span> path<span class="op">/</span><span class="st">'train'</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>val_path <span class="op">=</span> path<span class="op">/</span><span class="st">'val'</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>data_ops <span class="op">=</span> {</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'blocks'</span>:       (BioImageBlock(cls<span class="op">=</span>BioImageMulti), CategoryBlock(info[<span class="st">'label'</span>])),</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'get_items'</span>:    get_image_files,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'get_y'</span>:        parent_label,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'splitter'</span>:     GrandparentSplitter(train_name<span class="op">=</span><span class="st">'train'</span>, valid_name<span class="op">=</span><span class="st">'val'</span>),</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'item_tfms'</span>:    [ScaleIntensity(<span class="bu">min</span><span class="op">=</span><span class="fl">0.0</span>, <span class="bu">max</span><span class="op">=</span><span class="fl">1.0</span>), RandRot90(prob<span class="op">=</span><span class="fl">0.5</span>), RandFlip(prob<span class="op">=</span><span class="fl">0.5</span>)],</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'bs'</span>:           batch_size,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'blocks'</span>:       (BioImageBlock(cls<span class="op">=</span>BioImageMulti), CategoryBlock(info[<span class="st">'label'</span>])),              <span class="co"># define a `TransformBlock` tailored for bioimaging data</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'get_items'</span>:    get_image_files,                                                               <span class="co"># get image files in path</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'get_y'</span>:        parent_label,                                                                  <span class="co"># Label item with the parent folder name</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'splitter'</span>:     GrandparentSplitter(train_name<span class="op">=</span><span class="st">'train'</span>, valid_name<span class="op">=</span><span class="st">'val'</span>),                     <span class="co"># split data with the grandparent folder name</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'item_tfms'</span>:    [ScaleIntensity(<span class="bu">min</span><span class="op">=</span><span class="fl">0.0</span>, <span class="bu">max</span><span class="op">=</span><span class="fl">1.0</span>), RandRot90(prob<span class="op">=</span><span class="fl">0.75</span>), RandFlip(prob<span class="op">=</span><span class="fl">0.75</span>)], <span class="co"># list of item transforms</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'bs'</span>:           batch_size,                                                                    <span class="co"># batch size</span></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_source(</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    path, </span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    path,                           <span class="co"># root directory for data</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,             <span class="co"># print summary of the data</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,                     <span class="co"># rest of method arguments</span></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
@@ -477,7 +473,7 @@ validation images: 1712</code></pre>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> visionTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">20</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">10</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -497,6 +493,13 @@ validation images: 1712</code></pre>
 </style>
 </div>
 <div class="cell-output cell-output-display">
+
+    <div>
+      <progress value="0" class="" max="2" style="width:300px; height:20px; vertical-align: middle;"></progress>
+      0.00% [0/2 00:00&lt;?]
+    </div>
+    
+
 <table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
@@ -508,22 +511,15 @@ validation images: 1712</code></pre>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td>0</td>
-<td>0.708640</td>
-<td>0.683854</td>
-<td>0.777453</td>
-<td>00:10</td>
-</tr>
-<tr class="even">
-<td>1</td>
-<td>0.576192</td>
-<td>0.405103</td>
-<td>0.858061</td>
-<td>00:10</td>
-</tr>
 </tbody>
 </table>
+<p>
+
+    </p><div>
+      <progress value="0" class="" max="373" style="width:300px; height:20px; vertical-align: middle;"></progress>
+      0.00% [0/373 00:00&lt;?]
+    </div>
+    
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="901_tutorial_classification_files/figure-html/cell-8-output-3.png" class="img-fluid"></p>
@@ -560,142 +556,72 @@ validation images: 1712</code></pre>
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>0.299481</td>
-<td>0.193486</td>
-<td>0.936332</td>
-<td>00:11</td>
+<td>0.291281</td>
+<td>0.233348</td>
+<td>0.919977</td>
+<td>00:10</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>0.293008</td>
-<td>0.228729</td>
-<td>0.918224</td>
+<td>0.342873</td>
+<td>0.257221</td>
+<td>0.915304</td>
 <td>00:10</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>0.272829</td>
-<td>0.214455</td>
-<td>0.926402</td>
-<td>00:09</td>
+<td>0.337343</td>
+<td>0.270820</td>
+<td>0.908879</td>
+<td>00:10</td>
 </tr>
 <tr class="even">
 <td>3</td>
-<td>0.305058</td>
-<td>0.591883</td>
-<td>0.805491</td>
+<td>0.270955</td>
+<td>0.393423</td>
+<td>0.875000</td>
 <td>00:10</td>
 </tr>
 <tr class="odd">
 <td>4</td>
-<td>0.300107</td>
-<td>0.269342</td>
-<td>0.910631</td>
-<td>00:09</td>
+<td>0.238324</td>
+<td>0.197280</td>
+<td>0.935748</td>
+<td>00:10</td>
 </tr>
 <tr class="even">
 <td>5</td>
-<td>0.284960</td>
-<td>0.268985</td>
-<td>0.907710</td>
+<td>0.195583</td>
+<td>0.138654</td>
+<td>0.954439</td>
 <td>00:10</td>
 </tr>
 <tr class="odd">
 <td>6</td>
-<td>0.324666</td>
-<td>0.301217</td>
-<td>0.892523</td>
-<td>00:10</td>
-</tr>
-<tr class="even">
-<td>7</td>
-<td>0.464664</td>
-<td>0.377951</td>
-<td>0.877921</td>
-<td>00:10</td>
-</tr>
-<tr class="odd">
-<td>8</td>
-<td>0.248325</td>
-<td>0.231458</td>
-<td>0.924650</td>
-<td>00:09</td>
-</tr>
-<tr class="even">
-<td>9</td>
-<td>0.221637</td>
-<td>0.188274</td>
-<td>0.936332</td>
-<td>00:10</td>
-</tr>
-<tr class="odd">
-<td>10</td>
-<td>0.202730</td>
-<td>0.250833</td>
-<td>0.921729</td>
-<td>00:10</td>
-</tr>
-<tr class="even">
-<td>11</td>
-<td>0.167961</td>
-<td>0.246925</td>
-<td>0.910631</td>
-<td>00:10</td>
-</tr>
-<tr class="odd">
-<td>12</td>
-<td>0.147837</td>
-<td>0.146140</td>
+<td>0.187248</td>
+<td>0.158549</td>
 <td>0.944509</td>
 <td>00:10</td>
 </tr>
 <tr class="even">
-<td>13</td>
-<td>0.164445</td>
-<td>0.146480</td>
-<td>0.943341</td>
-<td>00:09</td>
-</tr>
-<tr class="odd">
-<td>14</td>
-<td>0.126141</td>
-<td>0.103653</td>
-<td>0.963785</td>
-<td>00:10</td>
-</tr>
-<tr class="even">
-<td>15</td>
-<td>0.112292</td>
-<td>0.123060</td>
-<td>0.960864</td>
+<td>7</td>
+<td>0.117520</td>
+<td>0.124926</td>
+<td>0.955023</td>
 <td>00:10</td>
 </tr>
 <tr class="odd">
-<td>16</td>
-<td>0.091364</td>
-<td>0.090764</td>
-<td>0.966121</td>
+<td>8</td>
+<td>0.117558</td>
+<td>0.102399</td>
+<td>0.961449</td>
 <td>00:10</td>
 </tr>
 <tr class="even">
-<td>17</td>
-<td>0.096191</td>
-<td>0.093275</td>
-<td>0.964953</td>
-<td>00:09</td>
-</tr>
-<tr class="odd">
-<td>18</td>
-<td>0.073260</td>
-<td>0.085704</td>
-<td>0.966706</td>
-<td>00:10</td>
-</tr>
-<tr class="even">
-<td>19</td>
-<td>0.080190</td>
-<td>0.087858</td>
-<td>0.966706</td>
+<td>9</td>
+<td>0.089571</td>
+<td>0.100060</td>
+<td>0.965537</td>
 <td>00:10</td>
 </tr>
 </tbody>
@@ -719,7 +645,7 @@ validation images: 1712</code></pre>
 </ul>
 </blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, metrics<span class="op">=</span>metrics, most_confused_n<span class="op">=</span><span class="dv">5</span>, show_graph<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer,  metrics<span class="op">=</span>metrics, most_confused_n<span class="op">=</span><span class="dv">5</span>, show_graph<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -828,22 +754,22 @@ validation images: 1712</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>              precision    recall  f1-score   support
 
-           0       0.93      0.99      0.96       122
-           1       1.00      1.00      1.00       312
-           2       0.97      0.97      0.97       155
-           3       0.94      0.89      0.91       290
-           4       0.97      0.97      0.97       122
-           5       0.91      0.96      0.93       143
-           6       0.98      0.97      0.97       333
+           0       0.93      0.97      0.95       122
+           1       1.00      0.99      0.99       312
+           2       0.97      0.98      0.98       155
+           3       0.95      0.90      0.93       290
+           4       0.95      0.95      0.95       122
+           5       0.94      0.95      0.95       143
+           6       0.97      0.99      0.98       333
            7       1.00      1.00      1.00       235
 
     accuracy                           0.97      1712
-   macro avg       0.96      0.97      0.96      1712
+   macro avg       0.96      0.97      0.97      1712
 weighted avg       0.97      0.97      0.97      1712
 
 
 Most Confused Classes:
-[('3', '5', 12), ('6', '3', 9), ('3', '0', 8), ('3', '6', 6), ('5', '3', 6)]</code></pre>
+[('3', '6', 12), ('5', '3', 9), ('3', '5', 8), ('3', '0', 7)]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 
@@ -884,15 +810,15 @@ Most Confused Classes:
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Mean</td>
-<td>1.313160</td>
+<td>1.319324</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Median</td>
-<td>1.274517</td>
+<td>1.274769</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Standard Deviation</td>
-<td>0.144572</td>
+<td>0.153524</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Min</td>
@@ -900,15 +826,15 @@ Most Confused Classes:
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Max</td>
-<td>2.273876</td>
+<td>2.273607</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Q1</td>
-<td>1.274059</td>
+<td>1.274172</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Q3</td>
-<td>1.279382</td>
+<td>1.280983</td>
 </tr>
 </tbody>
 </table>
@@ -933,7 +859,7 @@ Most Confused Classes:
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Mean</td>
-<td>0.966706</td>
+<td>0.964953</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Median</td>
@@ -941,7 +867,7 @@ Most Confused Classes:
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Standard Deviation</td>
-<td>0.179404</td>
+<td>0.183898</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Min</td>
@@ -973,10 +899,7 @@ Most Confused Classes:
 </div>
 </section>
 <section id="save-the-model" class="level3">
-<h3 class="anchored" data-anchor-id="save-the-model">Save the model</h3>
-</section>
-<section id="save-the-model-1" class="level3">
-<h3 class="anchored" data-anchor-id="save-the-model-1">Save the Model</h3>
+<h3 class="anchored" data-anchor-id="save-the-model">Save the Model</h3>
 <p>In this step, we will save the trained model using the <code>save</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#visiontrainer"><code>visionTrainer</code></a> class. Saving the model allows us to reuse it later without retraining. This is particularly useful when you want to deploy the model or continue training at a later time.</p>
 <blockquote class="blockquote">
 <ul>
@@ -986,7 +909,10 @@ Most Confused Classes:
 </ul>
 </blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('tmp-model')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>trainer.save(<span class="st">'tmp-model'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Path('models/tmp-model.pth')</code></pre>
+</div>
 </div>
 </section>
 <section id="evaluate-the-model-on-test-data" class="level3">
@@ -1002,17 +928,385 @@ Most Confused Classes:
 </ul>
 </blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>path_test <span class="op">=</span> path<span class="op">/</span><span class="st">'test'</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.test_dl(get_image_files(path_test).shuffle(), with_labels<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of test dataset</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'test images:'</span>, <span class="bu">len</span>(test_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>test_path <span class="op">=</span> path<span class="op">/</span><span class="st">'test'</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.test_dl(get_image_files(test_path).shuffle(), with_labels<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of test dataset</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'test images:'</span>, <span class="bu">len</span>(test_data.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>test images: 107</code></pre>
+<pre><code>test images: 3421</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data, metrics<span class="op">=</span>metrics, show_graph<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data, metrics<span class="op">=</span>metrics, show_graph<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+    <div>
+      <progress value="0" class="" max="107" style="width:300px; height:20px; vertical-align: middle;"></progress>
+      0.00% [0/107 00:00&lt;?]
+    </div>
+    
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              precision    recall  f1-score   support
+
+           0       0.95      0.96      0.96       244
+           1       1.00      0.99      0.99       624
+           2       0.97      0.97      0.97       311
+           3       0.92      0.91      0.91       579
+           4       0.96      0.95      0.96       243
+           5       0.92      0.92      0.92       284
+           6       0.97      0.98      0.98       666
+           7       1.00      1.00      1.00       470
+
+    accuracy                           0.96      3421
+   macro avg       0.96      0.96      0.96      3421
+weighted avg       0.96      0.96      0.96      3421
+
+
+Most Confused Classes:
+[('5', '3', 20), ('3', '5', 18), ('3', '6', 15), ('6', '3', 11), ('2', '3', 7), ('4', '3', 7), ('3', '0', 6), ('0', '3', 5), ('3', '2', 4), ('5', '4', 4), ('1', '6', 3), ('3', '4', 3), ('4', '2', 3), ('5', '0', 3), ('0', '4', 2), ('0', '5', 2), ('6', '2', 2), ('0', '6', 1), ('1', '5', 1), ('2', '4', 1), ('2', '6', 1), ('4', '0', 1), ('4', '5', 1), ('4', '6', 1), ('5', '2', 1), ('6', '0', 1), ('6', '1', 1), ('7', '4', 1)]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">CrossEntropyLossFlat</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>1.324022</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>1.274875</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.162755</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>1.274009</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>2.274009</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>1.274189</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>1.281520</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>0.961999</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.191198</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>1.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="901_tutorial_classification_files/figure-html/cell-12-output-14.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="901_tutorial_classification_files/figure-html/cell-12-output-15.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="load-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="load-the-model">Load the Model</h3>
+<p>In this step, we will load the previously trained model using the <code>load</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#visiontrainer"><code>visionTrainer</code></a> class. In this example, we will:</p>
+<blockquote class="blockquote">
+<ul>
+<li>Create a trainer instance and load the previously saved model.</li>
+<li>Train the model a several epochs more.</li>
+<li>Evaluate the model with test data again.</li>
+</ul>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> resnet34</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CrossEntropyLossFlat()</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> accuracy</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>trainer2 <span class="op">=</span> visionTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load saved model</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>trainer2.load(<span class="st">'tmp-model'</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Train several additional epochs</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>trainer2.fit_one_cycle(<span class="dv">10</span>, lr_max<span class="op">=</span><span class="fl">5e-5</span>)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate the model on the test dataset</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer2, test_data, metrics<span class="op">=</span>metrics, show_graph<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.069121</td>
+<td>0.100168</td>
+<td>0.961449</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.074518</td>
+<td>0.100497</td>
+<td>0.963201</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>0.078700</td>
+<td>0.102849</td>
+<td>0.965537</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0.079255</td>
+<td>0.098410</td>
+<td>0.964953</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.065211</td>
+<td>0.098590</td>
+<td>0.965537</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>0.053837</td>
+<td>0.102926</td>
+<td>0.964369</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.059444</td>
+<td>0.103828</td>
+<td>0.970210</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.054348</td>
+<td>0.099569</td>
+<td>0.963785</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.052112</td>
+<td>0.104379</td>
+<td>0.964953</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.052941</td>
+<td>0.101994</td>
+<td>0.966121</td>
+<td>00:10</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="901_tutorial_classification_files/figure-html/cell-13-output-3.png" class="img-fluid"></p>
+</div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1100,12 +1394,12 @@ Most Confused Classes:
 <div class="cell-output cell-output-stdout">
 <pre><code>              precision    recall  f1-score   support
 
-           0       0.96      0.94      0.95       244
-           1       1.00      1.00      1.00       624
-           2       0.98      0.97      0.98       311
-           3       0.91      0.93      0.92       579
-           4       0.95      0.95      0.95       243
-           5       0.90      0.92      0.91       284
+           0       0.95      0.95      0.95       244
+           1       0.99      1.00      1.00       624
+           2       0.98      0.97      0.97       311
+           3       0.91      0.92      0.92       579
+           4       0.95      0.96      0.95       243
+           5       0.92      0.90      0.91       284
            6       0.98      0.97      0.97       666
            7       1.00      1.00      1.00       470
 
@@ -1115,7 +1409,7 @@ weighted avg       0.96      0.96      0.96      3421
 
 
 Most Confused Classes:
-[('3', '5', 22), ('6', '3', 20), ('5', '3', 15), ('3', '6', 10), ('0', '3', 9), ('5', '4', 7), ('2', '3', 6), ('3', '0', 5), ('4', '3', 5), ('0', '5', 4), ('3', '4', 4), ('4', '5', 4), ('4', '2', 3), ('5', '0', 2), ('0', '4', 1), ('0', '6', 1), ('1', '0', 1), ('2', '1', 1), ('2', '4', 1), ('2', '6', 1), ('3', '2', 1), ('4', '0', 1), ('6', '1', 1), ('6', '2', 1)]</code></pre>
+[('5', '3', 21), ('3', '5', 17), ('6', '3', 13), ('3', '6', 12), ('0', '3', 8), ('2', '3', 6), ('4', '3', 6), ('3', '0', 5), ('5', '4', 5), ('3', '2', 4), ('0', '5', 3), ('3', '4', 3), ('2', '4', 2), ('4', '2', 2), ('6', '1', 2), ('6', '2', 2), ('0', '1', 1), ('0', '4', 1), ('0', '6', 1), ('1', '5', 1), ('2', '6', 1), ('3', '1', 1), ('4', '0', 1), ('4', '6', 1), ('5', '0', 1), ('5', '6', 1)]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 
@@ -1156,15 +1450,15 @@ Most Confused Classes:
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Mean</td>
-<td>1.319366</td>
+<td>1.319491</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Median</td>
-<td>1.274616</td>
+<td>1.274356</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Standard Deviation</td>
-<td>0.156896</td>
+<td>0.161213</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Min</td>
@@ -1172,15 +1466,15 @@ Most Confused Classes:
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Max</td>
-<td>2.274005</td>
+<td>2.274009</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Q1</td>
-<td>1.274069</td>
+<td>1.274054</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Q3</td>
-<td>1.280444</td>
+<td>1.278001</td>
 </tr>
 </tbody>
 </table>
@@ -1205,7 +1499,7 @@ Most Confused Classes:
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Mean</td>
-<td>0.963169</td>
+<td>0.961415</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Median</td>
@@ -1213,7 +1507,7 @@ Most Confused Classes:
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Standard Deviation</td>
-<td>0.188348</td>
+<td>0.192604</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Min</td>
@@ -1237,10 +1531,10 @@ Most Confused Classes:
 </div>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="901_tutorial_classification_files/figure-html/cell-12-output-14.png" class="img-fluid"></p>
+<p><img src="901_tutorial_classification_files/figure-html/cell-13-output-17.png" class="img-fluid"></p>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="901_tutorial_classification_files/figure-html/cell-12-output-15.png" class="img-fluid"></p>
+<p><img src="901_tutorial_classification_files/figure-html/cell-13-output-18.png" class="img-fluid"></p>
 </div>
 </div>
 

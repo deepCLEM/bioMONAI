@@ -105,12 +105,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/00_core_files/figure-html/cell-14-output-4.png">
 <meta property="og:site-name" content="bioMONAI">
 <meta property="og:image:height" content="351">
-<meta property="og:image:width" content="503">
+<meta property="og:image:width" content="516">
 <meta name="twitter:title" content="bioMONAI - Core">
 <meta name="twitter:description" content="bioMONAI core functions">
 <meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/00_core_files/figure-html/cell-14-output-4.png">
 <meta name="twitter:image-height" content="351">
-<meta name="twitter:image-width" content="503">
+<meta name="twitter:image-width" content="516">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -354,6 +354,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#get_device" id="toc-get_device" class="nav-link" data-scroll-target="#get_device">get_device</a></li>
   <li><a href="#img2float" id="toc-img2float" class="nav-link" data-scroll-target="#img2float">img2float</a></li>
   <li><a href="#img2tensor" id="toc-img2tensor" class="nav-link" data-scroll-target="#img2tensor">img2Tensor</a></li>
+  <li><a href="#apply_transforms" id="toc-apply_transforms" class="nav-link" data-scroll-target="#apply_transforms">apply_transforms</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -475,7 +476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>The <code>DataBlock</code> class acts as a container for creating data processing pipelines, allowing easy customization of datasets and data loaders. It enables the definition of item transformations, batch transformations, and dataset split methods, streamlining data preprocessing and loading across various stages of model training.</p>
+<p>The <code>DataBlock</code> class Datablock comes from the fastai library and builds datasets and dataloaders from blocks, acting as a container for creating data processing pipelines, allowing easy customization of datasets and data loaders. It enables the definition of item transformations, batch transformations, and dataset split methods, streamlining data preprocessing and loading across various stages of model training.</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/data/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -533,11 +534,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>*3D fluorescence microscopy image of cells.</p>
 <p>The returned data is a 3D multichannel array with dimensions provided in <code>(z, c, y, x)</code> order. Each voxel has a size of <code>(0.29 0.26 0.26)</code> micrometer. Channel 0 contains cell membranes, channel 1 contains nuclei.*</p>
 <p>The <code>cells3d</code> function returns a sample 3D fluorescence microscopy image. This is a valuable test image for demonstration and analysis, consisting of both cell membrane and nucleus channels. It can serve as a default dataset for evaluating and benchmarking new models and transformations.</p>
+<p>The dataset has the following dimensions: <em>(60,2,256,256)</em>, which are in a <em>(z,c,y,x)</em> order: - z: 60 slices in the image - c: 2 channels where channel 0 represents the cell membrane fluorescence, and channel 1 represents the nuclei fluorescence.<br>
+- y and x, which correspond to the dimensions of each slice</p>
 </section>
 </section>
 <section id="engine" class="level2">
 <h2 class="anchored" data-anchor-id="engine">Engine</h2>
-<p>The engine module provides advanced functionalities for model training, including configurable training loops and evaluation functions tailored for bioinformatics applications.</p>
+<p>The engine module provides advanced functionalities for model training, including configurable training loops and evaluation functions tailored for bioinformatics applications. This module is significantly valuable when there is a need for specific workflows and pipelines that meet specific requirements. For this reason, the classes fastTrainer and visionTrainer have been created, providing tailored implementations inheriting from the Learner class.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L56" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="read_yaml" class="level3">
@@ -554,6 +557,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> dictlist_to_funclist (transform_dicts)</code></pre>
 </blockquote>
+<p>FastTrainer is used for training models in bioinformatics applications, where specific loss functions and optimizers oriented to biological data can be used.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L77" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -731,32 +735,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>path_train <span class="op">=</span> path<span class="op">/</span><span class="st">'train'</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>path_val <span class="op">=</span> path<span class="op">/</span><span class="st">'val'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Dataset 'bloodmnist' is already downloaded and available in '_data/bloodmnist'.</code></pre>
+<pre><code>Downloading https://zenodo.org/records/10519652/files/bloodmnist.npz?download=1 to _data/bloodmnist/bloodmnist.npz
+Using downloaded and verified file: _data/bloodmnist/bloodmnist.npz
+Using downloaded and verified file: _data/bloodmnist/bloodmnist.npz
+Saving training images to _data/bloodmnist...
+Saving validation images to _data/bloodmnist...
+Saving test images to _data/bloodmnist...
+Removed bloodmnist.npz
+Datasets downloaded to _data/bloodmnist
+Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'The BloodMNIST is based on a dataset of individual normal cells, captured from individuals without infection, hematologic or oncologic disease and free of any pharmacologic treatment at the moment of blood collection. It contains a total of 17,092 images and is organized into 8 classes. We split the source dataset with a ratio of 7:1:2 into training, validation and test set. The source images with resolution 3×360×363 pixels are center-cropped into 3×200×200, and then resized into 3×28×28.', 'url': 'https://zenodo.org/records/10519652/files/bloodmnist.npz?download=1', 'MD5': '7053d0359d879ad8a5505303e11de1dc', 'url_64': 'https://zenodo.org/records/10519652/files/bloodmnist_64.npz?download=1', 'MD5_64': '2b94928a2ae4916078ca51e05b6b800b', 'url_128': 'https://zenodo.org/records/10519652/files/bloodmnist_128.npz?download=1', 'MD5_128': 'adace1e0ed228fccda1f39692059dd4c', 'url_224': 'https://zenodo.org/records/10519652/files/bloodmnist_224.npz?download=1', 'MD5_224': 'b718ff6835fcbdb22ba9eacccd7b2601', 'task': 'multi-class', 'label': {'0': 'basophil', '1': 'eosinophil', '2': 'erythroblast', '3': 'immature granulocytes(myelocytes, metamyelocytes and promyelocytes)', '4': 'lymphocyte', '5': 'monocyte', '6': 'neutrophil', '7': 'platelet'}, 'n_channels': 3, 'n_samples': {'train': 11959, 'val': 1712, 'test': 3421}, 'license': 'CC BY 4.0'}</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 35461855/35461855 [00:09&lt;00:00, 3590813.84it/s]
+100%|██████████| 11959/11959 [00:02&lt;00:00, 4998.88it/s]
+100%|██████████| 1712/1712 [00:00&lt;00:00, 5081.19it/s]
+100%|██████████| 3421/3421 [00:00&lt;00:00, 5037.19it/s]</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the dataloader</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.class_from_folder(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    path,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span><span class="st">'train'</span>,</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    valid<span class="op">=</span><span class="st">'val'</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    vocab<span class="op">=</span>info[<span class="st">'label'</span>],</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    bs<span class="op">=</span>batch_size)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                   in_channels<span class="op">=</span><span class="dv">3</span>,   </span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                   num_classes<span class="op">=</span><span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the dataloader</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.class_from_folder(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    path,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span><span class="st">'train'</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    valid<span class="op">=</span><span class="st">'val'</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    vocab<span class="op">=</span>info[<span class="st">'label'</span>],</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    bs<span class="op">=</span>batch_size)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                   in_channels<span class="op">=</span><span class="dv">3</span>,   </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                   num_classes<span class="op">=</span><span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer with configuration from a YAML file </span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"nbs/data_examples/sample_config.yml"</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer with configuration from a YAML file </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"./data_examples/sample_config.yml"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -791,12 +809,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>0.827615</td>
-<td>0.673989</td>
+<td>0.957569</td>
+<td>0.669474</td>
 <td>0.755841</td>
-<td>0.683253</td>
-<td>0.736713</td>
-<td>01:17</td>
+<td>0.682645</td>
+<td>0.767054</td>
+<td>00:12</td>
 </tr>
 </tbody>
 </table>
@@ -808,6 +826,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="00_core_files/figure-html/cell-14-output-4.png" class="img-fluid"></p>
 </div>
 </div>
+<p>VisionTrainer is used for computer vision applications, where image normalization or other computer vision related settings are needed.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L222" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -1075,6 +1094,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="evaluation" class="level2">
 <h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
+<p>The evaluation module provides functionalities for model evaluation, with several customizations available.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L363" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="display_statistics_table" class="level3">
@@ -1129,18 +1149,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p><em>Compute the loss for each prediction-target pair.</em></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="00_core_files/figure-html/cell-23-output-1.png" class="img-fluid"></p>
 </div>
 </div>
+<p>Evaluate_model and evaluate_classification_model are two classes created in order to integrate the evaluation process in a single computation. Evaluate_model can be used on any type of task, whereas evaluate_classification_model is specifically designed for classification tasks.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L398" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -1246,7 +1267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                                 show_table=True, show_results=True,
                                 as_dataframe=True, cmap=&lt;matplotlib.colors
                                 .LinearSegmentedColormap object at
-                                0x7f9f6793d790&gt;)</code></pre>
+                                0x7fafd788fe10&gt;)</code></pre>
 </blockquote>
 <p><em>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</em></p>
 <table class="table">
@@ -1334,7 +1355,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td>cmap</td>
 <td>LinearSegmentedColormap</td>
-<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7f9f6793d790&gt;</td>
+<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7fafd788fe10&gt;</td>
 <td>Color map for the confusion matrix plot.</td>
 </tr>
 </tbody>
@@ -1360,22 +1381,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> get_device ()</code></pre>
 </blockquote>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#get_device"><code>get_device</code></a> function is used to detect if the device the code is executed in has got a CUDA-enabled GPU available. If it doesn’t, it returns CPU.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L547" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L551" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2float" class="level3">
 <h3 class="anchored" data-anchor-id="img2float">img2float</h3>
 <blockquote class="blockquote">
 <pre><code> img2float (image, force_copy=False)</code></pre>
 </blockquote>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#img2float"><code>img2float</code></a> function turns an image into float representation.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L551" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L558" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2tensor" class="level3">
 <h3 class="anchored" data-anchor-id="img2tensor">img2Tensor</h3>
 <blockquote class="blockquote">
 <pre><code> img2Tensor (image)</code></pre>
 </blockquote>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#img2tensor"><code>img2Tensor</code></a> function turns an image into tensor representation after turning it first into float representation.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L565" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="apply_transforms" class="level3">
+<h3 class="anchored" data-anchor-id="apply_transforms">apply_transforms</h3>
+<blockquote class="blockquote">
+<pre><code> apply_transforms (image, transforms)</code></pre>
+</blockquote>
+<p><em>Apply a list of transformations, ensuring at least one is applied.</em></p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>image</td>
+<td>The image to transform</td>
+</tr>
+<tr class="even">
+<td>transforms</td>
+<td>A list of transformations to apply</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <hr>
 
 

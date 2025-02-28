@@ -104,17 +104,17 @@ nbs, follow these steps:
     conda env create --file bioMONAI-env.yml
     ```
 
-4.  **Create a new branch for your changes:**
-
-    ``` bash
-    git checkout -b feature/new-feature
-    ```
-
-5.  **Activate the environment and install MONAI in dev mode:**
+4.  **Activate the environment and install MONAI in dev mode:**
 
     ``` bash
     conda activate bioMONAI-env
     pip install -e .[dev]
+    ```
+
+5.  **Create a new branch for your changes:**
+
+    ``` bash
+    git checkout -b feature/new-feature
     ```
 
 6.  **Make your changes and commit them:**
@@ -144,4 +144,5 @@ issue on GitHub or contact us directly at:
 - Project Lead: [Biagio Mandracchia](mailto:biagio.mandracchia@uva.es)
 - Contributors: [Sara Cruz-Adrados](mailto:sara.cruz.adrados@uva.es),
   [Juan Pita-López](mailto:juan.pita@uva.es), [Rosa-María
-  Menchón-Lara](mailto:rosamaria.menchon@uva.es)
+  Menchón-Lara](mailto:rosamaria.menchon@uva.es), [Miguel Ángel Martín
+  Fernandez](mailto:migmar@uva.es)

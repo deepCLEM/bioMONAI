@@ -384,7 +384,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 <section id="download-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="download-dataset">Download dataset</h2>
-<p>In the next cell, we will download a subset of the RXRX1 dataset from the MONAI repository. This dataset contains multispectral images that we will use for our classification task. The <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#download_file"><code>download_file</code></a> function is used to download and extract the dataset to a specified directory.</p>
+<p>In the next cell, we will download a subset of the RXRX1 dataset from the MONAI repository. This dataset contains multispectral images that we will use for our classification task. The <code>download_file</code> function is used to download and extract the dataset to a specified directory.</p>
 <ul>
 <li>The dataset URL is specified, and a hash is provided to ensure data integrity.</li>
 <li>The <code>extract</code> parameter is set to <code>True</code> to automatically extract the downloaded zip file.</li>
@@ -457,7 +457,7 @@ Extracted files have been saved to: ../_data</code></pre>
 </section>
 <section id="split-dataset-into-train-validation-and-test-sets" class="level2">
 <h2 class="anchored" data-anchor-id="split-dataset-into-train-validation-and-test-sets">Split Dataset into Train, Validation, and Test Sets</h2>
-<p>In the next cell, we will split the updated metadata CSV file into training, validation, and test sets. This step is essential for training and evaluating our classification model. The <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#split_dataframe"><code>split_dataframe</code></a> function is used to perform the split based on the specified fractions.</p>
+<p>In the next cell, we will split the updated metadata CSV file into training, validation, and test sets. This step is essential for training and evaluating our classification model. The <code>split_dataframe</code> function is used to perform the split based on the specified fractions.</p>
 <ul>
 <li>The <code>train_fraction</code> parameter determines the proportion of the dataset to be used for training.</li>
 <li>The <code>valid_fraction</code> parameter determines the proportion of the dataset to be used for validation.</li>
@@ -494,11 +494,11 @@ Extracted files have been saved to: ../_data</code></pre>
 <h2 class="anchored" data-anchor-id="data-augmentation-and-dataloader-preparation">Data Augmentation and DataLoader Preparation</h2>
 <p>In the next cell, we will define the data augmentation techniques and prepare the data loaders for training and validation. Data augmentation is crucial for improving the generalization of our model by artificially increasing the diversity of the training dataset. We will use a combination of intensity scaling, random cropping, rotation, and flipping transformations.</p>
 <ul>
-<li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#scaleintensitypercentiles"><code>ScaleIntensityPercentiles</code></a> transformation scales the intensity values of the images based on the specified percentiles.</li>
+<li>The <code>ScaleIntensityPercentiles</code> transformation scales the intensity values of the images based on the specified percentiles.</li>
 <li>The <code>RandomResizedCrop</code> transformation randomly crops the images to the specified size with a random scale.</li>
-<li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#randrot90"><code>RandRot90</code></a> transformation randomly rotates the images by 90 degrees with the specified probability.</li>
-<li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#randflip"><code>RandFlip</code></a> transformation randomly flips the images horizontally or vertically with the specified probability.</li>
-<li>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders.class_from_csv"><code>BioDataLoaders.class_from_csv</code></a> function is used to create the data loaders from the CSV file containing the image paths and labels.</li>
+<li>The <code>RandRot90</code> transformation randomly rotates the images by 90 degrees with the specified probability.</li>
+<li>The <code>RandFlip</code> transformation randomly flips the images horizontally or vertically with the specified probability.</li>
+<li>The <code>BioDataLoaders.class_from_csv</code> function is used to create the data loaders from the CSV file containing the image paths and labels.</li>
 </ul>
 <blockquote class="blockquote">
 <ul>
@@ -540,7 +540,7 @@ validation images: 71</code></pre>
 </section>
 <section id="visualize-data-batch" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-data-batch">Visualize Data Batch</h2>
-<p>In the next cell, we will visualize a batch of images from the training dataset. This step is essential for verifying that the data augmentation techniques are applied correctly and that the images are loaded as expected. The <a href="https://deepCLEM.github.io/bioMONAI/data.html#show_batch"><code>show_batch</code></a> method of the <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> class is used to display a batch of images with their corresponding labels.</p>
+<p>In the next cell, we will visualize a batch of images from the training dataset. This step is essential for verifying that the data augmentation techniques are applied correctly and that the images are loaded as expected. The <code>show_batch</code> method of the <code>BioDataLoaders</code> class is used to display a batch of images with their corresponding labels.</p>
 <ul>
 <li>The <code>max_slices</code> parameter specifies the maximum number of slices to display for each image.</li>
 <li>The <code>layout</code> parameter determines the layout of the displayed images. The ‘multirow’ layout arranges the images in multiple rows.</li>
@@ -561,7 +561,7 @@ validation images: 71</code></pre>
 </section>
 <section id="visualize-a-specific-image" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-a-specific-image">Visualize a Specific Image</h2>
-<p>In the next cell, we will visualize a specific image from the dataset using its index. This step is useful for inspecting individual images and verifying their quality and labels. The <code>do_item</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> class is used to retrieve the image and its label, and the <code>show</code> method is used to display the image.</p>
+<p>In the next cell, we will visualize a specific image from the dataset using its index. This step is useful for inspecting individual images and verifying their quality and labels. The <code>do_item</code> method of the <code>BioDataLoaders</code> class is used to retrieve the image and its label, and the <code>show</code> method is used to display the image.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> data.do_item(<span class="dv">100</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>a[<span class="dv">0</span>].show(max_slices<span class="op">=</span><span class="dv">6</span>, layout<span class="op">=</span><span class="st">'multirow'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -575,7 +575,7 @@ validation images: 71</code></pre>
 <h2 class="anchored" data-anchor-id="define-and-train-the-model">Define and Train the Model</h2>
 <p>In the next cell, we will define and train a DenseNet169 model for our multispectral classification task. The model is initialized with the following parameters: - <code>spatial_dims=2</code>: Specifies that the input images are 2D. - <code>in_channels=6</code>: Specifies the number of input channels, which corresponds to the six multispectral channels. - <code>out_channels=data.c</code>: Specifies the number of output channels, which corresponds to the number of classes in our dataset. - <code>pretrained=True</code>: Initializes the model with pretrained weights.</p>
 <p>We will also define the metrics to evaluate the model’s performance during training. The <code>RocAuc</code> and <code>accuracy</code> metrics are used to measure the model’s performance.</p>
-<p>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class is used to train the model with the specified data loaders and metrics. The <code>fine_tune</code> method is called to fine-tune the model for a specified number of epochs, with an initial phase of freezing the pretrained layers.</p>
+<p>The <code>fastTrainer</code> class is used to train the model with the specified data loaders and metrics. The <code>fine_tune</code> method is called to fine-tune the model for a specified number of epochs, with an initial phase of freezing the pretrained layers.</p>
 <blockquote class="blockquote">
 <ul>
 <li>You can experiment with different model architectures by replacing <code>DenseNet169</code> with other models from the <code>monai.networks.nets</code> module.</li>
@@ -724,10 +724,10 @@ validation images: 71</code></pre>
 </section>
 <section id="save-the-trained-model" class="level2">
 <h2 class="anchored" data-anchor-id="save-the-trained-model">Save the Trained Model</h2>
-<p>In the next cell, we will save the trained model to a file. This step is crucial for preserving the model’s state after training, allowing us to load and use the model later without retraining. The <code>save</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class is used to save the model to the specified file path.</p>
+<p>In the next cell, we will save the trained model to a file. This step is crucial for preserving the model’s state after training, allowing us to load and use the model later without retraining. The <code>save</code> method of the <code>fastTrainer</code> class is used to save the model to the specified file path.</p>
 <ul>
 <li>The <code>save</code> method takes the file name as an argument and saves the model’s state dictionary to a file with the <code>.pth</code> extension.</li>
-<li>The saved model can be loaded later using the <code>load</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class.</li>
+<li>The saved model can be loaded later using the <code>load</code> method of the <code>fastTrainer</code> class.</li>
 </ul>
 <blockquote class="blockquote">
 <ul>
@@ -746,15 +746,15 @@ validation images: 71</code></pre>
 </section>
 <section id="evaluate-the-model-on-test-data" class="level2">
 <h2 class="anchored" data-anchor-id="evaluate-the-model-on-test-data">Evaluate the Model on Test Data</h2>
-<p>In the next cell, we will evaluate the trained model on the test dataset. This step is crucial for assessing the model’s performance on unseen data and understanding its generalization capabilities. The <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders.class_from_csv"><code>BioDataLoaders.class_from_csv</code></a> function is used to create the data loader for the test dataset, and the <a href="https://deepCLEM.github.io/bioMONAI/core.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function is used to compute the evaluation metrics.</p>
+<p>In the next cell, we will evaluate the trained model on the test dataset. This step is crucial for assessing the model’s performance on unseen data and understanding its generalization capabilities. The <code>BioDataLoaders.class_from_csv</code> function is used to create the data loader for the test dataset, and the <code>evaluate_classification_model</code> function is used to compute the evaluation metrics.</p>
 <ul>
 <li>The <code>fn_col</code> parameter specifies the columns containing the file paths for the multispectral channels.</li>
 <li>The <code>label_col</code> parameter specifies the column containing the labels.</li>
 <li>The <code>valid_pct</code> parameter is set to 0, indicating that no validation split is needed for the test dataset.</li>
-<li>The <code>item_tfms</code> parameter applies the <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#scaleintensitypercentiles"><code>ScaleIntensityPercentiles</code></a> transformation to the test images.</li>
+<li>The <code>item_tfms</code> parameter applies the <code>ScaleIntensityPercentiles</code> transformation to the test images.</li>
 <li>The <code>batch_tfms</code> parameter applies any batch-level transformations (if defined).</li>
 <li>The <code>bs</code> parameter specifies the batch size for loading the test data.</li>
-<li>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function takes the trained model, test data loader, and evaluation metrics as inputs and returns the computed scores.</li>
+<li>The <code>evaluate_classification_model</code> function takes the trained model, test data loader, and evaluation metrics as inputs and returns the computed scores.</li>
 </ul>
 <blockquote class="blockquote">
 <ul>

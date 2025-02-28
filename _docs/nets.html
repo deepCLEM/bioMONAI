@@ -324,7 +324,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#get_padding" id="toc-get_padding" class="nav-link" data-scroll-target="#get_padding">get_padding</a></li>
   <li><a href="#deeplabconfig" id="toc-deeplabconfig" class="nav-link" data-scroll-target="#deeplabconfig">DeeplabConfig</a></li>
   <li><a href="#blocks" id="toc-blocks" class="nav-link" data-scroll-target="#blocks">Blocks</a></li>
-  <li><a href="#block" id="toc-block" class="nav-link" data-scroll-target="#block">Block</a></li>
   <li><a href="#separableconv" id="toc-separableconv" class="nav-link" data-scroll-target="#separableconv">SeparableConv</a></li>
   <li><a href="#aligned-xception" id="toc-aligned-xception" class="nav-link" data-scroll-target="#aligned-xception">Aligned Xception</a></li>
   <li><a href="#xception" id="toc-xception" class="nav-link" data-scroll-target="#xception">Xception</a></li>
@@ -510,8 +509,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="deeplab-v3" class="level2">
 <h2 class="anchored" data-anchor-id="deeplab-v3">DeepLab v3+</h2>
+<p><code>DeepLabv3</code> is a semantic segmentation architecture that handles the problem of segmenting objects at multiple scales. It uses the Atroys Spatial Pyramid Pooling module, and introduces various updates with respect to other versions.</p>
 <section id="config" class="level3">
 <h3 class="anchored" data-anchor-id="config">Config</h3>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#deeplabconfig"><code>DeeplabConfig</code></a> class has been created to centralize all settings and hyperparameters in one place. It uses two main functions: Get_padding and interpolate. Get_padding is a function that calculates the amount of padding needed for a convolution operation to get the desired output size. Interpolate is a function that allows the resizing of a tensor using interpolation.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L149" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -602,106 +603,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="blocks" class="level3">
 <h3 class="anchored" data-anchor-id="blocks">Blocks</h3>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L201" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="block" class="level3">
-<h3 class="anchored" data-anchor-id="block">Block</h3>
-<blockquote class="blockquote">
-<pre><code> Block (config:__main__.DeeplabConfig, inplanes:int, planes:int, reps:int,
-        stride:int=1, dilation:int=1, start_with_relu:bool=True,
-        grow_first:bool=True, is_last:bool=False)</code></pre>
-</blockquote>
-<p>*Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
-<colgroup>
-<col style="width: 6%">
-<col style="width: 25%">
-<col style="width: 34%">
-<col style="width: 34%">
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th><strong>Type</strong></th>
-<th><strong>Default</strong></th>
-<th><strong>Details</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>config</td>
-<td>DeeplabConfig</td>
-<td></td>
-<td>Configuration for the Deeplab model</td>
-</tr>
-<tr class="even">
-<td>inplanes</td>
-<td>int</td>
-<td></td>
-<td>Number of input channels</td>
-</tr>
-<tr class="odd">
-<td>planes</td>
-<td>int</td>
-<td></td>
-<td>Number of output channels</td>
-</tr>
-<tr class="even">
-<td>reps</td>
-<td>int</td>
-<td></td>
-<td>Number of convolutional layers</td>
-</tr>
-<tr class="odd">
-<td>stride</td>
-<td>int</td>
-<td>1</td>
-<td>Stride for the convolution</td>
-</tr>
-<tr class="even">
-<td>dilation</td>
-<td>int</td>
-<td>1</td>
-<td>Dilation rate for the convolution</td>
-</tr>
-<tr class="odd">
-<td>start_with_relu</td>
-<td>bool</td>
-<td>True</td>
-<td>If True, start with a ReLU activation</td>
-</tr>
-<tr class="even">
-<td>grow_first</td>
-<td>bool</td>
-<td>True</td>
-<td>If True, increase the number of channels in the first convolution</td>
-</tr>
-<tr class="odd">
-<td>is_last</td>
-<td>bool</td>
-<td>False</td>
-<td>If True, add a convolution layer at the end</td>
-</tr>
-</tbody>
-</table>
+<p><a href="https://deepCLEM.github.io/bioMONAI/nets.html#separableconv"><code>SeparableConv</code></a> is a class that carries out a type of convolution operation that splits the traditional convolution into two parts: depthwise convolution (a convolution filter for each channel independently), and pointwise convolution (combines the outputs of the depthwise convolution).</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L161" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -790,11 +692,69 @@ class Model(nn.Module):
 </tr>
 </tbody>
 </table>
+<p><code>Block</code> is a class that combines multiple separable convolutional layers and residual connections.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Block(nn.Module):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, config: DeeplabConfig, <span class="co"># Configuration for the Deeplab model</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                 inplanes: <span class="bu">int</span>, <span class="co"># Number of input channels</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                 planes: <span class="bu">int</span>, <span class="co"># Number of output channels</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                 reps: <span class="bu">int</span>, <span class="co"># Number of convolutional layers</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                 stride: <span class="bu">int</span> <span class="op">=</span> <span class="dv">1</span>,  <span class="co"># Stride for the convolution</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                 dilation: <span class="bu">int</span> <span class="op">=</span> <span class="dv">1</span>, <span class="co"># Dilation rate for the convolution</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                 start_with_relu: <span class="bu">bool</span> <span class="op">=</span> <span class="va">True</span>, <span class="co"># If True, start with a ReLU activation</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                 grow_first: <span class="bu">bool</span> <span class="op">=</span> <span class="va">True</span>, <span class="co"># If True, increase the number of channels in the first convolution</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                 is_last: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>, <span class="co"># If True, add a convolution layer at the end</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                 ):</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> planes <span class="op">!=</span> inplanes <span class="kw">or</span> stride <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.skip <span class="op">=</span> Convolution(config.dimensions, inplanes, planes, kernel_size<span class="op">=</span><span class="dv">1</span>, bias<span class="op">=</span><span class="va">False</span>, </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                                    strides<span class="op">=</span>stride, norm<span class="op">=</span>Norm.BATCH)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.skip <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.relu <span class="op">=</span> nn.ReLU(inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        rep <span class="op">=</span> []</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        filters <span class="op">=</span> inplanes</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> grow_first:</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>            rep.append(<span class="va">self</span>.relu)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>            rep.append(SeparableConv(config, inplanes, planes, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">1</span>, dilation<span class="op">=</span>dilation, norm<span class="op">=</span>Norm.BATCH))</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>            filters <span class="op">=</span> planes</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(reps <span class="op">-</span> <span class="dv">1</span>):</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>            rep.append(<span class="va">self</span>.relu)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            rep.append(SeparableConv(config, filters, filters, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">1</span>, dilation<span class="op">=</span>dilation, norm<span class="op">=</span>Norm.BATCH))</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> grow_first:</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>            rep.append(<span class="va">self</span>.relu)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>            rep.append(SeparableConv(config, inplanes, planes, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">1</span>, dilation<span class="op">=</span>dilation, norm<span class="op">=</span>Norm.BATCH))</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> start_with_relu:</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>            rep <span class="op">=</span> rep[<span class="dv">1</span>:]</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> stride <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>            rep.append(SeparableConv(config, planes, planes, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> stride <span class="op">==</span> <span class="dv">1</span> <span class="kw">and</span> is_last:</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>            rep.append(SeparableConv(config, planes, planes, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rep <span class="op">=</span> nn.Sequential(<span class="op">*</span>rep)</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, inp: torch_Tensor) <span class="op">-&gt;</span> torch_Tensor:</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.rep(inp)</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.skip <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>            skip <span class="op">=</span> <span class="va">self</span>.skip(inp)</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>            skip <span class="op">=</span> inp</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>        x <span class="op">+=</span> skip</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="aligned-xception" class="level3">
 <h3 class="anchored" data-anchor-id="aligned-xception">Aligned Xception</h3>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#xception"><code>Xception</code></a> class defines the Xception Neural Network used in DeepLab.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L257" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L202" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="xception" class="level3">
 <h3 class="anchored" data-anchor-id="xception">Xception</h3>
@@ -838,8 +798,9 @@ class Model(nn.Module):
 </section>
 <section id="aspp" class="level3">
 <h3 class="anchored" data-anchor-id="aspp">ASPP</h3>
+<p>The class <a href="https://deepCLEM.github.io/bioMONAI/nets.html#aspp_module"><code>ASPP_module</code></a> to compute the Atroys Spatial Pyramid Pooling method and create the convolution that uses it.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L316" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L261" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="aspp_module" class="level3">
 <h3 class="anchored" data-anchor-id="aspp_module">ASPP_module</h3>
@@ -899,8 +860,9 @@ class Model(nn.Module):
 </section>
 <section id="deeplab-v3-1" class="level3">
 <h3 class="anchored" data-anchor-id="deeplab-v3-1">DeepLab V3</h3>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#deeplab"><code>Deeplab</code></a> class combines the different modules to make the DeepLab V3 architecture.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L335" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L280" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="deeplab" class="level3">
 <h3 class="anchored" data-anchor-id="deeplab">Deeplab</h3>
@@ -928,107 +890,107 @@ class Model(nn.Module):
 <section id="example" class="level4">
 <h4 class="anchored" data-anchor-id="example">Example</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a pre-trained ResNet backbone</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>resnet_backbone <span class="op">=</span> ResNetFeatures(<span class="st">'resnet10'</span>, pretrained<span class="op">=</span><span class="va">False</span>, in_channels<span class="op">=</span><span class="dv">1</span>, spatial_dims<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Forward pass through the backbone to get the output before the final classifier</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>dummy_input <span class="op">=</span> torch_randn(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">64</span>, <span class="dv">224</span>, <span class="dv">224</span>)  <span class="co"># Example input size; adjust based on your needs</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> resnet_backbone(dummy_input)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The shape of 'output' will give you the number of channels at this stage in the backbone</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Output channels:"</span>, output[<span class="op">-</span><span class="dv">1</span>].shape[<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a pre-trained ResNet backbone</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>resnet_backbone <span class="op">=</span> ResNetFeatures(<span class="st">'resnet10'</span>, pretrained<span class="op">=</span><span class="va">False</span>, in_channels<span class="op">=</span><span class="dv">1</span>, spatial_dims<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Forward pass through the backbone to get the output before the final classifier</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>dummy_input <span class="op">=</span> torch_randn(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">64</span>, <span class="dv">224</span>, <span class="dv">224</span>)  <span class="co"># Example input size; adjust based on your needs</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> resnet_backbone(dummy_input)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The shape of 'output' will give you the number of channels at this stage in the backbone</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Output channels:"</span>, output[<span class="op">-</span><span class="dv">1</span>].shape[<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Output channels: 512</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For 2D images</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>config_2d <span class="op">=</span> DeeplabConfig(</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">3</span>,  <span class="co"># For RGB images</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"xception"</span>,  <span class="co"># or whatever backbone you're using</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>model_2d <span class="op">=</span> Deeplab(config_2d)</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># For 3D images</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>config_3d <span class="op">=</span> DeeplabConfig(</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,  <span class="co"># For single-channel 3D medical images</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    middle_flow_blocks<span class="op">=</span><span class="dv">16</span>,</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>model_3d <span class="op">=</span> Deeplab(config_3d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For 2D images</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>config_2d <span class="op">=</span> DeeplabConfig(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">3</span>,  <span class="co"># For RGB images</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"xception"</span>,  <span class="co"># or whatever backbone you're using</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>model_2d <span class="op">=</span> Deeplab(config_2d)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># For 3D images</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>config_3d <span class="op">=</span> DeeplabConfig(</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,  <span class="co"># For single-channel 3D medical images</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    middle_flow_blocks<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>model_3d <span class="op">=</span> Deeplab(config_3d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> no_grad <span class="im">as</span> torch_no_grad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> no_grad <span class="im">as</span> torch_no_grad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_deeplab(config, input_shape, expected_output_shape):</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    set_determinism(<span class="dv">0</span>)  <span class="co"># For reproducibility</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> Deeplab(config)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()  <span class="co"># Set the model to evaluation mode</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Generate random input tensor</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> torch_randn(<span class="op">*</span>input_shape)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Forward pass</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch_no_grad():</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> model(x)</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check output shape</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> output.shape <span class="op">==</span> expected_output_shape, <span class="ss">f"Expected shape </span><span class="sc">{</span>expected_output_shape<span class="sc">}</span><span class="ss">, but got </span><span class="sc">{</span>output<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Test passed for </span><span class="sc">{</span>config<span class="sc">.</span>dimensions<span class="sc">}</span><span class="ss">D model with backbone </span><span class="sc">{</span>config<span class="sc">.</span>backbone<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Input shape: </span><span class="sc">{</span>input_shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Output shape: </span><span class="sc">{</span>output<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_deeplab(config, input_shape, expected_output_shape):</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    set_determinism(<span class="dv">0</span>)  <span class="co"># For reproducibility</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> Deeplab(config)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()  <span class="co"># Set the model to evaluation mode</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Generate random input tensor</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> torch_randn(<span class="op">*</span>input_shape)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Forward pass</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch_no_grad():</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> model(x)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check output shape</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> output.shape <span class="op">==</span> expected_output_shape, <span class="ss">f"Expected shape </span><span class="sc">{</span>expected_output_shape<span class="sc">}</span><span class="ss">, but got </span><span class="sc">{</span>output<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Test passed for </span><span class="sc">{</span>config<span class="sc">.</span>dimensions<span class="sc">}</span><span class="ss">D model with backbone </span><span class="sc">{</span>config<span class="sc">.</span>backbone<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Input shape: </span><span class="sc">{</span>input_shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Output shape: </span><span class="sc">{</span>output<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 2D model</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>config_2d <span class="op">=</span> DeeplabConfig(</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"xception"</span>,</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_2d, (<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 2D model with ResNet50 backbone</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>config_2d_resnet <span class="op">=</span> DeeplabConfig(</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"resnet50"</span>,</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_2d_resnet, (<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 3D model</span></span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>config_3d <span class="op">=</span> DeeplabConfig(</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"xception"</span>,</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_3d, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 3D model with ResNet10 backbone</span></span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>config_3d_resnet <span class="op">=</span> DeeplabConfig(</span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"resnet10"</span>,</span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_3d_resnet, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
-<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All tests passed successfully!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 2D model</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>config_2d <span class="op">=</span> DeeplabConfig(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"xception"</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_2d, (<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 2D model with ResNet50 backbone</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>config_2d_resnet <span class="op">=</span> DeeplabConfig(</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"resnet50"</span>,</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_2d_resnet, (<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 3D model</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>config_3d <span class="op">=</span> DeeplabConfig(</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"xception"</span>,</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_3d, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 3D model with ResNet10 backbone</span></span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>config_3d_resnet <span class="op">=</span> DeeplabConfig(</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>    backbone<span class="op">=</span><span class="st">"resnet10"</span>,</span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>    aspp_dilations<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">6</span>, <span class="dv">12</span>, <span class="dv">18</span>]</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>test_deeplab(config_3d_resnet, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>), (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">64</span>))</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All tests passed successfully!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Test passed for 2D model with backbone xception
 Input shape: (1, 3, 64, 64)
@@ -1055,7 +1017,7 @@ All tests passed successfully!</code></pre>
 <section id="umamba" class="level2">
 <h2 class="anchored" data-anchor-id="umamba">UMamba</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L420" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L365" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="mambalayer" class="level3">
 <h3 class="anchored" data-anchor-id="mambalayer">MambaLayer</h3>
 <blockquote class="blockquote">
@@ -1105,7 +1067,7 @@ All tests passed successfully!</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L471" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L416" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="umamba-1" class="level3">
 <h3 class="anchored" data-anchor-id="umamba-1">UMamba</h3>
@@ -1126,21 +1088,21 @@ All tests passed successfully!</code></pre>
 <section id="example-1" class="level4">
 <h4 class="anchored" data-anchor-id="example-1">Example</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> DynUNet(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>])</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> DynUNet(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>])</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch.Size([16, 1, 32, 64])</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>).cuda()</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> UMamba(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>]).cuda()</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>).cuda()</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> UMamba(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>]).cuda()</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tst(x).shape)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>test_eq(tst(x).shape, x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch.Size([16, 1, 32, 64])</code></pre>
 </div>

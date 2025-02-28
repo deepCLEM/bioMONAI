@@ -329,8 +329,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#display-a-batch-of-images" id="toc-display-a-batch-of-images" class="nav-link" data-scroll-target="#display-a-batch-of-images">Display a Batch of Images</a></li>
   <li><a href="#load-and-train-a-3d-model" id="toc-load-and-train-a-3d-model" class="nav-link" data-scroll-target="#load-and-train-a-3d-model">Load and train a 3D model</a></li>
   <li><a href="#train-the-model" id="toc-train-the-model" class="nav-link" data-scroll-target="#train-the-model">Train the Model</a></li>
+  <li><a href="#evaluate-the-model-on-validation-data" id="toc-evaluate-the-model-on-validation-data" class="nav-link" data-scroll-target="#evaluate-the-model-on-validation-data">Evaluate the Model on Validation Data</a></li>
   <li><a href="#save-the-trained-model" id="toc-save-the-trained-model" class="nav-link" data-scroll-target="#save-the-trained-model">Save the Trained Model</a></li>
   <li><a href="#evaluate-the-model-on-test-data" id="toc-evaluate-the-model-on-test-data" class="nav-link" data-scroll-target="#evaluate-the-model-on-test-data">Evaluate the Model on Test Data</a></li>
+  <li><a href="#load-the-model" id="toc-load-the-model" class="nav-link" data-scroll-target="#load-the-model">Load the Model</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -397,21 +399,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>val_path <span class="op">=</span> data_path<span class="op">/</span><span class="st">'val'</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>test_path <span class="op">=</span> data_path<span class="op">/</span><span class="st">'test'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Downloading https://zenodo.org/records/10519652/files/synapsemnist3d.npz?download=1 to ../_data/medmnist_data/synapsemnist3d/synapsemnist3d.npz
-Using downloaded and verified file: ../_data/medmnist_data/synapsemnist3d/synapsemnist3d.npz
-Using downloaded and verified file: ../_data/medmnist_data/synapsemnist3d/synapsemnist3d.npz
-Saving training images to ../_data/medmnist_data/synapsemnist3d...
-Saving validation images to ../_data/medmnist_data/synapsemnist3d...
-Saving test images to ../_data/medmnist_data/synapsemnist3d...
-Removed synapsemnist3d.npz
-Datasets downloaded to ../_data/medmnist_data/synapsemnist3d
-Dataset info for 'synapsemnist3d': {'python_class': 'SynapseMNIST3D', 'description': 'The SynapseMNIST3D is a new 3D volume dataset to classify whether a synapse is excitatory or inhibitory. It uses a 3D image volume of an adult rat acquired by a multi-beam scanning electron microscope. The original data is of the size 100×100×100um^3 and the resolution 8×8×30nm^3, where a (30um)^3 sub-volume was used in the MitoEM dataset with dense 3D mitochondria instance segmentation labels. Three neuroscience experts segment a pyramidal neuron within the whole volume and proofread all the synapses on this neuron with excitatory/inhibitory labels. For each labeled synaptic location, we crop a 3D volume of 1024×1024×1024nm^3 and resize it into 28×28×28 voxels. Finally, the dataset is randomly split with a ratio of 7:1:2 into training, validation and test set.', 'url': 'https://zenodo.org/records/10519652/files/synapsemnist3d.npz?download=1', 'MD5': '1235b78a3cd6280881dd7850a78eadb6', 'url_64': 'https://zenodo.org/records/10519652/files/synapsemnist3d_64.npz?download=1', 'MD5_64': '43bd14ebf3af9d3dd072446fedc14d5e', 'task': 'binary-class', 'label': {'0': 'inhibitory synapse', '1': 'excitatory synapse'}, 'n_channels': 1, 'n_samples': {'train': 1230, 'val': 177, 'test': 352}, 'license': 'CC BY 4.0'}</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>100%|██████████| 38034583/38034583 [00:03&lt;00:00, 11376652.92it/s]
-100%|██████████| 1230/1230 [00:00&lt;00:00, 2872.15it/s]
-100%|██████████| 177/177 [00:00&lt;00:00, 2822.73it/s]
-100%|██████████| 352/352 [00:00&lt;00:00, 2847.26it/s]</code></pre>
+<pre><code>Dataset 'synapsemnist3d' is already downloaded and available in '../_data/medmnist_data/synapsemnist3d'.</code></pre>
 </div>
 </div>
 </section>
@@ -420,7 +408,8 @@ Dataset info for 'synapsemnist3d': {'python_class': 'SynapseMNIST3D', 'descripti
 </section>
 <section id="customize-dataloader" class="level3">
 <h3 class="anchored" data-anchor-id="customize-dataloader">Customize DataLoader</h3>
-<p>In the next cell, we will create a DataLoader for the SynapseMNIST3D dataset. The <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders.class_from_folder"><code>BioDataLoaders.class_from_folder</code></a> function is used to load the dataset from the specified paths and apply transformations to the images.</p>
+<p>In the next cell, we will create a DataLoader for the SynapseMNIST3D dataset.</p>
+<p>The <code>BioDataLoaders.class_from_folder()</code> method is used to load the dataset from the specified paths and apply transformations to the images. This method is designed for classification tasks and datasets organized in folders. Indeed, it assumes that the images are organized in subfolders whose names represents the image labels.</p>
 <p>We will set the batch size to 8 and apply the following transformations: - <code>ScaleIntensity()</code>: Scales the intensity of the images. - <code>RandRot90(prob=0.5, spatial_axes=(1,2))</code>: Randomly rotates the images by 90 degrees with a probability of 0.5 along the specified spatial axes. - <code>Resize(32)</code>: Resizes the images to 32x32x32.</p>
 <p>You can customize the DataLoader by changing the batch size, adding or removing transformations, or modifying the paths to the dataset. For example, you can increase the batch size for faster training or add more complex transformations to augment the dataset.</p>
 <p>The <code>show_summary</code> parameter is set to <code>True</code> to display a summary of the dataset and transformations applied.</p>
@@ -442,24 +431,27 @@ Dataset info for 'synapsemnist3d': {'python_class': 'SynapseMNIST3D', 'descripti
 <section id="example-usage" class="level4">
 <h4 class="anchored" data-anchor-id="example-usage">Example Usage:</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">4</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.class_from_folder(</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    data_path,                              <span class="co"># root directory for data</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span><span class="st">'train'</span>,                          <span class="co"># folder for training data    </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    valid<span class="op">=</span><span class="st">'val'</span>,                            <span class="co"># folder for validation data</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    vocab<span class="op">=</span>info[<span class="st">'label'</span>],                    <span class="co"># list of class labels</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    item_tfms<span class="op">=</span>[ScaleIntensity(),</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>               RandRot90(prob<span class="op">=</span><span class="fl">0.75</span>, spatial_axes<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">2</span>)), </span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>               Resize(<span class="dv">32</span>)],                 <span class="co"># transformations to apply to each image</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span><span class="va">None</span>,                        <span class="co"># transformations to apply to each batch</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    img_cls<span class="op">=</span>BioImageStack,                  <span class="co"># class to use for images</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    bs<span class="op">=</span>batch_size,                          <span class="co"># batch size</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,                      <span class="co"># print summary of the data</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>data_ops <span class="op">=</span> {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'train'</span>: <span class="st">'train'</span>,                                       <span class="co"># folder for training data</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'valid'</span>: <span class="st">'val'</span>,                                           <span class="co"># folder for validation data</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'vocab'</span>: info[<span class="st">'label'</span>],                                 <span class="co"># list of class labels</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'img_cls'</span>: BioImageStack,                               <span class="co"># class to use for images</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'bs'</span>: batch_size,                                       <span class="co"># batch size</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'batch_tfms'</span>: <span class="va">None</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'item_tfms'</span>: [ScaleIntensity(),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                RandRot90(prob<span class="op">=</span><span class="fl">0.75</span>, spatial_axes<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">2</span>)), </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                Resize(<span class="dv">32</span>)],</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.class_from_folder(</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    data_path,                              <span class="co"># root directory for data</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,                     <span class="co"># print summary of the data</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,                             <span class="co"># rest of the method arguments</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>train images: 1230 
 validation images: 177</code></pre>
@@ -474,7 +466,7 @@ validation images: 177</code></pre>
 <p>For example, you can set <code>max_n=4</code> to display only 4 images from the batch, or set <code>figsize=(10, 10)</code> to increase the size of the displayed images.</p>
 <p>This visualization step is useful for verifying that the images have been loaded and transformed correctly before proceeding with model training.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>data.show_batch()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data.show_batch()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="902_tutorial_classification3D_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
 </div>
@@ -490,16 +482,20 @@ validation images: 177</code></pre>
 <p>The <code>trainer.fit(20)</code> method will train the model for 20 epochs.</p>
 <p>You can customize the training process by modifying the following parameters: - <code>model</code>: Change the model architecture to another 3D model, such as <code>DenseNet169</code>. - <code>loss_fn</code>: Use a different loss function, such as <code>FocalLoss</code>. - <code>metrics</code>: Add more metrics to evaluate the model, such as <code>Precision</code> or <code>Recall</code>. - <code>show_summary</code>: Set to <code>False</code> if you do not want to display the model summary. - <code>find_lr</code>: Set to <code>False</code> if you do not want to find the optimal learning rate.</p>
 <p>For example, you can add more metrics to the <code>metrics</code> list to get a more comprehensive evaluation of the model’s performance.</p>
+<p>You can customize the training process by modifying the following parameters: - <code>epochs</code>: Change the number of epochs to train the model for a different duration. For example, you can set it to 50 or 100 epochs. - <code>lr</code>: Adjust the learning rate to control the speed at which the model learns. A lower learning rate can lead to more stable training, while a higher learning rate can speed up the process but may cause instability. - <code>callbacks</code>: Add custom callbacks to monitor the training process, such as early stopping or learning rate schedulers.</p>
+<p>For example, you can add an early stopping callback to stop training if the validation loss does not improve for a certain number of epochs. This can help prevent overfitting and save training time.</p>
+<p>Additionally, you can experiment with different learning rates to find the optimal value for your dataset. The <code>find_lr</code> parameter in the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class can help you automatically find a suitable learning rate.</p>
+<p>By customizing these parameters, you can fine-tune the training process to achieve better performance and adapt the model to your specific dataset and requirements.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> SEResNet50</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.vision.<span class="bu">all</span> <span class="im">import</span> BalancedAccuracy, CrossEntropyLossFlat</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">3</span>, in_channels<span class="op">=</span><span class="dv">1</span>, num_classes<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CrossEntropyLossFlat()</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>metric <span class="op">=</span> BalancedAccuracy()</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metric, show_summary<span class="op">=</span><span class="va">True</span>, find_lr<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> SEResNet50</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.vision.<span class="bu">all</span> <span class="im">import</span> BalancedAccuracy, CrossEntropyLossFlat</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">3</span>, in_channels<span class="op">=</span><span class="dv">1</span>, num_classes<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CrossEntropyLossFlat()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> BalancedAccuracy()</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">True</span>, find_lr<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -956,7 +952,7 @@ Callbacks:
   - Recorder
   - ProgressCallback
   - ShowGraphCallback
-Inferred learning rate:  0.0003</code></pre>
+Inferred learning rate:  8e-05</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 
@@ -983,12 +979,8 @@ Inferred learning rate:  0.0003</code></pre>
 <p><img src="902_tutorial_classification3D_files/figure-html/cell-7-output-6.png" class="img-fluid"></p>
 </div>
 </div>
-<p>You can customize the training process by modifying the following parameters: - <code>epochs</code>: Change the number of epochs to train the model for a different duration. For example, you can set it to 50 or 100 epochs. - <code>lr</code>: Adjust the learning rate to control the speed at which the model learns. A lower learning rate can lead to more stable training, while a higher learning rate can speed up the process but may cause instability. - <code>callbacks</code>: Add custom callbacks to monitor the training process, such as early stopping or learning rate schedulers.</p>
-<p>For example, you can add an early stopping callback to stop training if the validation loss does not improve for a certain number of epochs. This can help prevent overfitting and save training time.</p>
-<p>Additionally, you can experiment with different learning rates to find the optimal value for your dataset. The <code>find_lr</code> parameter in the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class can help you automatically find a suitable learning rate.</p>
-<p>By customizing these parameters, you can fine-tune the training process to achieve better performance and adapt the model to your specific dataset and requirements.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1021,143 +1013,143 @@ Inferred learning rate:  0.0003</code></pre>
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>0.737844</td>
-<td>0.884683</td>
-<td>0.522529</td>
-<td>00:09</td>
+<td>0.661694</td>
+<td>0.606775</td>
+<td>0.498789</td>
+<td>00:15</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>0.668565</td>
-<td>0.655822</td>
-<td>0.537791</td>
-<td>00:10</td>
+<td>0.612015</td>
+<td>0.593106</td>
+<td>0.497578</td>
+<td>00:17</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>0.661785</td>
-<td>0.654336</td>
-<td>0.492490</td>
-<td>00:09</td>
+<td>0.637438</td>
+<td>0.660569</td>
+<td>0.462936</td>
+<td>00:17</td>
 </tr>
 <tr class="even">
 <td>3</td>
-<td>0.691415</td>
-<td>0.677920</td>
-<td>0.579700</td>
-<td>00:09</td>
+<td>0.632946</td>
+<td>0.583549</td>
+<td>0.541909</td>
+<td>00:18</td>
 </tr>
 <tr class="odd">
 <td>4</td>
-<td>0.656948</td>
-<td>0.604279</td>
-<td>0.537064</td>
-<td>00:09</td>
+<td>0.634405</td>
+<td>0.603777</td>
+<td>0.504118</td>
+<td>00:16</td>
 </tr>
 <tr class="even">
 <td>5</td>
-<td>0.592294</td>
-<td>0.580940</td>
-<td>0.574612</td>
-<td>00:09</td>
+<td>0.593679</td>
+<td>0.588400</td>
+<td>0.511870</td>
+<td>00:17</td>
 </tr>
 <tr class="odd">
 <td>6</td>
-<td>0.622304</td>
-<td>0.540016</td>
-<td>0.583818</td>
-<td>00:09</td>
+<td>0.603696</td>
+<td>0.603647</td>
+<td>0.534157</td>
+<td>00:17</td>
 </tr>
 <tr class="even">
 <td>7</td>
-<td>0.567228</td>
-<td>0.543166</td>
-<td>0.578246</td>
-<td>00:09</td>
+<td>0.565777</td>
+<td>0.654278</td>
+<td>0.568556</td>
+<td>00:17</td>
 </tr>
 <tr class="odd">
 <td>8</td>
-<td>0.611193</td>
-<td>0.579035</td>
-<td>0.514535</td>
-<td>00:09</td>
+<td>0.615456</td>
+<td>0.624638</td>
+<td>0.570010</td>
+<td>00:15</td>
 </tr>
 <tr class="even">
 <td>9</td>
-<td>0.592783</td>
-<td>0.724594</td>
-<td>0.500000</td>
-<td>00:09</td>
+<td>0.551408</td>
+<td>0.593446</td>
+<td>0.562742</td>
+<td>00:16</td>
 </tr>
 <tr class="odd">
 <td>10</td>
-<td>0.547133</td>
-<td>0.560082</td>
-<td>0.500000</td>
-<td>00:09</td>
+<td>0.579031</td>
+<td>0.579958</td>
+<td>0.554990</td>
+<td>00:17</td>
 </tr>
 <tr class="even">
 <td>11</td>
-<td>0.574452</td>
-<td>0.585088</td>
-<td>0.500000</td>
-<td>00:09</td>
+<td>0.603064</td>
+<td>0.567164</td>
+<td>0.560078</td>
+<td>00:17</td>
 </tr>
 <tr class="odd">
 <td>12</td>
-<td>0.566623</td>
-<td>0.580101</td>
-<td>0.564196</td>
-<td>00:09</td>
+<td>0.582610</td>
+<td>0.536173</td>
+<td>0.603198</td>
+<td>00:17</td>
 </tr>
 <tr class="even">
 <td>13</td>
-<td>0.619115</td>
-<td>0.552885</td>
-<td>0.492248</td>
-<td>00:09</td>
+<td>0.572616</td>
+<td>0.560610</td>
+<td>0.605862</td>
+<td>00:17</td>
 </tr>
 <tr class="odd">
 <td>14</td>
-<td>0.554509</td>
-<td>0.579128</td>
-<td>0.500000</td>
-<td>00:09</td>
+<td>0.523191</td>
+<td>0.547617</td>
+<td>0.656734</td>
+<td>00:15</td>
 </tr>
 <tr class="even">
 <td>15</td>
-<td>0.575963</td>
-<td>0.636180</td>
-<td>0.492248</td>
-<td>00:09</td>
+<td>0.566822</td>
+<td>0.533663</td>
+<td>0.644864</td>
+<td>00:15</td>
 </tr>
 <tr class="odd">
 <td>16</td>
-<td>0.539520</td>
-<td>0.724575</td>
-<td>0.596657</td>
-<td>00:09</td>
+<td>0.518719</td>
+<td>0.571238</td>
+<td>0.592539</td>
+<td>00:16</td>
 </tr>
 <tr class="even">
 <td>17</td>
-<td>0.574317</td>
-<td>0.690074</td>
-<td>0.538033</td>
-<td>00:09</td>
+<td>0.562587</td>
+<td>0.535425</td>
+<td>0.584787</td>
+<td>00:18</td>
 </tr>
 <tr class="odd">
 <td>18</td>
-<td>0.524487</td>
-<td>0.503385</td>
-<td>0.642200</td>
-<td>00:09</td>
+<td>0.579594</td>
+<td>0.567187</td>
+<td>0.615310</td>
+<td>00:16</td>
 </tr>
 <tr class="even">
 <td>19</td>
-<td>0.538340</td>
-<td>0.576844</td>
-<td>0.571705</td>
-<td>00:09</td>
+<td>0.553785</td>
+<td>0.580768</td>
+<td>0.586240</td>
+<td>00:16</td>
 </tr>
 </tbody>
 </table>
@@ -1167,37 +1159,20 @@ Inferred learning rate:  0.0003</code></pre>
 </div>
 </div>
 </section>
-<section id="save-the-trained-model" class="level3">
-<h3 class="anchored" data-anchor-id="save-the-trained-model">Save the Trained Model</h3>
-<p>In the next cell, we will save the trained model to a file using the <code>save</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class. This step is important to preserve the trained model so that it can be loaded and used later without retraining.</p>
-<p>You can customize the saving process by modifying the following parameters: - <code>file_name</code>: Change the name of the file to save the model with a different name. For example, you can set it to ‘final_model’ or ‘best_model’. - <code>path</code>: Specify a different path to save the model in a different directory. This is useful if you want to organize your saved models in a specific folder.</p>
-<p>For example, you can set <code>file_name='final_model'</code> to save the model with the name ‘final_model.pth’, or set <code>path='../models/'</code> to save the model in the ‘models’ directory.</p>
-<p>By customizing these parameters, you can ensure that the model is saved with a meaningful name and in an organized manner, making it easier to manage and retrieve the model for future use.</p>
+<section id="evaluate-the-model-on-validation-data" class="level3">
+<h3 class="anchored" data-anchor-id="evaluate-the-model-on-validation-data">Evaluate the Model on Validation Data</h3>
+<p>In this step, we will evaluate the trained model on the validation dataset using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function. This function computes the specified metrics and provides insights into the model’s performance. Additionally, it can display the most confused classes to help identify areas for improvement.</p>
+<blockquote class="blockquote">
+<ul>
+<li>You can customize the <code>metrics</code> parameter to include other evaluation metrics relevant to your task.</li>
+<li>The <code>most_confused_n</code> parameter specifies the number of most confused classes to display. Adjust this value to see more or fewer confused classes.</li>
+<li>Set the <code>show_graph</code> parameter to <code>True</code> to visualize the confusion matrix and other evaluation graphs.</li>
+<li>Use this evaluation step to monitor the model’s performance and make necessary adjustments to the training process or data pipeline.</li>
+</ul>
+</blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('tmp-model')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="evaluate-the-model-on-test-data" class="level3">
-<h3 class="anchored" data-anchor-id="evaluate-the-model-on-test-data">Evaluate the Model on Test Data</h3>
-<p>Here, we will evaluate the performance of the trained model on the test dataset. This step is crucial to understand how well the model generalizes to unseen data.</p>
-<p>We will use the <code>data.test_dl</code> method to create a DataLoader for the test dataset. The <code>get_image_files</code> function is used to retrieve the test images from the specified path. The <code>with_labels=True</code> parameter ensures that the test images are loaded with their corresponding labels.</p>
-<p>After creating the test DataLoader, we will print the number of test images to verify that the dataset has been loaded correctly.</p>
-<p>You can customize the evaluation process by modifying the following parameters: - <code>test_path</code>: Change the path to the test dataset if it is stored in a different location. - <code>with_labels</code>: Set to <code>False</code> if the test dataset does not have labels. This is useful for evaluating the model on unlabeled data. - <code>batch_size</code>: Adjust the batch size for the test DataLoader. A larger batch size can speed up the evaluation process but may require more memory.</p>
-<p>By customizing these parameters, you can adapt the evaluation process to different datasets and requirements, ensuring that the model’s performance is accurately assessed.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.test_dl(get_image_files(test_path), with_labels<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of test dataset</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'test images:'</span>, <span class="bu">len</span>(test_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>test images: 88</code></pre>
-</div>
-</div>
-<p>In the next cell, we will evaluate the performance of the trained model on the test dataset using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function. This function will compute various evaluation metrics and display the results.</p>
-<p>You can customize the evaluation process by modifying the following parameters: - <code>show_graph</code>: Set to <code>True</code> to display a graph of the evaluation metrics. This can help visualize the model’s performance. - <a href="https://deepCLEM.github.io/bioMONAI/data.html#show_results"><code>show_results</code></a>: Set to <code>True</code> to display the results of the evaluation, including the predicted labels and ground truth labels.</p>
-<p>For example, you can set <code>show_graph=True</code> to visualize the evaluation metrics, or set <code>show_results=True</code> to see the detailed results of the evaluation.</p>
-<p>By customizing these parameters, you can gain a deeper understanding of the model’s performance and identify areas for improvement. This step is crucial for fine-tuning the model and ensuring that it generalizes well to unseen data.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data, show_graph<span class="op">=</span><span class="va">False</span>, show_results<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> BalancedAccuracy()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer,  most_confused_n<span class="op">=</span><span class="dv">5</span>, show_graph<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1218,11 +1193,48 @@ Inferred learning rate:  0.0003</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 
-    <div>
-      <progress value="0" class="" max="88" style="width:300px; height:20px; vertical-align: middle;"></progress>
-      0.00% [0/88 00:00&lt;?]
-    </div>
-    
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
 </div>
 <div class="cell-output cell-output-display">
 
@@ -1269,16 +1281,16 @@ Inferred learning rate:  0.0003</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>              precision    recall  f1-score   support
 
-           0       0.69      0.12      0.20        95
-           1       0.75      0.98      0.85       257
+           0       0.55      0.25      0.34        48
+           1       0.77      0.92      0.84       129
 
-    accuracy                           0.75       352
-   macro avg       0.72      0.55      0.52       352
-weighted avg       0.73      0.75      0.67       352
+    accuracy                           0.74       177
+   macro avg       0.66      0.59      0.59       177
+weighted avg       0.71      0.74      0.70       177
 
 
 Most Confused Classes:
-[('0', '1', 84), ('1', '0', 5)]</code></pre>
+[('0', '1', 36), ('1', '0', 10)]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 
@@ -1319,31 +1331,31 @@ Most Confused Classes:
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Mean</td>
-<td>0.581597</td>
+<td>0.587019</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Median</td>
-<td>0.453715</td>
+<td>0.489525</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Standard Deviation</td>
-<td>0.254455</td>
+<td>0.249587</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Min</td>
-<td>0.314898</td>
+<td>0.322135</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Max</td>
-<td>1.300359</td>
+<td>1.253057</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Q1</td>
-<td>0.398424</td>
+<td>0.396089</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Q3</td>
-<td>0.711500</td>
+<td>0.699683</td>
 </tr>
 </tbody>
 </table>
@@ -1351,7 +1363,1411 @@ Most Confused Classes:
 </div>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="902_tutorial_classification3D_files/figure-html/cell-11-output-11.png" class="img-fluid"></p>
+<pre><code>{'CrossEntropyLossFlat': [0.8863237500190735,
+  1.1183360815048218,
+  0.8573156595230103,
+  1.1334142684936523,
+  0.6484331488609314,
+  1.129358172416687,
+  0.8611404299736023,
+  0.9286571145057678,
+  1.214358925819397,
+  0.45560964941978455,
+  1.178236961364746,
+  0.6221503019332886,
+  1.246012806892395,
+  1.0428478717803955,
+  0.5053641200065613,
+  0.916648268699646,
+  0.6762295365333557,
+  0.9035409688949585,
+  1.1084927320480347,
+  0.6972817182540894,
+  1.253056526184082,
+  0.921390175819397,
+  0.418337345123291,
+  1.2319676876068115,
+  0.5910228490829468,
+  0.6128923296928406,
+  1.0466420650482178,
+  0.835457444190979,
+  0.6822581887245178,
+  0.9162763953208923,
+  0.9741742610931396,
+  1.014482021331787,
+  0.8076924085617065,
+  0.7079397439956665,
+  1.0930589437484741,
+  0.9222192764282227,
+  0.8517340421676636,
+  1.050678014755249,
+  0.9816516637802124,
+  0.8517192006111145,
+  1.2492965459823608,
+  0.7637995481491089,
+  0.4299708604812622,
+  0.8972944021224976,
+  1.2395399808883667,
+  1.1543430089950562,
+  0.4593479633331299,
+  0.5102404952049255,
+  0.42439889907836914,
+  0.8248015642166138,
+  0.36090782284736633,
+  0.3719218075275421,
+  0.5487020611763,
+  0.4191642999649048,
+  0.34176105260849,
+  0.43608564138412476,
+  0.48952510952949524,
+  0.49054932594299316,
+  0.42283523082733154,
+  0.5003477334976196,
+  0.34486812353134155,
+  0.36839088797569275,
+  0.3378850519657135,
+  0.3899184763431549,
+  0.49661415815353394,
+  0.578790009021759,
+  0.48643261194229126,
+  0.515108048915863,
+  0.3629743158817291,
+  0.6325345039367676,
+  0.7856430411338806,
+  0.32379940152168274,
+  0.4499479830265045,
+  0.40896373987197876,
+  0.4036204218864441,
+  0.6996830701828003,
+  0.363511860370636,
+  0.46346110105514526,
+  0.4453890323638916,
+  0.9645428657531738,
+  0.6592583656311035,
+  0.5031762719154358,
+  0.44974562525749207,
+  0.5407688617706299,
+  0.45901745557785034,
+  0.6106874346733093,
+  0.6864117383956909,
+  0.3932831883430481,
+  0.5493935942649841,
+  0.34464719891548157,
+  0.38680267333984375,
+  0.4089789390563965,
+  0.5459567904472351,
+  0.48755955696105957,
+  0.38275888562202454,
+  0.39666348695755005,
+  0.5786342024803162,
+  0.6151580214500427,
+  0.3239724636077881,
+  0.9062234163284302,
+  0.5097941756248474,
+  0.4136832356452942,
+  0.4156460464000702,
+  0.4379082918167114,
+  0.4375806450843811,
+  0.34549716114997864,
+  0.34815239906311035,
+  0.3279549181461334,
+  0.7604740262031555,
+  0.39608877897262573,
+  0.49376189708709717,
+  0.36912456154823303,
+  0.5742262005805969,
+  0.4489256739616394,
+  0.37214747071266174,
+  0.5313464403152466,
+  0.3227514624595642,
+  0.36075758934020996,
+  0.3473138213157654,
+  0.4131373167037964,
+  0.34488046169281006,
+  0.4194236695766449,
+  0.3755335211753845,
+  0.4633443057537079,
+  0.4399503767490387,
+  0.357243150472641,
+  0.700052797794342,
+  0.37700772285461426,
+  0.4139581322669983,
+  0.45938318967819214,
+  0.4812823534011841,
+  0.3960230052471161,
+  0.34831568598747253,
+  0.5658310055732727,
+  0.6757023334503174,
+  0.6711947321891785,
+  0.3360849618911743,
+  0.48429739475250244,
+  0.6378294229507446,
+  0.4311976432800293,
+  0.7500190734863281,
+  0.6532543301582336,
+  0.338805228471756,
+  0.41630205512046814,
+  0.37095972895622253,
+  0.43623030185699463,
+  0.40275028347969055,
+  0.6298708915710449,
+  0.3798733651638031,
+  0.3527749180793762,
+  0.5855659246444702,
+  0.4642697274684906,
+  0.322134792804718,
+  0.36818087100982666,
+  0.3387206196784973,
+  0.46101468801498413,
+  0.6336299180984497,
+  0.3233686685562134,
+  0.6754025816917419,
+  0.6249858736991882,
+  0.7095690965652466,
+  0.35051554441452026,
+  0.44286635518074036,
+  0.39134156703948975,
+  0.3773763179779053,
+  0.7331044673919678,
+  0.5202566385269165,
+  0.4428062438964844,
+  0.3866722285747528,
+  0.4877132773399353,
+  0.5286975502967834,
+  0.3549131155014038,
+  0.33383917808532715,
+  0.5857742428779602,
+  0.602046549320221,
+  0.4274270534515381,
+  0.41402044892311096]}</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="902_tutorial_classification3D_files/figure-html/cell-9-output-16.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="902_tutorial_classification3D_files/figure-html/cell-9-output-17.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="save-the-trained-model" class="level3">
+<h3 class="anchored" data-anchor-id="save-the-trained-model">Save the Trained Model</h3>
+<p>In the next cell, we will save the trained model to a file using the <code>save</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class. This step is important to preserve the trained model so that it can be loaded and used later without retraining.</p>
+<p>You can customize the saving process by modifying the following parameters: - <code>file_name</code>: Change the name of the file to save the model with a different name. For example, you can set it to ‘final_model’ or ‘best_model’. - <code>path</code>: Specify a different path to save the model in a different directory. This is useful if you want to organize your saved models in a specific folder.</p>
+<p>For example, you can set <code>file_name='final_model'</code> to save the model with the name ‘final_model.pth’, or set <code>path='../models/'</code> to save the model in the ‘models’ directory.</p>
+<p>By customizing these parameters, you can ensure that the model is saved with a meaningful name and in an organized manner, making it easier to manage and retrieve the model for future use.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>trainer.save(<span class="st">'tmp-model'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Path('../_data/medmnist_data/synapsemnist3d/models/tmp-model.pth')</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluate-the-model-on-test-data" class="level3">
+<h3 class="anchored" data-anchor-id="evaluate-the-model-on-test-data">Evaluate the Model on Test Data</h3>
+<p>Here, we will evaluate the performance of the trained model on the test dataset. This step is crucial to understand how well the model generalizes to unseen data.</p>
+<p>We will use the <code>data.test_dl</code> method to create a DataLoader for the test dataset. The <code>get_image_files</code> function is used to retrieve the test images from the specified path. The <code>with_labels=True</code> parameter ensures that the test images are loaded with their corresponding labels.</p>
+<p>After creating the test DataLoader, we will print the number of test images to verify that the dataset has been loaded correctly.</p>
+<p>You can customize the evaluation process by modifying the following parameters: - <code>test_path</code>: Change the path to the test dataset if it is stored in a different location. - <code>with_labels</code>: Set to <code>False</code> if the test dataset does not have labels. This is useful for evaluating the model on unlabeled data. - <code>batch_size</code>: Adjust the batch size for the test DataLoader. A larger batch size can speed up the evaluation process but may require more memory.</p>
+<p>By customizing these parameters, you can adapt the evaluation process to different datasets and requirements, ensuring that the model’s performance is accurately assessed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.test_dl(get_image_files(test_path), with_labels<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of test dataset</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'test images:'</span>, <span class="bu">len</span>(test_data.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>test images: 352</code></pre>
+</div>
+</div>
+<p>In the next cell, we will evaluate the performance of the trained model on the test dataset using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function. This function will compute various evaluation metrics and display the results.</p>
+<p>You can customize the evaluation process by modifying the following parameters: - <code>show_graph</code>: Set to <code>True</code> to display a graph of the evaluation metrics. This can help visualize the model’s performance. - <a href="https://deepCLEM.github.io/bioMONAI/data.html#show_results"><code>show_results</code></a>: Set to <code>True</code> to display the results of the evaluation, including the predicted labels and ground truth labels.</p>
+<p>For example, you can set <code>show_graph=True</code> to visualize the evaluation metrics, or set <code>show_results=True</code> to see the detailed results of the evaluation.</p>
+<p>By customizing these parameters, you can gain a deeper understanding of the model’s performance and identify areas for improvement. This step is crucial for fine-tuning the model and ensuring that it generalizes well to unseen data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data, show_graph<span class="op">=</span><span class="va">False</span>, show_results<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              precision    recall  f1-score   support
+
+           0       0.46      0.13      0.20        95
+           1       0.75      0.95      0.83       257
+
+    accuracy                           0.72       352
+   macro avg       0.60      0.54      0.52       352
+weighted avg       0.67      0.72      0.66       352
+
+
+Most Confused Classes:
+[('0', '1', 83), ('1', '0', 14)]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">CrossEntropyLossFlat</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>0.588439</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>0.489406</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.251726</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>0.319300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>1.297334</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>0.393701</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>0.744933</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="902_tutorial_classification3D_files/figure-html/cell-12-output-11.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="load-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="load-the-model">Load the Model</h3>
+<p>In this step, we will load the previously trained model using the <code>load</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/core.html#visiontrainer"><code>visionTrainer</code></a> class. In this example, we will:</p>
+<blockquote class="blockquote">
+<ul>
+<li>Create a trainer instance and load the previously saved model.</li>
+<li>Fine tune the model a several epochs more.</li>
+<li>Evaluate the model with test data again.</li>
+</ul>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">3</span>, in_channels<span class="op">=</span><span class="dv">1</span>, num_classes<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CrossEntropyLossFlat()</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> BalancedAccuracy()</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>trainer2 <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">True</span>, find_lr<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load saved model</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>trainer2.load(<span class="st">'tmp-model'</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate the model on the test dataset</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer2, test_data, show_graph<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SEResNet50 (Input shape: 4 x 1 x 32 x 32 x 32)
+============================================================================
+Layer (type)         Output Shape         Param #    Trainable 
+============================================================================
+                     4 x 64 x 16 x 16 x  
+Conv3d                                    21952      True      
+BatchNorm3d                               128        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 64 x 8 x 8 x 8  
+MaxPool3d                                                      
+Conv3d                                    4096       True      
+BatchNorm3d                               128        True      
+ReLU                                                           
+Conv3d                                    110592     True      
+BatchNorm3d                               128        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 8 x 8 x 8 
+Conv3d                                    16384      True      
+BatchNorm3d                               512        True      
+____________________________________________________________________________
+                     4 x 256 x 1 x 1 x 1 
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 16              
+Linear                                    4112       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256             
+Linear                                    4352       True      
+Sigmoid                                                        
+____________________________________________________________________________
+                     4 x 256 x 8 x 8 x 8 
+Conv3d                                    16384      True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 64 x 8 x 8 x 8  
+Conv3d                                    16384      True      
+BatchNorm3d                               128        True      
+ReLU                                                           
+Conv3d                                    110592     True      
+BatchNorm3d                               128        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 8 x 8 x 8 
+Conv3d                                    16384      True      
+BatchNorm3d                               512        True      
+____________________________________________________________________________
+                     4 x 256 x 1 x 1 x 1 
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 16              
+Linear                                    4112       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256             
+Linear                                    4352       True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 64 x 8 x 8 x 8  
+Conv3d                                    16384      True      
+BatchNorm3d                               128        True      
+ReLU                                                           
+Conv3d                                    110592     True      
+BatchNorm3d                               128        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 8 x 8 x 8 
+Conv3d                                    16384      True      
+BatchNorm3d                               512        True      
+____________________________________________________________________________
+                     4 x 256 x 1 x 1 x 1 
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 16              
+Linear                                    4112       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256             
+Linear                                    4352       True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 128 x 4 x 4 x 4 
+Conv3d                                    32768      True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+Conv3d                                    442368     True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512 x 4 x 4 x 4 
+Conv3d                                    65536      True      
+BatchNorm3d                               1024       True      
+____________________________________________________________________________
+                     4 x 512 x 1 x 1 x 1 
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 32              
+Linear                                    16416      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512             
+Linear                                    16896      True      
+Sigmoid                                                        
+____________________________________________________________________________
+                     4 x 512 x 4 x 4 x 4 
+Conv3d                                    131072     True      
+BatchNorm3d                               1024       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 128 x 4 x 4 x 4 
+Conv3d                                    65536      True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+Conv3d                                    442368     True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512 x 4 x 4 x 4 
+Conv3d                                    65536      True      
+BatchNorm3d                               1024       True      
+____________________________________________________________________________
+                     4 x 512 x 1 x 1 x 1 
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 32              
+Linear                                    16416      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512             
+Linear                                    16896      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 128 x 4 x 4 x 4 
+Conv3d                                    65536      True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+Conv3d                                    442368     True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512 x 4 x 4 x 4 
+Conv3d                                    65536      True      
+BatchNorm3d                               1024       True      
+____________________________________________________________________________
+                     4 x 512 x 1 x 1 x 1 
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 32              
+Linear                                    16416      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512             
+Linear                                    16896      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 128 x 4 x 4 x 4 
+Conv3d                                    65536      True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+Conv3d                                    442368     True      
+BatchNorm3d                               256        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512 x 4 x 4 x 4 
+Conv3d                                    65536      True      
+BatchNorm3d                               1024       True      
+____________________________________________________________________________
+                     4 x 512 x 1 x 1 x 1 
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 32              
+Linear                                    16416      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512             
+Linear                                    16896      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 2 x 2 x 2 
+Conv3d                                    131072     True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+Conv3d                                    1769472    True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024 x 2 x 2 x  
+Conv3d                                    262144     True      
+BatchNorm3d                               2048       True      
+____________________________________________________________________________
+                     4 x 1024 x 1 x 1 x  
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 64              
+Linear                                    65600      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024            
+Linear                                    66560      True      
+Sigmoid                                                        
+____________________________________________________________________________
+                     4 x 1024 x 2 x 2 x  
+Conv3d                                    524288     True      
+BatchNorm3d                               2048       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 2 x 2 x 2 
+Conv3d                                    262144     True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+Conv3d                                    1769472    True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024 x 2 x 2 x  
+Conv3d                                    262144     True      
+BatchNorm3d                               2048       True      
+____________________________________________________________________________
+                     4 x 1024 x 1 x 1 x  
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 64              
+Linear                                    65600      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024            
+Linear                                    66560      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 2 x 2 x 2 
+Conv3d                                    262144     True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+Conv3d                                    1769472    True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024 x 2 x 2 x  
+Conv3d                                    262144     True      
+BatchNorm3d                               2048       True      
+____________________________________________________________________________
+                     4 x 1024 x 1 x 1 x  
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 64              
+Linear                                    65600      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024            
+Linear                                    66560      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 2 x 2 x 2 
+Conv3d                                    262144     True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+Conv3d                                    1769472    True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024 x 2 x 2 x  
+Conv3d                                    262144     True      
+BatchNorm3d                               2048       True      
+____________________________________________________________________________
+                     4 x 1024 x 1 x 1 x  
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 64              
+Linear                                    65600      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024            
+Linear                                    66560      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 2 x 2 x 2 
+Conv3d                                    262144     True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+Conv3d                                    1769472    True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024 x 2 x 2 x  
+Conv3d                                    262144     True      
+BatchNorm3d                               2048       True      
+____________________________________________________________________________
+                     4 x 1024 x 1 x 1 x  
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 64              
+Linear                                    65600      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024            
+Linear                                    66560      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 256 x 2 x 2 x 2 
+Conv3d                                    262144     True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+Conv3d                                    1769472    True      
+BatchNorm3d                               512        True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024 x 2 x 2 x  
+Conv3d                                    262144     True      
+BatchNorm3d                               2048       True      
+____________________________________________________________________________
+                     4 x 1024 x 1 x 1 x  
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 64              
+Linear                                    65600      True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 1024            
+Linear                                    66560      True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512 x 1 x 1 x 1 
+Conv3d                                    524288     True      
+BatchNorm3d                               1024       True      
+ReLU                                                           
+Conv3d                                    7077888    True      
+BatchNorm3d                               1024       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 2048 x 1 x 1 x  
+Conv3d                                    1048576    True      
+BatchNorm3d                               4096       True      
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 128             
+Linear                                    262272     True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 2048            
+Linear                                    264192     True      
+Sigmoid                                                        
+____________________________________________________________________________
+                     4 x 2048 x 1 x 1 x  
+Conv3d                                    2097152    True      
+BatchNorm3d                               4096       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512 x 1 x 1 x 1 
+Conv3d                                    1048576    True      
+BatchNorm3d                               1024       True      
+ReLU                                                           
+Conv3d                                    7077888    True      
+BatchNorm3d                               1024       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 2048 x 1 x 1 x  
+Conv3d                                    1048576    True      
+BatchNorm3d                               4096       True      
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 128             
+Linear                                    262272     True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 2048            
+Linear                                    264192     True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 512 x 1 x 1 x 1 
+Conv3d                                    1048576    True      
+BatchNorm3d                               1024       True      
+ReLU                                                           
+Conv3d                                    7077888    True      
+BatchNorm3d                               1024       True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 2048 x 1 x 1 x  
+Conv3d                                    1048576    True      
+BatchNorm3d                               4096       True      
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 128             
+Linear                                    262272     True      
+ReLU                                                           
+____________________________________________________________________________
+                     4 x 2048            
+Linear                                    264192     True      
+Sigmoid                                                        
+Identity                                                       
+ReLU                                                           
+AdaptiveAvgPool3d                                              
+____________________________________________________________________________
+                     4 x 2               
+Linear                                    4098       True      
+____________________________________________________________________________
+
+Total params: 48,690,162
+Total trainable params: 48,690,162
+Total non-trainable params: 0
+
+Optimizer used: &lt;function Adam&gt;
+Loss function: FlattenedLoss of CrossEntropyLoss()
+
+Callbacks:
+  - TrainEvalCallback
+  - CastToTensor
+  - Recorder
+  - ProgressCallback
+  - ShowGraphCallback
+Inferred learning rate:  0.0002
+              precision    recall  f1-score   support
+
+           0       0.46      0.13      0.20        95
+           1       0.75      0.95      0.83       257
+
+    accuracy                           0.72       352
+   macro avg       0.60      0.54      0.52       352
+weighted avg       0.67      0.72      0.66       352
+
+
+Most Confused Classes:
+[('0', '1', 83), ('1', '0', 14)]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>y_pred contains classes not in y_true</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">CrossEntropyLossFlat</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>0.588439</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>0.489406</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.251726</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>0.319300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>1.297334</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>0.393701</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>0.744933</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>{'CrossEntropyLossFlat': [1.0408622026443481,
+  1.1578984260559082,
+  0.6881772875785828,
+  0.9363319277763367,
+  0.9087399244308472,
+  1.0826153755187988,
+  0.9964368939399719,
+  1.2158238887786865,
+  1.1089214086532593,
+  1.221463918685913,
+  1.0761914253234863,
+  1.186295509338379,
+  0.6786251664161682,
+  1.1107286214828491,
+  1.145126461982727,
+  1.1261001825332642,
+  0.9511586427688599,
+  0.7463033199310303,
+  0.5725147128105164,
+  1.1618977785110474,
+  0.9097990989685059,
+  0.44584038853645325,
+  0.8780323266983032,
+  0.9188233613967896,
+  0.9556930661201477,
+  1.1352472305297852,
+  0.7040504217147827,
+  0.9733481407165527,
+  1.0048521757125854,
+  0.7980098724365234,
+  0.9922673106193542,
+  0.869306206703186,
+  0.9739875793457031,
+  0.37948086857795715,
+  1.012920618057251,
+  0.8291819095611572,
+  0.9980272054672241,
+  1.29733407497406,
+  0.788002073764801,
+  0.9568212032318115,
+  0.6713985204696655,
+  0.9891518354415894,
+  0.7182179093360901,
+  0.8292044997215271,
+  0.814678966999054,
+  1.041414499282837,
+  1.211199402809143,
+  0.851450502872467,
+  1.0254939794540405,
+  1.2656583786010742,
+  1.0246444940567017,
+  0.5752284526824951,
+  1.0591046810150146,
+  0.8559143543243408,
+  0.6757709383964539,
+  0.7601381540298462,
+  0.4829421639442444,
+  1.0796743631362915,
+  1.0974122285842896,
+  0.9888719320297241,
+  0.8028755784034729,
+  0.8559975624084473,
+  0.9881004095077515,
+  1.0822842121124268,
+  1.0593572854995728,
+  0.9177924394607544,
+  0.6975990533828735,
+  1.1635242700576782,
+  0.7751151919364929,
+  0.7199493050575256,
+  0.647948682308197,
+  0.8461402058601379,
+  0.960294246673584,
+  0.9831545352935791,
+  0.9469560384750366,
+  0.70534348487854,
+  0.7866503596305847,
+  1.0042998790740967,
+  1.2515259981155396,
+  0.6994943618774414,
+  0.7067183256149292,
+  0.8988455533981323,
+  0.530042290687561,
+  0.595201313495636,
+  1.0828694105148315,
+  1.0044187307357788,
+  1.0624949932098389,
+  0.8625806570053101,
+  1.0625666379928589,
+  0.9171555042266846,
+  0.9065350890159607,
+  0.9218341112136841,
+  0.959194540977478,
+  1.1146128177642822,
+  1.1585509777069092,
+  0.40620410442352295,
+  0.45093753933906555,
+  0.34938520193099976,
+  0.45664820075035095,
+  0.3728916049003601,
+  0.4952583312988281,
+  0.3562680780887604,
+  0.4371486306190491,
+  0.4880199432373047,
+  0.36928361654281616,
+  0.3754546344280243,
+  0.6245867609977722,
+  0.3525069057941437,
+  0.5675177574157715,
+  0.6520847082138062,
+  0.353052020072937,
+  0.48086896538734436,
+  0.7447199821472168,
+  0.5346560478210449,
+  0.4986109137535095,
+  0.6938120722770691,
+  0.5154314041137695,
+  0.5774945020675659,
+  0.4003353416919708,
+  0.5292413830757141,
+  0.5653185248374939,
+  0.4663919508457184,
+  0.3620073199272156,
+  0.377120703458786,
+  0.37827256321907043,
+  0.5470624566078186,
+  0.39838850498199463,
+  0.5519424080848694,
+  0.4028024971485138,
+  0.36848706007003784,
+  0.4950801730155945,
+  0.5683166980743408,
+  0.45818057656288147,
+  0.36193326115608215,
+  0.38497790694236755,
+  0.3885497748851776,
+  0.4847778379917145,
+  0.603176474571228,
+  0.47921109199523926,
+  0.35510218143463135,
+  0.5217238068580627,
+  0.7455733418464661,
+  0.3619154095649719,
+  0.47017306089401245,
+  0.345960408449173,
+  0.3208484947681427,
+  0.34310096502304077,
+  0.6390949487686157,
+  0.4258304238319397,
+  0.45827609300613403,
+  0.4231952130794525,
+  0.5310134887695312,
+  0.6510000228881836,
+  0.4777495265007019,
+  0.5087130069732666,
+  0.4479300379753113,
+  0.49563050270080566,
+  0.33000752329826355,
+  0.5506337881088257,
+  0.42805132269859314,
+  0.42974042892456055,
+  0.4038667380809784,
+  0.43504518270492554,
+  0.3300900459289551,
+  0.3882176876068115,
+  0.9264853000640869,
+  0.37244024872779846,
+  0.4575835168361664,
+  0.4151455760002136,
+  0.42391249537467957,
+  0.6124613285064697,
+  0.49788355827331543,
+  0.5779603719711304,
+  0.38539281487464905,
+  0.6079452633857727,
+  0.3271404504776001,
+  0.427549809217453,
+  0.4309330880641937,
+  0.4868423640727997,
+  0.49893486499786377,
+  0.35767433047294617,
+  0.34399178624153137,
+  0.4265051782131195,
+  0.3278067409992218,
+  0.3706507682800293,
+  0.6070206761360168,
+  0.3862752616405487,
+  0.4735139310359955,
+  0.4931168556213379,
+  0.34792381525039673,
+  0.3538956046104431,
+  0.32650992274284363,
+  0.4105501174926758,
+  0.3760108947753906,
+  0.4960388243198395,
+  0.4335479140281677,
+  0.33254721760749817,
+  0.3428356647491455,
+  0.5174188613891602,
+  0.6125808954238892,
+  0.3770809769630432,
+  0.5292183756828308,
+  0.392143577337265,
+  0.649427592754364,
+  0.40982040762901306,
+  0.4500376880168915,
+  0.35038506984710693,
+  0.4939887821674347,
+  0.5021756887435913,
+  0.6866542100906372,
+  0.3326438069343567,
+  0.3426518738269806,
+  0.41885194182395935,
+  0.5302056074142456,
+  0.6866236925125122,
+  0.38460803031921387,
+  0.5561084151268005,
+  0.3969656229019165,
+  0.47353339195251465,
+  0.45539286732673645,
+  0.6875081658363342,
+  0.3942200541496277,
+  0.3378905653953552,
+  0.5840994715690613,
+  0.44574466347694397,
+  0.4592127799987793,
+  0.3667334318161011,
+  0.36508628726005554,
+  0.5180249214172363,
+  0.7964318990707397,
+  0.40712565183639526,
+  0.3853033781051636,
+  0.41023147106170654,
+  0.4111946225166321,
+  0.3755834698677063,
+  0.5949910283088684,
+  0.45838412642478943,
+  0.32948818802833557,
+  0.5201802253723145,
+  0.36195021867752075,
+  0.4783022999763489,
+  0.37018516659736633,
+  0.40205714106559753,
+  0.33791089057922363,
+  0.4094063341617584,
+  0.33676567673683167,
+  0.6708754897117615,
+  0.32357680797576904,
+  0.6441725492477417,
+  0.3440205156803131,
+  0.43473201990127563,
+  0.865451455116272,
+  0.3822442293167114,
+  0.3382664918899536,
+  0.39760181307792664,
+  0.6348736882209778,
+  0.5668772459030151,
+  0.811066746711731,
+  0.35961464047431946,
+  0.4616280496120453,
+  0.3789650797843933,
+  0.4139070510864258,
+  0.4259195029735565,
+  0.357540100812912,
+  0.41236555576324463,
+  0.402128130197525,
+  0.5386462807655334,
+  0.41459888219833374,
+  0.3558102548122406,
+  0.439185231924057,
+  0.46669360995292664,
+  0.7794520854949951,
+  0.3585975766181946,
+  0.4554141163825989,
+  0.845185399055481,
+  0.5660108923912048,
+  0.3227575719356537,
+  0.43111878633499146,
+  0.4210037291049957,
+  0.5084980130195618,
+  0.6546767354011536,
+  0.43569856882095337,
+  0.3348544239997864,
+  0.36659571528434753,
+  0.3995625972747803,
+  0.3548799157142639,
+  0.3561785817146301,
+  0.3330909311771393,
+  0.6013681292533875,
+  0.4050350785255432,
+  0.41369062662124634,
+  0.4153604209423065,
+  0.4942138195037842,
+  0.5316246747970581,
+  0.985291600227356,
+  0.33689677715301514,
+  0.5417547225952148,
+  0.3756275177001953,
+  0.321730375289917,
+  0.511437177658081,
+  0.3656950294971466,
+  0.4439699649810791,
+  0.5812901854515076,
+  0.3942757546901703,
+  0.6534698009490967,
+  0.4661288559436798,
+  0.3313046991825104,
+  0.5693702697753906,
+  0.32885774970054626,
+  0.3751707673072815,
+  0.35857972502708435,
+  0.45387110114097595,
+  0.3477126657962799,
+  0.9262058734893799,
+  0.46716204285621643,
+  0.4110565781593323,
+  0.4238336980342865,
+  0.5040506720542908,
+  0.389617919921875,
+  0.5328419804573059,
+  0.3213559687137604,
+  0.41469496488571167,
+  0.31930041313171387,
+  0.860460638999939,
+  0.9833493232727051,
+  0.4419670104980469,
+  0.3991899788379669,
+  0.398302286863327,
+  0.5575388669967651,
+  0.35299965739250183,
+  0.7998232841491699,
+  0.3899614214897156,
+  0.4976290464401245,
+  0.6377553939819336,
+  0.36911144852638245,
+  0.3301665484905243,
+  0.4708522856235504,
+  0.410036563873291,
+  0.3852323293685913,
+  0.4744819700717926,
+  0.3669726252555847,
+  0.35127687454223633,
+  0.5936526656150818,
+  0.4907911419868469,
+  0.33877378702163696,
+  0.48342376947402954,
+  0.40779730677604675,
+  0.5780268311500549,
+  0.4419628977775574,
+  0.4168787896633148,
+  0.39997702836990356,
+  0.5047169923782349]}</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="902_tutorial_classification3D_files/figure-html/cell-13-output-19.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="902_tutorial_classification3D_files/figure-html/cell-13-output-20.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="902_tutorial_classification3D_files/figure-html/cell-13-output-21.png" class="img-fluid"></p>
 </div>
 </div>
 

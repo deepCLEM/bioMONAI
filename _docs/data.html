@@ -94,23 +94,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="styles.css">
 <meta property="og:title" content="bioMONAI - Data">
 <meta property="og:description" content="Data classes and functions">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/01_data_files/figure-html/cell-26-output-4.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/01_data_files/figure-html/cell-40-output-1.png">
 <meta property="og:site-name" content="bioMONAI">
-<meta property="og:image:height" content="351">
-<meta property="og:image:width" content="503">
+<meta property="og:image:height" content="389">
+<meta property="og:image:width" content="389">
 <meta name="twitter:title" content="bioMONAI - Data">
 <meta name="twitter:description" content="Data classes and functions">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/01_data_files/figure-html/cell-26-output-4.png">
-<meta name="twitter:image-height" content="351">
-<meta name="twitter:image-width" content="503">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/01_data_files/figure-html/cell-40-output-1.png">
+<meta name="twitter:image-height" content="389">
+<meta name="twitter:image-width" content="389">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -343,10 +340,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#biodataloaders.class_from_folder" id="toc-biodataloaders.class_from_folder" class="nav-link" data-scroll-target="#biodataloaders.class_from_folder">BioDataLoaders.class_from_folder</a></li>
   <li><a href="#biodataloaders.class_from_df" id="toc-biodataloaders.class_from_df" class="nav-link" data-scroll-target="#biodataloaders.class_from_df">BioDataLoaders.class_from_df</a></li>
   <li><a href="#biodataloaders.class_from_csv" id="toc-biodataloaders.class_from_csv" class="nav-link" data-scroll-target="#biodataloaders.class_from_csv">BioDataLoaders.class_from_csv</a></li>
-  <li><a href="#biodataloaders.class_from_lists" id="toc-biodataloaders.class_from_lists" class="nav-link" data-scroll-target="#biodataloaders.class_from_lists">BioDataLoaders.class_from_lists</a>
-  <ul class="collapse">
-  <li><a href="#example-train-a-model-with-configuration-from-a-yaml-file-loading-the-data-from-the-yaml-file-too" id="toc-example-train-a-model-with-configuration-from-a-yaml-file-loading-the-data-from-the-yaml-file-too" class="nav-link" data-scroll-target="#example-train-a-model-with-configuration-from-a-yaml-file-loading-the-data-from-the-yaml-file-too">Example: train a model with configuration from a YAML file loading the data from the YAML file too</a></li>
-  </ul></li>
+  <li><a href="#biodataloaders.class_from_lists" id="toc-biodataloaders.class_from_lists" class="nav-link" data-scroll-target="#biodataloaders.class_from_lists">BioDataLoaders.class_from_lists</a></li>
   </ul></li>
   <li><a href="#data-getters" id="toc-data-getters" class="nav-link" data-scroll-target="#data-getters">Data getters</a>
   <ul>
@@ -409,6 +403,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> MetaResolver (*args, **kwargs)</code></pre>
 </blockquote>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#metaresolver"><code>MetaResolver</code></a> class addresses metaclass conflicts, ensuring compatibility across different data structures. This is particularly useful when integrating with libraries that have specific metaclass requirements.</em></p>
+<p><strong>BioImageBase</strong> is a function that acts as a base class for biomedical images. It can be used for many things, such as loading image data as PyTorch tensors, displaying 2D slices of 3D images and making transformations on medical images.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L40" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -419,6 +414,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p>*Serving as the foundational class for bioimaging data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> provides core functionalities for image handling. It ensures that instances of specified types are appropriately cast to this class, maintaining consistency in data representation.</p>
 <p>Metaclass casts <code>x</code> to this class if it is of type <code>cls._bypass_type</code>.*</p>
+<p><strong>BioImage</strong> is a specialization of BioImageBase that is specifically used for 2D and 3D biomedical images. To do so, it directly inherits from that class and then squeezes the image data and allows for transformations to be made there.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L113" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -429,7 +425,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p><em>A subclass of <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a>, the <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimage"><code>BioImage</code></a> class is tailored for handling both 2D and 3D image objects. It offers methods to load images from various formats and provides access to image properties such as shape and dimensions.</em></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImage.create(<span class="st">'nbs/data_examples/example_tiff.tiff'</span>)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImage.create(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch.Size([1, 96, 512, 512])</code></pre>
@@ -445,10 +441,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p><em>Designed for 3D image data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagestack"><code>BioImageStack</code></a> extends <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to manage volumetric images effectively. It includes functionalities for slicing, visualization, and manipulation of 3D data.</em></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageStack.create(<span class="st">'data_examples/example_tiff.tiff'</span>)</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageStack.create(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>FileNotFoundError: File not found: "data_examples/example_tiff.tiff"</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>torch.Size([1, 96, 512, 512])</code></pre>
 </div>
 </div>
 <hr>
@@ -461,7 +457,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimageproject"><code>BioImageProject</code></a> class represents a 3D image stack as a 2D image using maximum intensity projection. This is particularly useful for visualizing volumetric data in a 2D format, aiding in quick assessments and presentations.</em></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageProject.create(<span class="st">'nbs/data_examples/example_tiff.tiff'</span>)</span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageProject.create(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>a.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <pre><code>torch.Size([1, 512, 512])</code></pre>
@@ -478,7 +474,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><em>For multi-channel 2D images, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagemulti"><code>BioImageMulti</code></a> extends <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to handle data with multiple channels, such as different fluorescence markers in microscopy images.</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a 3D image stack as a multichannel image</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageMulti.create(<span class="st">'nbs/data_examples/example_tiff.tiff'</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageMulti.create(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Differently from BioImageStack, here the third dimension is encoded as channels.</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -504,6 +500,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-blocks-and-dataloader" class="level2">
 <h2 class="anchored" data-anchor-id="data-blocks-and-dataloader">Data Blocks and Dataloader</h2>
 <p>The module offers classes to construct data blocks and data loaders, streamlining the preparation of datasets for machine learning models.</p>
+<p><strong>BioImageBlock</strong> Creates a new type of TransformBlock specifically for bioimaging data aside from other types like ImageBlock, CategoryBlock and TextBlock.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L248" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="bioimageblock" class="level3">
@@ -512,6 +509,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> BioImageBlock (cls:__main__.BioImageBase=&lt;class '__main__.BioImage'&gt;)</code></pre>
 </blockquote>
 <p><em>A <code>TransformBlock</code> tailored for bioimaging data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimageblock"><code>BioImageBlock</code></a> facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging.</em></p>
+<p>The <strong>BioDataBlock</strong> class is built on top of the DataBlock’s class which is provided by the fastai library and is used to build datasets and dataloaders from blocks specifically for biomedical data, offering additionally the option to use BioImageBlock as TransformBlock.</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L253" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -519,8 +517,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
 <blockquote class="blockquote">
 <pre><code> BioDataBlock (blocks:list=(&lt;fastai.data.block.TransformBlock object at
-               0x7ff83efbe390&gt;, &lt;fastai.data.block.TransformBlock object
-               at 0x7ff74d05b4d0&gt;), dl_type:fastai.data.core.TfmdDL=None,
+               0x7fa405f29d50&gt;, &lt;fastai.data.block.TransformBlock object
+               at 0x7fa313d0a250&gt;), dl_type:fastai.data.core.TfmdDL=None,
                get_items=&lt;function get_image_files&gt;, get_y=None,
                get_x=None, getters:list=None, n_inp:int=None,
                item_tfms:list=None, batch_tfms:list=None, **kwargs)</code></pre>
@@ -545,7 +543,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>blocks</td>
 <td>list</td>
-<td>(&lt;fastai.data.block.TransformBlock object at 0x7ff83efbe390&gt;, &lt;fastai.data.block.TransformBlock object at 0x7ff74d05b4d0&gt;)</td>
+<td>(&lt;fastai.data.block.TransformBlock object at 0x7fa405f29d50&gt;, &lt;fastai.data.block.TransformBlock object at 0x7fa313d0a250&gt;)</td>
 <td>One or more <code>TransformBlock</code>s</td>
 </tr>
 <tr class="even">
@@ -604,6 +602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+<p>The <strong>BioDataLoaders</strong> class is built on top of fastai’s DataLoaders class, and wraps various data loading methods as well as the use of BioImageBlock as TransformBlock</p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L284" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
@@ -1702,94 +1701,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<section id="example-train-a-model-with-configuration-from-a-yaml-file-loading-the-data-from-the-yaml-file-too" class="level4">
-<h4 class="anchored" data-anchor-id="example-train-a-model-with-configuration-from-a-yaml-file-loading-the-data-from-the-yaml-file-too">Example: train a model with configuration from a YAML file loading the data from the YAML file too</h4>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'_data'</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">32</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> Path(image_path)<span class="op">/</span><span class="st">'bloodmnist'</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>path_train <span class="op">=</span> path<span class="op">/</span><span class="st">'train'</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>path_val <span class="op">=</span> path<span class="op">/</span><span class="st">'val'</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Path to the YAML configuration file</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">'nbs/data_examples/sample_config.yml'</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Create BioDataLoaders instance from YAML with optional overrides</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>dataloaders <span class="op">=</span> BioDataLoaders.from_yaml(</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    path,</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    yaml_path,</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    show_summary <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                   in_channels<span class="op">=</span><span class="dv">3</span>,   </span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>                   num_classes<span class="op">=</span><span class="dv">8</span>)    </span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer and load the data from the yaml file </span></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(dataloaders, model, yaml_path)</span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
-    }
-    progress:not([value]), progress:not([value])::-webkit-progress-bar {
-        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
-    }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-</div>
-<div class="cell-output cell-output-display">
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th">epoch</th>
-<th data-quarto-table-cell-role="th">train_loss</th>
-<th data-quarto-table-cell-role="th">valid_loss</th>
-<th data-quarto-table-cell-role="th">accuracy</th>
-<th data-quarto-table-cell-role="th">balanced_accuracy_score</th>
-<th data-quarto-table-cell-role="th">precision_score</th>
-<th data-quarto-table-cell-role="th">time</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>0</td>
-<td>0.852773</td>
-<td>2.156543</td>
-<td>0.382593</td>
-<td>0.394585</td>
-<td>0.406876</td>
-<td>01:12</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Better model found at epoch 0 with accuracy value: 0.38259345293045044.</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<p><img src="01_data_files/figure-html/cell-26-output-4.png" class="img-fluid"></p>
-</div>
-</div>
-</section>
 </section>
 </section>
 <section id="data-getters" class="level2">
 <h2 class="anchored" data-anchor-id="data-getters">Data getters</h2>
 <p>Functions to retrieve specific data components are provided, aiding in the organization and preprocessing of datasets.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L558" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L554" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="get_gt" class="level3">
 <h3 class="anchored" data-anchor-id="get_gt">get_gt</h3>
 <blockquote class="blockquote">
@@ -1829,9 +1747,9 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tr>
 </tbody>
 </table>
-<p>Similar to <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a>, the <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_target"><code>get_target</code></a> function fetches target data for training, validation, or testing, facilitating the preparation of datasets for machine learning models.</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_target"><code>get_target</code></a> function constructs and returns functions for generating file paths to “target” files based on given input parameters. This function is particularly useful for tasks where the target files are stored in a different directory or have a different naming convention compared to the input files.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L585" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L581" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_target" class="level3">
 <h3 class="anchored" data-anchor-id="get_target">get_target</h3>
@@ -1893,23 +1811,32 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tr>
 </tbody>
 </table>
+<p>The function <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_target"><code>get_target</code></a> can be used to look for target files in different folders using either absolute or relative paths:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'train_folder/target'</span>, same_filename<span class="op">=</span><span class="va">False</span>)(<span class="st">'../signal/signal01.tif'</span>))</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'target'</span>, relative_path<span class="op">=</span><span class="va">True</span>)(<span class="st">'../train_folder/signal/image01.tif'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'train_folder/target'</span>, same_filename<span class="op">=</span><span class="va">False</span>)(<span class="st">'../signal/signal01.tif'</span>))</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'target'</span>, relative_path<span class="op">=</span><span class="va">True</span>)(<span class="st">'../train_folder/signal/image01.tif'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>train_folder/target/target01.tif
 ../train_folder/target/image01.tif</code></pre>
 </div>
 </div>
+<p>…and it can look for target files with different names but same numbering:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"image_clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"image_noisy"</span>)(<span class="st">'train_folder/signal/image_noisy.tif'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"image_clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"image_noisy"</span>)(<span class="st">'train_folder/signal/image_noisy_01.tif'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_folder/GT/image_clean.tif</code></pre>
+<pre><code>train_folder/GT/image_clean_01.tif</code></pre>
 </div>
 </div>
-<p>For tasks involving denoising or noise analysis, <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_noisy_pair"><code>get_noisy_pair</code></a> retrieves pairs of clean and noisy data, enabling the training of models to learn noise reduction.</p>
+<p>It also supports more general cases:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"noisy"</span>)(<span class="st">'train_folder/signal/01_image_noisy_dataset.tif'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_folder/GT/01_image_clean_dataset.tif</code></pre>
+</div>
+</div>
+<p>For tasks involving unsupervised denoising or noise analysis, <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_noisy_pair"><code>get_noisy_pair</code></a> retrieves pairs of noisy data, enabling the training of models such as N2N.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L638" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L634" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_noisy_pair" class="level3">
 <h3 class="anchored" data-anchor-id="get_noisy_pair">get_noisy_pair</h3>
@@ -2090,7 +2017,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>The module provides functions for data preprocessing, including patch extraction and dimensionality reduction, essential for preparing data for machine learning models.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L806" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L802" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="extract_patches" class="level3">
 <h3 class="anchored" data-anchor-id="extract_patches">extract_patches</h3>
 <blockquote class="blockquote">
@@ -2140,7 +2067,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L832" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L828" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="save_patches_grid" class="level3">
 <h3 class="anchored" data-anchor-id="save_patches_grid">save_patches_grid</h3>
@@ -2148,7 +2075,8 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <pre><code> save_patches_grid (data_folder, gt_folder, output_folder, patch_size,
                     overlap, threshold=None, squeeze_input=True,
                     squeeze_patches=False, csv_output=True,
-                    train_test_split_ratio=0.8)</code></pre>
+                    train_test_split_ratio=0.8, tfms_before:List=None,
+                    tfms_after:List=None)</code></pre>
 </blockquote>
 <p><em>Loads n-dimensional data from data_folder and gt_folder, generates patches, and saves them into individual HDF5 files. Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</em></p>
 <table class="table">
@@ -2207,13 +2135,13 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <td>squeeze_input</td>
 <td>bool</td>
 <td>True</td>
-<td></td>
+<td>If True, squeeze the input data to remove single-dimensional entries.</td>
 </tr>
 <tr class="even">
 <td>squeeze_patches</td>
 <td>bool</td>
 <td>False</td>
-<td></td>
+<td>If True, squeeze the patches to remove single-dimensional entries.</td>
 </tr>
 <tr class="odd">
 <td>csv_output</td>
@@ -2227,47 +2155,71 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <td>0.8</td>
 <td>Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</td>
 </tr>
+<tr class="odd">
+<td>tfms_before</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply before extracting patches.</td>
+</tr>
+<tr class="even">
+<td>tfms_after</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply after extracting patches.</td>
+</tr>
 </tbody>
 </table>
 <p>After extracting patches, <a href="https://deepCLEM.github.io/bioMONAI/data.html#save_patches_grid"><code>save_patches_grid</code></a> saves them in a grid format, facilitating visualization and inspection of the patches.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> Blur</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_folder, gt_folder, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_after<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00,  3.50it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 19.41it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test/train_patches.csv and ./_test/test_patches.csv</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader, split_hdf_path</span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader, split_hdf_path</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/X/1'</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/X/1'</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="01_data_files/figure-html/cell-40-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/y/1'</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="01_data_files/figure-html/cell-41-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L934" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L940" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="extract_random_patches" class="level3">
 <h3 class="anchored" data-anchor-id="extract_random_patches">extract_random_patches</h3>
 <blockquote class="blockquote">
-<pre><code> extract_random_patches (data, patch_size, num_patches)</code></pre>
+<pre><code> extract_random_patches (data_tuple, patch_size, num_patches)</code></pre>
 </blockquote>
-<p>*Extracts a specified number of random n-dimensional patches from the input data.</p>
-<p>Returns: - A list of randomly cropped patches as numpy arrays.*</p>
+<p>*Extracts a specified number of random n-dimensional patches from the input data and ground truth data.</p>
+<p>Returns: - A tuple of lists containing randomly cropped patches as numpy arrays (input_patches, gt_patches).*</p>
 <table class="table">
 <colgroup>
 <col style="width: 15%">
@@ -2281,8 +2233,8 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </thead>
 <tbody>
 <tr class="odd">
-<td>data</td>
-<td>numpy array of the input data (n-dimensional).</td>
+<td>data_tuple</td>
+<td>tuple of numpy arrays (input data, ground truth data).</td>
 </tr>
 <tr class="even">
 <td>patch_size</td>
@@ -2295,7 +2247,7 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L968" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L982" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="save_patches_random" class="level3">
 <h3 class="anchored" data-anchor-id="save_patches_random">save_patches_random</h3>
@@ -2303,7 +2255,8 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <pre><code> save_patches_random (data_folder, gt_folder, output_folder, patch_size,
                       num_patches, threshold=None, squeeze_input=True,
                       squeeze_patches=False, csv_output=True,
-                      train_test_split_ratio=0.8)</code></pre>
+                      train_test_split_ratio=0.8, tfms_before:List=None,
+                      tfms_after:List=None)</code></pre>
 </blockquote>
 <p><em>Loads n-dimensional data from data_folder and gt_folder, generates random patches, and saves them into individual HDF5 files. Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</em></p>
 <table class="table">
@@ -2382,33 +2335,54 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <td>0.8</td>
 <td>Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</td>
 </tr>
+<tr class="odd">
+<td>tfms_before</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply before extracting patches.</td>
+</tr>
+<tr class="even">
+<td>tfms_after</td>
+<td>List</td>
+<td>None</td>
+<td>List of transforms to apply after extracting patches.</td>
+</tr>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_folder, gt_folder, output_folder, patch_size, num_patches)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>gt_folder <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_folder, gt_folder, output_folder, patch_size, num_patches, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_before<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 13.96it/s]</code></pre>
+<pre><code>Processing files: 100%|██████████| 2/2 [00:00&lt;00:00, 52.76it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CSV files saved to: ./_test2/train_patches.csv and ./_test2/test_patches.csv</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/X/1'</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/X/1'</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="01_data_files/figure-html/cell-45-output-1.png" class="img-fluid"></p>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/y/1'</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="01_data_files/figure-html/cell-46-output-1.png" class="img-fluid"></p>
+</div>
+</div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L1071" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L1094" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dict2string" class="level3">
 <h3 class="anchored" data-anchor-id="dict2string">dict2string</h3>
@@ -2460,15 +2434,15 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>my_dict <span class="op">=</span> {<span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'Z'</span>: <span class="dv">30</span>, <span class="st">'S'</span>: <span class="dv">1</span>}</span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dict2string(my_dict, pad_zeroes<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>my_dict <span class="op">=</span> {<span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'Z'</span>: <span class="dv">30</span>, <span class="st">'S'</span>: <span class="dv">1</span>}</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dict2string(my_dict, pad_zeroes<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>C002_Z030_S001</code></pre>
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L1090" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L1113" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="remove_singleton_dims" class="level3">
 <h3 class="anchored" data-anchor-id="remove_singleton_dims">remove_singleton_dims</h3>
@@ -2498,7 +2472,7 @@ new_order (str): The updated dimension order string.*</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L1112" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L1135" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="extract_substacks" class="level3">
 <h3 class="anchored" data-anchor-id="extract_substacks">extract_substacks</h3>
@@ -2562,9 +2536,9 @@ new_order (str): The updated dimension order string.*</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./_test_folder/"</span></span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>subdirs <span class="op">=</span> [output_dir <span class="op">+</span> folder <span class="cf">for</span> folder <span class="kw">in</span> [<span class="st">"channel_0"</span>, <span class="st">"channel_1"</span>, <span class="st">"channel_2"</span>]]</span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>subdirs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./_test_folder/"</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>subdirs <span class="op">=</span> [output_dir <span class="op">+</span> folder <span class="cf">for</span> folder <span class="kw">in</span> [<span class="st">"channel_0"</span>, <span class="st">"channel_1"</span>, <span class="st">"channel_2"</span>]]</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>subdirs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <pre><code>['./_test_folder/channel_0',
  './_test_folder/channel_1',
@@ -2572,24 +2546,24 @@ new_order (str): The updated dimension order string.*</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>[os.path.join([output_dir][<span class="dv">0</span>], <span class="ss">f"</span><span class="sc">{</span>subdirs[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>ii<span class="sc">}</span><span class="ss">"</span>) <span class="cf">for</span> ii <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>[os.path.join([output_dir][<span class="dv">0</span>], <span class="ss">f"</span><span class="sc">{</span>subdirs[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>ii<span class="sc">}</span><span class="ss">"</span>) <span class="cf">for</span> ii <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <pre><code>['./_test_folder/./_test_folder/channel_0_0',
  './_test_folder/./_test_folder/channel_0_1']</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'./data_examples/2155a4fe_3500000635_100X_20170227_E08_P21.ome.tiff'</span></span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'./data_examples/2155a4fe_3500000635_100X_20170227_E08_P21.ome.tiff'</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Extracted substack saved to: ./_test_folder/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Zrange(0, 35)_T0.ome.tiff</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Extracted substack saved to: ./_test_folder/C_0/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Z5_T0.ome.tiff
 Extracted substack saved to: ./_test_folder/C_1/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C1_Z5_T0.ome.tiff
@@ -2597,8 +2571,8 @@ Extracted substack saved to: ./_test_folder/C_2/2155a4fe_3500000635_100X_2017022
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
-<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Extracted substack saved to: ./_test_folder/channel_0/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C0_Z5.ome.tiff
 Extracted substack saved to: ./_test_folder/channel_1/2155a4fe_3500000635_100X_20170227_E08_P21_substack_C1_Z5.ome.tiff

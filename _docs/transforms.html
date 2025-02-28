@@ -323,6 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#noise" id="toc-noise" class="nav-link" data-scroll-target="#noise">Noise</a>
   <ul>
   <li><a href="#randcameranoise" id="toc-randcameranoise" class="nav-link" data-scroll-target="#randcameranoise">RandCameraNoise</a></li>
+  <li><a href="#blur" id="toc-blur" class="nav-link" data-scroll-target="#blur">Blur</a></li>
   </ul></li>
   <li><a href="#normalization" id="toc-normalization" class="nav-link" data-scroll-target="#normalization">Normalization</a>
   <ul>
@@ -369,7 +370,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="size-sampling" class="level2">
 <h2 class="anchored" data-anchor-id="size-sampling">Size &amp; Sampling</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L19" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L22" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="resample" class="level3">
 <h3 class="anchored" data-anchor-id="resample">Resample</h3>
 <blockquote class="blockquote">
@@ -413,7 +414,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L55" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="resize" class="level3">
 <h3 class="anchored" data-anchor-id="resize">Resize</h3>
@@ -475,7 +476,7 @@ torch.Size([60, 50, 50])</code></pre>
 <section id="noise" class="level2">
 <h2 class="anchored" data-anchor-id="noise">Noise</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L103" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L107" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="randcameranoise" class="level3">
 <h3 class="anchored" data-anchor-id="randcameranoise">RandCameraNoise</h3>
 <blockquote class="blockquote">
@@ -615,12 +616,55 @@ torch.Size([60, 50, 50])</code></pre>
 <p><img src="05_transforms_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
 </div>
 </div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L178" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="blur" class="level3">
+<h3 class="anchored" data-anchor-id="blur">Blur</h3>
+<blockquote class="blockquote">
+<pre><code> Blur (sigma=1.0, ksize=5, prob=0.5)</code></pre>
+</blockquote>
+<p><em>Apply Gaussian blur to the image.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a random NumPy array </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>random_array <span class="op">=</span> np.random.rand(<span class="dv">64</span>, <span class="dv">64</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply Blur transform to the image</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>blur_transform <span class="op">=</span> Blur(ksize<span class="op">=</span><span class="dv">15</span>, prob<span class="op">=</span><span class="dv">1</span>) </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>blurred_nparray <span class="op">=</span> blur_transform(random_array)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the original image</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>plot_image(random_array)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the blurred image</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>plot_image(blurred_nparray)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-14-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-14-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply Blur transform to the image</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>blur_transform <span class="op">=</span> Blur(sigma<span class="op">=</span><span class="dv">5</span>, prob<span class="op">=</span><span class="fl">1.0</span>) </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>blurred_img <span class="op">=</span> blur_transform(img)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the original image</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>plot_image(img)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the blurred image</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plot_image(blurred_img)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-15-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="05_transforms_files/figure-html/cell-15-output-2.png" class="img-fluid"></p>
+</div>
+</div>
 </section>
 </section>
 <section id="normalization" class="level2">
 <h2 class="anchored" data-anchor-id="normalization">Normalization</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L189" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L208" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="scaleintensity" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensity">ScaleIntensity</h3>
 <blockquote class="blockquote">
@@ -683,7 +727,7 @@ torch.Size([60, 50, 50])</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L208" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L237" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="scaleintensitypercentiles" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensitypercentiles">ScaleIntensityPercentiles</h3>
@@ -766,7 +810,7 @@ torch.Size([60, 50, 50])</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L232" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L273" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="scaleintensityvariance" class="level3">
 <h3 class="anchored" data-anchor-id="scaleintensityvariance">ScaleIntensityVariance</h3>
@@ -805,19 +849,19 @@ torch.Size([60, 50, 50])</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage with a random tensor of shape (1, 3, 256, 256)</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">256</span>, <span class="dv">256</span>))</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>transform <span class="op">=</span> ScaleIntensityVariance(ndim<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the transform to the tensor</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>scaled_tensor <span class="op">=</span> transform(rand_tensor)</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original Tensor Variance:'</span>, rand_tensor.var().item())</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Scaled Tensor Variance:'</span>, scaled_tensor.var().item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage with a random tensor of shape (1, 3, 256, 256)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">256</span>, <span class="dv">256</span>))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>transform <span class="op">=</span> ScaleIntensityVariance(ndim<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the transform to the tensor</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>scaled_tensor <span class="op">=</span> transform(rand_tensor)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original Tensor Variance:'</span>, rand_tensor.var().item())</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Scaled Tensor Variance:'</span>, scaled_tensor.var().item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Original Tensor Variance: 0.08352072536945343
-Scaled Tensor Variance: 0.9999999403953552</code></pre>
+<pre><code>Original Tensor Variance: 0.08322268724441528
+Scaled Tensor Variance: 1.0</code></pre>
 </div>
 </div>
 </section>
@@ -825,13 +869,14 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 <section id="data-augmentation" class="level2">
 <h2 class="anchored" data-anchor-id="data-augmentation">Data Augmentation</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L271" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L321" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="randcrop2d" class="level3">
 <h3 class="anchored" data-anchor-id="randcrop2d">RandCrop2D</h3>
 <blockquote class="blockquote">
 <pre><code> RandCrop2D (size:int|tuple, lazy=False, **kwargs)</code></pre>
 </blockquote>
-<p><em>Randomly crop an image to <code>size</code></em></p>
+<p>*Randomly crops a 2D image to a specified size.</p>
+<p>This transform randomly crops a 2D image to a specified size during training and performs a center crop during validation.*</p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -869,7 +914,7 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L302" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L369" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randcropnd" class="level3">
 <h3 class="anchored" data-anchor-id="randcropnd">RandCropND</h3>
@@ -915,22 +960,22 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">65</span>, <span class="dv">65</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">8</span>, <span class="op">*</span>orig_size))</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    test_eq((<span class="dv">8</span>,<span class="dv">64</span>,<span class="dv">64</span>),RandCropND((<span class="dv">64</span>,<span class="dv">64</span>))(rand_tensor).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">65</span>, <span class="dv">65</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="dv">8</span>, <span class="op">*</span>orig_size))</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    test_eq((<span class="dv">8</span>,<span class="dv">64</span>,<span class="dv">64</span>),RandCropND((<span class="dv">64</span>,<span class="dv">64</span>))(rand_tensor).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L350" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L422" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randflip" class="level3">
 <h3 class="anchored" data-anchor-id="randflip">RandFlip</h3>
 <blockquote class="blockquote">
 <pre><code> RandFlip (prob=0.1, spatial_axis=None, ndim=2, lazy=False, **kwargs)</code></pre>
 </blockquote>
-<p><em>Randomly flips an ND image over a specified axis.</em></p>
+<p><em>Randomly flips an ND image over a specified axis. Works with both NumPy arrays and BioImageBase objects.</em></p>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -957,19 +1002,19 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 <td>spatial_axis</td>
 <td>NoneType</td>
 <td>None</td>
-<td>Spatial axes along which to flip over. Default is None. The default axis=None will flip over all of the axes of the input array.</td>
+<td>Axes to flip. Default is None (random selection)</td>
 </tr>
 <tr class="odd">
 <td>ndim</td>
 <td>int</td>
 <td>2</td>
-<td>Number of spatial dimensions in the image</td>
+<td>Number of spatial dimensions</td>
 </tr>
 <tr class="even">
 <td>lazy</td>
 <td>bool</td>
 <td>False</td>
-<td>Flag to indicate whether this transform should execute lazily or not. Defaults to False</td>
+<td>Flag for lazy execution (for BioImageBase)</td>
 </tr>
 <tr class="odd">
 <td>kwargs</td>
@@ -980,42 +1025,58 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandFlip(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axis<span class="op">=</span><span class="va">None</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>image <span class="op">=</span> np.random.rand(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">3</span>)  </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>flip_transform <span class="op">=</span> RandFlip(prob<span class="op">=</span><span class="fl">1.</span>, ndim<span class="op">=</span><span class="dv">2</span>, spatial_axis<span class="op">=</span><span class="dv">1</span>)  </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>flipped_image <span class="op">=</span> flip_transform(image)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'original:</span><span class="ch">\n</span><span class="st">'</span>, image)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'flipped:</span><span class="ch">\n</span><span class="st">'</span>, flipped_image)  </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>test_eq(image[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>], flipped_image[<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>]) <span class="co"># Check if the image is flipped correctly</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.4648, 0.4394, 0.0145, 0.4412],
-         [0.2723, 0.8205, 0.4727, 0.9594],
-         [0.6661, 0.9815, 0.9765, 0.4414],
-         [0.2815, 0.6184, 0.0845, 0.0834]]]) 
+<pre><code>original:
+ [[[0.07611485 0.91377192 0.7166257 ]
+  [0.81333662 0.28594794 0.06074749]
+  [0.96771797 0.12758963 0.51526851]]]
+flipped:
+ [[[0.96771797 0.12758963 0.51526851]
+  [0.81333662 0.28594794 0.06074749]
+  [0.07611485 0.91377192 0.7166257 ]]]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandFlip(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axis<span class="op">=</span><span class="va">None</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>orig tensor:  metatensor([[[0.4286, 0.1079, 0.6336, 0.6456],
+         [0.4857, 0.3213, 0.7593, 0.2457],
+         [0.7655, 0.7342, 0.6495, 0.3154],
+         [0.5077, 0.2230, 0.8204, 0.0682]]]) 
 
-metatensor([[[0.2815, 0.6184, 0.0845, 0.0834],
-         [0.6661, 0.9815, 0.9765, 0.4414],
-         [0.2723, 0.8205, 0.4727, 0.9594],
-         [0.4648, 0.4394, 0.0145, 0.4412]]])
-metatensor([[[0.0834, 0.0845, 0.6184, 0.2815],
-         [0.4414, 0.9765, 0.9815, 0.6661],
-         [0.9594, 0.4727, 0.8205, 0.2723],
-         [0.4412, 0.0145, 0.4394, 0.4648]]])
-metatensor([[[0.4648, 0.4394, 0.0145, 0.4412],
-         [0.2723, 0.8205, 0.4727, 0.9594],
-         [0.6661, 0.9815, 0.9765, 0.4414],
-         [0.2815, 0.6184, 0.0845, 0.0834]]])</code></pre>
+metatensor([[[0.6456, 0.6336, 0.1079, 0.4286],
+         [0.2457, 0.7593, 0.3213, 0.4857],
+         [0.3154, 0.6495, 0.7342, 0.7655],
+         [0.0682, 0.8204, 0.2230, 0.5077]]])
+metatensor([[[0.4286, 0.1079, 0.6336, 0.6456],
+         [0.4857, 0.3213, 0.7593, 0.2457],
+         [0.7655, 0.7342, 0.6495, 0.3154],
+         [0.5077, 0.2230, 0.8204, 0.0682]]])
+metatensor([[[0.6456, 0.6336, 0.1079, 0.4286],
+         [0.2457, 0.7593, 0.3213, 0.4857],
+         [0.3154, 0.6495, 0.7342, 0.7655],
+         [0.0682, 0.8204, 0.2230, 0.5077]]])</code></pre>
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L383" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/transforms.py#L464" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randrot90" class="level3">
 <h3 class="anchored" data-anchor-id="randrot90">RandRot90</h3>
 <blockquote class="blockquote">
-<pre><code> RandRot90 (prob=0.1, max_k=3, spatial_axes=(0, 1), ndim=2, lazy=False,
-            **kwargs)</code></pre>
+<pre><code> RandRot90 (prob=0.1, k=1, max_k=3, spatial_axes=(0, 1), ndim=2,
+            lazy=False, **kwargs)</code></pre>
 </blockquote>
 <p><em>Randomly rotate an ND image by 90 degrees in the plane specified by axes.</em></p>
 <table class="table">
@@ -1041,30 +1102,36 @@ metatensor([[[0.4648, 0.4394, 0.0145, 0.4412],
 <td>Probability of rotating</td>
 </tr>
 <tr class="even">
+<td>k</td>
+<td>int</td>
+<td>1</td>
+<td>Number of times to rotate by 90 degrees. If k is None, it will be set randomly in <code>before_call</code>.</td>
+</tr>
+<tr class="odd">
 <td>max_k</td>
 <td>int</td>
 <td>3</td>
 <td>Max number of times to rotate by 90 degrees</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>spatial_axes</td>
 <td>tuple</td>
 <td>(0, 1)</td>
-<td>Spatial axes along which to rotate. Default: (0, 1), this is the first two axis in spatial dimensions.</td>
+<td>Spatial axes that define the plane around which to rotate. Default: (0, 1), this are the first two axis in spatial dimensions.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>ndim</td>
 <td>int</td>
 <td>2</td>
-<td></td>
+<td>Number of spatial dimensions</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>lazy</td>
 <td>bool</td>
 <td>False</td>
 <td>Flag to indicate whether this transform should execute lazily or not. Defaults to False</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>kwargs</td>
 <td></td>
 <td></td>
@@ -1073,32 +1140,32 @@ metatensor([[[0.4648, 0.4394, 0.0145, 0.4412],
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRot90(prob<span class="op">=</span><span class="fl">.75</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a random tensor</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>orig_size <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">4</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>rand_tensor <span class="op">=</span> BioImageBase(torch.rand(<span class="op">*</span>orig_size))</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'orig tensor: '</span>, rand_tensor, <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRot90(prob<span class="op">=</span><span class="dv">1</span>, k<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)(rand_tensor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.6143, 0.4423, 0.1837, 0.9712],
-         [0.5201, 0.4463, 0.2429, 0.4175],
-         [0.7642, 0.9752, 0.8923, 0.8719],
-         [0.0691, 0.7557, 0.9410, 0.0721]]]) 
+<pre><code>orig tensor:  metatensor([[[0.1851, 0.1876, 0.4261, 0.6961],
+         [0.6611, 0.2846, 0.6376, 0.7556],
+         [0.3825, 0.4489, 0.4670, 0.2890],
+         [0.1055, 0.1973, 0.3708, 0.1817]]]) 
 
-metatensor([[[0.9712, 0.4175, 0.8719, 0.0721],
-         [0.1837, 0.2429, 0.8923, 0.9410],
-         [0.4423, 0.4463, 0.9752, 0.7557],
-         [0.6143, 0.5201, 0.7642, 0.0691]]])
-metatensor([[[0.9712, 0.4175, 0.8719, 0.0721],
-         [0.1837, 0.2429, 0.8923, 0.9410],
-         [0.4423, 0.4463, 0.9752, 0.7557],
-         [0.6143, 0.5201, 0.7642, 0.0691]]])
-metatensor([[[0.0721, 0.9410, 0.7557, 0.0691],
-         [0.8719, 0.8923, 0.9752, 0.7642],
-         [0.4175, 0.2429, 0.4463, 0.5201],
-         [0.9712, 0.1837, 0.4423, 0.6143]]])</code></pre>
+metatensor([[[0.6961, 0.7556, 0.2890, 0.1817],
+         [0.4261, 0.6376, 0.4670, 0.3708],
+         [0.1876, 0.2846, 0.4489, 0.1973],
+         [0.1851, 0.6611, 0.3825, 0.1055]]])
+metatensor([[[0.1817, 0.3708, 0.1973, 0.1055],
+         [0.2890, 0.4670, 0.4489, 0.3825],
+         [0.7556, 0.6376, 0.2846, 0.6611],
+         [0.6961, 0.4261, 0.1876, 0.1851]]])
+metatensor([[[0.1055, 0.3825, 0.6611, 0.1851],
+         [0.1973, 0.4489, 0.2846, 0.1876],
+         [0.3708, 0.4670, 0.6376, 0.4261],
+         [0.1817, 0.2890, 0.7556, 0.6961]]])</code></pre>
 </div>
 </div>
 

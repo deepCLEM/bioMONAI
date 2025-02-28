@@ -21,11 +21,19 @@ from .core import torchTensor, tensor, delegates, torch_from_numpy, hasattrs, im
 from .io import tiff2torch
 
 # %% ../nbs/09_visualize.ipynb 6
-def plot_image(values, # A 2D array of pixel values representing the image.
+def plot_image(values, # A 2D or 3D array of pixel values representing the image.
                ):
     """
-    Plot a 2D image using Matplotlib. The function assumes that 'values' is a 2D array representing an image, typically in grayscale.
+    Plot a 2D image or the central slice of a 3D image using Matplotlib. 
+    The function assumes that 'values' is a 2D or 3D array representing an image, typically in grayscale.
     """
+    # Check if the input is 3D
+    if values.ndim == 3:
+        # Get the central slice along the first axis
+        central_slice = values[values.shape[0] // 2]
+    else:
+        central_slice = values
+    
     # Create a figure with Matplotlib
     fig = plt.figure()
     
@@ -34,7 +42,7 @@ def plot_image(values, # A 2D array of pixel values representing the image.
     
     # Display the image using imshow. The np.flipud function is applied to flip the array vertically, 
     # which is necessary because Matplotlib's default orientation might differ from NumPy's or Plotly's.
-    ax.imshow(np.flipud(values), cmap='gray')
+    ax.imshow(np.flipud(central_slice), cmap='gray')
     
     # Turn off axis numbers and ticks for a cleaner visual appearance of the image
     ax.axis('off')
@@ -42,8 +50,7 @@ def plot_image(values, # A 2D array of pixel values representing the image.
     # Display the figure with all defined elements
     plt.show()
 
-
-# %% ../nbs/09_visualize.ipynb 9
+# %% ../nbs/09_visualize.ipynb 10
 @delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
 def show_multichannel(img,                  # A tensor or numpy array representing a multi-channel image.
                       ax=None,              # The Matplotlib axis to use for plotting.
@@ -135,13 +142,13 @@ def show_multichannel(img,                  # A tensor or numpy array representi
 
 
 
-# %% ../nbs/09_visualize.ipynb 12
+# %% ../nbs/09_visualize.ipynb 13
 # Utility function for determining figure bounds
 def _fig_bounds(x):
     r = x//8
     return min(15, max(1,r))
 
-# %% ../nbs/09_visualize.ipynb 13
+# %% ../nbs/09_visualize.ipynb 14
 def mosaic_image_3d(t: (np.ndarray, torchTensor),   # 3D image to plot
                   axis: int = 0,                    # axis to split 3D array to 2D images
                   figsize: tuple = (15,15),         # size of the figure
@@ -188,7 +195,7 @@ def mosaic_image_3d(t: (np.ndarray, torchTensor),   # 3D image to plot
     plt.imshow(grid[0,:,:], cmap=cmap, alpha=alpha)
     plt.axis('off')
 
-# %% ../nbs/09_visualize.ipynb 14
+# %% ../nbs/09_visualize.ipynb 15
 @delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
 def show_images_grid(images,            # A list of images to display.
                      ax=None,           # The Matplotlib axis to use for plotting.
@@ -260,7 +267,7 @@ def show_images_grid(images,            # A list of images to display.
 
     return ax
 
-# %% ../nbs/09_visualize.ipynb 18
+# %% ../nbs/09_visualize.ipynb 19
 def show_plane(ax,                  # The axis object to display the slice on.
                plane,               # A 2D numpy array representing the slice of the image tensor.
                cmap="gray",         # Colormap to use for displaying the image.
@@ -284,7 +291,7 @@ def show_plane(ax,                  # The axis object to display the slice on.
         ax.axvline(lines[1], color=linecolor, linestyle=linestyle)
 
 
-# %% ../nbs/09_visualize.ipynb 19
+# %% ../nbs/09_visualize.ipynb 20
 def visualize_slices(data,          # A 3D numpy array representing the image tensor.
                      planes=None,   # A tuple containing the indices of the planes to visualize.
                      showlines=True,# Whether to show dashed lines on the planes, rows, and columns.
@@ -318,7 +325,7 @@ def visualize_slices(data,          # A 3D numpy array representing the image te
     plt.show()
 
 
-# %% ../nbs/09_visualize.ipynb 22
+# %% ../nbs/09_visualize.ipynb 23
 def slice_explorer(data,            # A 3D numpy array representing the image tensor.
                    order='CZYX',    # The order of dimensions in the data.
                    **kwargs):
@@ -365,7 +372,7 @@ def slice_explorer(data,            # A 3D numpy array representing the image te
     # Display the plot using Plotly's show function
     pio.show(fig)
 
-# %% ../nbs/09_visualize.ipynb 25
+# %% ../nbs/09_visualize.ipynb 26
 def plot_volume(values,             # A 3D array of pixel values representing the volume.
                 opacity=0.1,        # Opacity level for the surfaces in the volume plot.
                 min=0.1,            # Minimum threshold multiplier for the visualization.

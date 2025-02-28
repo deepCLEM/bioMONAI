@@ -393,35 +393,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> CombinedLoss (spatial_dims=2, mse_weight=0.33, mae_weight=0.33)</code></pre>
 </blockquote>
-<p><em>losses combined</em></p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L59" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="msssimloss" class="level3">
-<h3 class="anchored" data-anchor-id="msssimloss">MSSSIMLoss</h3>
-<blockquote class="blockquote">
-<pre><code> MSSSIMLoss (spatial_dims=2, window_size:int=8, sigma:float=1.5,
-             reduction:str='mean', levels:int=3, weights=None)</code></pre>
-</blockquote>
-<p>*Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
+<p>*CombinedLoss computes a weighted combination of SSIM, MSE, and MAE losses.</p>
+<p>This class allows for the combination of three different loss functions: Structural Similarity Index (SSIM), Mean Squared Error (MSE), and Mean Absolute Error (MAE). The weights for MSE and MAE can be adjusted, and the weight for SSIM is automatically calculated as the remaining weight.</p>
+<p>CombinedLoss reference paper: Shah, Z. H., Müller, M., Hammer, B., Huser, T., &amp; Schenck, W. (2022, July). Impact of different loss functions on denoising of microscopic images. In 2022 International Joint Conference on Neural Networks (IJCNN) (pp.&nbsp;1-10). IEEE.*</p>
 <table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -441,7 +416,53 @@ class Model(nn.Module):
 <td>spatial_dims</td>
 <td>int</td>
 <td>2</td>
-<td>Number of spatial dimensions.</td>
+<td>Number of spatial dimensions (2 for 2D images, 3 for 3D images)</td>
+</tr>
+<tr class="even">
+<td>mse_weight</td>
+<td>float</td>
+<td>0.33</td>
+<td>Weight for the MSE loss component</td>
+</tr>
+<tr class="odd">
+<td>mae_weight</td>
+<td>float</td>
+<td>0.33</td>
+<td>Weight for the MAE loss component</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L59" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msssimloss" class="level3">
+<h3 class="anchored" data-anchor-id="msssimloss">MSSSIMLoss</h3>
+<blockquote class="blockquote">
+<pre><code> MSSSIMLoss (spatial_dims=2, window_size:int=8, sigma:float=1.5,
+             reduction:str='mean', levels:int=3, weights=None)</code></pre>
+</blockquote>
+<p><em>Multi-Scale Structural Similarity (MSSSIM) Loss using MONAI’s SSIMLoss as the base.</em></p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>spatial_dims</td>
+<td>int</td>
+<td>2</td>
+<td>Number of spatial dimensions (2 for 2D images, 3 for 3D images).</td>
 </tr>
 <tr class="even">
 <td>window_size</td>
@@ -476,13 +497,13 @@ class Model(nn.Module):
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>msssim_loss <span class="op">=</span> MSSSIMLoss(levels<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ssim_loss <span class="op">=</span> SSIMLoss(<span class="dv">2</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example output</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example target</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssim_loss(output, target)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>loss2 <span class="op">=</span> ssim_loss(output,target)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ms-ssim: "</span>,loss, <span class="st">'</span><span class="ch">\n</span><span class="st">ssim: '</span>, loss2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>msssim_loss <span class="op">=</span> MSSSIMLoss(levels<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ssim_loss <span class="op">=</span> SSIMLoss(<span class="dv">2</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example output</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example target</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssim_loss(output, target)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>loss2 <span class="op">=</span> ssim_loss(output,target)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ms-ssim: "</span>,loss, <span class="st">'</span><span class="ch">\n</span><span class="st">ssim: '</span>, loss2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ms-ssim:  tensor(0.9686, device='cuda:0') 
 ssim:  tensor(0.9949, device='cuda:0')</code></pre>
@@ -498,25 +519,9 @@ ssim:  tensor(0.9949, device='cuda:0')</code></pre>
                sigma:float=1.5, reduction:str='mean', levels:int=3,
                weights=None)</code></pre>
 </blockquote>
-<p>*Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
+<p>*Multi-Scale Structural Similarity (MSSSIM) with Gaussian-weighted L1 Loss.</p>
+<p>Reference paper: Zhao, H., Gallo, O., Frosio, I., &amp; Kautz, J. (2016). Loss functions for image restoration with neural networks. IEEE Transactions on computational imaging, 3(1), 47-57.*</p>
 <table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -577,14 +582,14 @@ class Model(nn.Module):
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>msssiml1_loss <span class="op">=</span> MSSSIML1Loss(alpha<span class="op">=</span><span class="fl">0.025</span>, window_size<span class="op">=</span><span class="dv">11</span>, sigma<span class="op">=</span><span class="fl">1.5</span>, levels<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>input_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)  <span class="co"># Batch of 4 grayscale images (1 channel)</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>target_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute MSSSIM + Gaussian-weighted L1 loss</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssiml1_loss(input_image, target_image)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>loss2 <span class="op">=</span> ssim_loss(input_image, target_image)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ms-ssim: "</span>, loss, <span class="st">'</span><span class="ch">\n</span><span class="st">ssim: '</span>, loss2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>msssiml1_loss <span class="op">=</span> MSSSIML1Loss(alpha<span class="op">=</span><span class="fl">0.025</span>, window_size<span class="op">=</span><span class="dv">11</span>, sigma<span class="op">=</span><span class="fl">1.5</span>, levels<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>input_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)  <span class="co"># Batch of 4 grayscale images (1 channel)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>target_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute MSSSIM + Gaussian-weighted L1 loss</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssiml1_loss(input_image, target_image)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>loss2 <span class="op">=</span> ssim_loss(input_image, target_image)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ms-ssim: "</span>, loss, <span class="st">'</span><span class="ch">\n</span><span class="st">ssim: '</span>, loss2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ms-ssim:  tensor(0.0250) 
 ssim:  tensor(0.9955)</code></pre>
@@ -600,25 +605,9 @@ ssim:  tensor(0.9955)</code></pre>
                sigma:float=1.5, reduction:str='mean', levels:int=3,
                weights=None)</code></pre>
 </blockquote>
-<p>*Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
+<p>*Multi-Scale Structural Similarity (MSSSIM) with Gaussian-weighted L2 Loss.</p>
+<p>Reference paper: Zhao, H., Gallo, O., Frosio, I., &amp; Kautz, J. (2016). Loss functions for image restoration with neural networks. IEEE Transactions on computational imaging, 3(1), 47-57.*</p>
 <table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -679,11 +668,11 @@ class Model(nn.Module):
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>msssim_l2_loss <span class="op">=</span> MSSSIML2Loss()</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example output with even dimensions</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example target with even dimensions</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssim_l2_loss(output, target)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(loss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>msssim_l2_loss <span class="op">=</span> MSSSIML2Loss()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example output with even dimensions</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).cuda()  <span class="co"># Example target with even dimensions</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssim_l2_loss(output, target)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(loss)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tensor(0.0956, device='cuda:0')</code></pre>
 </div>
@@ -734,19 +723,19 @@ class Model(nn.Module):
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inputs and targets must be equally dimensional tensors</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> randn, randint</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inputs and targets must be equally dimensional tensors</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> randn, randint</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> randn((<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>))  <span class="co"># Input</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>targets <span class="op">=</span> randint(<span class="dv">0</span>, <span class="dv">2</span>, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>)).<span class="bu">float</span>()  <span class="co"># Ground Truth</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>dice_loss <span class="op">=</span> DiceLoss()</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute loss</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> dice_loss(inputs, targets)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Dice Loss:'</span>, loss.item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> randn((<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>))  <span class="co"># Input</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>targets <span class="op">=</span> randint(<span class="dv">0</span>, <span class="dv">2</span>, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>)).<span class="bu">float</span>()  <span class="co"># Ground Truth</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>dice_loss <span class="op">=</span> DiceLoss()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute loss</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> dice_loss(inputs, targets)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Dice Loss:'</span>, loss.item())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Dice Loss: 0.4982335567474365</code></pre>
 </div>
