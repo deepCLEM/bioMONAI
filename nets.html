@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="description" content="Neural networks">
 
-<title>bioMONAI - Networks</title>
+<title>Networks – bioMONAI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +34,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -80,7 +80,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -89,6 +95,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -97,10 +104,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="bioMONAI - Networks">
+<meta property="og:title" content="Networks – bioMONAI">
 <meta property="og:description" content="Neural networks">
-<meta property="og:site-name" content="bioMONAI">
-<meta name="twitter:title" content="bioMONAI - Networks">
+<meta property="og:site_name" content="bioMONAI">
+<meta name="twitter:title" content="Networks – bioMONAI">
 <meta name="twitter:description" content="Neural networks">
 <meta name="twitter:card" content="summary">
 </head>
@@ -109,55 +116,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">bioMONAI</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://deepclem.github.io" rel="" target="">
- <span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://deepclem.github.io"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Resources</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
         <li>
-    <a class="dropdown-item" href="https://monai.io/" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://monai.io/"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">monai</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://docs.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://docs.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fast.ai</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://fastcore.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://fastcore.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fastcore</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fastxtend</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://nbdev.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://nbdev.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">nbdev</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues" rel="" target=""><i class="bi bi-bug" role="img">
+    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues"><i class="bi bi-bug" role="img">
 </i> 
  <span class="dropdown-text">Report an Issue</span></a>
   </li>  
@@ -166,36 +173,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/" rel="" target=""><i class="bi bi-twitter" role="img" aria-label="Twitter">
+    <a class="nav-link" href="https://twitter.com/"> <i class="bi bi-twitter" role="img" aria-label="Twitter">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
+          </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
 </div>
-          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./nets.html">Networks</a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./nets.html">Networks</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
     </div>
   </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -266,9 +273,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -302,7 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -344,7 +351,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -369,22 +376,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
+
 <script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
 <section id="unet" class="level2">
 <h2 class="anchored" data-anchor-id="unet">UNet</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L34" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="create_custom_unet" class="level3">
 <h3 class="anchored" data-anchor-id="create_custom_unet">create_custom_unet</h3>
 <blockquote class="blockquote">
-<pre><code> create_custom_unet (resnet_version, output_channels, img_size=(128, 128),
-                     pretrained=True, n_in=1, cut=4)</code></pre>
+<pre><code> create_custom_unet (resnet_version, n_in=1, n_out=1, img_size=(128, 128),
+                     pretrained=True, cut=4)</code></pre>
 </blockquote>
-<p>*Create a U-Net model with a ResNet backbone.</p>
-<p>Returns: - U-Net model with the specified ResNet backbone.*</p>
-<table class="table">
+<p>Create a U-Net model with a ResNet backbone.</p>
+<p>Returns: - U-Net model with the specified ResNet backbone.</p>
+<table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -407,28 +415,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Choose a ResNet model between: ‘resnet18’, ‘resnet34’, ‘resnet50’, ‘resnet101’, and ‘resnet152’.</td>
 </tr>
 <tr class="even">
-<td>output_channels</td>
-<td></td>
-<td></td>
-<td>Number of output channels.</td>
+<td>n_in</td>
+<td>int</td>
+<td>1</td>
+<td>Number of input channels, default is 1 (e.g., grayscale).</td>
 </tr>
 <tr class="odd">
+<td>n_out</td>
+<td>int</td>
+<td>1</td>
+<td>Number of output channels.</td>
+</tr>
+<tr class="even">
 <td>img_size</td>
 <td>tuple</td>
 <td>(128, 128)</td>
 <td>Tuple for the input image size, default is (128, 128).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>pretrained</td>
 <td>bool</td>
 <td>True</td>
 <td>If True, use a pretrained ResNet backbone.</td>
-</tr>
-<tr class="odd">
-<td>n_in</td>
-<td>int</td>
-<td>1</td>
-<td>Number of input channels, default is 1 (e.g., grayscale).</td>
 </tr>
 <tr class="even">
 <td>cut</td>
@@ -443,15 +451,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="denoising-cnn" class="level2">
 <h2 class="anchored" data-anchor-id="denoising-cnn">Denoising CNN</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L70" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="dncnn" class="level3">
 <h3 class="anchored" data-anchor-id="dncnn">DnCNN</h3>
 <blockquote class="blockquote">
 <pre><code> DnCNN (spatial_dims=2, in_channels=1, out_channels=1, num_of_layers=9,
         features=64, kernel_size=3)</code></pre>
 </blockquote>
-<p><em>A Deep Neural Network for Image Denoising (DnCNN) model.</em></p>
-<table class="table">
+<p>A Deep Neural Network for Image Denoising (DnCNN) model.</p>
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th></th>
@@ -499,7 +506,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<div class="cell">
+<div id="cell-6" class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> DnCNN(<span class="dv">2</span>,<span class="dv">1</span>)</span>
@@ -512,9 +519,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>DeepLabv3</code> is a semantic segmentation architecture that handles the problem of segmenting objects at multiple scales. It uses the Atroys Spatial Pyramid Pooling module, and introduces various updates with respect to other versions.</p>
 <section id="config" class="level3">
 <h3 class="anchored" data-anchor-id="config">Config</h3>
-<p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#deeplabconfig"><code>DeeplabConfig</code></a> class has been created to centralize all settings and hyperparameters in one place. It uses two main functions: Get_padding and interpolate. Get_padding is a function that calculates the amount of padding needed for a convolution operation to get the desired output size. Interpolate is a function that allows the resizing of a tensor using interpolation.</p>
+<p>The <code>DeeplabConfig</code> class has been created to centralize all settings and hyperparameters in one place. It uses two main functions: Get_padding and interpolate. Get_padding is a function that calculates the amount of padding needed for a convolution operation to get the desired output size. Interpolate is a function that allows the resizing of a tensor using interpolation.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L149" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="interpolate" class="level3">
 <h3 class="anchored" data-anchor-id="interpolate">interpolate</h3>
@@ -522,7 +528,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code> interpolate (x:torch.Tensor, size:Union[List[int],Tuple[int,...]],
               dims:int)</code></pre>
 </blockquote>
-<table class="table">
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th></th>
@@ -554,14 +560,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L144" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_padding" class="level3">
 <h3 class="anchored" data-anchor-id="get_padding">get_padding</h3>
 <blockquote class="blockquote">
 <pre><code> get_padding (kernel_size:int, dilation:int)</code></pre>
 </blockquote>
-<table class="table">
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th></th>
@@ -588,7 +593,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L132" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="deeplabconfig" class="level3">
 <h3 class="anchored" data-anchor-id="deeplabconfig">DeeplabConfig</h3>
@@ -603,9 +607,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="blocks" class="level3">
 <h3 class="anchored" data-anchor-id="blocks">Blocks</h3>
-<p><a href="https://deepCLEM.github.io/bioMONAI/nets.html#separableconv"><code>SeparableConv</code></a> is a class that carries out a type of convolution operation that splits the traditional convolution into two parts: depthwise convolution (a convolution filter for each channel independently), and pointwise convolution (combines the outputs of the depthwise convolution).</p>
+<p><code>SeparableConv</code> is a class that carries out a type of convolution operation that splits the traditional convolution into two parts: depthwise convolution (a convolution filter for each channel independently), and pointwise convolution (combines the outputs of the depthwise convolution).</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L161" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="separableconv" class="level3">
 <h3 class="anchored" data-anchor-id="separableconv">SeparableConv</h3>
@@ -614,7 +617,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                 kernel_size:int=3, stride:int=1, dilation:int=1,
                 bias:bool=False, norm:Optional[str]=None)</code></pre>
 </blockquote>
-<p>*Base class for all neural network modules.</p>
+<p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
 <p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
 <pre><code>import torch.nn as nn
@@ -631,8 +634,8 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<table class="caption-top table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool</caption>
 <thead>
 <tr class="header">
 <th></th>
@@ -693,7 +696,7 @@ class Model(nn.Module):
 </tbody>
 </table>
 <p><code>Block</code> is a class that combines multiple separable convolutional layers and residual connections.</p>
-<div class="cell">
+<div id="cell-18" class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Block(nn.Module):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, config: DeeplabConfig, <span class="co"># Configuration for the Deeplab model</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                 inplanes: <span class="bu">int</span>, <span class="co"># Number of input channels</span></span>
@@ -752,16 +755,15 @@ class Model(nn.Module):
 </section>
 <section id="aligned-xception" class="level3">
 <h3 class="anchored" data-anchor-id="aligned-xception">Aligned Xception</h3>
-<p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#xception"><code>Xception</code></a> class defines the Xception Neural Network used in DeepLab.</p>
+<p>The <code>Xception</code> class defines the Xception Neural Network used in DeepLab.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L202" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="xception" class="level3">
 <h3 class="anchored" data-anchor-id="xception">Xception</h3>
 <blockquote class="blockquote">
 <pre><code> Xception (config:__main__.DeeplabConfig)</code></pre>
 </blockquote>
-<p>*Base class for all neural network modules.</p>
+<p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
 <p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
 <pre><code>import torch.nn as nn
@@ -778,8 +780,8 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<table class="caption-top table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool</caption>
 <thead>
 <tr class="header">
 <th></th>
@@ -798,9 +800,8 @@ class Model(nn.Module):
 </section>
 <section id="aspp" class="level3">
 <h3 class="anchored" data-anchor-id="aspp">ASPP</h3>
-<p>The class <a href="https://deepCLEM.github.io/bioMONAI/nets.html#aspp_module"><code>ASPP_module</code></a> to compute the Atroys Spatial Pyramid Pooling method and create the convolution that uses it.</p>
+<p>The class <code>ASPP_module</code> to compute the Atroys Spatial Pyramid Pooling method and create the convolution that uses it.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L261" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="aspp_module" class="level3">
 <h3 class="anchored" data-anchor-id="aspp_module">ASPP_module</h3>
@@ -808,7 +809,7 @@ class Model(nn.Module):
 <pre><code> ASPP_module (config:__main__.DeeplabConfig, inplanes:int, planes:int,
               dilation:int)</code></pre>
 </blockquote>
-<p>*Base class for all neural network modules.</p>
+<p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
 <p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
 <pre><code>import torch.nn as nn
@@ -825,8 +826,8 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</caption>
+<table class="caption-top table">
+<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool</caption>
 <thead>
 <tr class="header">
 <th></th>
@@ -860,16 +861,15 @@ class Model(nn.Module):
 </section>
 <section id="deeplab-v3-1" class="level3">
 <h3 class="anchored" data-anchor-id="deeplab-v3-1">DeepLab V3</h3>
-<p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#deeplab"><code>Deeplab</code></a> class combines the different modules to make the DeepLab V3 architecture.</p>
+<p>The <code>Deeplab</code> class combines the different modules to make the DeepLab V3 architecture.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L280" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="deeplab" class="level3">
 <h3 class="anchored" data-anchor-id="deeplab">Deeplab</h3>
 <blockquote class="blockquote">
 <pre><code> Deeplab (config:__main__.DeeplabConfig)</code></pre>
 </blockquote>
-<p>*Base class for all neural network modules.</p>
+<p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
 <p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
 <pre><code>import torch.nn as nn
@@ -886,10 +886,10 @@ class Model(nn.Module):
         return F.relu(self.conv2(x))</code></pre>
 <p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
-<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*</p>
+<p>:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool</p>
 <section id="example" class="level4">
 <h4 class="anchored" data-anchor-id="example">Example</h4>
-<div class="cell">
+<div id="cell-29" class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a pre-trained ResNet backbone</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>resnet_backbone <span class="op">=</span> ResNetFeatures(<span class="st">'resnet10'</span>, pretrained<span class="op">=</span><span class="va">False</span>, in_channels<span class="op">=</span><span class="dv">1</span>, spatial_dims<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -903,7 +903,7 @@ class Model(nn.Module):
 <pre><code>Output channels: 512</code></pre>
 </div>
 </div>
-<div class="cell">
+<div id="cell-30" class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For 2D images</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>config_2d <span class="op">=</span> DeeplabConfig(</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
@@ -924,10 +924,10 @@ class Model(nn.Module):
 <span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>model_3d <span class="op">=</span> Deeplab(config_3d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div id="cell-31" class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> no_grad <span class="im">as</span> torch_no_grad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div id="cell-32" class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_deeplab(config, input_shape, expected_output_shape):</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    set_determinism(<span class="dv">0</span>)  <span class="co"># For reproducibility</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -949,7 +949,7 @@ class Model(nn.Module):
 <span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Output shape: </span><span class="sc">{</span>output<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"---"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div id="cell-33" class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test 2D model</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>config_2d <span class="op">=</span> DeeplabConfig(</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    dimensions<span class="op">=</span><span class="dv">2</span>,</span>
@@ -1017,14 +1017,13 @@ All tests passed successfully!</code></pre>
 <section id="umamba" class="level2">
 <h2 class="anchored" data-anchor-id="umamba">UMamba</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L365" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="mambalayer" class="level3">
 <h3 class="anchored" data-anchor-id="mambalayer">MambaLayer</h3>
 <blockquote class="blockquote">
 <pre><code> MambaLayer (dim, d_state=16, d_conv=4, expand=2)</code></pre>
 </blockquote>
-<p><em>A custom neural network layer that incorporates the Mamba block from the Mamba model, along with layer normalization and optional mixed precision handling.</em></p>
-<table class="table">
+<p>A custom neural network layer that incorporates the Mamba block from the Mamba model, along with layer normalization and optional mixed precision handling.</p>
+<table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -1067,7 +1066,6 @@ All tests passed successfully!</code></pre>
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L416" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="umamba-1" class="level3">
 <h3 class="anchored" data-anchor-id="umamba-1">UMamba</h3>
@@ -1083,11 +1081,11 @@ All tests passed successfully!</code></pre>
          'negative_slope': 0.01}), deep_supervision:bool=False,
          deep_supr_num:int=1, res_block:bool=False, trans_bias:bool=False)</code></pre>
 </blockquote>
-<p>*A custom subclass of DynUNet that integrates the Mamba layer into the model’s bottleneck.</p>
-<p>This class inherits from <code>DynUNet</code> and adds a specific bottleneck structure containing a convolution block followed by a MambaLayer.*</p>
+<p>A custom subclass of DynUNet that integrates the Mamba layer into the model’s bottleneck.</p>
+<p>This class inherits from <code>DynUNet</code> and adds a specific bottleneck structure containing a convolution block followed by a MambaLayer.</p>
 <section id="example-1" class="level4">
 <h4 class="anchored" data-anchor-id="example-1">Example</h4>
-<div class="cell">
+<div id="cell-38" class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> DynUNet(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>])</span>
@@ -1097,7 +1095,7 @@ All tests passed successfully!</code></pre>
 <pre><code>torch.Size([16, 1, 32, 64])</code></pre>
 </div>
 </div>
-<div class="cell">
+<div id="cell-39" class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch_randn(<span class="dv">16</span>, <span class="dv">1</span>, <span class="dv">32</span>, <span class="dv">64</span>).cuda()</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>tst <span class="op">=</span> UMamba(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,[<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>]).cuda()</span>
@@ -1150,18 +1148,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1193,11 +1180,55 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1207,8 +1238,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1220,7 +1260,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1264,6 +1427,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1289,6 +1453,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1346,29 +1536,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       });
     }
   }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-          // target, if specified
-          link.setAttribute("target", "_blank");
-      }
-    }
 });
 </script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Copyright © 2024 Biagio Mandracchia, MIT License</div>   
+    <div class="nav-footer-left">
+<p>Copyright © 2024 Biagio Mandracchia, MIT License</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
-    </div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
@@ -1387,6 +1565,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 

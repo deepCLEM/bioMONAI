@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="description" content="bioMONAI core functions">
 
-<title>bioMONAI - Core</title>
+<title>Core – bioMONAI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +34,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -80,7 +80,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -89,84 +95,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="bioMONAI - Core">
+<meta property="og:title" content="Core – bioMONAI">
 <meta property="og:description" content="bioMONAI core functions">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/00_core_files/figure-html/cell-14-output-4.png">
-<meta property="og:site-name" content="bioMONAI">
-<meta property="og:image:height" content="351">
-<meta property="og:image:width" content="516">
-<meta name="twitter:title" content="bioMONAI - Core">
+<meta property="og:site_name" content="bioMONAI">
+<meta name="twitter:title" content="Core – bioMONAI">
 <meta name="twitter:description" content="bioMONAI core functions">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/00_core_files/figure-html/cell-14-output-4.png">
-<meta name="twitter:image-height" content="351">
-<meta name="twitter:image-width" content="516">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">bioMONAI</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://deepclem.github.io" rel="" target="">
- <span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://deepclem.github.io"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Resources</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
         <li>
-    <a class="dropdown-item" href="https://monai.io/" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://monai.io/"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">monai</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://docs.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://docs.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fast.ai</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://fastcore.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://fastcore.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fastcore</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fastxtend</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://nbdev.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://nbdev.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">nbdev</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues" rel="" target=""><i class="bi bi-bug" role="img">
+    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues"><i class="bi bi-bug" role="img">
 </i> 
  <span class="dropdown-text">Report an Issue</span></a>
   </li>  
@@ -175,36 +176,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/" rel="" target=""><i class="bi bi-twitter" role="img" aria-label="Twitter">
+    <a class="nav-link" href="https://twitter.com/"> <i class="bi bi-twitter" role="img" aria-label="Twitter">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
+          </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
 </div>
-          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">Core</a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">Core</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
     </div>
   </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -275,9 +276,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -311,7 +312,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -357,7 +358,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#apply_transforms" id="toc-apply_transforms" class="nav-link" data-scroll-target="#apply_transforms">apply_transforms</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -382,7 +383,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
+
 <script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
 <section id="imports" class="level2">
@@ -397,8 +400,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             n_inp:int=None, item_tfms:list=None, batch_tfms:list=None,
             get_items=None, splitter=None, get_y=None, get_x=None)</code></pre>
 </blockquote>
-<p><em>Generic container to quickly build <code>Datasets</code> and <code>DataLoaders</code>.</em></p>
-<table class="table">
+<p>Generic container to quickly build <code>Datasets</code> and <code>DataLoaders</code>.</p>
+<table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -485,14 +488,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> DataLoaders (*loaders, path:str|pathlib.Path='.', device=None)</code></pre>
 </blockquote>
-<p><em>Basic wrapper around several <code>DataLoader</code>s.</em></p>
+<p>Basic wrapper around several <code>DataLoader</code>s.</p>
 <p>The <code>DataLoaders</code> class is a container for managing training and validation datasets. This class wraps one or more <code>DataLoader</code> instances, ensuring seamless data management and transfer across devices (CPU or GPU) for efficient training and evaluation.</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/learner.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="learner" class="level3">
 <h3 class="anchored" data-anchor-id="learner">Learner</h3>
-<p><em>Group together a <code>model</code>, some <code>dls</code> and a <code>loss_func</code> to handle training</em></p>
+<p>Group together a <code>model</code>, some <code>dls</code> and a <code>loss_func</code> to handle training</p>
 <p>The <code>Learner</code> class is the main interface for training machine learning models, encapsulating the model, data, loss function, optimizer, and training metrics. It simplifies the training process by providing built-in functionality for model evaluation, hyperparameter tuning, and training loop customization, allowing you to focus on model optimization.</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/progress.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
@@ -512,7 +515,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                     after_cancel_epoch=None, after_epoch=None,
                     after_cancel_fit=None, after_fit=None)</code></pre>
 </blockquote>
-<p><em>Update a graph of training and validation loss</em></p>
+<p>Update a graph of training and validation loss</p>
 <p>The <code>ShowGraphCallback</code> is a convenient callback for visualizing training progress. By plotting the training and validation loss, it helps users monitor convergence and performance, making it easy to assess if the model requires adjustments in learning rate, architecture, or data handling.</p>
 <hr>
 <p><a href="https://github.com/fastai/fastai/blob/master/fastai/callback/progress.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
@@ -522,7 +525,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> CSVLogger (fname='history.csv', append=False)</code></pre>
 </blockquote>
-<p><em>Log the results displayed in <code>learn.path/fname</code></em></p>
+<p>Log the results displayed in <code>learn.path/fname</code></p>
 <p>The <code>CSVLogger</code> is a tool for logging model training metrics to a CSV file, offering a permanent record of training history. This feature is especially useful for long-term experiments and fine-tuning, allowing you to track and analyze model performance over time.</p>
 <hr>
 </section>
@@ -531,8 +534,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <pre><code> cells3d ()</code></pre>
 </blockquote>
-<p>*3D fluorescence microscopy image of cells.</p>
-<p>The returned data is a 3D multichannel array with dimensions provided in <code>(z, c, y, x)</code> order. Each voxel has a size of <code>(0.29 0.26 0.26)</code> micrometer. Channel 0 contains cell membranes, channel 1 contains nuclei.*</p>
+<p>3D fluorescence microscopy image of cells.</p>
+<p>The returned data is a 3D multichannel array with dimensions provided in <code>(z, c, y, x)</code> order. Each voxel has a size of <code>(0.29 0.26 0.26)</code> micrometer. Channel 0 contains cell membranes, channel 1 contains nuclei.</p>
 <p>The <code>cells3d</code> function returns a sample 3D fluorescence microscopy image. This is a valuable test image for demonstration and analysis, consisting of both cell membrane and nucleus channels. It can serve as a default dataset for evaluating and benchmarking new models and transformations.</p>
 <p>The dataset has the following dimensions: <em>(60,2,256,256)</em>, which are in a <em>(z,c,y,x)</em> order: - z: 60 slices in the image - c: 2 channels where channel 0 represents the cell membrane fluorescence, and channel 1 represents the nuclei fluorescence.<br>
 - y and x, which correspond to the dimensions of each slice</p>
@@ -542,15 +545,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="engine">Engine</h2>
 <p>The engine module provides advanced functionalities for model training, including configurable training loops and evaluation functions tailored for bioinformatics applications. This module is significantly valuable when there is a need for specific workflows and pipelines that meet specific requirements. For this reason, the classes fastTrainer and visionTrainer have been created, providing tailored implementations inheriting from the Learner class.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L56" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="read_yaml" class="level3">
 <h3 class="anchored" data-anchor-id="read_yaml">read_yaml</h3>
 <blockquote class="blockquote">
 <pre><code> read_yaml (yaml_path)</code></pre>
 </blockquote>
-<p><em>Reads a YAML file and returns its contents as a dictionary</em></p>
+<p>Reads a YAML file and returns its contents as a dictionary</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L63" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dictlist_to_funclist" class="level3">
 <h3 class="anchored" data-anchor-id="dictlist_to_funclist">dictlist_to_funclist</h3>
@@ -559,7 +560,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p>FastTrainer is used for training models in bioinformatics applications, where specific loss functions and optimizers oriented to biological data can be used.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L77" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="fasttrainer" class="level3">
 <h3 class="anchored" data-anchor-id="fasttrainer">fastTrainer</h3>
@@ -579,8 +579,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
               wd_bn_bias:bool=False, train_bn:bool=True, moms:tuple=(0.95,
               0.85, 0.95), default_cbs:bool=True)</code></pre>
 </blockquote>
-<p><em>A custom implementation of the FastAI Learner class for training models in bioinformatics applications.</em></p>
-<table class="table">
+<p>A custom implementation of the FastAI Learner class for training models in bioinformatics applications.</p>
+<table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -720,13 +720,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="example-train-a-model-with-configuration-from-a-yaml-file." class="level4">
 <h4 class="anchored" data-anchor-id="example-train-a-model-with-configuration-from-a-yaml-file.">Example: train a model with configuration from a YAML file.</h4>
-<div class="cell">
+<div id="cell-23" class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> SEResNet50</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.data <span class="im">import</span> BioDataLoaders</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div id="cell-24" class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the data</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'_data'</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>info <span class="op">=</span> download_medmnist(<span class="st">'bloodmnist'</span>, image_path, download_only<span class="op">=</span><span class="va">True</span>)</span>
@@ -735,46 +735,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>path_train <span class="op">=</span> path<span class="op">/</span><span class="st">'train'</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>path_val <span class="op">=</span> path<span class="op">/</span><span class="st">'val'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Downloading https://zenodo.org/records/10519652/files/bloodmnist.npz?download=1 to _data/bloodmnist/bloodmnist.npz
+<pre><code>Downloading https://zenodo.org/records/10519652/files/bloodmnist.npz?download=1 to _data/bloodmnist/bloodmnist.npz</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 35461855/35461855 [00:09&lt;00:00, 3590813.84it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Using downloaded and verified file: _data/bloodmnist/bloodmnist.npz
 Using downloaded and verified file: _data/bloodmnist/bloodmnist.npz
-Using downloaded and verified file: _data/bloodmnist/bloodmnist.npz
-Saving training images to _data/bloodmnist...
-Saving validation images to _data/bloodmnist...
-Saving test images to _data/bloodmnist...
-Removed bloodmnist.npz
+Saving training images to _data/bloodmnist...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 11959/11959 [00:02&lt;00:00, 4998.88it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Saving validation images to _data/bloodmnist...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 1712/1712 [00:00&lt;00:00, 5081.19it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Saving test images to _data/bloodmnist...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 3421/3421 [00:00&lt;00:00, 5037.19it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Removed bloodmnist.npz
 Datasets downloaded to _data/bloodmnist
 Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'The BloodMNIST is based on a dataset of individual normal cells, captured from individuals without infection, hematologic or oncologic disease and free of any pharmacologic treatment at the moment of blood collection. It contains a total of 17,092 images and is organized into 8 classes. We split the source dataset with a ratio of 7:1:2 into training, validation and test set. The source images with resolution 3×360×363 pixels are center-cropped into 3×200×200, and then resized into 3×28×28.', 'url': 'https://zenodo.org/records/10519652/files/bloodmnist.npz?download=1', 'MD5': '7053d0359d879ad8a5505303e11de1dc', 'url_64': 'https://zenodo.org/records/10519652/files/bloodmnist_64.npz?download=1', 'MD5_64': '2b94928a2ae4916078ca51e05b6b800b', 'url_128': 'https://zenodo.org/records/10519652/files/bloodmnist_128.npz?download=1', 'MD5_128': 'adace1e0ed228fccda1f39692059dd4c', 'url_224': 'https://zenodo.org/records/10519652/files/bloodmnist_224.npz?download=1', 'MD5_224': 'b718ff6835fcbdb22ba9eacccd7b2601', 'task': 'multi-class', 'label': {'0': 'basophil', '1': 'eosinophil', '2': 'erythroblast', '3': 'immature granulocytes(myelocytes, metamyelocytes and promyelocytes)', '4': 'lymphocyte', '5': 'monocyte', '6': 'neutrophil', '7': 'platelet'}, 'n_channels': 3, 'n_samples': {'train': 11959, 'val': 1712, 'test': 3421}, 'license': 'CC BY 4.0'}</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>100%|██████████| 35461855/35461855 [00:09&lt;00:00, 3590813.84it/s]
-100%|██████████| 11959/11959 [00:02&lt;00:00, 4998.88it/s]
-100%|██████████| 1712/1712 [00:00&lt;00:00, 5081.19it/s]
-100%|██████████| 3421/3421 [00:00&lt;00:00, 5037.19it/s]</code></pre>
+<pre><code></code></pre>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the dataloader</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.class_from_folder(</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    path,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span><span class="st">'train'</span>,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    valid<span class="op">=</span><span class="st">'val'</span>,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    vocab<span class="op">=</span>info[<span class="st">'label'</span>],</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    bs<span class="op">=</span>batch_size)</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                   in_channels<span class="op">=</span><span class="dv">3</span>,   </span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                   num_classes<span class="op">=</span><span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-25" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the dataloader</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.class_from_folder(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    path,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    train<span class="op">=</span><span class="st">'train'</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    valid<span class="op">=</span><span class="st">'val'</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    vocab<span class="op">=</span>info[<span class="st">'label'</span>],</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    bs<span class="op">=</span>batch_size)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SEResNet50(spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>                   in_channels<span class="op">=</span><span class="dv">3</span>,   </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>                   num_classes<span class="op">=</span><span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer with configuration from a YAML file </span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"./data_examples/sample_config.yml"</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-26" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer with configuration from a YAML file </span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"./data_examples/sample_config.yml"</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -794,7 +811,7 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 </style>
 </div>
 <div class="cell-output cell-output-display">
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th">epoch</th>
@@ -823,12 +840,15 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 <pre><code>Better model found at epoch 0 with accuracy value: 0.7558411359786987.</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="00_core_files/figure-html/cell-14-output-4.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="00_core_files/figure-html/cell-14-output-4.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>VisionTrainer is used for computer vision applications, where image normalization or other computer vision related settings are needed.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L222" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 </section>
 <section id="visiontrainer" class="level3">
@@ -855,8 +875,8 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
                 pool=True, lin_ftrs=None, ps=0.5, first_bn=True,
                 bn_final=False, lin_first=False, y_range=None, n_in=3)</code></pre>
 </blockquote>
-<p><em>Build a vision trainer from <code>dataloaders</code> and <code>model</code></em></p>
-<table class="table">
+<p>Build a vision trainer from <code>dataloaders</code> and <code>model</code></p>
+<table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -1096,74 +1116,71 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 <h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
 <p>The evaluation module provides functionalities for model evaluation, with several customizations available.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L363" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="display_statistics_table" class="level3">
 <h3 class="anchored" data-anchor-id="display_statistics_table">display_statistics_table</h3>
 <blockquote class="blockquote">
 <pre><code> display_statistics_table (stats, fn_name='', as_dataframe=True)</code></pre>
 </blockquote>
-<p><em>Display a table of the key statistics.</em></p>
+<p>Display a table of the key statistics.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L329" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="plot_histogram_and_kde" class="level3">
 <h3 class="anchored" data-anchor-id="plot_histogram_and_kde">plot_histogram_and_kde</h3>
 <blockquote class="blockquote">
 <pre><code> plot_histogram_and_kde (data, stats, bw_method=0.3, fn_name='')</code></pre>
 </blockquote>
-<p><em>Plot the histogram and KDE of the data with key statistics marked.</em></p>
+<p>Plot the histogram and KDE of the data with key statistics marked.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L317" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="format_sig" class="level3">
 <h3 class="anchored" data-anchor-id="format_sig">format_sig</h3>
 <blockquote class="blockquote">
 <pre><code> format_sig (value)</code></pre>
 </blockquote>
-<p><em>Format numbers with two significant digits.</em></p>
+<p>Format numbers with two significant digits.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L302" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="calculate_statistics" class="level3">
 <h3 class="anchored" data-anchor-id="calculate_statistics">calculate_statistics</h3>
 <blockquote class="blockquote">
 <pre><code> calculate_statistics (data)</code></pre>
 </blockquote>
-<p><em>Calculate key statistics for the data.</em></p>
+<p>Calculate key statistics for the data.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L291" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="compute_metric" class="level3">
 <h3 class="anchored" data-anchor-id="compute_metric">compute_metric</h3>
 <blockquote class="blockquote">
 <pre><code> compute_metric (predictions, targets, metric_fn)</code></pre>
 </blockquote>
-<p><em>Compute the metric for each prediction-target pair. Handles cases where metric_fn has or does not have a ‘func’ attribute.</em></p>
+<p>Compute the metric for each prediction-target pair. Handles cases where metric_fn has or does not have a ‘func’ attribute.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L284" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="compute_losses" class="level3">
 <h3 class="anchored" data-anchor-id="compute_losses">compute_losses</h3>
 <blockquote class="blockquote">
 <pre><code> compute_losses (predictions, targets, loss_fn)</code></pre>
 </blockquote>
-<p><em>Compute the loss for each prediction-target pair.</em></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Compute the loss for each prediction-target pair.</p>
+<div id="cell-37" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> standard_normal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-38" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> standard_normal(<span class="dv">1000</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> calculate_statistics(a)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>plot_histogram_and_kde(a, stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="00_core_files/figure-html/cell-23-output-1.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="00_core_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Evaluate_model and evaluate_classification_model are two classes created in order to integrate the evaluation process in a single computation. Evaluate_model can be used on any type of task, whereas evaluate_classification_model is specifically designed for classification tasks.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L398" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="evaluate_model" class="level3">
 <h3 class="anchored" data-anchor-id="evaluate_model">evaluate_model</h3>
@@ -1174,8 +1191,8 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
                  show_table=True, show_results=True, as_dataframe=True,
                  cmap='magma')</code></pre>
 </blockquote>
-<p><em>Calculate and optionally plot the distribution of loss values from predictions made by the trainer on test data, with an optional table of key statistics.</em></p>
-<table class="table">
+<p>Calculate and optionally plot the distribution of loss values from predictions made by the trainer on test data, with an optional table of key statistics.</p>
+<table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -1254,7 +1271,6 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L459" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="evaluate_classification_model" class="level3">
 <h3 class="anchored" data-anchor-id="evaluate_classification_model">evaluate_classification_model</h3>
@@ -1267,10 +1283,10 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
                                 show_table=True, show_results=True,
                                 as_dataframe=True, cmap=&lt;matplotlib.colors
                                 .LinearSegmentedColormap object at
-                                0x7fafd788fe10&gt;)</code></pre>
+                                0x7fc444a9fb90&gt;)</code></pre>
 </blockquote>
-<p><em>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</em></p>
-<table class="table">
+<p>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</p>
+<table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
 <col style="width: 25%">
@@ -1355,7 +1371,7 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 <tr class="even">
 <td>cmap</td>
 <td>LinearSegmentedColormap</td>
-<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7fafd788fe10&gt;</td>
+<td>&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7fc444a9fb90&gt;</td>
 <td>Color map for the confusion matrix plot.</td>
 </tr>
 </tbody>
@@ -1366,50 +1382,45 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 <h2 class="anchored" data-anchor-id="utils">Utils</h2>
 <p>The utils module contains helper functions and classes to facilitate data manipulation, model setup, and training. These utilities add flexibility and convenience, supporting rapid experimentation and efficient data handling.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L534" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="attributesfromdict" class="level3">
 <h3 class="anchored" data-anchor-id="attributesfromdict">attributesFromDict</h3>
 <blockquote class="blockquote">
 <pre><code> attributesFromDict (d)</code></pre>
 </blockquote>
-<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#attributesfromdict"><code>attributesFromDict</code></a> function simplifies the conversion of dictionary keys and values into object attributes, allowing dynamic attribute creation for configuration objects. This utility is handy for initializing model or dataset configurations directly from dictionaries, improving code readability and maintainability.</em></p>
+<p>The <code>attributesFromDict</code> function simplifies the conversion of dictionary keys and values into object attributes, allowing dynamic attribute creation for configuration objects. This utility is handy for initializing model or dataset configurations directly from dictionaries, improving code readability and maintainability.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L543" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_device" class="level3">
 <h3 class="anchored" data-anchor-id="get_device">get_device</h3>
 <blockquote class="blockquote">
 <pre><code> get_device ()</code></pre>
 </blockquote>
-<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#get_device"><code>get_device</code></a> function is used to detect if the device the code is executed in has got a CUDA-enabled GPU available. If it doesn’t, it returns CPU.</em></p>
+<p>The <code>get_device</code> function is used to detect if the device the code is executed in has got a CUDA-enabled GPU available. If it doesn’t, it returns CPU.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L551" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2float" class="level3">
 <h3 class="anchored" data-anchor-id="img2float">img2float</h3>
 <blockquote class="blockquote">
 <pre><code> img2float (image, force_copy=False)</code></pre>
 </blockquote>
-<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#img2float"><code>img2float</code></a> function turns an image into float representation.</em></p>
+<p>The <code>img2float</code> function turns an image into float representation.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L558" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2tensor" class="level3">
 <h3 class="anchored" data-anchor-id="img2tensor">img2Tensor</h3>
 <blockquote class="blockquote">
 <pre><code> img2Tensor (image)</code></pre>
 </blockquote>
-<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#img2tensor"><code>img2Tensor</code></a> function turns an image into tensor representation after turning it first into float representation.</em></p>
+<p>The <code>img2Tensor</code> function turns an image into tensor representation after turning it first into float representation.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L565" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="apply_transforms" class="level3">
 <h3 class="anchored" data-anchor-id="apply_transforms">apply_transforms</h3>
 <blockquote class="blockquote">
 <pre><code> apply_transforms (image, transforms)</code></pre>
 </blockquote>
-<p><em>Apply a list of transformations, ensuring at least one is applied.</em></p>
-<table class="table">
+<p>Apply a list of transformations, ensuring at least one is applied.</p>
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th></th>
@@ -1427,9 +1438,9 @@ Dataset info for 'bloodmnist': {'python_class': 'BloodMNIST', 'description': 'Th
 </tr>
 </tbody>
 </table>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-49" class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 
@@ -1473,18 +1484,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1516,11 +1516,55 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1530,8 +1574,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1543,7 +1596,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1587,6 +1763,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1612,6 +1789,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1669,29 +1872,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       });
     }
   }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-          // target, if specified
-          link.setAttribute("target", "_blank");
-      }
-    }
 });
 </script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Copyright © 2024 Biagio Mandracchia, MIT License</div>   
+    <div class="nav-footer-left">
+<p>Copyright © 2024 Biagio Mandracchia, MIT License</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
-    </div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
@@ -1710,6 +1901,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 

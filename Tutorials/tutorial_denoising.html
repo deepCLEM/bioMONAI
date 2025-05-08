@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="description" content="Tutorial denoising: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for 2D microscopy image denoising tasks.">
 
-<title>bioMONAI - Denoising</title>
+<title>Denoising – bioMONAI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +34,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -80,7 +80,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -89,84 +95,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="../styles.css">
-<meta property="og:title" content="bioMONAI - Denoising">
+<meta property="og:title" content="Denoising – bioMONAI">
 <meta property="og:description" content="Tutorial denoising: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for 2D microscopy image denoising tasks.">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/903_tutorial_denoising_files/figure-html/cell-10-output-1.png">
-<meta property="og:site-name" content="bioMONAI">
-<meta property="og:image:height" content="708">
-<meta property="og:image:width" content="1415">
-<meta name="twitter:title" content="bioMONAI - Denoising">
+<meta property="og:site_name" content="bioMONAI">
+<meta name="twitter:title" content="Denoising – bioMONAI">
 <meta name="twitter:description" content="Tutorial denoising: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for 2D microscopy image denoising tasks.">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/903_tutorial_denoising_files/figure-html/cell-10-output-1.png">
-<meta name="twitter:image-height" content="708">
-<meta name="twitter:image-width" content="1415">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">bioMONAI</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://deepclem.github.io" rel="" target="">
- <span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://deepclem.github.io"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Resources</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
         <li>
-    <a class="dropdown-item" href="https://monai.io/" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://monai.io/"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">monai</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://docs.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://docs.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fast.ai</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://fastcore.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://fastcore.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fastcore</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">fastxtend</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://nbdev.fast.ai" rel="" target=""><i class="bi bi-link" role="img">
+    <a class="dropdown-item" href="https://nbdev.fast.ai"><i class="bi bi-link" role="img">
 </i> 
  <span class="dropdown-text">nbdev</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues" rel="" target=""><i class="bi bi-bug" role="img">
+    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues"><i class="bi bi-bug" role="img">
 </i> 
  <span class="dropdown-text">Report an Issue</span></a>
   </li>  
@@ -175,36 +176,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/" rel="" target=""><i class="bi bi-twitter" role="img" aria-label="Twitter">
+    <a class="nav-link" href="https://twitter.com/"> <i class="bi bi-twitter" role="img" aria-label="Twitter">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
+          </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
 </div>
-          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Tutorials/tutorial_classification.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../Tutorials/tutorial_denoising.html">Denoising</a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Tutorials/tutorial_classification.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../Tutorials/tutorial_denoising.html">Denoising</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
     </div>
   </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -275,9 +276,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -311,27 +312,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#download-data" id="toc-download-data" class="nav-link active" data-scroll-target="#download-data">Download Data</a></li>
+  <li><a href="#setup-imports" id="toc-setup-imports" class="nav-link active" data-scroll-target="#setup-imports">Setup imports</a></li>
+  <li><a href="#download-data" id="toc-download-data" class="nav-link" data-scroll-target="#download-data">Download Data</a></li>
   <li><a href="#prepare-data-for-training" id="toc-prepare-data-for-training" class="nav-link" data-scroll-target="#prepare-data-for-training">Prepare Data for Training</a></li>
   <li><a href="#visualize-a-batch-of-training-data" id="toc-visualize-a-batch-of-training-data" class="nav-link" data-scroll-target="#visualize-a-batch-of-training-data">Visualize a Batch of Training Data</a></li>
+  <li><a href="#visualize-a-specific-image" id="toc-visualize-a-specific-image" class="nav-link" data-scroll-target="#visualize-a-specific-image">Visualize a Specific Image</a>
+  <ul>
   <li><a href="#define-and-train-the-model" id="toc-define-and-train-the-model" class="nav-link" data-scroll-target="#define-and-train-the-model">Define and Train the Model</a></li>
   <li><a href="#show-results" id="toc-show-results" class="nav-link" data-scroll-target="#show-results">Show Results</a></li>
   <li><a href="#save-the-trained-model" id="toc-save-the-trained-model" class="nav-link" data-scroll-target="#save-the-trained-model">Save the Trained Model</a></li>
   <li><a href="#evaluate-the-model-on-test-data" id="toc-evaluate-the-model-on-test-data" class="nav-link" data-scroll-target="#evaluate-the-model-on-test-data">Evaluate the Model on Test Data</a></li>
+  <li><a href="#load-the-model" id="toc-load-the-model" class="nav-link" data-scroll-target="#load-the-model">Load the Model</a></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Tutorials/tutorial_classification.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../Tutorials/tutorial_denoising.html">Denoising</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Denoising</h1>
 </div>
@@ -351,10 +357,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
+
 <script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
-<div class="cell">
+<section id="setup-imports" class="level3">
+<h3 class="anchored" data-anchor-id="setup-imports">Setup imports</h3>
+<div id="cell-3" class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.data <span class="im">import</span> <span class="op">*</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> <span class="op">*</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.core <span class="im">import</span> <span class="op">*</span></span>
@@ -365,20 +375,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.metrics <span class="im">import</span> <span class="op">*</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.datasets <span class="im">import</span> download_file</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div id="cell-4" class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div id="cell-5" class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> get_device()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(device)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>cuda</code></pre>
 </div>
 </div>
+</section>
 <section id="download-data" class="level3">
 <h3 class="anchored" data-anchor-id="download-data">Download Data</h3>
-<p>In the next cell, we will download the dataset required for this tutorial. The dataset is hosted online, and we will use the <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#download_file"><code>download_file</code></a> function from the <code>bioMONAI</code> library to download and extract the files.</p>
+<p>In the next cell, we will download the dataset required for this tutorial. The dataset is hosted online, and we will use the <code>download_file</code> function from the <code>bioMONAI</code> library to download and extract the files.</p>
 <blockquote class="blockquote">
 <ul>
 <li>You can change the <code>output_directory</code> variable to specify a different directory where you want to save the downloaded files.</li>
@@ -387,40 +398,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 </blockquote>
 <p>Make sure you have enough storage space in the specified directory before downloading the dataset.</p>
-<div class="cell">
+<div id="cell-7" class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the directory where you want to save the downloaded files</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>output_directory <span class="op">=</span> <span class="st">"../_data/U2OS"</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the base URL for the dataset</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'http://csbdeep.bioimagecomputing.com/example_data/snr_7_binning_2.zip'</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Download only the first two images</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>extract_directory <span class="op">=</span> download_file(url, output_directory, extract<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>download_file(url, output_directory, extract<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Unzipping contents of '/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip' to '/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/ttt'</code></pre>
+<pre><code>Downloading data from 'http://csbdeep.bioimagecomputing.com/example_data/snr_7_binning_2.zip' to file '/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip'.
+SHA256 hash of downloaded file: d5f2499874d762a8cd8cc90f34052b663e70071e280ec8af05acb8fdccb4badb
+Use this value as the 'known_hash' argument of 'pooch.retrieve' to ensure that the file hasn't changed if it is downloaded again in the future.
+Unzipping contents of '/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip' to '/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip'</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The file has been downloaded and saved to: /home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS
-Extracted files have been saved to: /home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/ttt</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">'/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS'</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>downloaded_file <span class="op">=</span> <span class="st">'/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/dewd$de/dwedwed/dewdwe.tif'</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>output_dir_len <span class="op">=</span> <span class="bu">len</span>(Path(os.path.abspath(output_dir)).parts)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(output_dir_len)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>file0 <span class="op">=</span> os.path.abspath(downloaded_file)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(Path(file0).parts)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>extract_dir <span class="op">=</span> os.path.join(<span class="op">*</span>Path(file0).parts[<span class="dv">0</span>:output_dir_len<span class="op">+</span><span class="dv">1</span>])</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#extract_dir = Path('/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS').parts[0:11]</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#print(os.path.join(*extract_dir))</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(extract_dir)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>10
-('/', 'home', 'export', 'personal', 'miguel', 'git_projects', 'bioMONAI', 'nbs', '_data', 'U2OS', '128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip', 'dewd$de', 'dwedwed', 'dewdwe.tif')
-/home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip</code></pre>
+<pre><code>The file has been downloaded and saved to: /home/export/personal/miguel/git_projects/bioMONAI/nbs/_data/U2OS</code></pre>
 </div>
 </div>
 </section>
@@ -438,31 +431,34 @@ Extracted files have been saved to: /home/export/personal/miguel/git_projects/bi
 <blockquote class="blockquote">
 <p>You can customize the following parameters to suit your needs: - Change the <code>X_path</code> variable to point to a different dataset. - Adjust the <code>bs</code> and <code>patch_size</code> variables to match your hardware capabilities and model requirements. - Modify the transformations in <code>itemTfms</code> and <code>batchTfms</code> to include other augmentations or preprocessing steps.</p>
 </blockquote>
-<p>After defining these parameters and transformations, we will create a <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> object to load the training and validation datasets.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/train/low/'</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>bs <span class="op">=</span> <span class="dv">32</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> <span class="dv">96</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>itemTfms <span class="op">=</span> [RandCropND(patch_size), RandRot90(prob<span class="op">=</span><span class="fl">.75</span>), RandFlip(prob<span class="op">=</span><span class="fl">0.75</span>)]</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>batchTfms <span class="op">=</span> [ScaleIntensityPercentiles()]</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>get_target_fn <span class="op">=</span> get_target(<span class="st">'GT'</span>, same_filename<span class="op">=</span><span class="va">True</span>, relative_path<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_folder(</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    X_path,                 <span class="co"># input images</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    get_target_fn,          <span class="co"># target images</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    valid_pct<span class="op">=</span><span class="fl">0.05</span>,         <span class="co"># percentage of data for the validation set</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">42</span>,                <span class="co"># seed for random number generator  </span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    item_tfms<span class="op">=</span>itemTfms,     <span class="co"># item transformations</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    batch_tfms<span class="op">=</span>batchTfms,   <span class="co"># batch transformations</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,     <span class="co"># print summary of the dataset</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    bs <span class="op">=</span> bs,                <span class="co"># batch size</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After defining these parameters and transformations, we will create a <code>BioDataLoaders</code> object to load the training and validation datasets.</p>
+<div id="cell-9" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>extract_directory <span class="op">=</span> Path(output_directory)<span class="op">/</span><span class="st">'128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip'</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>X_path <span class="op">=</span> extract_directory<span class="op">/</span><span class="st">'train'</span><span class="op">/</span><span class="st">'low'</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">32</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> <span class="dv">96</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>get_target_fn <span class="op">=</span> get_target(<span class="st">'GT'</span>, same_filename<span class="op">=</span><span class="va">True</span>, relative_path<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>data_ops <span class="op">=</span> {</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'valid_pct'</span>: <span class="fl">0.05</span>,         <span class="co"># percentage of data for the validation set</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'seed'</span>: <span class="dv">42</span>,                <span class="co"># seed for random number generator  </span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'bs'</span>: batch_size,          <span class="co"># batch size</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'item_tfms'</span>: [RandCropND(patch_size),   <span class="co"># item transformations</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                RandRot90(prob<span class="op">=</span><span class="fl">.75</span>), </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                RandFlip(prob<span class="op">=</span><span class="fl">0.75</span>)],</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'batch_tfms'</span>: [ScaleIntensityPercentiles()],   <span class="co"># batch transformations</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_folder(</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    X_path,                 <span class="co"># input images</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    get_target_fn,          <span class="co"># target images</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">False</span>,     <span class="co"># print summary of the dataset</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,             <span class="co"># rest of the method arguments</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>train images: 2335 
 validation images: 122</code></pre>
@@ -479,13 +475,31 @@ validation images: 122</code></pre>
 <p>Change the <code>cmap</code> parameter to use a different colormap (e.g., ‘gray’, ‘viridis’, ‘plasma’) based on your preference.</p>
 </blockquote>
 <p>Visualizing the data helps in understanding the dataset better and ensures that the transformations are applied correctly.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-11" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
+<section id="visualize-a-specific-image" class="level2">
+<h2 class="anchored" data-anchor-id="visualize-a-specific-image">Visualize a Specific Image</h2>
+<p>In the next cell, we will visualize a specific image from the dataset using its index. This step is useful for inspecting individual images and verifying their quality and labels. The <code>do_item</code> method of the <code>BioDataLoaders</code> class is used to retrieve the image and its label, and the <code>show</code> method is used to display the image.</p>
+<div id="cell-13" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>a<span class="op">=</span>data.do_item(<span class="dv">100</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>a[<span class="dv">0</span>].show(cmap<span class="op">=</span><span class="st">'magma'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 <section id="define-and-train-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="define-and-train-the-model">Define and Train the Model</h3>
 <p>In the next cell, we will define a 2D U-Net model using the <code>create_unet_model</code> function from the <code>bioMONAI</code> library. The U-Net model is a popular architecture for image segmentation tasks, and it can be customized to suit various applications.</p>
@@ -500,21 +514,21 @@ validation images: 122</code></pre>
 <blockquote class="blockquote">
 <p>You can customize the following parameters to suit your needs: - Change the backbone to a different architecture. - Adjust the input and output channels based on your dataset. - Modify the input size to match the dimensions of your images. - Set <code>pretrained</code> to <code>False</code> if you want to train the model from scratch.</p>
 </blockquote>
-<p>After defining the model, we will proceed to train it using the <a href="https://deepCLEM.github.io/bioMONAI/core.html#fasttrainer"><code>fastTrainer</code></a> class. The training process involves fine-tuning the model for a specified number of epochs and evaluating its performance on the validation dataset.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.nets <span class="im">import</span> create_unet_model, resnet34</span>
+<p>After defining the model, we will proceed to train it using the <code>fastTrainer</code> class. The training process involves fine-tuning the model for a specified number of epochs and evaluating its performance on the validation dataset.</p>
+<div id="cell-15" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.nets <span class="im">import</span> create_unet_model, resnet34</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> create_unet_model(resnet34, <span class="dv">1</span>, (<span class="dv">128</span>,<span class="dv">128</span>), <span class="va">True</span>, n_in<span class="op">=</span><span class="dv">1</span>, cut<span class="op">=</span><span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CombinedLoss(mse_weight<span class="op">=</span><span class="fl">0.8</span>, mae_weight<span class="op">=</span><span class="fl">0.1</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> create_unet_model(resnet34, <span class="dv">1</span>, (<span class="dv">128</span>,<span class="dv">128</span>), <span class="va">True</span>, n_in<span class="op">=</span><span class="dv">1</span>, cut<span class="op">=</span><span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [MSEMetric(), MAEMetric(), SSIMMetric(<span class="dv">2</span>)]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CombinedLoss(mse_weight<span class="op">=</span><span class="fl">0.8</span>, mae_weight<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [MSEMetric(), MAEMetric(), SSIMMetric(<span class="dv">2</span>)]</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">50</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-17" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">50</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -534,7 +548,7 @@ validation images: 122</code></pre>
 </style>
 </div>
 <div class="cell-output cell-output-display">
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th">epoch</th>
@@ -549,27 +563,31 @@ validation images: 122</code></pre>
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>0.059263</td>
-<td>0.031750</td>
-<td>0.003062</td>
-<td>0.030812</td>
-<td>0.737810</td>
-<td>00:05</td>
+<td>0.091283</td>
+<td>0.038087</td>
+<td>0.003334</td>
+<td>0.033882</td>
+<td>0.679681</td>
+<td>00:09</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>0.031509</td>
-<td>0.021351</td>
-<td>0.002592</td>
-<td>0.025890</td>
-<td>0.833123</td>
-<td>00:04</td>
+<td>0.039144</td>
+<td>0.020872</td>
+<td>0.003213</td>
+<td>0.029064</td>
+<td>0.846050</td>
+<td>00:09</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-13-output-3.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-11-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output cell-output-display">
 
@@ -590,7 +608,7 @@ validation images: 122</code></pre>
 </style>
 </div>
 <div class="cell-output cell-output-display">
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th">epoch</th>
@@ -605,459 +623,463 @@ validation images: 122</code></pre>
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>0.018390</td>
-<td>0.017519</td>
-<td>0.001561</td>
-<td>0.020792</td>
-<td>0.858087</td>
-<td>00:04</td>
+<td>0.018590</td>
+<td>0.016245</td>
+<td>0.001428</td>
+<td>0.020205</td>
+<td>0.869175</td>
+<td>00:07</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>0.016879</td>
-<td>0.015520</td>
-<td>0.001512</td>
-<td>0.020095</td>
-<td>0.876995</td>
-<td>00:04</td>
+<td>0.017735</td>
+<td>0.016854</td>
+<td>0.001767</td>
+<td>0.022272</td>
+<td>0.867866</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>0.015920</td>
-<td>0.016230</td>
-<td>0.001825</td>
-<td>0.021673</td>
-<td>0.873977</td>
-<td>00:04</td>
+<td>0.016453</td>
+<td>0.016980</td>
+<td>0.001879</td>
+<td>0.022511</td>
+<td>0.867746</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>3</td>
-<td>0.015772</td>
-<td>0.015743</td>
-<td>0.001493</td>
-<td>0.019981</td>
-<td>0.874495</td>
-<td>00:04</td>
+<td>0.016318</td>
+<td>0.016501</td>
+<td>0.001660</td>
+<td>0.021157</td>
+<td>0.869425</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>4</td>
-<td>0.015445</td>
-<td>0.018726</td>
-<td>0.002763</td>
-<td>0.026642</td>
-<td>0.861489</td>
-<td>00:04</td>
+<td>0.015802</td>
+<td>0.014503</td>
+<td>0.001199</td>
+<td>0.018310</td>
+<td>0.882879</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>5</td>
-<td>0.015966</td>
-<td>0.015048</td>
-<td>0.001492</td>
-<td>0.019624</td>
-<td>0.881081</td>
-<td>00:04</td>
+<td>0.015380</td>
+<td>0.015624</td>
+<td>0.001231</td>
+<td>0.018881</td>
+<td>0.872488</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>6</td>
-<td>0.016098</td>
-<td>0.016459</td>
-<td>0.001995</td>
-<td>0.022954</td>
-<td>0.874330</td>
-<td>00:04</td>
+<td>0.015434</td>
+<td>0.015256</td>
+<td>0.001402</td>
+<td>0.019921</td>
+<td>0.878575</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>7</td>
-<td>0.015651</td>
-<td>0.015040</td>
-<td>0.001728</td>
-<td>0.020668</td>
-<td>0.884089</td>
-<td>00:04</td>
+<td>0.016333</td>
+<td>0.016394</td>
+<td>0.001672</td>
+<td>0.021574</td>
+<td>0.871009</td>
+<td>00:07</td>
 </tr>
 <tr class="odd">
 <td>8</td>
-<td>0.015609</td>
-<td>0.016344</td>
-<td>0.002146</td>
-<td>0.022793</td>
-<td>0.876518</td>
-<td>00:04</td>
+<td>0.016842</td>
+<td>0.016297</td>
+<td>0.001407</td>
+<td>0.019500</td>
+<td>0.867791</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>9</td>
-<td>0.015790</td>
-<td>0.016388</td>
-<td>0.001928</td>
-<td>0.021907</td>
-<td>0.873452</td>
-<td>00:04</td>
+<td>0.015876</td>
+<td>0.016804</td>
+<td>0.001347</td>
+<td>0.019480</td>
+<td>0.862223</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>10</td>
-<td>0.016008</td>
-<td>0.016197</td>
-<td>0.001503</td>
-<td>0.020361</td>
-<td>0.870417</td>
-<td>00:05</td>
+<td>0.016188</td>
+<td>0.014634</td>
+<td>0.001234</td>
+<td>0.018485</td>
+<td>0.882012</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>11</td>
-<td>0.015512</td>
-<td>0.015503</td>
-<td>0.001408</td>
-<td>0.019778</td>
-<td>0.876012</td>
-<td>00:05</td>
+<td>0.014898</td>
+<td>0.015135</td>
+<td>0.001373</td>
+<td>0.018963</td>
+<td>0.878599</td>
+<td>00:07</td>
 </tr>
 <tr class="odd">
 <td>12</td>
-<td>0.015767</td>
-<td>0.015337</td>
-<td>0.001368</td>
-<td>0.019256</td>
-<td>0.876830</td>
-<td>00:05</td>
+<td>0.015670</td>
+<td>0.015895</td>
+<td>0.001535</td>
+<td>0.020535</td>
+<td>0.873862</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>13</td>
-<td>0.015257</td>
-<td>0.014446</td>
-<td>0.001362</td>
-<td>0.019063</td>
-<td>0.885507</td>
-<td>00:04</td>
+<td>0.015179</td>
+<td>0.018079</td>
+<td>0.001370</td>
+<td>0.020026</td>
+<td>0.850189</td>
+<td>00:07</td>
 </tr>
 <tr class="odd">
 <td>14</td>
-<td>0.015756</td>
-<td>0.014684</td>
-<td>0.001553</td>
-<td>0.020141</td>
-<td>0.885727</td>
-<td>00:04</td>
+<td>0.016163</td>
+<td>0.015631</td>
+<td>0.001266</td>
+<td>0.018942</td>
+<td>0.872760</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>15</td>
-<td>0.015227</td>
-<td>0.015024</td>
-<td>0.001379</td>
-<td>0.019199</td>
-<td>0.879995</td>
-<td>00:04</td>
+<td>0.015571</td>
+<td>0.015849</td>
+<td>0.001280</td>
+<td>0.019001</td>
+<td>0.870751</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>16</td>
-<td>0.015261</td>
-<td>0.014982</td>
-<td>0.001360</td>
-<td>0.019180</td>
-<td>0.880241</td>
-<td>00:04</td>
+<td>0.015575</td>
+<td>0.014438</td>
+<td>0.001204</td>
+<td>0.018123</td>
+<td>0.883374</td>
+<td>00:07</td>
 </tr>
 <tr class="even">
 <td>17</td>
-<td>0.014247</td>
-<td>0.014851</td>
-<td>0.002221</td>
-<td>0.022847</td>
-<td>0.892102</td>
-<td>00:04</td>
+<td>0.014841</td>
+<td>0.014776</td>
+<td>0.001362</td>
+<td>0.019337</td>
+<td>0.882474</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>18</td>
-<td>0.014091</td>
-<td>0.014845</td>
-<td>0.001407</td>
-<td>0.019615</td>
-<td>0.882418</td>
-<td>00:04</td>
+<td>0.014846</td>
+<td>0.014924</td>
+<td>0.001550</td>
+<td>0.020492</td>
+<td>0.883654</td>
+<td>00:07</td>
 </tr>
 <tr class="even">
 <td>19</td>
-<td>0.014043</td>
-<td>0.013648</td>
-<td>0.001350</td>
-<td>0.018536</td>
-<td>0.892850</td>
-<td>00:04</td>
+<td>0.014523</td>
+<td>0.014821</td>
+<td>0.001338</td>
+<td>0.018680</td>
+<td>0.881175</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>20</td>
-<td>0.013710</td>
-<td>0.014114</td>
-<td>0.001372</td>
-<td>0.018851</td>
-<td>0.888687</td>
-<td>00:04</td>
+<td>0.014897</td>
+<td>0.016450</td>
+<td>0.001910</td>
+<td>0.022266</td>
+<td>0.873053</td>
+<td>00:07</td>
 </tr>
 <tr class="even">
 <td>21</td>
-<td>0.013437</td>
-<td>0.016465</td>
-<td>0.001930</td>
-<td>0.022347</td>
-<td>0.873133</td>
-<td>00:04</td>
+<td>0.015053</td>
+<td>0.014026</td>
+<td>0.001173</td>
+<td>0.017865</td>
+<td>0.886989</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>22</td>
-<td>0.013622</td>
-<td>0.014885</td>
-<td>0.001425</td>
-<td>0.019470</td>
-<td>0.882027</td>
-<td>00:04</td>
+<td>0.014654</td>
+<td>0.014989</td>
+<td>0.001183</td>
+<td>0.018154</td>
+<td>0.877735</td>
+<td>00:07</td>
 </tr>
 <tr class="even">
 <td>23</td>
-<td>0.013829</td>
-<td>0.014458</td>
-<td>0.001389</td>
-<td>0.019248</td>
-<td>0.885781</td>
-<td>00:04</td>
+<td>0.014243</td>
+<td>0.014246</td>
+<td>0.001124</td>
+<td>0.017807</td>
+<td>0.884340</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>24</td>
-<td>0.014047</td>
-<td>0.013161</td>
-<td>0.001478</td>
-<td>0.018917</td>
-<td>0.899137</td>
-<td>00:04</td>
+<td>0.014193</td>
+<td>0.014786</td>
+<td>0.001117</td>
+<td>0.017774</td>
+<td>0.878852</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>25</td>
-<td>0.013911</td>
-<td>0.012902</td>
-<td>0.001281</td>
-<td>0.018061</td>
-<td>0.899292</td>
-<td>00:04</td>
+<td>0.013763</td>
+<td>0.014003</td>
+<td>0.001241</td>
+<td>0.018323</td>
+<td>0.888228</td>
+<td>00:07</td>
 </tr>
 <tr class="odd">
 <td>26</td>
-<td>0.013629</td>
-<td>0.013000</td>
-<td>0.001469</td>
-<td>0.018982</td>
-<td>0.900730</td>
-<td>00:04</td>
+<td>0.013847</td>
+<td>0.014553</td>
+<td>0.001140</td>
+<td>0.017833</td>
+<td>0.881418</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>27</td>
-<td>0.013198</td>
-<td>0.014055</td>
-<td>0.001335</td>
-<td>0.018980</td>
-<td>0.889103</td>
-<td>00:04</td>
+<td>0.013748</td>
+<td>0.013692</td>
+<td>0.001058</td>
+<td>0.017123</td>
+<td>0.888672</td>
+<td>00:07</td>
 </tr>
 <tr class="odd">
 <td>28</td>
-<td>0.013180</td>
-<td>0.012791</td>
-<td>0.001315</td>
-<td>0.018064</td>
-<td>0.900674</td>
-<td>00:04</td>
+<td>0.013593</td>
+<td>0.013587</td>
+<td>0.001049</td>
+<td>0.017127</td>
+<td>0.889649</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>29</td>
-<td>0.013422</td>
-<td>0.012379</td>
-<td>0.001298</td>
-<td>0.017815</td>
-<td>0.904412</td>
-<td>00:04</td>
+<td>0.013200</td>
+<td>0.013431</td>
+<td>0.001047</td>
+<td>0.016945</td>
+<td>0.891008</td>
+<td>00:07</td>
 </tr>
 <tr class="odd">
 <td>30</td>
-<td>0.013412</td>
-<td>0.013191</td>
-<td>0.001374</td>
-<td>0.018449</td>
-<td>0.897529</td>
-<td>00:04</td>
+<td>0.012974</td>
+<td>0.016077</td>
+<td>0.001290</td>
+<td>0.018692</td>
+<td>0.868238</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>31</td>
-<td>0.013132</td>
-<td>0.012420</td>
-<td>0.001276</td>
-<td>0.017726</td>
-<td>0.903737</td>
-<td>00:04</td>
+<td>0.012834</td>
+<td>0.014635</td>
+<td>0.001158</td>
+<td>0.017853</td>
+<td>0.880768</td>
+<td>00:09</td>
 </tr>
 <tr class="odd">
 <td>32</td>
-<td>0.012796</td>
-<td>0.012543</td>
-<td>0.001240</td>
-<td>0.017730</td>
-<td>0.902221</td>
-<td>00:04</td>
+<td>0.012843</td>
+<td>0.014368</td>
+<td>0.001127</td>
+<td>0.017666</td>
+<td>0.883002</td>
+<td>00:10</td>
 </tr>
 <tr class="even">
 <td>33</td>
-<td>0.012817</td>
-<td>0.012291</td>
-<td>0.001316</td>
-<td>0.018162</td>
-<td>0.905779</td>
-<td>00:04</td>
+<td>0.012455</td>
+<td>0.015606</td>
+<td>0.001213</td>
+<td>0.018493</td>
+<td>0.872137</td>
+<td>00:07</td>
 </tr>
 <tr class="odd">
 <td>34</td>
-<td>0.012658</td>
-<td>0.012130</td>
-<td>0.001254</td>
-<td>0.017662</td>
-<td>0.906392</td>
-<td>00:04</td>
+<td>0.012464</td>
+<td>0.015070</td>
+<td>0.001333</td>
+<td>0.019086</td>
+<td>0.879045</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>35</td>
-<td>0.012476</td>
-<td>0.012438</td>
-<td>0.001278</td>
-<td>0.018083</td>
-<td>0.903923</td>
-<td>00:04</td>
+<td>0.012562</td>
+<td>0.015481</td>
+<td>0.001210</td>
+<td>0.018499</td>
+<td>0.873372</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>36</td>
-<td>0.012751</td>
-<td>0.012415</td>
-<td>0.001341</td>
-<td>0.018224</td>
-<td>0.904799</td>
-<td>00:04</td>
+<td>0.012072</td>
+<td>0.014047</td>
+<td>0.001047</td>
+<td>0.017079</td>
+<td>0.884988</td>
+<td>00:09</td>
 </tr>
 <tr class="even">
 <td>37</td>
-<td>0.012631</td>
-<td>0.014831</td>
-<td>0.001759</td>
-<td>0.020762</td>
-<td>0.886519</td>
-<td>00:04</td>
+<td>0.012390</td>
+<td>0.014027</td>
+<td>0.001038</td>
+<td>0.016993</td>
+<td>0.885025</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>38</td>
-<td>0.012579</td>
-<td>0.012348</td>
-<td>0.001227</td>
-<td>0.017694</td>
-<td>0.904028</td>
-<td>00:04</td>
+<td>0.012325</td>
+<td>0.013614</td>
+<td>0.001042</td>
+<td>0.016882</td>
+<td>0.889081</td>
+<td>00:09</td>
 </tr>
 <tr class="even">
 <td>39</td>
-<td>0.012365</td>
-<td>0.012506</td>
-<td>0.001264</td>
-<td>0.017780</td>
-<td>0.902831</td>
-<td>00:04</td>
+<td>0.012342</td>
+<td>0.014779</td>
+<td>0.001063</td>
+<td>0.017242</td>
+<td>0.877952</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>40</td>
-<td>0.012290</td>
-<td>0.012359</td>
-<td>0.001237</td>
-<td>0.017511</td>
-<td>0.903814</td>
-<td>00:04</td>
+<td>0.011910</td>
+<td>0.013977</td>
+<td>0.001112</td>
+<td>0.017367</td>
+<td>0.886484</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>41</td>
-<td>0.012234</td>
-<td>0.011951</td>
-<td>0.001238</td>
-<td>0.017431</td>
-<td>0.907826</td>
-<td>00:04</td>
+<td>0.011827</td>
+<td>0.013966</td>
+<td>0.001037</td>
+<td>0.016936</td>
+<td>0.885579</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>42</td>
-<td>0.012528</td>
-<td>0.012128</td>
-<td>0.001226</td>
-<td>0.017376</td>
-<td>0.905901</td>
-<td>00:04</td>
+<td>0.011600</td>
+<td>0.014270</td>
+<td>0.001051</td>
+<td>0.017050</td>
+<td>0.882753</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>43</td>
-<td>0.012046</td>
-<td>0.011911</td>
-<td>0.001287</td>
-<td>0.017585</td>
-<td>0.908764</td>
-<td>00:05</td>
+<td>0.011793</td>
+<td>0.014414</td>
+<td>0.001045</td>
+<td>0.017061</td>
+<td>0.881285</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>44</td>
-<td>0.012103</td>
-<td>0.012053</td>
-<td>0.001222</td>
-<td>0.017326</td>
-<td>0.906574</td>
-<td>00:04</td>
+<td>0.011914</td>
+<td>0.014048</td>
+<td>0.001027</td>
+<td>0.016870</td>
+<td>0.884611</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>45</td>
-<td>0.012201</td>
-<td>0.011962</td>
-<td>0.001235</td>
-<td>0.017346</td>
-<td>0.907602</td>
-<td>00:04</td>
+<td>0.011940</td>
+<td>0.014476</td>
+<td>0.001088</td>
+<td>0.017383</td>
+<td>0.881329</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>46</td>
-<td>0.012174</td>
-<td>0.011858</td>
-<td>0.001234</td>
-<td>0.017341</td>
-<td>0.908638</td>
-<td>00:04</td>
+<td>0.011864</td>
+<td>0.014843</td>
+<td>0.001094</td>
+<td>0.017490</td>
+<td>0.877812</td>
+<td>00:07</td>
 </tr>
 <tr class="even">
 <td>47</td>
-<td>0.011766</td>
-<td>0.013627</td>
-<td>0.001352</td>
-<td>0.018609</td>
-<td>0.893159</td>
-<td>00:04</td>
+<td>0.011933</td>
+<td>0.014440</td>
+<td>0.001040</td>
+<td>0.017015</td>
+<td>0.880933</td>
+<td>00:08</td>
 </tr>
 <tr class="odd">
 <td>48</td>
-<td>0.011853</td>
-<td>0.012117</td>
-<td>0.001251</td>
-<td>0.017631</td>
-<td>0.906461</td>
-<td>00:04</td>
+<td>0.011844</td>
+<td>0.014545</td>
+<td>0.001059</td>
+<td>0.017142</td>
+<td>0.880159</td>
+<td>00:08</td>
 </tr>
 <tr class="even">
 <td>49</td>
-<td>0.011875</td>
-<td>0.012058</td>
-<td>0.001255</td>
-<td>0.017596</td>
-<td>0.907052</td>
-<td>00:04</td>
+<td>0.011932</td>
+<td>0.014833</td>
+<td>0.001062</td>
+<td>0.017238</td>
+<td>0.877410</td>
+<td>00:08</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-13-output-6.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-11-output-6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -1067,9 +1089,9 @@ validation images: 122</code></pre>
 <ul>
 <li><code>trainer.show_results(cmap='magma')</code>: This function will display a batch of images from the validation dataset along with their corresponding denoised outputs using the ‘magma’ colormap.</li>
 </ul>
-<p>Visualizing the results helps in assessing the performance of the model and identifying any areas that may need further improvement.m</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Visualizing the results helps in assessing the performance of the model and identifying any areas that may need further improvement.</p>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results(cmap<span class="op">=</span><span class="st">'magma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1092,7 +1114,11 @@ validation images: 122</code></pre>
 
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-14-output-3.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-12-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -1106,8 +1132,11 @@ validation images: 122</code></pre>
 <p>Suggestions for customization: - Change the filename to include details like the model architecture, dataset, or date (e.g., ‘unet_resnet34_U2OS_2023’). - Save the model in a specific directory by providing the full path (e.g., ‘models/unet_resnet34_U2OS_2023’). - Save additional information like training history, metrics, or configuration settings in a separate file for better reproducibility.</p>
 </blockquote>
 <p>Saving the model ensures that you can easily share it with others or deploy it in a production environment without needing to retrain it.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('tmp-model')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-21" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>trainer.save(<span class="st">'tmp-model'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Path('../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/train/low/models/tmp-model.pth')</code></pre>
+</div>
 </div>
 </section>
 <section id="evaluate-the-model-on-test-data" class="level3">
@@ -1122,32 +1151,17 @@ validation images: 122</code></pre>
 <p>Suggestions for customization: - Change the <code>test_X_path</code> variable to point to a different test dataset. - Add more metrics to the <code>metrics</code> parameter to get a comprehensive evaluation (e.g., <code>MSEMetric()</code>, <code>MAEMetric()</code>). - Save the evaluation results to a file for further analysis or reporting.</p>
 </blockquote>
 <p>Evaluating the model on test data helps in understanding its performance in real-world scenarios and identifying any areas that may need further improvement.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>test_X_path <span class="op">=</span> <span class="st">'../_data/U2OS/128a57f165e1044e34d9a6ef46e66b3c-snr_7_binning_2.zip.unzip/test/low/'</span></span>
+<div id="cell-23" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>test_X_path <span class="op">=</span> extract_directory<span class="op">/</span><span class="st">'test'</span><span class="op">/</span><span class="st">'low'</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.test_dl(get_image_files(test_X_path), with_labels<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>evaluate_model(trainer, test_data, metrics<span class="op">=</span>SSIMMetric(<span class="dv">2</span>))<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
-    }
-    progress:not([value]), progress:not([value])::-webkit-progress-bar {
-        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
-    }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-</div>
-<div class="cell-output cell-output-display">
-
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of test dataset</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'test images:'</span>, <span class="bu">len</span>(test_data.items))</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>evaluate_model(trainer, test_data, metrics<span class="op">=</span>SSIMMetric(<span class="dv">2</span>))<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>test images: 615</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 
@@ -1171,16 +1185,45 @@ validation images: 122</code></pre>
 
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-16-output-5.png" class="img-fluid"></p>
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-16-output-6.png" class="img-fluid"></p>
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-14-output-6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-14-output-7.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -1194,31 +1237,31 @@ validation images: 122</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Mean</td>
-<td>0.016833</td>
+<td>0.013527</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Median</td>
-<td>0.013806</td>
+<td>0.012786</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Standard Deviation</td>
-<td>0.012330</td>
+<td>0.006557</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Min</td>
-<td>0.000871</td>
+<td>0.000649</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Max</td>
-<td>0.094672</td>
+<td>0.066723</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Q1</td>
-<td>0.010612</td>
+<td>0.010045</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Q3</td>
-<td>0.018312</td>
+<td>0.015991</td>
 </tr>
 </tbody>
 </table>
@@ -1226,13 +1269,17 @@ validation images: 122</code></pre>
 </div>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="903_tutorial_denoising_files/figure-html/cell-16-output-8.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-14-output-9.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -1246,31 +1293,31 @@ validation images: 122</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Mean</td>
-<td>0.860965</td>
+<td>0.891894</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Median</td>
-<td>0.893404</td>
+<td>0.899943</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Standard Deviation</td>
-<td>0.118673</td>
+<td>0.059861</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Min</td>
-<td>0.104494</td>
+<td>0.361847</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Max</td>
-<td>0.992975</td>
+<td>0.994855</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Q1</td>
-<td>0.852688</td>
+<td>0.873131</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Q3</td>
-<td>0.918993</td>
+<td>0.923070</td>
 </tr>
 </tbody>
 </table>
@@ -1278,8 +1325,373 @@ validation images: 122</code></pre>
 </div>
 </div>
 </div>
+</section>
+<section id="load-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="load-the-model">Load the Model</h3>
+<p>In this step, we will load the previously trained model using the <code>load</code> method of the <code>visionTrainer</code> class. In this example, we will:</p>
+<blockquote class="blockquote">
+<ul>
+<li>Create a trainer instance and load the previously saved model.</li>
+<li>Fine tune the model a several epochs more.</li>
+<li>Evaluate the model with test data again.</li>
+</ul>
+</blockquote>
+<div id="cell-25" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> create_unet_model(resnet34, <span class="dv">1</span>, (<span class="dv">128</span>,<span class="dv">128</span>), <span class="va">True</span>, n_in<span class="op">=</span><span class="dv">1</span>, cut<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CombinedLoss(mse_weight<span class="op">=</span><span class="fl">0.8</span>, mae_weight<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [MSEMetric(), MAEMetric(), SSIMMetric(<span class="dv">2</span>)]</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>trainer2 <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>, find_lr<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load saved model</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>trainer2.load(<span class="st">'tmp-model'</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Train several additional epochs</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>trainer2.fit_one_cycle(<span class="dv">2</span>, lr_max<span class="op">=</span><span class="fl">2e-4</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate the model on the test dataset</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>evaluate_model(trainer2, test_data, metrics<span class="op">=</span>metrics, show_graph<span class="op">=</span><span class="va">False</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inferred learning rate:  0.0002</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">MSE</th>
+<th data-quarto-table-cell-role="th">MAE</th>
+<th data-quarto-table-cell-role="th">SSIM</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.011576</td>
+<td>0.014184</td>
+<td>0.001200</td>
+<td>0.018013</td>
+<td>0.885774</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.011833</td>
+<td>0.014967</td>
+<td>0.001053</td>
+<td>0.017201</td>
+<td>0.875956</td>
+<td>00:09</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-15-output-6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
 
 
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">CombinedLoss</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>0.013745</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>0.013117</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.006751</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>0.000657</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>0.066316</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>0.010192</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>0.016188</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MSE</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>0.001185</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>0.001085</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.000799</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>0.000002</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>0.004928</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>0.000643</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>0.001567</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MAE</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>0.017776</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>0.018082</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.008009</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>0.001321</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>0.044682</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>0.012950</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>0.022790</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">SSIM</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mean</td>
+<td>0.889803</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Median</td>
+<td>0.898358</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Deviation</td>
+<td>0.062184</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min</td>
+<td>0.365174</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max</td>
+<td>0.994775</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Q1</td>
+<td>0.870843</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Q3</td>
+<td>0.921133</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-15-output-15.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="903_tutorial_denoising_files/figure-html/cell-15-output-16.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -1318,18 +1730,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1361,11 +1762,55 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1375,8 +1820,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1388,7 +1842,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1432,6 +2009,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1457,6 +2035,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1514,29 +2118,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       });
     }
   }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-          // target, if specified
-          link.setAttribute("target", "_blank");
-      }
-    }
 });
 </script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Copyright © 2024 Biagio Mandracchia, MIT License</div>   
+    <div class="nav-footer-left">
+<p>Copyright © 2024 Biagio Mandracchia, MIT License</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
-    </div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
@@ -1555,6 +2147,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 
