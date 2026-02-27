@@ -418,7 +418,7 @@ class RGB2HED(Transform):
         return bioimagetype(torchTensor(ihc))  # Return the converted image with the same type as the input
     
     def encodes(self, x: np.ndarray):
-        x = ScaleIntensity()(x).numpy()  # Ensure the image is scaled to [0, 1] before conversion
+        x = ScaleIntensity()(x)  # Ensure the image is scaled to [0, 1] before conversion
         return rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
 
 # %% ../nbs/05_transforms.ipynb #3f829aa9
