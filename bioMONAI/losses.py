@@ -378,8 +378,8 @@ class InstanceSegLoss:
         Nature methods, 18(1), 100-106.
     """
     def __init__(self,
-                 mse_weight: float = 1.0,  # Weight applied to the MSE component
-                 ssim_weight: float = 0.0, # Weight applied to the SSIM component
+                 mse_weight: float = 0.5,  # Weight applied to the MSE component
+                 ssim_weight: float = 1.0, # Weight applied to the SSIM component
                  spatial_dims: int = 2     # Number of spatial dimensions (2 for 2D, 3 for 3D)
                  ):
         self.BCELogits_loss = nn.BCEWithLogitsLoss()
