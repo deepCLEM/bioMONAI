@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['Resample', 'Resize', 'CropND', 'RandCameraNoise', 'Blur', 'ScaleIntensity', 'ScaleIntensityPercentiles',
-           'ScaleIntensityVariance', 'RelabelInstances', 'RandCrop2D', 'RandCropND', 'RandFlip', 'RandRot90']
+           'ScaleIntensityVariance', 'RelabelInstances', 'RGB2HED', 'RandCrop2D', 'RandCropND', 'RandFlip', 'RandRot90']
 
 # %% ../nbs/05_transforms.ipynb #56ab9960
 import numpy as np
@@ -404,6 +404,22 @@ class RelabelInstances(Transform):
             y[x == old_id] = new_id
 
         return y
+
+# %% ../nbs/05_transforms.ipynb #0879d854
+from skimage.color import rgb2hed
+
+# %% ../nbs/05_transforms.ipynb #1da05998
+class RGB2HED(Transform):
+    """Convert RGB images to HED color space."""
+    def encodes(self, x: BioImageBase):
+        bioimagetype = type(x)
+        x = ScaleIntensity()(x).numpy()  # Ensure the image is scaled to [0, 1] before conversion
+        ihc = rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
+        return bioimagetype(torchTensor(ihc))  # Return the converted image with the same type as the input
+    
+    def encodes(self, x: np.ndarray):
+        x = ScaleIntensity()(x).numpy()  # Ensure the image is scaled to [0, 1] before conversion
+        return rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
 
 # %% ../nbs/05_transforms.ipynb #3f829aa9
 def _process_sz(size, ndim=3):
