@@ -18,6 +18,8 @@ import numpy as np
 from PIL import Image
 import tifffile as tiff
 from tqdm import tqdm
+from typing import Callable, List, Optional, Union
+from fastai.data.all import L
 
 import medmnist
 
@@ -479,9 +481,6 @@ def add_columns_to_csv(csv_path, # Path to the input CSV file
     print(f"Columns {list(column_data.keys())} added successfully. Updated file saved to '{output_path}'")
 
 # %% ../nbs/08_datasets.ipynb #8f0ea54a
-from typing import Callable, List, Optional, Union
-from fastai.data.all import L
-
 def build_csv(
     filenames: Union[list[str|Path], L],                 # List of file names to process
     *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).

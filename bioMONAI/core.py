@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import gaussian_kde
 from matplotlib.colors import LinearSegmentedColormap
+from attr import dataclass
 
 from torch import Tensor as torchTensor
 from torch import tensor
@@ -563,10 +564,41 @@ def img2Tensor(image):
     return torchTensor(img2float(image))
 
 # %% ../nbs/00_core.ipynb #62a89a7d
-from attr import dataclass
-
 @dataclass
 class TargetedTransform:
+    """
+    Wrapper for a transform that specifies which input(s) it should be applied to.
+
+    This allows fine-grained control when working with paired data such as
+    (X, y), stereo images, or multi-modal inputs.
+
+    Parameters
+    ----------
+    transform : callable
+        The transform to apply. Must implement an `encodes()` method
+        if used within a Transform pipeline.
+
+    targets : tuple of str, default ("both",)
+        Specifies where the transform should be applied.
+        Supported values:
+            - ("X",)      : apply only to the first element
+            - ("y",)      : apply only to the second element
+            - ("both",)   : apply to both elements
+
+    Examples
+    --------
+    Apply to both inputs (default):
+
+        TargetedTransform(RandomFlip())
+
+    Apply only to X:
+
+        TargetedTransform(RandomBrightness(), targets=("X",))
+
+    Apply only to y:
+
+        TargetedTransform(RemapMask(), targets=("y",))
+    """
     transform: callable
     targets: tuple = ("both",)   # ("X",), ("y",), ("both",)
 
