@@ -18,7 +18,7 @@ from numpy import percentile, isscalar, float32 as np_float32
 from skimage.transform import resize
 
 from .data import BioImageBase, BioImageStack, Tensor2BioImage
-from .core import img2Tensor
+from .core import torchTensor
 
 # %% ../nbs/05_transforms.ipynb #e49a336f
 class Resample(Transform):
@@ -49,7 +49,7 @@ class Resample(Transform):
     
     def encodes(self, img: np.ndarray):
         """Transforms a NumPy array to BioImage and resamples with Spacing."""
-        tensor_img = Tensor2BioImage()(img2Tensor(img))
+        tensor_img = Tensor2BioImage()(torchTensor(img))
         return self.spacing(tensor_img).numpy()
 
 
