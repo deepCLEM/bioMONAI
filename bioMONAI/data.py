@@ -986,29 +986,48 @@ def show_results(x: BioImageBase,       # The input image data.
 
 
 # %% ../nbs/01_data.ipynb #bf008823
-def extract_patches(data, # numpy array of the input data (n-dimensional).
-                    patch_size, # tuple of integers defining the size of the patches in each dimension.
-                    overlap, # float (between 0 and 1) indicating overlap between patches.
-                    ):
+def extract_patches(data: np.ndarray,       # Input array (n-dimensional) from which to extract patches.
+                    patch_size: tuple,      # Tuple of integers defining the size of the patches in each dimension.
+                    overlap: float|tuple,   # Float (between 0 and 1) or tuple of floats indicating the overlap fraction for each dimension.
+):
     """
-    Extracts n-dimensional patches from the input data.
+    Extract n-dimensional patches from input data.
 
-    Returns:
-    - A list of patches as numpy arrays.
+    Returns
+    -------
+    patches : list of np.ndarray
     """
+
     data_shape = data.shape
-    strides = tuple(int(p * (1 - overlap)) for p in patch_size)  # Calculate the stride for each dimension
-    
-    # Compute the range of indices for each dimension
-    slices = [range(0, data_shape[i] - patch_size[i] + 1, strides[i]) for i in range(len(patch_size))]
-    
-    # Generate patches
+    ndim = len(patch_size)
+
+    if isinstance(overlap, (int, float)):
+        overlap = (overlap,) * ndim
+    else:
+        if len(overlap) != ndim:
+            raise ValueError("overlap tuple must match patch dimensions")
+
+    # compute strides safely (>=1)
+    strides = tuple(
+        max(1, int(patch_size[i] * (1 - overlap[i])))
+        for i in range(ndim)
+    )
+
+    # compute start indices for each dimension
+    slices = [
+        range(0, data_shape[i] - patch_size[i] + 1, strides[i])
+        for i in range(ndim)
+    ]
+
     patches = []
+
     for indices in np.ndindex(*[len(s) for s in slices]):
-        # Create slices for each dimension
-        patch_slices = tuple(slice(slices[dim][idx], slices[dim][idx] + patch_size[dim]) for dim, idx in enumerate(indices))
+        patch_slices = tuple(
+            slice(slices[dim][idx], slices[dim][idx] + patch_size[dim])
+            for dim, idx in enumerate(indices)
+        )
         patches.append(data[patch_slices])
-    
+
     return patches
 
 # %% ../nbs/01_data.ipynb #337a703a
@@ -1076,8 +1095,8 @@ def save_patches_grid(data_paths,                   # Path to folder or list of 
             data_file_name = os.path.splitext(os.path.basename(data_file_path))[0]
         
         # Load the images
-        data = np.array(image_reader(data_file_path))
-        gt = np.array(image_reader(gt_file_path))
+        data = image_reader(data_file_path, dtype=np.array)
+        gt = image_reader(gt_file_path, dtype=np.array)
         
         if squeeze_input:
             data = np.squeeze(data)
@@ -1085,15 +1104,15 @@ def save_patches_grid(data_paths,                   # Path to folder or list of 
         
         gt_patch_size = patch_size  # Assuming the same patch size for gt, can be modified to accept a different one
 
+        # Apply transforms before extracting patches
+        if tfms_before is not None:
+            data, gt = apply_transforms((data, gt), tfms_before)
+
+        # Check if data and gt have the same shape, if not, attempt to align spatial dimensions
         if data.shape != gt.shape:
             if data.shape[-2:] != gt.shape[-2:]:
                 raise ValueError(f"Spatial dimension mismatch between {os.path.basename(data_file_path)} and {os.path.basename(gt_file_path)}: {data.shape} vs {gt.shape}")
             gt_patch_size = patch_size[-2:]  # Use only spatial dimensions for gt patches
-
-
-        # Apply transforms before extracting patches
-        if tfms_before is not None:
-            data, gt = apply_transforms((data, gt), tfms_before)
         
         # Extract patches from both datasets
         data_patches_nd = extract_patches(data, patch_size, overlap)
