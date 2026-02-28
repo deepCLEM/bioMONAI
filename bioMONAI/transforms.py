@@ -620,4 +620,4 @@ class RandRot90(RandTransform):
         return bioimagetype(Rotate90(k=self.k, spatial_axes=self.spatial_axes, lazy=self.lazy)(x))
     
     def encodes(self, x: np.ndarray):
-        return np.rot90(image, self.k, axes=self.spatial_axes)
+        return np.rot90(x, self.k, axes=self.spatial_axes)

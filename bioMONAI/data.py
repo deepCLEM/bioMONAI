@@ -676,7 +676,7 @@ def _build_filename_predicate(
 
 
 def get_images(
-    path: str,
+    path: str|Path,
     folders: str|list[str]|None = None,
     recurse: bool = True,
     filename_filter: str|re.Pattern|Callable[[str], bool]|None = None,
@@ -986,49 +986,77 @@ def show_results(x: BioImageBase,       # The input image data.
 
 
 # %% ../nbs/01_data.ipynb #bf008823
-def extract_patches(data: np.ndarray,       # Input array (n-dimensional) from which to extract patches.
-                    patch_size: tuple,      # Tuple of integers defining the size of the patches in each dimension.
-                    overlap: float|tuple,   # Float (between 0 and 1) or tuple of floats indicating the overlap fraction for each dimension.
+def extract_patches(
+    data: np.ndarray,                 # Input array (n-dimensional)
+    patch_size: tuple,                # Patch size per dimension
+    overlap: float | tuple,           # Overlap fraction(s)
+    transforms: List[Callable]|None = None # Optional list of transforms
 ):
     """
     Extract n-dimensional patches from input data.
+    Optionally applies transforms to the full data before extracting patches.
+
+    Parameters
+    ----------
+    data : np.ndarray
+    patch_size : tuple
+    overlap : float or tuple
+    transforms : list of callables, optional
+        Each transform must take a np.ndarray and return a np.ndarray
+        of the same dimensionality.
 
     Returns
     -------
     patches : list of np.ndarray
     """
 
-    data_shape = data.shape
-    ndim = len(patch_size)
+    def _extract_from_single_array(arr: np.ndarray):
+        data_shape = arr.shape
+        ndim = len(patch_size)
 
-    if isinstance(overlap, (int, float)):
-        overlap = (overlap,) * ndim
-    else:
-        if len(overlap) != ndim:
-            raise ValueError("overlap tuple must match patch dimensions")
+        # normalize overlap
+        if isinstance(overlap, (int, float)):
+            overlap_tuple = (overlap,) * ndim
+        else:
+            if len(overlap) != ndim:
+                raise ValueError("overlap tuple must match patch dimensions")
+            overlap_tuple = overlap
 
-    # compute strides safely (>=1)
-    strides = tuple(
-        max(1, int(patch_size[i] * (1 - overlap[i])))
-        for i in range(ndim)
-    )
-
-    # compute start indices for each dimension
-    slices = [
-        range(0, data_shape[i] - patch_size[i] + 1, strides[i])
-        for i in range(ndim)
-    ]
-
-    patches = []
-
-    for indices in np.ndindex(*[len(s) for s in slices]):
-        patch_slices = tuple(
-            slice(slices[dim][idx], slices[dim][idx] + patch_size[dim])
-            for dim, idx in enumerate(indices)
+        # compute strides (>=1)
+        strides = tuple(
+            max(1, int(patch_size[i] * (1 - overlap_tuple[i])))
+            for i in range(ndim)
         )
-        patches.append(data[patch_slices])
 
-    return patches
+        # compute start indices
+        slices = [
+            range(0, data_shape[i] - patch_size[i] + 1, strides[i])
+            for i in range(ndim)
+        ]
+
+        patches_local = []
+
+        for indices in np.ndindex(*[len(s) for s in slices]):
+            patch_slices = tuple(
+                slice(slices[dim][idx], slices[dim][idx] + patch_size[dim])
+                for dim, idx in enumerate(indices)
+            )
+            patches_local.append(arr[patch_slices])
+
+        return patches_local
+
+    all_patches = []
+
+    # Extract from original
+    all_patches.extend(_extract_from_single_array(data))
+
+    # Extract from transformed versions
+    if transforms is not None:
+        for transform in transforms:
+            transformed = transform(data)
+            all_patches.extend(_extract_from_single_array(transformed))
+
+    return all_patches
 
 # %% ../nbs/01_data.ipynb #337a703a
 def save_patches_grid(data_paths,                   # Path to folder or list of paths to data files (n-dimensional data).
