@@ -380,13 +380,15 @@ class InstanceSegLoss:
     def __init__(self,
                  mse_weight: float = 0.5,  # Weight applied to the MSE component
                  ssim_weight: float = 1.0, # Weight applied to the SSIM component
-                 spatial_dims: int = 2     # Number of spatial dimensions (2 for 2D, 3 for 3D)
+                 spatial_dims: int = 2,     # Number of spatial dimensions (2 for 2D, 3 for 3D)
+                 logits: bool = True       # Whether to apply sigmoid to logits before computing loss
                  ):
-        self.BCELogits_loss = nn.BCEWithLogitsLoss()
+        self.BCE_loss = nn.BCEWithLogitsLoss() if logits else nn.BCELoss()
         self.MSE_loss = nn.MSELoss()
         self.SSIM_loss = SSIMLoss(spatial_dims=spatial_dims)
         self.mse_weight = mse_weight
         self.ssim_weight = ssim_weight
+        self.logits = logits
         
     def __call__(self,
                  pred,  # Model logits of shape (bs, n_instances, h, w)
@@ -396,7 +398,10 @@ class InstanceSegLoss:
         Compute the combined BCE + MSE instance segmentation loss.
         """
         # BCE component 
-        bce = self.BCELogits_loss(pred, targ)
+        if self.logits:
+            bce = self.BCE_loss(pred, targ)
+        else:
+            bce = self.BCE_loss((pred>0.).float(), (targ>0.).float())
 
         # MSE component 
         mse = self.MSE_loss(pred, targ)

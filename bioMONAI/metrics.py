@@ -90,12 +90,6 @@ def DiceMetric(threshold=0.5, instance=False, **kwargs):
     dice_metric = _DiceMetric(**kwargs)
 
     def Dice(pred, target):
-        # logits -> probabilities
-        pred = sigmoid(pred)
-
-        # Binarize
-        pred = (pred > threshold).float()
-
         # Check shapes 
         if target.ndim == 3:
             target = target.unsqueeze(1)
@@ -103,7 +97,14 @@ def DiceMetric(threshold=0.5, instance=False, **kwargs):
         # if target is not binary assume it's an instance mask and
         # convert to a binary foreground/background mask
         if instance:
+            # Binarize
+            pred = (pred > threshold).float()
             target = (target > 0).float()
+        else:
+            # logits -> probabilities
+            pred = sigmoid(pred)
+            # Binarize
+            pred = (pred > threshold).float()
 
         dice_metric.reset()
         dice_metric(pred, target)
