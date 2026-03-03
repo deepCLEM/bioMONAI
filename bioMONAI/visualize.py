@@ -376,11 +376,12 @@ def slice_explorer(data,            # A 3D numpy array representing the image te
 # %% ../nbs/09_visualize.ipynb #5e7e936b
 def plot_volume(values,             # A 3D array of pixel values representing the volume.
                 opacity=0.1,        # Opacity level for the surfaces in the volume plot.
-                min=0.1,            # Minimum threshold multiplier for the visualization.
-                max=0.8,            # Maximum threshold multiplier for the visualization.
+                min=0.1,            # Minimum threshold for the visualization.
+                max=0.8,            # Maximum threshold for the visualization.
                 surface_count=5,    # Number of surfaces to display in the volume plot.
                 width=800,          # Width of the plotted figure.
                 height=600,         # Height of the plotted figure.
+                **kwargs            # Additional keyword arguments for Plotly figure customization.
                 ):
     """
     Interactive visualization of a 3D volume using Plotly. The function assumes that 'values' is a 3D array representing the volume data.
@@ -394,10 +395,12 @@ def plot_volume(values,             # A 3D array of pixel values representing th
         y=Y.flatten(),
         z=Z.flatten(),
         value=values.flatten(),
-        isomin=np.min(values) * min, # Adjust the minimum threshold for visualization
-        isomax=np.max(values) * max, # Adjust the maximum threshold for visualization
+        colorscale='cividis',  # You can choose other colorscales like 'Hot', 'Jet', etc.
+        isomin=min, # Adjust the minimum threshold for visualization
+        isomax=max, # Adjust the maximum threshold for visualization
         opacity=opacity, # needs to be small to see through all surfaces
         surface_count=surface_count, # needs to be a large number for good volume rendering
+        **kwargs,
     ))
     
     # Update layout with specific width and height

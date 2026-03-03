@@ -31,6 +31,7 @@ class Resample(Transform):
     """
     
     def __init__(self, sampling, # Sampling factor for isotropic resampling
+                 has_channels=True, # Indicates whether the input image has a channel dimension (only for numpy arrays)
                  **kwargs, # Additional keyword arguments that can include 'pixdim' to specify custom voxel dimensions
                  ):
         """
@@ -40,6 +41,7 @@ class Resample(Transform):
         
         The Spacing class from which Resample inherits is initialized with either the provided pixdim or calculated based on the sampling factor and original image properties.
         """
+        store_attr()
         if 'pixdim' in kwargs:
             self.spacing = Spacing(**kwargs)
         else:
@@ -50,6 +52,8 @@ class Resample(Transform):
     
     def encodes(self, img: np.ndarray):
         """Transforms a NumPy array to BioImage and resamples with Spacing."""
+        if not self.has_channels:
+            img = np.expand_dims(img, axis=0)  # Add channel dimension if not present
         tensor_img = Tensor2BioImage()(torchTensor(img))
         return self.spacing(tensor_img).numpy()
 
