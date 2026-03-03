@@ -376,8 +376,8 @@ def slice_explorer(data,            # A 3D numpy array representing the image te
 # %% ../nbs/09_visualize.ipynb #5e7e936b
 def plot_volume(values,             # A 3D array of pixel values representing the volume.
                 opacity=0.1,        # Opacity level for the surfaces in the volume plot.
-                min=0.1,            # Minimum threshold for the visualization.
-                max=0.8,            # Maximum threshold for the visualization.
+                min=None,            # Minimum threshold for the visualization.
+                max=None,            # Maximum threshold for the visualization.
                 surface_count=5,    # Number of surfaces to display in the volume plot.
                 width=800,          # Width of the plotted figure.
                 height=600,         # Height of the plotted figure.
@@ -388,6 +388,10 @@ def plot_volume(values,             # A 3D array of pixel values representing th
     """
     # Generate coordinates based on the shape of the values array
     X, Y, Z = np.mgrid[0:values.shape[0], 0:values.shape[1], 0:values.shape[2]]
+    if min is None:
+        min = values.min()
+    if max is None:
+        max = values.max()
     
     # Create a Plotly figure with volume data
     fig = go.Figure(data=go.Volume(
