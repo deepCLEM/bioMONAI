@@ -108,7 +108,7 @@ def DiceMetric(threshold=0.5, instance=False, **kwargs):
 
         dice_metric.reset()
         dice_metric(pred, target)
-        return dice_metric.aggregate().item()
+        return dice_metric.aggregate()
 
     return AvgMetric(Dice)
 
@@ -137,7 +137,7 @@ def PanopticQualityMetric(**kwargs):
 
         pq_metric.reset()
         pq_metric(y_pred=pred, y=target)
-        return pq_metric.aggregate().item()
+        return pq_metric.aggregate()
 
     return AvgMetric(PQ)
 
@@ -159,7 +159,7 @@ def ROCAUCMetric(**kwargs):
 
         rocaucmetric.reset()
         rocaucmetric(pred, target)
-        return rocaucmetric.aggregate().item()
+        return rocaucmetric.aggregate()
     return AvgMetric(ROCAUC)
 
 # %% ../nbs/06_metrics.ipynb #8481bc99
