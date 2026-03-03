@@ -395,7 +395,6 @@ def plot_volume(values,             # A 3D array of pixel values representing th
         y=Y.flatten(),
         z=Z.flatten(),
         value=values.flatten(),
-        colorscale='cividis',  # You can choose other colorscales like 'Hot', 'Jet', etc.
         isomin=min, # Adjust the minimum threshold for visualization
         isomax=max, # Adjust the maximum threshold for visualization
         opacity=opacity, # needs to be small to see through all surfaces
