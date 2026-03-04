@@ -355,7 +355,7 @@ def plot_histogram_and_kde(data, stats, bw_method=0.3, fn_name=''):
 
     # Add loss function name to the title
     plt.title(f"Combined Histogram and KDE with Statistics\n{fn_name}")
-    plt.xlabel("Loss Value")
+    plt.xlabel("Value")
     plt.ylabel("Density")
     plt.legend()
     # plt.grid(True)

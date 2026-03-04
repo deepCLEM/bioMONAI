@@ -220,40 +220,52 @@ class BioImageProject(BioImageBase):
 # %% ../nbs/01_data.ipynb #b484acfa
 class BioImageMulti(BioImageBase):
     """
-    For multi-channel 2D images, `BioImageMulti` extends `BioImageBase` to handle data with multiple channels, such as different fluorescence markers in microscopy images. 
+    Multi-channel 2D/3D image assuming CDHW layout.
     """
-    
+
     @classmethod
-    def create(cls, fn: (Path, str, L, list, torchTensor), roi=None, **kwargs) -> torchTensor: 
-        """
-        Opens an image and casts it to BioImageBase object.
-        If `fn` is a torchTensor, it's cast to BioImageBase object.
+    def create(
+        cls,
+        fn: (Path, str, L, list, torchTensor),
+        roi=None,
+        merge_cd: bool = True,
+        interleaved: bool = True,
+        **kwargs
+    ) -> torchTensor:
 
-        Args:
-            fn : (Path, str, torchTensor)
-                Image path or a 4D torchTensor.
-            kwargs : dict
-                Additional parameters for the medical image reader.
-
-        Returns:
-            torchTensor : A 3D tensor as a BioImage object.
-        """
         if isinstance(fn, torchTensor):
-            return cls(fn)
+            img = fn
+        else:
+            img = image_reader(
+                fn,
+                dtype=cls,
+                resample=cls.resample,
+                reorder=cls.reorder,
+                **kwargs
+            )
+            img = torchsqueeze(img)
 
-        img = torchsqueeze(image_reader(fn, dtype=cls, resample=cls.resample, reorder=cls.reorder))
         if roi is not None:
-            return img[roi[0]:roi[1]]
-        return img
-    
+            img = img[roi[0]:roi[1]]
+
+        # Assume layout: (C, D, H, W)
+        if merge_cd and img.ndim == 4:
+            c, d, h, w = img.shape
+
+            if interleaved:
+                # (C, D, H, W) → (D, C, H, W) → flatten
+                img = img.permute(1, 0, 2, 3).reshape(c * d, h, w)
+            else:
+                # Sequential flatten (C blocks)
+                img = img.reshape(c * d, h, w)
+
+        return cls(img)
+
     def show(self, ctx=None, **kwargs):
-        "Show image using `merge(self._show_args, kwargs)`"
         return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
-    
+
     def __repr__(self) -> str:
-        """Returns the string representation of the ImageBase instance."""
         return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
-        
 
 # %% ../nbs/01_data.ipynb #a42a484e
 class Tensor2BioImage(DisplayedTransform):
