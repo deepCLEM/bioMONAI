@@ -14,7 +14,7 @@ from numpy import trapezoid as trapz
 from torch import abs, sqrt, div, complex64, where, isinf, zeros_like, real, isnan, argmax, sigmoid, is_tensor
 from torch.fft import fftshift
 from torch.fft import fft2
-from torch.nn.functional import softmax
+from torch.nn.functional import softmax, one_hot
 
 from fastai.vision.all import AvgMetric
 from monai.losses import SSIMLoss
@@ -142,7 +142,9 @@ def PanopticQualityMetric(**kwargs):
     return AvgMetric(PQ)
 
 # %% ../nbs/06_metrics.ipynb #0481c954
-def ROCAUCMetric(**kwargs):
+def ROCAUCMetric(onehot=True,       # if False, labels and targets are one-hot encoded
+                 num_classes=None,  # number of classes
+                 **kwargs):
     """
     Wrapper around monai.metrics.ROCAUCMetric
     Computes Area Under the Receiver Operating Characteristic Curve (ROC AUC).
@@ -157,6 +159,10 @@ def ROCAUCMetric(**kwargs):
         if target.ndim == 3:
             target = target.unsqueeze(1)
 
+        if not onehot:
+            pred = one_hot(pred, num_classes=num_classes)
+            target = one_hot(target, num_classes=num_classes)
+            
         rocaucmetric.reset()
         rocaucmetric(pred, target)
         return rocaucmetric.aggregate()

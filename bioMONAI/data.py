@@ -495,7 +495,7 @@ class BioDataLoaders(DataLoaders):
 
     @classmethod
     @delegates(from_source)
-    def class_from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col=0, folder=None, suff='', label_col=1, label_delim=None,
+    def class_from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col='filename', folder=None, suff='', label_col='label', label_delim=' ',
                 y_block=None, valid_col=None, item_tfms=None, batch_tfms=None, img_cls=BioImage, **kwargs):
         "Create from `df` using `fn_col` and `label_col`"
         pref = f'{Path(path) if folder is None else Path(path)/folder}{os.path.sep}'
