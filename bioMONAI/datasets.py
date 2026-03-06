@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['download_medmnist', 'medmnist2df', 'download_file', 'download_files', 'download_dataset', 'download_dataset_from_csv',
-           'aics_pipeline', 'manifest2csv', 'split_dataframe', 'add_columns_to_csv', 'build_csv']
+           'aics_pipeline', 'manifest2csv', 'split_dataframe', 'add_columns_to_csv', 'build_df']
 
 # %% ../nbs/08_datasets.ipynb #35d1219f
 import os
@@ -361,97 +361,135 @@ def manifest2csv(signal,                # List of paths to signal images
     df_train.to_csv(data_save_path+train, index=False)
 
 # %% ../nbs/08_datasets.ipynb #73b6b94c
-def split_dataframe(input_data, # Path to CSV file or DataFrame
-                    train_fraction=0.7, # Proportion of data to use for the training set
-                    valid_fraction=0.1, # Proportion of data to use for the validation set
-                    split_column=None, # Column name that indicates pre-defined split
-                    stratify=False, # If True, stratify by split_column during random split
-                    add_is_valid=False, # If True, adds 'is_valid' column in the train set to mark validation samples
-                    train_path="train.csv", # Path to save the training CSV file
-                    test_path="test.csv", # Path to save the test CSV file
-                    valid_path="valid.csv", # Path to save the validation CSV file
-                    data_save_path=None, # Path to save the data files
-                    random_seed=None, # Random state for reproducibility
-                    ):
+def split_dataframe(
+    input_data: Union[str, pd.DataFrame],
+    train_fraction: float = 0.8,
+    valid_fraction: float = 0.1,
+    split_column: Optional[str] = None,
+    stratify: bool = False,
+    add_is_valid: bool = False,
+    train_path: str = "train.csv",
+    test_path: str = "test.csv",
+    valid_path: str = "valid.csv",
+    data_save_path: Optional[str] = None,
+    random_seed: Optional[int] = None,
+    shuffle: bool = False,
+) -> tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]:
     """
-    Splits a DataFrame or CSV file into train, test, and optional validation sets.
+    Split a dataset into train, test and optional validation sets.
 
+    Parameters
+    ----------
+    input_data : str | DataFrame
+        CSV file path or pandas DataFrame.
+    train_fraction : float
+        Fraction of samples for training.
+    valid_fraction : float
+        Fraction of samples for validation.
+    split_column : str, optional
+        Column containing predefined split labels ("train", "test", "validation").
+    stratify : bool
+        Stratify random splits by split_column.
+    add_is_valid : bool
+        Add an `is_valid` column to the train set instead of saving a separate validation file.
+    data_save_path : str, optional
+        Directory where CSV files will be saved.
+
+    Returns
+    -------
+    (train_df, test_df, valid_df)
     """
-    # Load data
+
+    # Load dataset
     if isinstance(input_data, str):
         df = pd.read_csv(input_data)
     elif isinstance(input_data, pd.DataFrame):
         df = input_data.copy()
     else:
-        raise ValueError("input_data must be a path to a CSV file or a DataFrame")
-    
-    # Update paths if data_save_path is provided
-    if data_save_path:
-        train_path = os.path.join(data_save_path, train_path)
-        test_path = os.path.join(data_save_path, test_path)
-        valid_path = os.path.join(data_save_path, valid_path)
+        raise TypeError("input_data must be a file path or pandas DataFrame")
 
-    # Check for pre-defined split
+    valid_df: Optional[pd.DataFrame] = None
+
+    # Predefined split
     if split_column and split_column in df.columns:
-        # Use pre-defined split values if available
+
+        print("Using predefined dataset split")
+
         train_df = df[df[split_column] == "train"].copy()
         test_df = df[df[split_column] == "test"].copy()
-        valid_df = df[df[split_column] == "validation"].copy() if "validation" in df[split_column].unique() else None
+
+        if "validation" in df[split_column].unique():
+            valid_df = df[df[split_column] == "validation"].copy()
+
+    # Random split
     else:
-        # Otherwise, Random split
-        test_fraction = 1.0 - train_fraction - valid_fraction
+
+        test_fraction = 1 - train_fraction - valid_fraction
+
         if test_fraction <= 0:
-            raise ValueError("train_fraction and valid_fraction must sum to less than 1.")
+            raise ValueError("train_fraction + valid_fraction must be < 1")
 
-        # First split into temp (train + valid) and test
+        stratify_col = df[split_column] if stratify and split_column else None
+
         temp_df, test_df = train_test_split(
-            df, 
+            df,
             test_size=test_fraction,
-            stratify=df[split_column] if stratify and split_column else None,
-            random_state=random_seed
+            stratify=stratify_col,
+            random_state=random_seed,
+            shuffle=shuffle,
         )
-        #train_df = train_df.copy()
-        #temp_df = temp_df.copy()
 
-        # Then split temp into train and valid
-        if valid_fraction > 0:
-            valid_size = valid_fraction / (train_fraction + valid_fraction)
-            train_df, valid_df = train_test_split(
-                temp_df, 
-                test_size=valid_size,
-                stratify=temp_df[split_column] if stratify and split_column else None
-            )
-            # Validation set indexes
-            valid_indices = valid_df.index
-
-            # valid_df = valid_df.copy()
-            # test_df = test_df.copy()
-        
         train_df = temp_df
-        
-    # Handle 'is_valid' column
-    if add_is_valid and valid_fraction > 0:
-        if valid_df is None:
-            # Sample validation rows from the training set if no pre-defined validation split
-            valid_indices = train_df.sample(frac=valid_fraction / (train_fraction + valid_fraction)).index
-        else:
-            valid_indices = valid_df.index
-        train_df['is_valid'] = 0
-        train_df.loc[valid_indices, 'is_valid'] = 1
-        train_df['is_valid'] = train_df['is_valid'].astype(int)
-    elif valid_df is not None:
-        # Save validation set as a separate CSV if not adding 'is_valid' in training set
-        valid_df.to_csv(valid_path, index=False)
-        print(f"Validation file saved as '{valid_path}'.")
 
-    # Save train and test sets as CSV files
-    train_df.to_csv(train_path, index=False)
-    test_df.to_csv(test_path, index=False)
-    
-    print(f"Train set saved to '{train_path}'.")
-    print(f"Test set saved to '{test_path}'.")
-    if add_is_valid and valid_fraction > 0:
-        print(f"'is_valid' column added to '{train_path}' for validation samples.")
+        if (add_is_valid == False) and (valid_fraction > 0):
+
+            valid_ratio = valid_fraction / (train_fraction + valid_fraction)
+
+            stratify_col = (
+                temp_df[split_column] if stratify and split_column else None
+            )
+
+            train_df, valid_df = train_test_split(
+                temp_df,
+                test_size=valid_ratio,
+                stratify=stratify_col,
+                random_state=random_seed,
+                shuffle=shuffle,
+            )
+
+    # Add validation flag
+    if add_is_valid and (valid_df is not None) and (valid_fraction > 0):
+
+        train_df = train_df.copy()
+        train_df["is_valid"] = 0
+
+        valid_idx = train_df.sample(
+            frac=valid_fraction / (train_fraction + valid_fraction),
+            random_state=random_seed,
+        ).index
+        train_df.loc[valid_idx, "is_valid"] = 1
+
+        train_df["is_valid"] = train_df["is_valid"].astype(int)
+        print(f"'is_valid' column added to train dataframe for validation samples.")
+
+    # Save datasets
+    if data_save_path:
+
+        os.makedirs(data_save_path, exist_ok=True)
+
+        train_file = os.path.join(data_save_path, train_path)
+        test_file = os.path.join(data_save_path, test_path)
+
+        train_df.to_csv(train_file, index=False)
+        test_df.to_csv(test_file, index=False)
+
+        if valid_df is not None and not add_is_valid:
+            valid_file = os.path.join(data_save_path, valid_path)
+            valid_df.to_csv(valid_file, index=False)
+
+        print("Datasets saved to %s", data_save_path)
+
+    return train_df, test_df, valid_df
 
 # %% ../nbs/08_datasets.ipynb #4ca991a5
 def add_columns_to_csv(csv_path, # Path to the input CSV file
@@ -481,7 +519,7 @@ def add_columns_to_csv(csv_path, # Path to the input CSV file
     print(f"Columns {list(column_data.keys())} added successfully. Updated file saved to '{output_path}'")
 
 # %% ../nbs/08_datasets.ipynb #8f0ea54a
-def build_csv(
+def build_df(
     filenames: Union[list[str|Path], L],                 # List of file names to process
     *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
     function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
@@ -520,7 +558,6 @@ def build_csv(
     # Apply splitting if requested
     if split:
         split_kwargs = split_kwargs or {}
-        split_dataframe(df, **split_kwargs)
-        return None
+        return split_dataframe(df, **split_kwargs)
 
     return df
