@@ -1012,7 +1012,7 @@ def split_dataframe(
     valid_path: str = "valid.csv",
     data_save_path: Optional[str] = None,
     random_seed: Optional[int] = None,
-    shuffle: bool = False,
+    shuffle: bool = True,
 ) -> tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]:
     """
     Split a dataset into train, test and optional validation sets.
