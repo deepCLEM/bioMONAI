@@ -5,8 +5,9 @@
 # %% auto #0
 __all__ = ['MetaResolver', 'BioImageBase', 'BioImage', 'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage',
            'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'test_biodataloader', 'get_images', 'get_gt',
-           'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'extract_patches', 'save_patches_grid',
-           'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv',
+           'build_df', 'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
+           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 import os
@@ -19,8 +20,9 @@ from bioio import BioImage as AICSImage
 from bioio.writers import OmeTiffWriter
 from sklearn.model_selection import train_test_split
 from torch import stack as torch_stack
+from typing import Callable, List, Optional, Union
+import re
 
-from .datasets import split_dataframe
 from .core import MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform, fastTrainer, torchsqueeze, Path, List, L, torchmax, randint, dictlist_to_funclist, read_yaml,  apply_transforms
 from plum import dispatch as typedispatch
 from .io import image_reader
@@ -631,21 +633,21 @@ BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_
 
 
 # %% ../nbs/01_data.ipynb #5033a580
-def test_biodataloader(dls:DataLoaders, test_path:str|Path|pd.DataFrame, with_labels=True, csv_header='infer', csv_delimiter=None, csv_quoting=0):
+def test_biodataloader(dls:DataLoaders, test_data:str|Path|pd.DataFrame, with_labels=True, csv_header='infer', csv_delimiter=None, csv_quoting=0):
     "Test a `DataLoader` on a set of `test_files` and return the results as a list of tuples containing the file name and the corresponding input and target tensors."
-    if isinstance(test_path, pd.DataFrame):
+    if isinstance(test_data, pd.DataFrame):
         # Handle DataFrame case directly
-        test_data = dls.test_dl(test_path, with_labels=with_labels)
-    elif isinstance(test_path, (str, Path)):
-        test_path = Path(test_path)
+        test_data = dls.test_dl(test_data, with_labels=with_labels)
+    elif isinstance(test_data, (str, Path)):
+        test_data = Path(test_data)
         # Check if it's a CSV file
-        if test_path.suffix.lower() == '.csv':
+        if test_data.suffix.lower() == '.csv':
             # Handle CSV file case
-            df = pd.read_csv(test_path, header=csv_header, delimiter=csv_delimiter, quoting=csv_quoting)
+            df = pd.read_csv(test_data, header=csv_header, delimiter=csv_delimiter, quoting=csv_quoting)
             test_data = dls.test_dl(df, with_labels=with_labels)
         else:
             # Handle non-CSV file case - get image files from directory
-            test_data = dls.test_dl(get_image_files(test_path), with_labels=with_labels)
+            test_data = dls.test_dl(get_image_files(test_data), with_labels=with_labels)
     
     return test_data
 
@@ -996,6 +998,234 @@ def show_results(x: BioImageBase,       # The input image data.
     
     return ctxs
 
+
+# %% ../nbs/01_data.ipynb #bac1e22a
+def split_dataframe(
+    input_data: Union[str, pd.DataFrame],
+    train_fraction: float = 0.8,
+    valid_fraction: float = 0.1,
+    split_column: Optional[str] = None,
+    stratify: bool = False,
+    add_is_valid: bool = False,
+    train_path: str = "train.csv",
+    test_path: str = "test.csv",
+    valid_path: str = "valid.csv",
+    data_save_path: Optional[str] = None,
+    random_seed: Optional[int] = None,
+    shuffle: bool = False,
+) -> tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]:
+    """
+    Split a dataset into train, test and optional validation sets.
+
+    Parameters
+    ----------
+    input_data : str | DataFrame
+        CSV file path or pandas DataFrame.
+    train_fraction : float
+        Fraction of samples for training.
+    valid_fraction : float
+        Fraction of samples for validation.
+    split_column : str, optional
+        Column containing predefined split labels ("train", "test", "validation").
+    stratify : bool
+        Stratify random splits by split_column.
+    add_is_valid : bool
+        Add an `is_valid` column to the train set instead of saving a separate validation file.
+    data_save_path : str, optional
+        Directory where CSV files will be saved.
+
+    Returns
+    -------
+    (train_df, test_df, valid_df)
+    """
+
+    # Load dataset
+    if isinstance(input_data, str):
+        df = pd.read_csv(input_data)
+    elif isinstance(input_data, pd.DataFrame):
+        df = input_data.copy()
+    else:
+        raise TypeError("input_data must be a file path or pandas DataFrame")
+
+    valid_df: Optional[pd.DataFrame] = None
+
+    if split_column and split_column in df.columns:
+        # Predefined split
+        print("Using predefined dataset split")
+
+        train_df = df[df[split_column] == "train"].copy()
+        test_df = df[df[split_column] == "test"].copy()
+
+        if "validation" in df[split_column].unique():
+            valid_df = df[df[split_column] == "validation"].copy()
+
+    else:
+        # Random split
+        test_fraction = 1 - train_fraction - valid_fraction
+
+        if test_fraction <= 0:
+            raise ValueError("train_fraction + valid_fraction must be < 1")
+
+        stratify_col = df[split_column] if stratify and split_column else None
+
+        train_df, test_df = train_test_split(
+            df,
+            test_size=test_fraction,
+            stratify=stratify_col,
+            random_state=random_seed,
+            shuffle=shuffle,
+        )
+
+        if (add_is_valid == False) and (valid_fraction > 0):
+
+            valid_ratio = valid_fraction / (train_fraction + valid_fraction)
+
+            stratify_col = (
+                train_df[split_column] if stratify and split_column else None
+            )
+
+            train_df, valid_df = train_test_split(
+                train_df,
+                test_size=valid_ratio,
+                stratify=stratify_col,
+                random_state=random_seed,
+                shuffle=shuffle,
+            )
+
+    # Add validation flag
+    if add_is_valid and (valid_df is None) and (valid_fraction > 0):
+
+        train_df = train_df.copy()
+        train_df["is_valid"] = 0
+
+        valid_idx = train_df.sample(
+            frac=valid_fraction / (train_fraction + valid_fraction),
+            random_state=random_seed,
+        ).index
+        train_df.loc[valid_idx, "is_valid"] = 1
+
+        train_df["is_valid"] = train_df["is_valid"].astype(int)
+        print(f"'is_valid' column added to train dataframe for validation samples.")
+
+    # Save datasets
+    if data_save_path:
+
+        os.makedirs(data_save_path, exist_ok=True)
+
+        train_file = os.path.join(data_save_path, train_path)
+        test_file = os.path.join(data_save_path, test_path)
+
+        train_df.to_csv(train_file, index=False)
+        test_df.to_csv(test_file, index=False)
+
+        if valid_df is not None and not add_is_valid:
+            valid_file = os.path.join(data_save_path, valid_path)
+            valid_df.to_csv(valid_file, index=False)
+
+        print("Datasets saved to %s", data_save_path)
+
+    return train_df, test_df, valid_df
+
+# %% ../nbs/01_data.ipynb #7d94df40
+def add_columns_to_csv(csv_path, # Path to the input CSV file
+                       column_data, # Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.
+                       output_path=None, # Path to save the updated CSV file. If None, it overwrites the input CSV file.
+                       ):
+    """
+    Adds one or more new columns to an existing CSV file.
+
+    """
+    # Load the CSV file into a DataFrame
+    df = pd.read_csv(csv_path)
+
+    # Iterate over each column and add to the DataFrame
+    for column_name, column_values in column_data.items():
+        # Check if column_values is a list and matches DataFrame length
+        if isinstance(column_values, list) and len(column_values) != len(df):
+            raise ValueError(f"Length of values for column '{column_name}' does not match the number of rows in the CSV.")
+        
+        # Add the new column
+        df[column_name] = column_values
+
+    # Save the updated DataFrame to a CSV file
+    output_path = output_path or csv_path
+    df.to_csv(output_path, index=False)
+
+    print(f"Columns {list(column_data.keys())} added successfully. Updated file saved to '{output_path}'")
+
+# %% ../nbs/01_data.ipynb #1e42b2d6
+def build_df(
+    filenames: Union[list[str|Path], L],                 # List of file names to process
+    *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
+    function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
+    output_csv: Optional[str|Path] = None,               # If provided, saves the full dataframe to this CSV path.
+    split: bool = False,                            # If True, applies split_dataframe to the generated dataframe.
+    split_kwargs: Optional[dict] = None,            # Keyword arguments passed to split_dataframe.
+) -> Union[
+    pd.DataFrame,
+    tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]
+]:
+    
+    """
+    Create a DataFrame from filenames and one or more transformation functions.
+    """
+
+    if function_names and len(function_names) != len(functions):
+        raise ValueError("Length of function_names must match number of functions.")
+
+    # Determine column names
+    if function_names is None:
+        column_names = [
+            f.__name__ if hasattr(f, "__name__") else f"func_{i}"
+            for i, f in enumerate(functions)
+        ]
+    else:
+        column_names = function_names
+
+    # Build dataframe
+    data = {"filename": filenames}
+
+    for col_name, func in zip(column_names, functions):
+        data[col_name] = [func(fname) for fname in filenames]
+
+    df = pd.DataFrame(data)
+
+    # Save full dataset if requested
+    if output_csv:
+        df.to_csv(output_csv, index=False)
+
+    # Apply splitting if requested
+    if split:
+        split_kwargs = split_kwargs or {}
+        return split_dataframe(df, **split_kwargs)
+
+    return df
+
+# %% ../nbs/01_data.ipynb #02b16df9
+def build_df_from_folder(
+    path: str|Path,
+    *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
+    function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
+    output_csv: Optional[str|Path] = None,               # If provided, saves the full dataframe to this CSV path.
+    subfolders: str|list[str]|None = None,
+    recurse: bool = True,
+    filename_filter: str|re.Pattern|Callable[[str], bool]|None = None,
+    split: bool = False,                            # If True, applies split_dataframe to the generated dataframe.
+    split_kwargs: Optional[dict] = None,            # Keyword arguments passed to split_dataframe.
+) -> Union[
+    pd.DataFrame,
+    tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]
+]:
+    """
+    Create a DataFrame from filenames and one or more transformation functions.
+    """
+
+    filenames = get_images(path, subfolders, recurse, filename_filter)
+    return build_df(filenames, *functions, 
+                    function_names=function_names,
+                    output_csv=output_csv, 
+                    split=split, 
+                    split_kwargs=split_kwargs)
 
 # %% ../nbs/01_data.ipynb #bf008823
 def extract_patches(
