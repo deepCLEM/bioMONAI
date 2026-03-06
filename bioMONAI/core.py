@@ -5,8 +5,8 @@
 # %% auto #0
 __all__ = ['coolwarm', 'warm_cmap', 'read_yaml', 'dictlist_to_funclist', 'fastTrainer', 'visionTrainer', 'compute_losses',
            'compute_metric', 'calculate_statistics', 'format_sig', 'plot_histogram_and_kde', 'display_statistics_table',
-           'evaluate_model', 'evaluate_classification_model', 'attributesFromDict', 'get_device', 'img2float',
-           'img2Tensor', 'TargetedTransform', 'apply_transforms']
+           'evaluate_model', 'evaluate_classification_model', 'add_method', 'attributesFromDict', 'get_device',
+           'img2float', 'img2Tensor', 'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/00_core.ipynb #e46d9793
 import numpy as np
@@ -463,6 +463,7 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
                                   loss_fn=None,                 # Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.
                                   most_confused_n:int=1,        # Number of most confused class pairs to display. 
                                   normalize:bool=True,          # Whether to normalize the confusion matrix.
+                                  act=None,                     # Apply activation to predictions, defaults to `self.loss_func`'s activation
                                   metrics=None,                 # Single metric or a list of metrics to evaluate. 
                                   bw_method=0.3,                # Bandwidth method for KDE. 
                                   show_graph=True,              # Boolean flag to show the histogram and KDE plot.
@@ -481,14 +482,14 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     
     # Interpret the results on test data
     if test_data is None:
-        class_int = ClassificationInterpretation.from_learner(trainer)
-        p, t = trainer.get_preds()
+        class_int = ClassificationInterpretation.from_learner(trainer, act=act)
+        p, t = trainer.get_preds(act=act)
         # Show results for test data
         if show_results:
             trainer.show_results()
     else:
-        class_int = ClassificationInterpretation(trainer, test_data, loss_fn)
-        p, t = trainer.get_preds(dl=test_data)
+        class_int = ClassificationInterpretation(trainer, test_data, loss_fn, act=act)
+        p, t = trainer.get_preds(dl=test_data, act=act)
         # Show results for test data
         if show_results:
             trainer.show_results(dl=test_data)
@@ -531,6 +532,13 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     
     return out
 
+
+# %% ../nbs/00_core.ipynb #3866c2cc
+def add_method(cls):
+    def decorator(func):
+        setattr(cls, func.__name__, func)
+        return func
+    return decorator
 
 # %% ../nbs/00_core.ipynb #1367cad5
 def attributesFromDict(d):
