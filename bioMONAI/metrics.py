@@ -16,6 +16,7 @@ from torch.fft import fftshift
 from torch.fft import fft2
 from torch.nn.functional import softmax, one_hot
 
+import fastai.metrics
 from fastai.vision.all import AvgMetric
 from monai.losses import SSIMLoss
 from monai.metrics import (
@@ -144,6 +145,7 @@ def PanopticQualityMetric(**kwargs):
 # %% ../nbs/06_metrics.ipynb #0481c954
 def ROCAUCMetric(onehot=True,       # if False, labels and targets are one-hot encoded
                  num_classes=None,  # number of classes
+                 act=None,          # activation operations, typically Sigmoid or Softmax.
                  **kwargs):
     """
     Wrapper around monai.metrics.ROCAUCMetric
@@ -152,8 +154,8 @@ def ROCAUCMetric(onehot=True,       # if False, labels and targets are one-hot e
     rocaucmetric = _ROCAUCMetric(**kwargs)
 
     def ROCAUC(pred, target):
-        # logits -> probabilities
-        pred = sigmoid(pred)
+        if act is not None:
+            pred = act(pred)
 
         # Check shapes 
         if target.ndim == 3:

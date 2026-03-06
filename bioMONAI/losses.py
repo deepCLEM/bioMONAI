@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['MSELoss', 'L1Loss', 'CombinedLoss', 'MSSSIMLoss', 'MSSSIML1Loss', 'MSSSIML2Loss', 'CellLoss', 'InstanceSegLoss',
-           'DiceBCELoss', 'CrossEntropyLossFlat3D', 'BCELoss', 'DiceLoss', 'FRCLoss', 'FCRCutoff']
+           'DiceBCELoss', 'activation', 'CrossEntropyLossFlat3D', 'BCELoss', 'DiceLoss', 'FRCLoss', 'FCRCutoff']
 
 # %% ../nbs/03_losses.ipynb #690ce34c
 from .core import store_attr
@@ -15,6 +15,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import sigmoid
+from torch.nn import CrossEntropyLoss
 
 from monai.losses import SSIMLoss
 
@@ -22,7 +23,7 @@ from scipy.optimize import curve_fit
 from fastai.vision.all import mse, mae, CrossEntropyLossFlat, Any, test_eq, test_is
 
 from .metrics import FRCMetric, get_fourier_ring_correlations
-from .core import torchTensor
+from .core import torchTensor, add_method
 
 
 # %% ../nbs/03_losses.ipynb #42a19e7f
@@ -464,6 +465,11 @@ class DiceBCELoss:
         dice = dice.mean()  # average over instance channels
 
         return bce + self.dice_weight * dice
+
+# %% ../nbs/03_losses.ipynb #d31a7ced
+@add_method(CrossEntropyLoss)
+def activation(self, x):
+    return F.softmax(x, dim=1)
 
 # %% ../nbs/03_losses.ipynb #e6e9dbda
 class CrossEntropyLossFlat3D(CrossEntropyLossFlat):
