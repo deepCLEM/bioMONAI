@@ -839,7 +839,7 @@ class RandZoom(RandTransform):
     split_idx = None
         
     def __init__(self, 
-                 prob = 0.1,            # Probability of rotating
+                 prob = 0.1,            # Probability of the transform
                  min_zoom=0.9, 
                  max_zoom=1.1,
                  has_channels=True,
