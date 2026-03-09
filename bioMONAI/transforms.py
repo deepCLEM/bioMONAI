@@ -5,12 +5,12 @@
 # %% auto #0
 __all__ = ['FunctionTransform', 'MonaiTransform', 'RandMonaiTransform', 'Resample', 'Resize', 'CropND', 'RandCameraNoise', 'Blur',
            'GaussianSmooth', 'MedianSmooth', 'SavitzkyGolaySmooth', 'GaussianSharpen', 'RandGaussianSmooth',
-           'RandGaussianSharpen', 'ScaleImage', 'ScaleImagePercentiles', 'ScaleImageVariance', 'ScaleIntensity',
-           'ScaleIntensityFixedMean', 'ScaleIntensityRange', 'ScaleIntensityRangePercentiles', 'NormalizeIntensity',
-           'HistogramNormalize', 'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps',
-           'ThresholdIntensity', 'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop2D', 'RandCropND',
-           'RandFlip', 'RandRot90', 'RandRotate', 'RandZoom', 'ShiftIntensity', 'StdShiftIntensity',
-           'RandShiftIntensity', 'RandStdShiftIntensity', 'AdjustContrast', 'RandAdjustContrast']
+           'RandGaussianSharpen', 'RandGaussianNoise', 'ScaleImage', 'ScaleImagePercentiles', 'ScaleImageVariance',
+           'ScaleIntensity', 'ScaleIntensityFixedMean', 'ScaleIntensityRange', 'ScaleIntensityRangePercentiles',
+           'NormalizeIntensity', 'HistogramNormalize', 'RelabelInstances', 'InstanceToMaskAndDistance',
+           'ComputeHoVerMaps', 'ThresholdIntensity', 'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB',
+           'RandCrop2D', 'RandCropND', 'RandFlip', 'RandRot90', 'RandRotate', 'RandZoom', 'ShiftIntensity',
+           'StdShiftIntensity', 'RandShiftIntensity', 'RandStdShiftIntensity', 'AdjustContrast', 'RandAdjustContrast']
 
 # %% ../nbs/05_transforms.ipynb #56ab9960
 import numpy as np
@@ -545,7 +545,7 @@ class RandGaussianSharpen(RandMonaiTransform):
         )
 
 # %% ../nbs/05_transforms.ipynb #01ccbeaa
-class RandGaussianSharpen(RandMonaiTransform):
+class RandGaussianNoise(RandMonaiTransform):
     """
     Add Gaussian noise to image.
     """
