@@ -544,6 +544,28 @@ class RandGaussianSharpen(RandMonaiTransform):
             approx=approx
         )
 
+# %% ../nbs/05_transforms.ipynb #01ccbeaa
+class RandGaussianSharpen(RandMonaiTransform):
+    """
+    Add Gaussian noise to image.
+    """
+
+    def __init__(self,
+                 mean=0.0, 
+                 std=0.1,
+                 prob=0.1,
+                 dtype=np.float32,
+                 has_channels=True):
+
+        super().__init__(
+            tfms.RandGaussianNoise,
+            prob=prob,
+            mean=mean, 
+            std=std,
+            dtype=dtype,
+            has_channels=has_channels,
+        )
+
 # %% ../nbs/05_transforms.ipynb #409a18ef
 def _scale_intensity_range(x,   # The input image to scale.
                            mi,  # The minimum intensity value.
