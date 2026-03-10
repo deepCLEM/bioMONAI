@@ -269,7 +269,7 @@ class BioImageMulti(BioImageBase):
     def __repr__(self) -> str:
         return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
 
-# %% ../nbs/01_data.ipynb #a42a484e
+# %% ../nbs/01_data.ipynb #98c6bb4c
 class Tensor2BioImage(DisplayedTransform):
     """
     The `Tensor2BioImage` transform converts tensors into `BioImageBase` instances, enabling the application of bioimaging-specific methods to tensor data. 
@@ -309,24 +309,6 @@ class Tensor2BioImage(DisplayedTransform):
             except:
                 dec = 0
         return f'{self.name}(enc:{enc},dec:{dec})'
-
-# %% ../nbs/01_data.ipynb #56557263
-class Tensor2BioImage(DisplayedTransform):
-    """
-    The `Tensor2BioImage` transform converts tensors into `BioImageBase` instances, enabling the application of bioimaging-specific methods to tensor data. 
-    This is essential for integrating deep learning models with bioimaging workflows.
-    """
-    def __init__(self, cls:BioImageBase=BioImageStack):
-        self.cls = cls
-
-    def encodes(self, o):
-        if isinstance(o, MetaTensor):
-            # return self.cls(o.clone(), affine=o.affine, meta=o.meta)
-            return self.cls(o.clone(), meta=o.meta)
-        
-        if isinstance(o, torchTensor):
-            return self.cls(o)
-        
 
 # %% ../nbs/01_data.ipynb #68b31c0c
 def BioImageBlock(cls:BioImageBase=BioImage):
