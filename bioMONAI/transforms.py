@@ -14,20 +14,42 @@ __all__ = ['FunctionTransform', 'MonaiTransform', 'RandMonaiTransform', 'ApplyTo
            'RandAdjustContrast']
 
 # %% ../nbs/05_transforms.ipynb #56ab9960
-import numpy as np
-from math import ceil
-import cv2
+# =================================
+# Standard library
+# =================================
 import random
-from fastai.vision.all import *
-from fastai.data.all import *
-import monai.transforms as tfms
+from math import ceil
+
+# =================================
+# Scientific / numerical
+# =================================
+import numpy as np
 from numpy import percentile, isscalar, float32 as np_float32
-from skimage.transform import resize
 from scipy.ndimage import distance_transform_edt
+
+# =================================
+# Computer vision / imaging
+# =================================
+import cv2
+from skimage.transform import resize
+
+# =================================
+# MONAI
+# =================================
+import monai.transforms as tfms
 from monai.utils.enums import *
 
-from .data import BioImageBase, BioImageStack, Tensor2BioImage
+# =================================
+# fastai
+# =================================
+from fastai.data.all import *
+from fastai.vision.all import *
+
+# =================================
+# bioMONAI
+# =================================
 from .core import torchTensor
+from .data import BioImageBase, BioImageStack, Tensor2BioImage
 
 # %% ../nbs/05_transforms.ipynb #425f62e2
 class FunctionTransform(Transform):

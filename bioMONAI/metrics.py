@@ -8,37 +8,61 @@ __all__ = ['SSIMMetric', 'MSSIMMetric', 'MSEMetric', 'MAEMetric', 'RMSEMetric', 
            'radial_mask', 'get_radial_masks', 'get_fourier_ring_correlations', 'FRCMetric']
 
 # %% ../nbs/06_metrics.ipynb #09106178
+# =================================
+# Scientific / numerical
+# =================================
 import numpy as np
 from numpy import trapezoid as trapz
-
-from torch import abs, sqrt, div, complex64, where, isinf, zeros_like, real, isnan, argmax, sigmoid, is_tensor
-from torch.fft import fftshift
-from torch.fft import fft2
-from torch.nn.functional import softmax, one_hot
-
-import fastai.metrics
-from fastai.vision.all import AvgMetric
-from monai.losses import SSIMLoss
-from monai.metrics import (
-    PSNRMetric as _PSNR,
-    RMSEMetric as _RMSE,
-    MSEMetric as _MSE,
-    MAEMetric as _MAE,
-    SSIMMetric as _SSIM,
-    MultiScaleSSIMMetric as _MS_SSIM,
-    DiceMetric as _DiceMetric,
-    ROCAUCMetric as _ROCAUCMetric,
-    PanopticQualityMetric as _PanopticQualityMetric,
-    MetricsReloadedCategorical as _MetricsReloadedCategorical,
-    MetricsReloadedBinary as _MetricsReloadedBinary,
-)
-
-from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
-from sklearn.model_selection import StratifiedKFold
 from sklearn import svm
+from sklearn.datasets import load_iris
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import RocCurveDisplay, auc
 
+# =================================
+# PyTorch
+# =================================
+from torch import (
+    abs,
+    argmax,
+    complex64,
+    div,
+    isnan,
+    is_tensor,
+    isinf,
+    real,
+    sigmoid,
+    where,
+    zeros_like,
+)
+from torch.fft import fft2, fftshift
+from torch.nn.functional import one_hot, softmax
+
+# =================================
+# fastai
+# =================================
+import fastai.metrics
+from fastai.vision.all import AvgMetric
+
+# =================================
+# MONAI
+# =================================
+from monai.losses import SSIMLoss
+from monai.metrics import (
+    DiceMetric as _DiceMetric,
+    MAEMetric as _MAE,
+    MetricsReloadedBinary as _MetricsReloadedBinary,
+    MetricsReloadedCategorical as _MetricsReloadedCategorical,
+    MultiScaleSSIMMetric as _MS_SSIM,
+    PanopticQualityMetric as _PanopticQualityMetric,
+    PSNRMetric as _PSNR,
+    RMSEMetric as _RMSE,
+    SSIMMetric as _SSIM,
+)
+
+# =================================
+# bioMONAI
+# =================================
 from .core import torch_from_numpy
 
 # %% ../nbs/06_metrics.ipynb #4960aa4d

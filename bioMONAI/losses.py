@@ -10,21 +10,43 @@ __all__ = ['MSELoss', 'L1Loss', 'CombinedLoss', 'MSSSIMLoss', 'MSSSIML1Loss', 'M
 from .core import store_attr
 
 # %% ../nbs/03_losses.ipynb #97c8e1f9
+# =================================
+# Scientific
+# =================================
 import numpy as np
+from scipy.optimize import curve_fit
+
+# =================================
+# PyTorch
+# =================================
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import sigmoid
 from torch.nn import CrossEntropyLoss
 
+# =================================
+# MONAI
+# =================================
 from monai.losses import SSIMLoss
 
-from scipy.optimize import curve_fit
-from fastai.vision.all import mse, mae, CrossEntropyLossFlat, Any, test_eq, test_is
+# =================================
+# fastai
+# =================================
+from fastai.vision.all import (
+    Any,
+    CrossEntropyLossFlat,
+    mae,
+    mse,
+    test_eq,
+    test_is,
+)
 
+# =================================
+# bioMONAI
+# =================================
+from .core import add_method, torchTensor
 from .metrics import FRCMetric, get_fourier_ring_correlations
-from .core import torchTensor, add_method
-
 
 # %% ../nbs/03_losses.ipynb #42a19e7f
 def MSELoss(

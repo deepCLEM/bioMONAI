@@ -7,19 +7,48 @@ __all__ = ['plot_image', 'show_multichannel', 'mosaic_image_3d', 'show_images_gr
            'slice_explorer', 'plot_volume', 'plot_metrics', 'plot_intensity_histogram']
 
 # %% ../nbs/09_visualize.ipynb #b19af8ae
+# =================================
+# Scientific / data
+# =================================
 import numpy as np
+import pandas as pd
+
+# =================================
+# Visualization
+# =================================
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import plotly.io as pio
 import plotly.express as px
 import plotly.graph_objects as go
-import pandas as pd
+import plotly.io as pio
+
+# =================================
+# PyTorch / vision
+# =================================
 import torchvision
 
-from fastai.vision.all import plt, ifnone
+# =================================
+# fastai
+# =================================
+from fastai.vision.all import ifnone, plt
 
-from .core import torchTensor, tensor, delegates, torch_from_numpy, hasattrs, img2float, cells3d
+# =================================
+# bioMONAI
+# =================================
+from bioMONAI.core import (
+    cells3d,
+    delegates,
+    hasattrs,
+    img2float,
+    tensor,
+    torchTensor,
+    torch_from_numpy,
+)
+
+# =================================
+# Optional / commented
+# =================================
 # from bioMONAI.io import tiff2torch
 
 # %% ../nbs/09_visualize.ipynb #4273c3de

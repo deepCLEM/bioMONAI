@@ -10,33 +10,84 @@ __all__ = ['MetaResolver', 'BioImageBase', 'BioImage', 'BioImageStack', 'BioImag
            'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
+# =================================
+# Standard library
+# =================================
 import os
+import random
+import re
+import types
+from typing import Callable, List, Optional, Union
+
+# =================================
+# Third-party scientific stack
+# =================================
+import h5py
 import numpy as np
 import pandas as pd
-import h5py
-from tqdm import tqdm 
-import random
-import types
+from tqdm import tqdm
+
+# =================================
+# Bioimage IO
+# =================================
 from bioio import BioImage as AICSImage
 from bioio.writers import OmeTiffWriter
-from sklearn.model_selection import train_test_split
-from torch import stack as torch_stack
-from typing import Callable, List, Optional, Union
-import re
 
-from .core import MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform, fastTrainer, torchsqueeze, Path, List, L, torchmax, randint, dictlist_to_funclist, read_yaml,  apply_transforms
-from plum import dispatch as typedispatch
+# =================================
+# Machine Learning
+# =================================
+from sklearn.model_selection import train_test_split
+
+# =================================
+# PyTorch
+# =================================
+from torch import stack as torch_stack
+from torch.utils.data import DataLoader as torchDataLoader
+from torch.utils.data import Dataset as torchDataset
+
+# =================================
+# fastai
+# =================================
+from fastai.data.all import (
+    DataLoaders, delegates, RegexLabeller, is_listy,
+    ColReader, ColSplitter
+)
+
+from fastai.torch_core import TensorImage
+
+from fastai.vision.all import (
+    DataBlock, CategoryBlock, MultiCategoryBlock, RegressionBlock,
+    TfmdDL, TransformBlock,
+    get_image_files, get_grid, merge, show_image,
+    RandomSplitter, GrandparentSplitter,
+    parent_label, CategoryMap,
+    partial
+)
+
+# =================================
+# bioMONAI
+# =================================
+from bioMONAI.core import (
+    MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform,
+    fastTrainer, torchsqueeze, Path, List, L,
+    torchmax, randint,
+    dictlist_to_funclist, read_yaml, apply_transforms
+)
+
 from .io import image_reader
 from .visualize import show_images_grid, show_multichannel
 
-from fastai.data.all import DataLoaders, delegates, RegexLabeller, is_listy, ColReader, ColSplitter
-from fastai.vision.all import DataBlock, CategoryBlock, MultiCategoryBlock, RegressionBlock, TfmdDL, get_image_files, TransformBlock, get_grid, merge, show_image, RandomSplitter, GrandparentSplitter, partial, parent_label
-from fastai.torch_core import TensorImage
+# =================================
+# Multiple dispatch
+# =================================
+from plum import dispatch as typedispatch
 
-from torch.utils.data import Dataset as torchDataset, DataLoader as torchDataLoader
 
-# Patch fasttransform to handle missing 'methods' attribute during __repr__
+# =================================
+# fasttransform patch
+# =================================
 import fasttransform
+
 _original_repr = fasttransform.transform.Transform.__repr__
 
 def _safe_repr(self):
@@ -44,7 +95,6 @@ def _safe_repr(self):
         return _original_repr(self)
     except AttributeError as e:
         if "'_BoundFunction' object has no attribute 'methods'" in str(e):
-            # Fallback for transforms with plum-dispatched methods
             return f"{self.__class__.__name__}(...)"
         raise
 
@@ -688,10 +738,20 @@ def _patch_dataset(ds, **attrs):
 
 # %% ../nbs/01_data.ipynb #fa5a5cd9
 def _patch_dataloader(dl):
+    """
+    Patch a PyTorch DataLoader to add minimal fastai compatibility.
 
+    Adds:
+    - .one_batch(): returns a single batch
+    - .new(**kwargs): clone dataloader with overrides
+    - .vocab: inferred from underlying dataset if present
+    """
+
+    # ---- single batch method ----
     def one_batch(self):
         return next(iter(self))
 
+    # ---- clone dataloader method ----
     def new(self, **kwargs):
         params = dict(
             dataset=self.dataset,
@@ -704,7 +764,7 @@ def _patch_dataloader(dl):
         )
         params.update(kwargs)
 
-        new_dl =torchDataLoader(**params)
+        new_dl = torchDataLoader(**params)
 
         # patch the clone too
         _patch_dataloader(new_dl)
@@ -712,6 +772,15 @@ def _patch_dataloader(dl):
 
     dl.one_batch = types.MethodType(one_batch, dl)
     dl.new = types.MethodType(new, dl)
+
+    # attach vocab if available
+    if hasattr(dl.dataset, "vocab"):
+        vocab = dl.dataset.vocab
+        # convert plain list -> CategoryMap if needed
+        if isinstance(vocab, list):
+            vocab = CategoryMap(vocab)
+        dl.vocab = vocab
+
     return dl
 
 # %% ../nbs/01_data.ipynb #1ea349cf

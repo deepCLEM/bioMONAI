@@ -7,20 +7,36 @@ __all__ = ['download_medmnist', 'medmnist2df', 'download_file', 'download_files'
            'aics_pipeline', 'manifest2csv']
 
 # %% ../nbs/08_datasets.ipynb #35d1219f
+# =================================
+# Standard library
+# =================================
 import os
 from pathlib import Path
 
-from pooch import create as pooch_create, retrieve as pooch_retrieve, Decompress, Unzip, Untar
-import quilt3
-import pandas as pd
+# =================================
+# Scientific / data
+# =================================
 import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
+# =================================
+# Imaging
+# =================================
 from PIL import Image
 import tifffile as tiff
-from tqdm import tqdm
-from fastai.data.all import L
-
 import medmnist
 
+# =================================
+# Data management
+# =================================
+import quilt3
+from pooch import create as pooch_create, retrieve as pooch_retrieve, Decompress, Unzip, Untar
+
+# =================================
+# fastai
+# =================================
+from fastai.data.all import L
 
 # %% ../nbs/08_datasets.ipynb #7162dc3f
 def download_medmnist(dataset: str, # The name of the MedMNIST dataset (e.g., 'pathmnist', 'bloodmnist', etc.).

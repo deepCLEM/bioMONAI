@@ -9,50 +9,96 @@ __all__ = ['coolwarm', 'warm_cmap', 'read_yaml', 'dictlist_to_funclist', 'fastTr
            'img2float', 'img2Tensor', 'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/00_core.ipynb #e46d9793
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-from scipy.stats import gaussian_kde
-from matplotlib.colors import LinearSegmentedColormap
+# =================================
+# Standard library
+# =================================
+import yaml
+from random import randint, random as rand, choice
+from typing import MutableSequence
+from collections.abc import MutableSequence
 from attr import dataclass
 
-from torch import Tensor as torchTensor
-from torch import tensor
-from monai.data import MetaTensor
-from monai.utils import set_determinism
+# =================================
+# Scientific / data
+# =================================
+import numpy as np
+import pandas as pd
+from scipy.stats import gaussian_kde
 
-import torch.nn.functional as F
-from torch.nn.init import kaiming_normal_
+# =================================
+# Visualization
+# =================================
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
-from random import randint, random as rand, choice
-
+# =================================
+# Imaging
+# =================================
 from skimage import util
 from skimage.data import cells3d
 
-import yaml
+# =================================
+# PyTorch
+# =================================
+import torch.nn.functional as F
+import torch.optim as toptim
 
-# %% ../nbs/00_core.ipynb #998b6398
-from torch import squeeze as torchsqueeze, max as torchmax, from_numpy as torch_from_numpy, device as torch_device
+from torch import (
+    Tensor as torchTensor,
+    tensor,
+    squeeze as torchsqueeze,
+    max as torchmax,
+    from_numpy as torch_from_numpy,
+    device as torch_device,
+)
+
 from torch.cuda import is_available as is_cuda_available
+from torch.nn.init import kaiming_normal_
 
-# %% ../nbs/00_core.ipynb #7ce13c4f
-from collections.abc import MutableSequence
-from typing import MutableSequence
-    
-from fastai.callback.core import Callback
-from fastai.data.all import DataLoaders, Path, trainable_params, delegates, hasattrs, Path, List, L, Normalize
-from fastai.optimizer import Adam, OptimWrapper, Optimizer
-from fastai.vision.all import BypassNewMeta, DisplayedTransform, store_attr, DataBlock, Learner, ShowGraphCallback, CSVLogger, Any, minimum, steep, valley, slide, create_vision_model, create_timm_model, get_c, default_split, model_meta, ifnone, ClassificationInterpretation
-from fastcore.script import risinstance
-from fastai.callback.all import *
-from fastai.vision.all import *
-from plum import dispatch as typedispatch
-import fastai.optimizer
+# =================================
+# MONAI
+# =================================
+from monai.data import MetaTensor
+from monai.utils import set_determinism
+
+# =================================
+# fastai
+# =================================
 import fastai.losses
 import fastai.metrics
-import torch.optim as toptim
-from .datasets import download_medmnist
+import fastai.optimizer
 
+from fastai.callback.core import Callback
+from fastai.callback.all import *
+
+from fastai.data.all import (
+    DataLoaders, Path, trainable_params, delegates,
+    hasattrs, List, L, Normalize
+)
+
+from fastai.optimizer import Adam, OptimWrapper, Optimizer
+
+from fastai.vision.all import (
+    Any, BypassNewMeta, CSVLogger, ClassificationInterpretation,
+    DataBlock, DisplayedTransform, Learner, ShowGraphCallback,
+    create_vision_model, create_timm_model, default_split,
+    get_c, ifnone, minimum, model_meta, slide, steep, store_attr, valley
+)
+
+# =================================
+# fastcore
+# =================================
+from fastcore.script import risinstance
+
+# =================================
+# Multiple dispatch
+# =================================
+from plum import dispatch as typedispatch
+
+# =================================
+# bioMONAI
+# =================================
+from .datasets import download_medmnist
 
 # %% ../nbs/00_core.ipynb #792e9e80
 def read_yaml(yaml_path):
@@ -501,8 +547,10 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     class_int.print_classification_report()
     
     # Show the most confused classes
+    out['most_confused'] = pd.DataFrame(class_int.most_confused(most_confused_n), 
+                                        columns=["Actual Class", "Predicted Class", "Count"])
     print("\nMost Confused Classes:")
-    print(class_int.most_confused(most_confused_n))
+    display(out['most_confused'])
 
     # Calculate loss for each prediction-target pair
     losses = compute_losses(p, t, loss_fn)
