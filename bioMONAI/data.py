@@ -739,19 +739,74 @@ def _patch_dataset(ds, **attrs):
 # %% ../nbs/01_data.ipynb #fa5a5cd9
 def _patch_dataloader(dl):
     """
-    Patch a PyTorch DataLoader to add minimal fastai compatibility.
+    Patch a PyTorch DataLoader for minimal fastai compatibility.
 
     Adds:
     - .one_batch(): returns a single batch
     - .new(**kwargs): clone dataloader with overrides
+    - .show_results(): show batch results using BioImage/MetaTensor
+    - .show_batch(): show a batch using BioImage/MetaTensor
     - .vocab: inferred from underlying dataset if present
     """
 
-    # ---- single batch method ----
-    def one_batch(self):
-        return next(iter(self))
+    # ---- helpers ----
+    def _attach_method(obj, fn):
+        setattr(obj, fn.__name__, types.MethodType(fn, obj))
 
-    # ---- clone dataloader method ----
+    # def _get_batch_items(b, max_n):
+    #     "Return first `max_n` items from batch `b` safely."
+    #     # Ensure it's indexable
+    #     if isinstance(b, (tuple, list)):
+    #         x = b[0]
+    #         y = b[1] if len(b) > 1 else None
+    #     else:
+    #         x = b
+    #         y = None
+    #     n = min(max_n, len(x))
+    #     x_items = [x[i] for i in range(n)]
+    #     y_items = [y[i] for i in range(n)] if y is not None else [None]*n
+    #     return x_items, y_items
+    
+    def _get_batch_items(b, max_n):
+        "Return first `max_n` items from batch `b`, handling single tensors."
+        # unpack batch
+        if isinstance(b, (tuple, list)) and len(b) == 2:
+            x, y = b
+        else:
+            x = b
+            y = None
+
+        # ensure x_items is a list
+        if isinstance(x, MetaTensor):
+            if x.dim() == 0:          # scalar
+                x_items = [x]
+            elif x.dim() == 3:        # single image (C,H,W)
+                x_items = [x]
+            else:                     # batched (B,C,H,W)
+                x_items = [x[i] for i in range(min(max_n, x.shape[0]))]
+        elif isinstance(x, list):
+            x_items = x[:max_n]
+        else:
+            x_items = list(x)[:max_n]
+
+        # same for y
+        if y is None:
+            y_items = [None]*len(x_items)
+        elif isinstance(y, MetaTensor):
+            if y.dim() == 0:
+                y_items = [y.item()]
+            elif y.dim() == 1:
+                y_items = [y[i].item() for i in range(min(max_n, len(y)))]
+            else:
+                y_items = [y[i] for i in range(min(max_n, y.shape[0]))]
+        else:
+            y_items = list(y)[:len(x_items)]
+
+        return x_items, y_items
+
+    # ---- methods ----
+    def one_batch(self): return next(iter(self))
+
     def new(self, **kwargs):
         params = dict(
             dataset=self.dataset,
@@ -763,24 +818,38 @@ def _patch_dataloader(dl):
             drop_last=self.drop_last,
         )
         params.update(kwargs)
-
-        new_dl = torchDataLoader(**params)
-
-        # patch the clone too
+        new_dl = type(self)(**params)
         _patch_dataloader(new_dl)
         return new_dl
 
-    # ---- attach methods ----
-    dl.one_batch = types.MethodType(one_batch, dl)
-    dl.new = types.MethodType(new, dl)
-    dl.show_results = types.MethodType(show_results, dl)
-    dl.show_batch = types.MethodType(show_batch, dl)
+    def show_batch(
+        self, b=None, max_n=9, ctxs=None, show=True, unique=False, **kwargs
+    ):
+        "Show `max_n` input(s) and target(s) from the batch."
+        if unique:
+            old_get_idxs = getattr(self, "get_idxs", lambda: None)
+            self.get_idxs = lambda: [0]
 
-    # attach vocab if available
+        if b is None: b = self.one_batch()
+        x_items, y_items = _get_batch_items(b, max_n)
+
+        if show:
+            samples = list(zip(x_items, y_items))
+            show_batch(x_items, y_items, samples=samples, ctxs=ctxs, max_n=max_n, **kwargs)
+        else:
+            return x_items, y_items
+
+        if unique: self.get_idxs = old_get_idxs
+
+    # ---- attach methods ----
+    for fn in (one_batch, new, show_results, show_batch):
+        _attach_method(dl, fn)
+
+    # ---- attach vocab if available ----
     if hasattr(dl.dataset, "vocab"):
         vocab = dl.dataset.vocab
-        # convert plain list -> CategoryMap if needed
         if isinstance(vocab, list):
+            from fastai.data.transforms import CategoryMap
             vocab = CategoryMap(vocab)
         dl.vocab = vocab
 
@@ -1269,9 +1338,54 @@ def show_batch(x: BioImageBase,      # The input image data.
     
     return ctxs
 
+# %% ../nbs/01_data.ipynb #bee716ba
+@typedispatch
+def show_batch(
+    x: list[MetaTensor],       # List of input MetaTensors
+    y: MetaTensor|list,        # Target MetaTensor or list
+    samples: list|None=None,   # L of (x, y) tuples, optional
+    ctxs=None,                 # List of axes for displaying images
+    max_n: int=9,              # Max number of items to display
+    **kwargs                   # Extra args for BioImage.show()
+):
+    """
+    Show `max_n` inputs and targets from a batch.
+    
+    Converts MetaTensor inputs to BioImage/BioImageMulti
+    based on channels. Displays each image with its corresponding label.
+    """
+    # Ensure x is a list of individual images
+    if isinstance(x, MetaTensor):
+        x = [x[i] for i in range(len(x))]
+    elif isinstance(x, list) and isinstance(x[0], MetaTensor) and x[0].ndim > 3:
+        # flatten batch dimension if necessary
+        x = [t[i] for t in x for i in range(t.shape[0])]
 
+    # Determine BioImage type based on channels
+    cls = BioImage if x[0].ndim == 3 else BioImageMulti
+    x_bio = [Tensor2BioImage(cls)(t) for t in x]
 
+    # Convert y to list
+    if isinstance(y, MetaTensor):
+        y_list = [int(y[i]) for i in range(len(y))]
+    else:
+        y_list = list(y)
 
+    # Create samples if not provided
+    if samples is None:
+        samples = L(zip(x_bio, y_list))
+
+    # Create grid if ctxs not provided
+    if ctxs is None:
+        ctxs = get_grid(min(len(samples), max_n), figsize=(12, 12))
+
+    # Show each image with label
+    for i, ((img, lbl), ax) in enumerate(zip(samples, ctxs)):
+        if i >= max_n: break
+        img.show(ctx=ax, **kwargs)
+        ax.set_title(str(lbl), fontsize=10)
+
+    return ctxs
 
 # %% ../nbs/01_data.ipynb #c5cef986
 @typedispatch
