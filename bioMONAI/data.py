@@ -61,7 +61,7 @@ from fastai.vision.all import (
     get_image_files, get_grid, merge, show_image,
     RandomSplitter, GrandparentSplitter,
     parent_label, CategoryMap,
-    partial
+    partial, show_results, show_batch,
 )
 
 # =================================
@@ -328,7 +328,7 @@ class Tensor2BioImage(DisplayedTransform):
     The `Tensor2BioImage` transform converts tensors into `BioImageBase` instances, enabling the application of bioimaging-specific methods to tensor data. 
     This is essential for integrating deep learning models with bioimaging workflows.
     """
-    def __init__(self, cls:BioImageBase=BioImageStack):
+    def __init__(self, cls:BioImageBase=BioImage):
         self.cls = cls
 
     def encodes(self, o: MetaTensor):
@@ -770,8 +770,11 @@ def _patch_dataloader(dl):
         _patch_dataloader(new_dl)
         return new_dl
 
+    # ---- attach methods ----
     dl.one_batch = types.MethodType(one_batch, dl)
     dl.new = types.MethodType(new, dl)
+    dl.show_results = types.MethodType(show_results, dl)
+    dl.show_batch = types.MethodType(show_batch, dl)
 
     # attach vocab if available
     if hasattr(dl.dataset, "vocab"):
@@ -1334,6 +1337,44 @@ def show_results(x: BioImageBase,       # The input image data.
     
     return ctxs
 
+
+# %% ../nbs/01_data.ipynb #96d2aa11
+@typedispatch
+def show_results(dl: torchDataLoader, batch: list, preds: MetaTensor, 
+                 ctxs=None, max_n: int=10, nrows: int|None=None, ncols: int|None=None, 
+                 figsize: tuple|None=None, **kwargs):
+
+    "Show a batch of input images along with predicted and target labels"
+
+    x, y = batch  # unpack batch
+
+    # Determine the correct BioImage class
+    cls = BioImage if x[0].shape[0]==1 else BioImageMulti
+    x_bio = [Tensor2BioImage(cls)(t) for t in x]
+
+    # Convert preds and labels to lists for easier handling
+    y_list = y.tolist()
+    preds = TensorCategory(preds)
+
+    # Make L of tuples (image, label) for easier indexing
+    samples = L(zip(x_bio, y_list))
+
+    # Create a grid if ctxs not provided
+    if ctxs is None:
+        ctxs = get_grid(min(len(samples), max_n), nrows=nrows, ncols=ncols, 
+                        figsize=figsize, title="Target / Prediction")
+
+    # Loop over the images and show them with labels
+    for i, ((img, true_label), pred_label) in enumerate(zip(samples, preds)):
+        if i >= max_n: break
+        ax = ctxs[i]
+        img.show(ctx=ax, **kwargs)  # show image
+
+        # Overlay GT vs Pred text in green/red
+        color = 'green' if true_label == pred_label else 'red'
+        ax.set_title(f"GT:{true_label} | Pred:{pred_label}", color=color, fontsize=10)
+
+    return ctxs
 
 # %% ../nbs/01_data.ipynb #bac1e22a
 def split_dataframe(

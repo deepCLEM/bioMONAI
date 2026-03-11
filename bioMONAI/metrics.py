@@ -41,7 +41,7 @@ from torch.nn.functional import one_hot, softmax
 # =================================
 # fastai
 # =================================
-import fastai.metrics
+from fastai.metrics import *
 from fastai.vision.all import AvgMetric
 
 # =================================
