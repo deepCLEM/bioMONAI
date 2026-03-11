@@ -4,10 +4,10 @@
 
 # %% auto #0
 __all__ = ['MetaResolver', 'BioImageBase', 'BioImage', 'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage',
-           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'test_biodataloader', 'get_images', 'get_gt',
-           'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv',
-           'build_df', 'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
-           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'test_biodataloader', 'ReadDictDataset', 'get_images',
+           'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe',
+           'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches', 'save_patches_grid',
+           'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 import os
@@ -16,6 +16,7 @@ import pandas as pd
 import h5py
 from tqdm import tqdm 
 import random
+import types
 from bioio import BioImage as AICSImage
 from bioio.writers import OmeTiffWriter
 from sklearn.model_selection import train_test_split
@@ -31,6 +32,8 @@ from .visualize import show_images_grid, show_multichannel
 from fastai.data.all import DataLoaders, delegates, RegexLabeller, is_listy, ColReader, ColSplitter
 from fastai.vision.all import DataBlock, CategoryBlock, MultiCategoryBlock, RegressionBlock, TfmdDL, get_image_files, TransformBlock, get_grid, merge, show_image, RandomSplitter, GrandparentSplitter, partial, parent_label
 from fastai.torch_core import TensorImage
+
+from torch.utils.data import Dataset as torchDataset, DataLoader as torchDataLoader
 
 # Patch fasttransform to handle missing 'methods' attribute during __repr__
 import fasttransform
@@ -632,6 +635,288 @@ def test_biodataloader(dls:DataLoaders, test_data:str|Path|pd.DataFrame, with_la
             test_data = dls.test_dl(get_image_files(test_data), with_labels=with_labels)
     
     return test_data
+
+# %% ../nbs/01_data.ipynb #bdcfc91f
+class ReadDictDataset(torchDataset):
+    def __init__(self, ds, x_keys="image", y_keys="label"):
+        """
+        ds: MONAI dataset (or any dict-like dataset)
+        x_keys: single key (str) or list/tuple of keys for inputs
+        y_keys: single key (str) or list/tuple of keys for outputs
+        """
+        self.ds = ds
+        # Normalize to lists
+        self.x_keys = [x_keys] if isinstance(x_keys, str) else list(x_keys)
+        self.y_keys = [y_keys] if isinstance(y_keys, str) else list(y_keys)
+
+    def __len__(self):
+        return len(self.ds)
+
+    def __getitem__(self, idx):
+        item = self.ds[idx]
+        # Flatten all keys into a single tuple
+        output = tuple(item[k] for k in self.x_keys + self.y_keys)
+        return output
+
+    def __getattr__(self, name):
+        # Forward any unknown attribute to the underlying dataset
+        return getattr(self.ds, name)
+
+# %% ../nbs/01_data.ipynb #85d2071b
+def _patch_dataset(ds, **attrs):
+    """
+    Patch a dataset instance with arbitrary attributes.
+
+    This allows adding fastai-style attributes (like `vocab`) or other
+    metadata to a dataset instance without modifying the class.
+
+    Parameters
+    ----------
+    ds : Dataset
+        Dataset instance to patch.
+    **attrs : dict
+        Arbitrary attributes to attach to the dataset.
+
+    Returns
+    -------
+    Dataset
+        The patched dataset.
+    """
+    for k, v in attrs.items():
+        setattr(ds, k, v)
+    return ds
+
+# %% ../nbs/01_data.ipynb #fa5a5cd9
+def _patch_dataloader(dl):
+
+    def one_batch(self):
+        return next(iter(self))
+
+    def new(self, **kwargs):
+        params = dict(
+            dataset=self.dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            collate_fn=self.collate_fn,
+            pin_memory=self.pin_memory,
+            drop_last=self.drop_last,
+        )
+        params.update(kwargs)
+
+        new_dl =torchDataLoader(**params)
+
+        # patch the clone too
+        _patch_dataloader(new_dl)
+        return new_dl
+
+    dl.one_batch = types.MethodType(one_batch, dl)
+    dl.new = types.MethodType(new, dl)
+    return dl
+
+# %% ../nbs/01_data.ipynb #1ea349cf
+def _show_summary(train_dl, val_dl=None):
+    """
+    Print a summary of the training and validation dataloaders.
+
+    Displays dataset size, batch size, number of batches,
+    batch shapes/dtypes, and approximate memory usage (MB).
+    """
+    def _describe_dl(dl, name):
+        print(f"\n{name} DataLoader")
+        print("-" * (len(name) + 11))
+
+        ds = dl.dataset
+
+        # dataset info
+        try:
+            ds_len = len(ds)
+        except:
+            ds_len = "unknown"
+
+        print(f"Dataset size : {ds_len}")
+        print(f"Batch size   : {dl.batch_size}")
+        print(f"Batches      : {len(dl)}")
+
+        if hasattr(ds, "vocab"):
+            print(f"Classes      : {ds.vocab}")
+
+        # inspect one batch
+        try:
+            batch = next(iter(dl))
+        except Exception as e:
+            print(f"Could not fetch batch: {e}")
+            return
+
+        print("\nBatch structure:")
+
+        def _tensor_size(x):
+            return x.numel() * x.element_size() / (1024 ** 2)  # MB
+
+        total_mem = 0.0
+
+        if isinstance(batch, (list, tuple)):
+            for i, item in enumerate(batch):
+                if isinstance(item, torchTensor):
+                    mem = _tensor_size(item)
+                    total_mem += mem
+                    print(f"  [{i}] shape={tuple(item.shape)} dtype={item.dtype} ~{mem:.2f} MB")
+                else:
+                    print(f"  [{i}] type={type(item)}")
+        elif isinstance(batch, dict):
+            for k, v in batch.items():
+                if isinstance(v, torchTensor):
+                    mem = _tensor_size(v)
+                    total_mem += mem
+                    print(f"  {k}: shape={tuple(v.shape)} dtype={v.dtype} ~{mem:.2f} MB")
+                else:
+                    print(f"  {k}: type={type(v)}")
+        else:
+            print(type(batch))
+
+        print(f"Approx batch memory: {total_mem:.2f} MB")
+
+    _describe_dl(train_dl, "Train")
+
+    if val_dl is not None:
+        _describe_dl(val_dl, "Valid")
+
+# %% ../nbs/01_data.ipynb #13f09332
+class BioDataLoaders(DataLoaders):
+    """
+    Wrapper around fastai `DataLoaders` for biomedical datasets.
+    """
+
+    @classmethod
+    def from_monai(
+        cls,
+        train_ds,            # MONAI training dataset
+        val_ds=None,         # MONAI validation dataset
+        x_keys="image",      # Key(s) used as model inputs
+        y_keys="label",      # Key(s) used as targets
+        bs=64,               # Training batch size
+        val_bs=None,         # Validation batch size (overrides automatic scaling)
+        val_bs_factor=2,     # Multiplier applied to bs when val_bs is None
+        shuffle=True,        # Shuffle training dataset
+        val_shuffle=False,   # Shuffle validation dataset (defaults to False)
+        show_summary=False,  # Print basic dataloader summary
+        vocab=None,          # Optional class names for classification tasks
+        **dl_kwargs,         # Additional torch DataLoader kwargs (train + val_)
+    ):
+        """
+        Create fastai-compatible `DataLoaders` from MONAI dictionary datasets.
+
+        Parameters
+        ----------
+        train_ds : Dataset
+            Training dataset (typically MONAI `Dataset`, `CacheDataset`, etc.)
+
+        val_ds : Dataset, optional
+            Validation dataset.
+
+        x_keys : str or Sequence[str]
+            Dictionary key(s) to extract as model inputs.
+
+        y_keys : str or Sequence[str]
+            Dictionary key(s) to extract as targets.
+
+        bs : int
+            Training batch size.
+
+        val_bs : int, optional
+            Validation batch size. If None, computed as `bs * val_bs_factor`.
+
+        val_bs_factor : int
+            Multiplier applied to training batch size for validation.
+
+        shuffle : bool
+            Whether to shuffle the training dataset.
+
+        val_shuffle : bool
+            Whether to shuffle the validation dataset. Defaults to False.
+
+        show_summary : bool
+            If True, prints number of batches in each dataloader.
+
+        **dl_kwargs
+            Additional arguments passed to `torch.utils.data.DataLoader`.
+
+            Validation-specific arguments can be specified using the `val_`
+            prefix.
+
+            Example:
+
+            - `num_workers=8`
+            - `pin_memory=True`
+            - `prefetch_factor=4`
+            - `val_prefetch_factor=2`
+        """
+
+        # ---- wrap datasets ----
+        train_ds = ReadDictDataset(train_ds, x_keys=x_keys, y_keys=y_keys)
+        val_ds = ReadDictDataset(val_ds, x_keys=x_keys, y_keys=y_keys) if val_ds else None
+
+        # ----patch datasets ----
+        if vocab:
+            train_ds = _patch_dataset(train_ds, vocab=vocab)
+            val_ds = _patch_dataset(val_ds, vocab=vocab) if val_ds else None
+
+
+        # ---- split train / val kwargs ----
+        train_kwargs = {}
+        val_kwargs = {}
+
+        for k, v in dl_kwargs.items():
+            if k.startswith("val_"):
+                val_kwargs[k[4:]] = v
+            else:
+                train_kwargs[k] = v
+
+        # ---- mirror train → val defaults ----
+        for k, v in train_kwargs.items():
+            val_kwargs.setdefault(k, v)
+
+        # ---- enforce sensible validation defaults ----
+        val_kwargs.setdefault("shuffle", val_shuffle)
+        val_kwargs.setdefault("drop_last", False)
+
+        # ---- base train args ----
+        train_args = dict(
+            dataset=train_ds,
+            batch_size=bs,
+            shuffle=shuffle,
+        )
+        train_args.update(train_kwargs)
+
+        train_dl = torchDataLoader(**train_args)
+
+        # ---- validation batch size scaling ----
+        val_dl = None
+        if val_ds is not None:
+
+            if val_bs is None:
+                val_bs = bs * val_bs_factor
+
+            val_args = dict(
+                dataset=val_ds,
+                batch_size=val_bs,
+            )
+            val_args.update(val_kwargs)
+
+            val_dl = torchDataLoader(**val_args)
+
+        # ---- patch fastai compatibility ----
+        train_dl = _patch_dataloader(train_dl)
+        if val_dl is not None:
+            val_dl = _patch_dataloader(val_dl)
+
+        # ---- build fastai DataLoaders ----
+        dls = cls(train_dl, val_dl)
+
+        if show_summary:
+            _show_summary(train_dl, val_dl)
+
+        return dls
 
 # %% ../nbs/01_data.ipynb #12e03f1b
 from fastai.vision.all import get_image_files
