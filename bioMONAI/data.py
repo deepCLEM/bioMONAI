@@ -1340,39 +1340,67 @@ def show_results(x: BioImageBase,       # The input image data.
 
 # %% ../nbs/01_data.ipynb #96d2aa11
 @typedispatch
-def show_results(dl: torchDataLoader, batch: list, preds: MetaTensor, 
-                 ctxs=None, max_n: int=10, nrows: int|None=None, ncols: int|None=None, 
-                 figsize: tuple|None=None, **kwargs):
+def show_results(dl: torchDataLoader,         # DataLoader containing the batch and optional vocab
+                 batch: list,                # The batch of data from the DataLoader (inputs, targets)
+                 preds: MetaTensor,          # Model predictions corresponding to the batch
+                 ctxs=None,                  # Optional: list of axes to plot on. If None, created automatically
+                 max_n: int=10,              # Maximum number of samples to display
+                 nrows: int|None=None,       # Number of rows in the grid if ctxs are not provided
+                 ncols: int|None=None,       # Number of columns in the grid if ctxs are not provided
+                 figsize: tuple|None=None,   # Figure size for the display grid
+                 **kwargs                     # Additional keyword arguments passed to `BioImage.show`
+                ):
+    """
+    Display a batch of images with their ground truth labels and predicted labels.
 
-    "Show a batch of input images along with predicted and target labels"
+    This version supports `BioImage` or `BioImageMulti` depending on input channels,
+    and will use `dl.vocab` to convert integer class indices to class names if available.
 
-    x, y = batch  # unpack batch
+    Args:
+        dl (torchDataLoader): DataLoader providing the batch and optional `vocab`.
+        batch (list): A tuple/list `(x, y)` containing input tensors and labels.
+        preds (MetaTensor): Model outputs for the batch.
+        ctxs (list, optional): Predefined plotting axes. If None, axes are created automatically.
+        max_n (int): Maximum number of samples to display.
+        nrows (int | None): Number of rows in the grid if ctxs not provided.
+        ncols (int | None): Number of columns in the grid if ctxs not provided.
+        figsize (tuple | None): Figure size for the display grid.
+        **kwargs: Additional arguments to pass to `BioImage.show`.
 
-    # Determine the correct BioImage class
+    Returns:
+        list: List of matplotlib axes containing the displayed images with labels.
+    """
+
+    x, y = batch
+
+    # Choose the right BioImage class based on channels
     cls = BioImage if x[0].shape[0]==1 else BioImageMulti
     x_bio = [Tensor2BioImage(cls)(t) for t in x]
 
-    # Convert preds and labels to lists for easier handling
+    # Convert predictions and labels to lists
     y_list = y.tolist()
-    preds = TensorCategory(preds)
+    preds_list = TensorCategory(preds).tolist()
 
-    # Make L of tuples (image, label) for easier indexing
+    # Map indices to class names if DataLoader has vocab
+    if hasattr(dl, 'vocab') and dl.vocab is not None:
+        y_list = [dl.vocab[o] for o in y_list]
+        preds_list = [dl.vocab[o] for o in preds_list]
+
+    # Combine images and true labels
     samples = L(zip(x_bio, y_list))
 
-    # Create a grid if ctxs not provided
+    # Create grid of axes if not provided
     if ctxs is None:
         ctxs = get_grid(min(len(samples), max_n), nrows=nrows, ncols=ncols, 
                         figsize=figsize, title="Target / Prediction")
 
-    # Loop over the images and show them with labels
-    for i, ((img, true_label), pred_label) in enumerate(zip(samples, preds)):
+    # Display images and overlay text for GT vs Pred
+    for i, ((img, true_label), pred_label) in enumerate(zip(samples, preds_list)):
         if i >= max_n: break
         ax = ctxs[i]
-        img.show(ctx=ax, **kwargs)  # show image
-
-        # Overlay GT vs Pred text in green/red
+        img.show(ctx=ax, **kwargs)
         color = 'green' if true_label == pred_label else 'red'
-        ax.set_title(f"GT:{true_label} | Pred:{pred_label}", color=color, fontsize=10)
+        ax.set_title(f"{true_label} / {pred_label}", color=color, fontsize=10)
 
     return ctxs
 
