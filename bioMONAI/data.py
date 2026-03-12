@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['MetaResolver', 'BioImageBase', 'BioImage', 'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage',
-           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'test_biodataloader', 'ReadDictDataset', 'get_images',
+           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'ReadDictDataset', 'test_biodataloader', 'get_images',
            'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe',
            'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches', 'save_patches_grid',
            'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
@@ -63,6 +63,11 @@ from fastai.vision.all import (
     parent_label, CategoryMap,
     partial, show_results, show_batch,
 )
+
+# =================================
+# MONAI
+# =================================
+from monai.data import Dataset as monaiDataset
 
 # =================================
 # bioMONAI
@@ -667,25 +672,6 @@ BioDataLoaders.class_from_csv = delegates(to=BioDataLoaders.class_from_df)(BioDa
 BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_func)(BioDataLoaders.class_from_path_re)
 
 
-# %% ../nbs/01_data.ipynb #5033a580
-def test_biodataloader(dls:DataLoaders, test_data:str|Path|pd.DataFrame, with_labels=True, csv_header='infer', csv_delimiter=None, csv_quoting=0):
-    "Test a `DataLoader` on a set of `test_files` and return the results as a list of tuples containing the file name and the corresponding input and target tensors."
-    if isinstance(test_data, pd.DataFrame):
-        # Handle DataFrame case directly
-        test_data = dls.test_dl(test_data, with_labels=with_labels)
-    elif isinstance(test_data, (str, Path)):
-        test_data = Path(test_data)
-        # Check if it's a CSV file
-        if test_data.suffix.lower() == '.csv':
-            # Handle CSV file case
-            df = pd.read_csv(test_data, header=csv_header, delimiter=csv_delimiter, quoting=csv_quoting)
-            test_data = dls.test_dl(df, with_labels=with_labels)
-        else:
-            # Handle non-CSV file case - get image files from directory
-            test_data = dls.test_dl(get_image_files(test_data), with_labels=with_labels)
-    
-    return test_data
-
 # %% ../nbs/01_data.ipynb #bdcfc91f
 class ReadDictDataset(torchDataset):
     def __init__(self, ds, x_keys="image", y_keys="label"):
@@ -848,6 +834,13 @@ def _patch_dataloader(dl):
             from fastai.data.transforms import CategoryMap
             vocab = CategoryMap(vocab)
         dl.vocab = vocab
+
+    # ---- attach x/y keys if available ----
+    if hasattr(dl.dataset, "x_keys"):
+        dl.x_keys = dl.dataset.x_keys
+
+    if hasattr(dl.dataset, "y_keys"):
+        dl.y_keys = dl.dataset.y_keys
 
     return dl
 
@@ -1054,6 +1047,117 @@ class BioDataLoaders(DataLoaders):
             _show_summary(train_dl, val_dl)
 
         return dls
+
+# %% ../nbs/01_data.ipynb #c8037343
+def _create_test_dl(
+    test_ds,
+    data,                 # existing fastai DataLoaders
+    x_keys=None,
+    y_keys=None,
+    vocab=None,
+    **dl_kwargs           # overrides for dataloader settings
+):
+    """
+    Create a test DataLoader using validation DataLoader settings as defaults.
+
+    Parameters
+    ----------
+    test_ds : Dataset
+        MONAI test dataset.
+
+    data : DataLoaders
+        Existing fastai DataLoaders containing train/valid loaders.
+
+    x_keys : str or sequence, optional
+        Keys used as model inputs. Defaults to `data.valid.x_keys`.
+
+    y_keys : str or sequence, optional
+        Keys used as targets. Defaults to `data.valid.y_keys`.
+
+    vocab : optional
+        Vocabulary for classification tasks. Defaults to data.vocab if available.
+
+    **dl_kwargs
+        Explicit overrides for DataLoader parameters.
+
+    Returns
+    -------
+    torch.utils.data.DataLoader
+    """
+
+    valid_dl = data.valid
+
+    # ---- default keys from validation dataloader ----
+    if x_keys is None:
+        x_keys = getattr(valid_dl, "x_keys", "image")
+
+    if y_keys is None:
+        y_keys = getattr(valid_dl, "y_keys", "label")
+
+    # ---- wrap dataset ----
+    test_ds = ReadDictDataset(test_ds, x_keys=x_keys, y_keys=y_keys)
+
+    # ---- vocab fallback ----
+    if vocab is None and hasattr(data, "vocab"):
+        vocab = data.vocab
+
+    if vocab:
+        test_ds = _patch_dataset(test_ds, vocab=vocab)
+
+    # ---- copy validation dataloader settings ----
+    base_kwargs = {
+        "batch_size": valid_dl.batch_size,
+        "num_workers": valid_dl.num_workers,
+        "pin_memory": getattr(valid_dl, "pin_memory", False),
+        "drop_last": False,
+        "shuffle": False,
+    }
+
+    # optional attributes if present
+    for attr in ["prefetch_factor", "persistent_workers"]:
+        if hasattr(valid_dl, attr):
+            base_kwargs[attr] = getattr(valid_dl, attr)
+
+    # ---- allow explicit overrides ----
+    base_kwargs.update(dl_kwargs)
+
+    # ---- build dataloader ----
+    test_dl = torchDataLoader(
+        dataset=test_ds,
+        **base_kwargs
+    )
+
+    # ---- fastai compatibility patch ----
+    test_dl = _patch_dataloader(test_dl)
+
+    return test_dl
+
+# %% ../nbs/01_data.ipynb #29793415
+def test_biodataloader(dls:DataLoaders, 
+                       test_data:str|Path|pd.DataFrame|monaiDataset, 
+                       with_labels=True, 
+                       csv_header='infer', 
+                       csv_delimiter=None, 
+                       csv_quoting=0
+                       ):
+    "Test a `DataLoader` on a set of `test_files` and return the results as a list of tuples containing the file name and the corresponding input and target tensors."
+    if isinstance(test_data, pd.DataFrame):
+        # Handle DataFrame case directly
+        test_dl = dls.test_dl(test_data, with_labels=with_labels)
+    elif isinstance(test_data, (str, Path)):
+        test_data = Path(test_data)
+        # Check if it's a CSV file
+        if test_data.suffix.lower() == '.csv':
+            # Handle CSV file case
+            df = pd.read_csv(test_data, header=csv_header, delimiter=csv_delimiter, quoting=csv_quoting)
+            test_dl = dls.test_dl(df, with_labels=with_labels)
+        else:
+            # Handle non-CSV file case - get image files from directory
+            test_dl = dls.test_dl(get_image_files(test_data), with_labels=with_labels)
+    elif isinstance(test_data, monaiDataset):
+        test_dl = _create_test_dl(test_data, dls)
+    
+    return test_dl
 
 # %% ../nbs/01_data.ipynb #12e03f1b
 from fastai.vision.all import get_image_files
