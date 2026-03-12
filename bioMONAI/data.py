@@ -752,20 +752,6 @@ def _patch_dataloader(dl):
     # ---- helpers ----
     def _attach_method(obj, fn):
         setattr(obj, fn.__name__, types.MethodType(fn, obj))
-
-    # def _get_batch_items(b, max_n):
-    #     "Return first `max_n` items from batch `b` safely."
-    #     # Ensure it's indexable
-    #     if isinstance(b, (tuple, list)):
-    #         x = b[0]
-    #         y = b[1] if len(b) > 1 else None
-    #     else:
-    #         x = b
-    #         y = None
-    #     n = min(max_n, len(x))
-    #     x_items = [x[i] for i in range(n)]
-    #     y_items = [y[i] for i in range(n)] if y is not None else [None]*n
-    #     return x_items, y_items
     
     def _get_batch_items(b, max_n):
         "Return first `max_n` items from batch `b`, handling single tensors."
@@ -822,6 +808,9 @@ def _patch_dataloader(dl):
         _patch_dataloader(new_dl)
         return new_dl
 
+    # alias the typedispatch function
+    from bioMONAI.data import show_batch as _show_batch
+
     def show_batch(
         self, b=None, max_n=9, ctxs=None, show=True, unique=False, **kwargs
     ):
@@ -834,8 +823,15 @@ def _patch_dataloader(dl):
         x_items, y_items = _get_batch_items(b, max_n)
 
         if show:
-            samples = list(zip(x_items, y_items))
-            show_batch(x_items, y_items, samples=samples, ctxs=ctxs, max_n=max_n, **kwargs)
+            _show_batch(
+                x_items,
+                y_items,
+                samples=None,
+                ctxs=ctxs,
+                max_n=max_n,
+                vocab=getattr(self, "vocab", None),
+                **kwargs
+            )
         else:
             return x_items, y_items
 
@@ -1346,6 +1342,7 @@ def show_batch(
     samples: list|None=None,   # L of (x, y) tuples, optional
     ctxs=None,                 # List of axes for displaying images
     max_n: int=9,              # Max number of items to display
+    vocab=None,                # Optional vocab for decoding labels (if y is categorical)
     **kwargs                   # Extra args for BioImage.show()
 ):
     """
@@ -1354,25 +1351,28 @@ def show_batch(
     Converts MetaTensor inputs to BioImage/BioImageMulti
     based on channels. Displays each image with its corresponding label.
     """
-    # Ensure x is a list of individual images
-    if isinstance(x, MetaTensor):
-        x = [x[i] for i in range(len(x))]
-    elif isinstance(x, list) and isinstance(x[0], MetaTensor) and x[0].ndim > 3:
-        # flatten batch dimension if necessary
-        x = [t[i] for t in x for i in range(t.shape[0])]
-
-    # Determine BioImage type based on channels
-    cls = BioImage if x[0].ndim == 3 else BioImageMulti
-    x_bio = [Tensor2BioImage(cls)(t) for t in x]
-
-    # Convert y to list
-    if isinstance(y, MetaTensor):
-        y_list = [int(y[i]) for i in range(len(y))]
-    else:
-        y_list = list(y)
-
     # Create samples if not provided
     if samples is None:
+        # Ensure x is a list of individual images
+        if isinstance(x, MetaTensor):
+            x = [x[i] for i in range(len(x))]
+        elif isinstance(x, list) and isinstance(x[0], MetaTensor) and x[0].ndim > 3:
+            # flatten batch dimension if necessary
+            x = [t[i] for t in x for i in range(t.shape[0])]
+
+        # Determine BioImage type based on channels
+        cls = BioImage if x[0].ndim == 3 else BioImageMulti
+        x_bio = [Tensor2BioImage(cls)(t) for t in x]
+
+        # Convert y to list
+        if isinstance(y, MetaTensor):
+            y_list = [int(y[i]) for i in range(len(y))]
+        else:
+            y_list = list(y)
+
+        if vocab is not None:
+            y_list = [vocab[o] for o in y_list] 
+    
         samples = L(zip(x_bio, y_list))
 
     # Create grid if ctxs not provided
