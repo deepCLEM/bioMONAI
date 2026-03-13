@@ -14,6 +14,7 @@ __all__ = ['MetaResolver', 'BioImageBase', 'BioImage', 'BioImageStack', 'BioImag
 # Standard library
 # =================================
 import os
+import sys
 import random
 import re
 import types
