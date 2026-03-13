@@ -1048,6 +1048,320 @@ class BioDataLoaders(DataLoaders):
 
         return dls
 
+    @classmethod
+    def from_monai_ds(
+        cls,
+        dataset_cls,                 # MONAI dataset class (Dataset, CacheDataset, etc.)
+        train_data,                  # Training datalist
+        train_transform=None,        # Training transform pipeline
+        val_data=None,               # Optional validation datalist
+        val_transform=None,          # Validation transforms
+        dataset_kwargs=None,         # Extra args for dataset constructor
+        val_dataset_kwargs=None,     # Validation dataset overrides
+        **dl_kwargs                  # Passed to `from_monai`
+    ):
+        """
+        Build `BioDataLoaders` from any MONAI dataset class.
+        """
+
+        dataset_kwargs = dataset_kwargs or {}
+        val_dataset_kwargs = val_dataset_kwargs or {}
+
+        # ---- training dataset ----
+        train_ds = dataset_cls(
+            train_data,
+            transform=train_transform,
+            **dataset_kwargs
+        )
+
+        # ---- validation dataset ----
+        val_ds = None
+        if val_data is not None:
+            val_ds = dataset_cls(
+                val_data,
+                transform=val_transform,
+                **{**dataset_kwargs, **val_dataset_kwargs}
+            )
+
+        # ---- delegate to main loader ----
+        return cls.from_monai(
+            train_ds=train_ds,
+            val_ds=val_ds,
+            **dl_kwargs
+        )
+    
+
+# %% ../nbs/01_data.ipynb #b2fb3f9a
+class BioDataLoaders(DataLoaders):
+    """
+    Wrapper around fastai `DataLoaders` for biomedical datasets.
+    """
+
+    @classmethod
+    @delegates(BioDataLoaders.from_monai)
+    def monaidataset(
+        cls,
+        train_data,                # Training datalist
+        train_transform,           # MONAI transform pipeline
+        val_data=None,             # Optional validation datalist
+        val_transform=None,        # Validation transforms
+        **dl_kwargs                # Passed to `from_monai`
+    ):
+        """
+        Create `BioDataLoaders` using MONAI `Dataset`.
+        """
+        from monai.data import Dataset
+
+        return cls.from_monai_ds(
+            Dataset,
+            train_data=train_data,
+            train_transform=train_transform,
+            val_data=val_data,
+            val_transform=val_transform,
+            **dl_kwargs,
+        )
+    
+
+    @classmethod
+    @delegates(monaidataset)
+    def cachedataset(
+        cls,
+        train_data,                     # Training datalist
+        train_transform,                # MONAI transform pipeline
+        val_data=None,                  # Optional validation datalist
+        val_transform=None,             # Validation transforms
+
+        # ---- CacheDataset parameters ----
+        cache_num=sys.maxsize,          # Maximum items to cache
+        cache_rate=1.0,                 # Fraction of dataset to cache
+        cache_num_val=None,             # Validation cache_num override
+        cache_rate_val=None,            # Validation cache_rate override
+        cache_workers=1,                # Workers used to build cache
+        progress=True,                  # Show cache progress bar
+        copy_cache=True,                # Deepcopy cache before random transforms
+        as_contiguous=True,             # Store cached tensors as contiguous
+        hash_as_key=False,              # Use hash keys to avoid duplicate cache
+        hash_func=None,                 # Hash function for cache keys
+        runtime_cache=False,            # Enable runtime caching
+
+        **dl_kwargs                     # Passed to `from_monai`
+    ):
+        """
+        Create `BioDataLoaders` using MONAI `CacheDataset`.
+        """
+
+        from monai.data import CacheDataset
+        from monai.data.utils import pickle_hashing
+
+        if hash_func is None:
+            hash_func = pickle_hashing
+
+        if cache_num_val is None:
+            cache_num_val = cache_num
+        if cache_rate_val is None:
+            cache_rate_val = cache_rate
+
+        dataset_kwargs = dict(
+            cache_num=cache_num,
+            cache_rate=cache_rate,
+            num_workers=cache_workers,
+            progress=progress,
+            copy_cache=copy_cache,
+            as_contiguous=as_contiguous,
+            hash_as_key=hash_as_key,
+            hash_func=hash_func,
+            runtime_cache=runtime_cache,
+        )
+
+        val_dataset_kwargs = dict(
+            cache_num=cache_num_val,
+            cache_rate=cache_rate_val,
+        )
+
+        return cls.from_monai_ds(
+            CacheDataset,
+            train_data=train_data,
+            train_transform=train_transform,
+            val_data=val_data,
+            val_transform=val_transform,
+            dataset_kwargs=dataset_kwargs,
+            val_dataset_kwargs=val_dataset_kwargs,
+            **dl_kwargs,
+        )
+    
+
+    @classmethod
+    @delegates(monaidataset)
+    def persistentdataset(
+        cls,
+        train_data,                   # Training datalist
+        train_transform,              # MONAI transform pipeline
+        cache_dir,                    # Directory for cached tensors
+        val_data=None,                # Optional validation datalist
+        val_transform=None,           # Validation transforms
+        hash_func=None,               # Hash function for cache keys
+        hash_transform=None,          # Hash transform pipeline
+        reset_ops_id=True,            # Reset transform instance IDs
+        **dl_kwargs                   # Passed to `from_monai`
+    ):
+        """
+        Create `BioDataLoaders` using MONAI `PersistentDataset`.
+        """
+
+        from monai.data import PersistentDataset
+        from monai.data.utils import pickle_hashing
+
+        if hash_func is None:
+            hash_func = pickle_hashing
+
+        dataset_kwargs = dict(
+            cache_dir=cache_dir,
+            hash_func=hash_func,
+            hash_transform=hash_transform,
+            reset_ops_id=reset_ops_id,
+        )
+
+        return cls.from_monai_ds(
+            PersistentDataset,
+            train_data=train_data,
+            train_transform=train_transform,
+            val_data=val_data,
+            val_transform=val_transform,
+            dataset_kwargs=dataset_kwargs,
+            **dl_kwargs,
+        )
+    
+    
+    @classmethod
+    @delegates(monaidataset)
+    def smartcachedataset(
+        cls,
+        train_data,                   # Training datalist
+        train_transform,              # MONAI transform pipeline
+        val_data=None,                # Optional validation datalist
+        val_transform=None,           # Validation transforms
+
+        replace_rate=0.1,             # Fraction of cache replaced each epoch
+        cache_num=sys.maxsize,        # Max cached items
+        cache_rate=1.0,               # Fraction of dataset cached
+        num_init_workers=1,           # Workers used to initialize cache
+        num_replace_workers=1,        # Workers used for cache replacement
+        progress=True,                # Show cache initialization progress
+        shuffle=True,                 # Shuffle before building cache
+        seed=0,                       # Random seed
+        copy_cache=True,              # Deepcopy cache before transforms
+        as_contiguous=True,           # Store contiguous tensors
+        runtime_cache=False,          # Runtime caching mode
+
+        **dl_kwargs                   # Passed to `from_monai`
+    ):
+        """
+        Create `BioDataLoaders` using MONAI `SmartCacheDataset`.
+        """
+
+        from monai.data import SmartCacheDataset
+
+        dataset_kwargs = dict(
+            replace_rate=replace_rate,
+            cache_num=cache_num,
+            cache_rate=cache_rate,
+            num_init_workers=num_init_workers,
+            num_replace_workers=num_replace_workers,
+            progress=progress,
+            shuffle=shuffle,
+            seed=seed,
+            copy_cache=copy_cache,
+            as_contiguous=as_contiguous,
+            runtime_cache=runtime_cache,
+        )
+
+        return cls.from_monai_ds(
+            SmartCacheDataset,
+            train_data=train_data,
+            train_transform=train_transform,
+            val_data=val_data,
+            val_transform=val_transform,
+            dataset_kwargs=dataset_kwargs,
+            **dl_kwargs,
+        )
+
+    @classmethod
+    @delegates(monaidataset)
+    def patchdataset(
+        cls,
+        data,                         # Base dataset (list, dict, or MONAI dataset)
+        patch_iter=None,              # Optional: user-supplied PatchIter or PatchIterd
+        keys=None,                    # Keys for PatchIterd (e.g., ["image", "label"])
+        patch_size=(96, 96, 96),      # Patch size for PatchIterd
+        num_patches=64,               # Number of patches per image
+        start_pos=None,               # Start position for GridPatchDataset / PatchIterd
+        transform=None,               # Optional patch transform
+        with_coordinates=True,        # Return patch coordinates
+
+        val_data=None,                # Optional validation dataset
+        val_patch_iter=None,          # Optional val patch iterator
+        val_keys=None,                # Keys for validation PatchIterd
+        val_patch_size=(96, 96, 96),  # Patch size for validation
+        val_num_patches=64,           # Number of patches for validation
+        val_start_pos=None,           # Start position for validation
+        val_transform=None,           # Optional validation transform
+        val_with_coordinates=None,    # Validation coordinate flag
+
+        **dl_kwargs                   # Passed to from_monai
+    ):
+        """
+        Create a DataLoader with random or deterministic patches.
+
+        - If `patch_iter` is provided: uses it (PatchIter / PatchIterd)
+        - Otherwise: automatically creates a PatchIterd using exposed parameters
+        """
+        from monai.data import PatchDataset, PatchIterd
+
+        # === TRAIN PATCH ITER ===
+        if patch_iter is None:
+            if keys is None:
+                raise ValueError("You must provide `keys` when not supplying patch_iter")
+            patch_iter = PatchIterd(
+                keys=keys,
+                patch_size=patch_size,
+                num_patches=num_patches,
+                start_pos=start_pos
+            )
+
+        train_ds = PatchDataset(
+            data=data,
+            patch_iter=patch_iter,
+            transform=transform,
+            with_coordinates=with_coordinates
+        )
+
+        # === VALIDATION PATCH ITER ===
+        val_ds = None
+        if val_data is not None:
+            if val_patch_iter is None:
+                val_patch_iter = PatchIterd(
+                    keys=val_keys if val_keys is not None else keys,
+                    patch_size=val_patch_size,
+                    num_patches=val_num_patches,
+                    start_pos=val_start_pos
+                )
+            if val_with_coordinates is None:
+                val_with_coordinates = with_coordinates
+
+            val_ds = PatchDataset(
+                data=val_data,
+                patch_iter=val_patch_iter,
+                transform=val_transform,
+                with_coordinates=val_with_coordinates
+            )
+
+        # === CREATE DATALOADER ===
+        return cls.from_monai(
+            train_ds=train_ds,
+            val_ds=val_ds,
+            **dl_kwargs
+        )
+
 # %% ../nbs/01_data.ipynb #c8037343
 def _create_test_dl(
     test_ds,
