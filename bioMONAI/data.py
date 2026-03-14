@@ -4,10 +4,11 @@
 
 # %% auto #0
 __all__ = ['MetaResolver', 'BioImageBase', 'BioImage', 'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage',
-           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'ReadDictDataset', 'test_biodataloader', 'get_images',
-           'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe',
-           'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches', 'save_patches_grid',
-           'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'ReadDictDataset', 'from_monai', 'from_monai_ds',
+           'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
+           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches',
+           'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims',
+           'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -914,184 +915,181 @@ def _show_summary(train_dl, val_dl=None):
         _describe_dl(val_dl, "Valid")
 
 # %% ../nbs/01_data.ipynb #13f09332
-class BioDataLoaders(DataLoaders):
+def from_monai(
+    cls,
+    train_ds,            # MONAI training dataset
+    val_ds=None,         # MONAI validation dataset
+    x_keys="image",      # Key(s) used as model inputs
+    y_keys="label",      # Key(s) used as targets
+    bs=64,               # Training batch size
+    val_bs=None,         # Validation batch size (overrides automatic scaling)
+    val_bs_factor=2,     # Multiplier applied to bs when val_bs is None
+    shuffle=True,        # Shuffle training dataset
+    val_shuffle=False,   # Shuffle validation dataset (defaults to False)
+    show_summary=False,  # Print basic dataloader summary
+    vocab=None,          # Optional class names for classification tasks
+    **dl_kwargs,         # Additional torch DataLoader kwargs (train + val_)
+):
     """
-    Wrapper around fastai `DataLoaders` for biomedical datasets.
+    Create fastai-compatible `DataLoaders` from MONAI dictionary datasets.
+
+    Parameters
+    ----------
+    train_ds : Dataset
+        Training dataset (typically MONAI `Dataset`, `CacheDataset`, etc.)
+
+    val_ds : Dataset, optional
+        Validation dataset.
+
+    x_keys : str or Sequence[str]
+        Dictionary key(s) to extract as model inputs.
+
+    y_keys : str or Sequence[str]
+        Dictionary key(s) to extract as targets.
+
+    bs : int
+        Training batch size.
+
+    val_bs : int, optional
+        Validation batch size. If None, computed as `bs * val_bs_factor`.
+
+    val_bs_factor : int
+        Multiplier applied to training batch size for validation.
+
+    shuffle : bool
+        Whether to shuffle the training dataset.
+
+    val_shuffle : bool
+        Whether to shuffle the validation dataset. Defaults to False.
+
+    show_summary : bool
+        If True, prints number of batches in each dataloader.
+
+    **dl_kwargs
+        Additional arguments passed to `torch.utils.data.DataLoader`.
+
+        Validation-specific arguments can be specified using the `val_`
+        prefix.
+
+        Example:
+
+        - `num_workers=8`
+        - `pin_memory=True`
+        - `prefetch_factor=4`
+        - `val_prefetch_factor=2`
     """
 
-    @classmethod
-    def from_monai(
-        cls,
-        train_ds,            # MONAI training dataset
-        val_ds=None,         # MONAI validation dataset
-        x_keys="image",      # Key(s) used as model inputs
-        y_keys="label",      # Key(s) used as targets
-        bs=64,               # Training batch size
-        val_bs=None,         # Validation batch size (overrides automatic scaling)
-        val_bs_factor=2,     # Multiplier applied to bs when val_bs is None
-        shuffle=True,        # Shuffle training dataset
-        val_shuffle=False,   # Shuffle validation dataset (defaults to False)
-        show_summary=False,  # Print basic dataloader summary
-        vocab=None,          # Optional class names for classification tasks
-        **dl_kwargs,         # Additional torch DataLoader kwargs (train + val_)
-    ):
-        """
-        Create fastai-compatible `DataLoaders` from MONAI dictionary datasets.
+    # ---- wrap datasets ----
+    train_ds = ReadDictDataset(train_ds, x_keys=x_keys, y_keys=y_keys)
+    val_ds = ReadDictDataset(val_ds, x_keys=x_keys, y_keys=y_keys) if val_ds else None
 
-        Parameters
-        ----------
-        train_ds : Dataset
-            Training dataset (typically MONAI `Dataset`, `CacheDataset`, etc.)
+    # ----patch datasets ----
+    if vocab:
+        train_ds = _patch_dataset(train_ds, vocab=vocab)
+        val_ds = _patch_dataset(val_ds, vocab=vocab) if val_ds else None
 
-        val_ds : Dataset, optional
-            Validation dataset.
 
-        x_keys : str or Sequence[str]
-            Dictionary key(s) to extract as model inputs.
+    # ---- split train / val kwargs ----
+    train_kwargs = {}
+    val_kwargs = {}
 
-        y_keys : str or Sequence[str]
-            Dictionary key(s) to extract as targets.
+    for k, v in dl_kwargs.items():
+        if k.startswith("val_"):
+            val_kwargs[k[4:]] = v
+        else:
+            train_kwargs[k] = v
 
-        bs : int
-            Training batch size.
+    # ---- mirror train → val defaults ----
+    for k, v in train_kwargs.items():
+        val_kwargs.setdefault(k, v)
 
-        val_bs : int, optional
-            Validation batch size. If None, computed as `bs * val_bs_factor`.
+    # ---- enforce sensible validation defaults ----
+    val_kwargs.setdefault("shuffle", val_shuffle)
+    val_kwargs.setdefault("drop_last", False)
 
-        val_bs_factor : int
-            Multiplier applied to training batch size for validation.
+    # ---- base train args ----
+    train_args = dict(
+        dataset=train_ds,
+        batch_size=bs,
+        shuffle=shuffle,
+    )
+    train_args.update(train_kwargs)
 
-        shuffle : bool
-            Whether to shuffle the training dataset.
+    train_dl = torchDataLoader(**train_args)
 
-        val_shuffle : bool
-            Whether to shuffle the validation dataset. Defaults to False.
+    # ---- validation batch size scaling ----
+    val_dl = None
+    if val_ds is not None:
 
-        show_summary : bool
-            If True, prints number of batches in each dataloader.
+        if val_bs is None:
+            val_bs = bs * val_bs_factor
 
+        val_args = dict(
+            dataset=val_ds,
+            batch_size=val_bs,
+        )
+        val_args.update(val_kwargs)
+
+        val_dl = torchDataLoader(**val_args)
+
+    # ---- patch fastai compatibility ----
+    train_dl = _patch_dataloader(train_dl)
+    if val_dl is not None:
+        val_dl = _patch_dataloader(val_dl)
+
+    # ---- build fastai DataLoaders ----
+    dls = cls(train_dl, val_dl)
+
+    if show_summary:
+        _show_summary(train_dl, val_dl)
+
+    return dls
+
+BioDataLoaders.from_monai = classmethod(from_monai)
+
+# %% ../nbs/01_data.ipynb #4d90089b
+def from_monai_ds(
+    cls,
+    dataset_cls,                 # MONAI dataset class (Dataset, CacheDataset, etc.)
+    train_data,                  # Training datalist
+    train_transform=None,        # Training transform pipeline
+    val_data=None,               # Optional validation datalist
+    val_transform=None,          # Validation transforms
+    dataset_kwargs=None,         # Extra args for dataset constructor
+    val_dataset_kwargs=None,     # Validation dataset overrides
+    **dl_kwargs                  # Passed to `from_monai`
+):
+    """
+    Build `BioDataLoaders` from any MONAI dataset class.
+    """
+
+    dataset_kwargs = dataset_kwargs or {}
+    val_dataset_kwargs = val_dataset_kwargs or {}
+
+    # ---- training dataset ----
+    train_ds = dataset_cls(
+        train_data,
+        transform=train_transform,
+        **dataset_kwargs
+    )
+
+    # ---- validation dataset ----
+    val_ds = None
+    if val_data is not None:
+        val_ds = dataset_cls(
+            val_data,
+            transform=val_transform,
+            **{**dataset_kwargs, **val_dataset_kwargs}
+        )
+
+    # ---- delegate to main loader ----
+    return cls.from_monai(
+        train_ds=train_ds,
+        val_ds=val_ds,
         **dl_kwargs
-            Additional arguments passed to `torch.utils.data.DataLoader`.
+    )
 
-            Validation-specific arguments can be specified using the `val_`
-            prefix.
-
-            Example:
-
-            - `num_workers=8`
-            - `pin_memory=True`
-            - `prefetch_factor=4`
-            - `val_prefetch_factor=2`
-        """
-
-        # ---- wrap datasets ----
-        train_ds = ReadDictDataset(train_ds, x_keys=x_keys, y_keys=y_keys)
-        val_ds = ReadDictDataset(val_ds, x_keys=x_keys, y_keys=y_keys) if val_ds else None
-
-        # ----patch datasets ----
-        if vocab:
-            train_ds = _patch_dataset(train_ds, vocab=vocab)
-            val_ds = _patch_dataset(val_ds, vocab=vocab) if val_ds else None
-
-
-        # ---- split train / val kwargs ----
-        train_kwargs = {}
-        val_kwargs = {}
-
-        for k, v in dl_kwargs.items():
-            if k.startswith("val_"):
-                val_kwargs[k[4:]] = v
-            else:
-                train_kwargs[k] = v
-
-        # ---- mirror train → val defaults ----
-        for k, v in train_kwargs.items():
-            val_kwargs.setdefault(k, v)
-
-        # ---- enforce sensible validation defaults ----
-        val_kwargs.setdefault("shuffle", val_shuffle)
-        val_kwargs.setdefault("drop_last", False)
-
-        # ---- base train args ----
-        train_args = dict(
-            dataset=train_ds,
-            batch_size=bs,
-            shuffle=shuffle,
-        )
-        train_args.update(train_kwargs)
-
-        train_dl = torchDataLoader(**train_args)
-
-        # ---- validation batch size scaling ----
-        val_dl = None
-        if val_ds is not None:
-
-            if val_bs is None:
-                val_bs = bs * val_bs_factor
-
-            val_args = dict(
-                dataset=val_ds,
-                batch_size=val_bs,
-            )
-            val_args.update(val_kwargs)
-
-            val_dl = torchDataLoader(**val_args)
-
-        # ---- patch fastai compatibility ----
-        train_dl = _patch_dataloader(train_dl)
-        if val_dl is not None:
-            val_dl = _patch_dataloader(val_dl)
-
-        # ---- build fastai DataLoaders ----
-        dls = cls(train_dl, val_dl)
-
-        if show_summary:
-            _show_summary(train_dl, val_dl)
-
-        return dls
-
-    @classmethod
-    def from_monai_ds(
-        cls,
-        dataset_cls,                 # MONAI dataset class (Dataset, CacheDataset, etc.)
-        train_data,                  # Training datalist
-        train_transform=None,        # Training transform pipeline
-        val_data=None,               # Optional validation datalist
-        val_transform=None,          # Validation transforms
-        dataset_kwargs=None,         # Extra args for dataset constructor
-        val_dataset_kwargs=None,     # Validation dataset overrides
-        **dl_kwargs                  # Passed to `from_monai`
-    ):
-        """
-        Build `BioDataLoaders` from any MONAI dataset class.
-        """
-
-        dataset_kwargs = dataset_kwargs or {}
-        val_dataset_kwargs = val_dataset_kwargs or {}
-
-        # ---- training dataset ----
-        train_ds = dataset_cls(
-            train_data,
-            transform=train_transform,
-            **dataset_kwargs
-        )
-
-        # ---- validation dataset ----
-        val_ds = None
-        if val_data is not None:
-            val_ds = dataset_cls(
-                val_data,
-                transform=val_transform,
-                **{**dataset_kwargs, **val_dataset_kwargs}
-            )
-
-        # ---- delegate to main loader ----
-        return cls.from_monai(
-            train_ds=train_ds,
-            val_ds=val_ds,
-            **dl_kwargs
-        )
-    
+BioDataLoaders.from_monai_ds = classmethod(from_monai_ds)
 
 # %% ../nbs/01_data.ipynb #c8037343
 def _create_test_dl(
@@ -1486,49 +1484,68 @@ def show_batch(x: BioImageBase,      # The input image data.
 # %% ../nbs/01_data.ipynb #bee716ba
 @typedispatch
 def show_batch(
-    x: list[MetaTensor],       # List of input MetaTensors
-    y: MetaTensor|list,        # Target MetaTensor or list
-    samples: list|None=None,   # L of (x, y) tuples, optional
-    ctxs=None,                 # List of axes for displaying images
-    max_n: int=9,              # Max number of items to display
-    vocab=None,                # Optional vocab for decoding labels (if y is categorical)
-    **kwargs                   # Extra args for BioImage.show()
+    x: list[MetaTensor|torchTensor],   # inputs
+    y: MetaTensor|torchTensor|list,    # targets
+    samples: list|None=None,
+    ctxs=None,
+    max_n: int=9,
+    vocab=None,
+    **kwargs
 ):
     """
     Show `max_n` inputs and targets from a batch.
-    
-    Converts MetaTensor inputs to BioImage/BioImageMulti
-    based on channels. Displays each image with its corresponding label.
+
+    Supports both MetaTensor and torch.Tensor inputs.
+    Converts to BioImage/BioImageMulti automatically.
     """
+
+    # -------------------------
     # Create samples if not provided
+    # -------------------------
     if samples is None:
-        # Ensure x is a list of individual images
-        if isinstance(x, MetaTensor):
-            x = [x[i] for i in range(len(x))]
-        elif isinstance(x, list) and isinstance(x[0], MetaTensor) and x[0].ndim > 3:
-            # flatten batch dimension if necessary
+
+        # Ensure x is a list
+        if isinstance(x, (MetaTensor, torchTensor)):
+            if x.ndim == 4:        # batch tensor
+                x = [x[i] for i in range(len(x))]
+            else:
+                x = [x]
+
+        elif isinstance(x, list) and isinstance(x[0], (MetaTensor, torchTensor)) and x[0].ndim > 3:
+            # flatten batch dimension
             x = [t[i] for t in x for i in range(t.shape[0])]
 
-        # Determine BioImage type based on channels
-        cls = BioImage if x[0].ndim == 3 else BioImageMulti
+        # -------------------------
+        # Convert tensors → BioImage
+        # -------------------------
+        cls = BioImage if x[0].shape[0] == 1 else BioImageMulti
         x_bio = [Tensor2BioImage(cls)(t) for t in x]
 
+        # -------------------------
         # Convert y to list
-        if isinstance(y, MetaTensor):
-            y_list = [int(y[i]) for i in range(len(y))]
+        # -------------------------
+        if isinstance(y, (MetaTensor, torchTensor)):
+            if y.ndim == 0:
+                y_list = [int(y)]
+            else:
+                y_list = [int(y[i]) for i in range(len(y))]
         else:
             y_list = list(y)
 
         if vocab is not None:
-            y_list = [vocab[o] for o in y_list] 
-    
+            y_list = [vocab[o] for o in y_list]
+
         samples = L(zip(x_bio, y_list))
 
+    # -------------------------
     # Create grid if ctxs not provided
+    # -------------------------
     if ctxs is None:
         ctxs = get_grid(min(len(samples), max_n), figsize=(12, 12))
 
-    # Show each image with label
+    # -------------------------
+    # Display
+    # -------------------------
     for i, ((img, lbl), ax) in enumerate(zip(samples, ctxs)):
         if i >= max_n: break
         img.show(ctx=ax, **kwargs)
@@ -1605,7 +1622,7 @@ def show_results(x: BioImageBase,       # The input image data.
 @typedispatch
 def show_results(dl: torchDataLoader,         # DataLoader containing the batch and optional vocab
                  batch: list,                # The batch of data from the DataLoader (inputs, targets)
-                 preds: MetaTensor,          # Model predictions corresponding to the batch
+                 preds: MetaTensor|torchTensor,          # Model predictions corresponding to the batch
                  ctxs=None,                  # Optional: list of axes to plot on. If None, created automatically
                  max_n: int=10,              # Maximum number of samples to display
                  nrows: int|None=None,       # Number of rows in the grid if ctxs are not provided
