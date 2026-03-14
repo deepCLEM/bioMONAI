@@ -780,6 +780,23 @@ def _patch_dataloader(dl):
         return x_items, y_items
 
     # ---- methods ----
+
+    def do_item(self, i):
+        """
+        Return a single item from the dataset after minimal processing.
+        Mimics fastai DataLoader.do_item behavior.
+        """
+        item = self.dataset[i]
+
+        # if collate_fn exists, apply it to make batch-like
+        if getattr(self, "collate_fn", None) is not None:
+            try:
+                item = self.collate_fn([item])
+            except:
+                pass
+
+        return item
+
     def one_batch(self): return next(iter(self))
 
     def new(self, **kwargs):
@@ -827,7 +844,7 @@ def _patch_dataloader(dl):
         if unique: self.get_idxs = old_get_idxs
 
     # ---- attach methods ----
-    for fn in (one_batch, new, show_results, show_batch):
+    for fn in (one_batch, new, do_item, show_results, show_batch):
         _attach_method(dl, fn)
 
     # ---- attach vocab if available ----
@@ -1418,7 +1435,7 @@ def show_batch(x: BioImageBase,     # The input image data.
                y: BioImageBase,     # The target image data.
                samples,             # List of sample indices to display.
                ctxs=None,           # List of contexts for displaying images. If None, create new ones using get_grid().
-               max_n: int=10,       # Maximum number of samples to display. Default is 10.
+               max_n: int=9,       # Maximum number of samples to display. Default is 9.
                nrows: int|None=None,     # Number of rows in the grid if ctxs are not provided.
                ncols: int|None=None,     # Number of columns in the grid if ctxs are not provided.
                figsize: tuple|None=None, # Figure size for the image display.
@@ -1451,7 +1468,7 @@ def show_batch(x: BioImageBase,      # The input image data.
                y: TensorCategory,    # The target data (categorical labels).
                samples,              # List of sample indices to display.
                ctxs=None,            # List of contexts for displaying images. If None, create new ones using get_grid().
-               max_n: int=10,        # Maximum number of samples to display. Default is 10.
+               max_n: int=9,        # Maximum number of samples to display. Default is 9.
                nrows: int|None=None,      # Number of rows in the grid if ctxs are not provided.
                ncols: int|None=None,      # Number of columns in the grid if ctxs are not provided.
                figsize: tuple|None=None,  # Figure size for the image display.
@@ -1486,9 +1503,12 @@ def show_batch(x: BioImageBase,      # The input image data.
 def show_batch(
     x: list[MetaTensor|torchTensor],   # inputs
     y: MetaTensor|torchTensor|list,    # targets
-    samples: list|None=None,
-    ctxs=None,
-    max_n: int=9,
+    samples: list|None=None,           # List of sample indices to display.
+    ctxs=None,                         # List of contexts for displaying images. If None, create new ones using get_grid().
+    max_n: int=9,                      # Maximum number of samples to display. Default is 9.
+    nrows: int|None=None,      # Number of rows in the grid if ctxs are not provided.
+    ncols: int|None=None,      # Number of columns in the grid if ctxs are not provided.
+    figsize: tuple|None=None,  # Figure size for the image display.
     vocab=None,
     **kwargs
 ):
@@ -1541,7 +1561,7 @@ def show_batch(
     # Create grid if ctxs not provided
     # -------------------------
     if ctxs is None:
-        ctxs = get_grid(min(len(samples), max_n), figsize=(12, 12))
+        ctxs = get_grid(min(len(samples), max_n), nrows=nrows, ncols=ncols, figsize=figsize)
 
     # -------------------------
     # Display
