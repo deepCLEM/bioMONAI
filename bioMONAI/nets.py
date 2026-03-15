@@ -7,28 +7,63 @@ __all__ = ['create_custom_unet', 'DnCNN', 'DeeplabConfig', 'get_padding', 'inter
            'ASPP_module', 'Deeplab']
 
 # %% ../nbs/04_nets.ipynb #775b485a
+# =================================
+# Standard library
+# =================================
 from dataclasses import dataclass, field
 from typing import List, Tuple, Optional, Union
 
-from torch import cat as torch_cat
-from torch import Tensor as torch_Tensor, randn as torch_randn
+# =================================
+# PyTorch
+# =================================
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.nn as nn
 from torch.cuda.amp import autocast
-from torch import float16 as torch_float16, float32 as torch_float32
 
-from fastai.vision.all import create_unet_model, resnet18, resnet34, resnet50, resnet101, resnet152
+from torch import (
+    Tensor as torch_Tensor,
+    cat as torch_cat,
+    randn as torch_randn,
+    float16 as torch_float16,
+    float32 as torch_float32,
+)
 
-# from mamba_ssm import Mamba
+# =================================
+# fastai
+# =================================
+from fastai.vision.all import (
+    create_unet_model,
+    resnet18,
+    resnet34,
+    resnet50,
+    resnet101,
+    resnet152,
+)
 
+# =================================
+# MONAI
+# =================================
 from monai.networks.blocks import Convolution
 from monai.networks.layers.factories import Act, Norm, Pool
+from monai.networks.nets import (
+    AttentionUnet,
+    BasicUNet,
+    DynUNet,
+    ResNet,
+    ResNetFeatures,
+    UNet,
+)
 from monai.utils import set_determinism
-from monai.networks.nets import BasicUNet, AttentionUnet, DynUNet, UNet, BasicUNet, ResNet, ResNetFeatures
 
+# =================================
+# bioMONAI
+# =================================
 from .core import get_device
 
+# =================================
+# Optional / experimental
+# =================================
+# from mamba_ssm import Mamba
 
 # %% ../nbs/04_nets.ipynb #54bfd02d
 def create_custom_unet(resnet_version,      # Choose a ResNet model between: 'resnet18', 'resnet34', 'resnet50', 'resnet101', and 'resnet152'.

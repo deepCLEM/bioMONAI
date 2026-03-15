@@ -4,26 +4,49 @@
 
 # %% auto #0
 __all__ = ['MSELoss', 'L1Loss', 'CombinedLoss', 'MSSSIMLoss', 'MSSSIML1Loss', 'MSSSIML2Loss', 'CellLoss', 'InstanceSegLoss',
-           'DiceBCELoss', 'CrossEntropyLossFlat3D', 'BCELoss', 'DiceLoss', 'FRCLoss', 'FCRCutoff']
+           'DiceBCELoss', 'activation', 'CrossEntropyLossFlat3D', 'BCELoss', 'DiceLoss', 'FRCLoss', 'FCRCutoff']
 
 # %% ../nbs/03_losses.ipynb #690ce34c
 from .core import store_attr
 
 # %% ../nbs/03_losses.ipynb #97c8e1f9
+# =================================
+# Scientific
+# =================================
 import numpy as np
+from scipy.optimize import curve_fit
+
+# =================================
+# PyTorch
+# =================================
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import sigmoid
+from torch.nn import CrossEntropyLoss
 
+# =================================
+# MONAI
+# =================================
 from monai.losses import SSIMLoss
 
-from scipy.optimize import curve_fit
-from fastai.vision.all import mse, mae, CrossEntropyLossFlat, Any, test_eq, test_is
+# =================================
+# fastai
+# =================================
+from fastai.vision.all import (
+    Any,
+    CrossEntropyLossFlat,
+    mae,
+    mse,
+    test_eq,
+    test_is,
+)
 
+# =================================
+# bioMONAI
+# =================================
+from .core import add_method, torchTensor
 from .metrics import FRCMetric, get_fourier_ring_correlations
-from .core import torchTensor
-
 
 # %% ../nbs/03_losses.ipynb #42a19e7f
 def MSELoss(
@@ -378,15 +401,17 @@ class InstanceSegLoss:
         Nature methods, 18(1), 100-106.
     """
     def __init__(self,
-                 mse_weight: float = 1.0,  # Weight applied to the MSE component
-                 ssim_weight: float = 0.0, # Weight applied to the SSIM component
-                 spatial_dims: int = 2     # Number of spatial dimensions (2 for 2D, 3 for 3D)
+                 mse_weight: float = 0.5,  # Weight applied to the MSE component
+                 ssim_weight: float = 1.0, # Weight applied to the SSIM component
+                 spatial_dims: int = 2,     # Number of spatial dimensions (2 for 2D, 3 for 3D)
+                 logits: bool = True       # Whether to apply sigmoid to logits before computing loss
                  ):
-        self.BCELogits_loss = nn.BCEWithLogitsLoss()
+        self.BCE_loss = nn.BCEWithLogitsLoss() if logits else nn.BCELoss()
         self.MSE_loss = nn.MSELoss()
         self.SSIM_loss = SSIMLoss(spatial_dims=spatial_dims)
         self.mse_weight = mse_weight
         self.ssim_weight = ssim_weight
+        self.logits = logits
         
     def __call__(self,
                  pred,  # Model logits of shape (bs, n_instances, h, w)
@@ -396,7 +421,10 @@ class InstanceSegLoss:
         Compute the combined BCE + MSE instance segmentation loss.
         """
         # BCE component 
-        bce = self.BCELogits_loss(pred, targ)
+        if self.logits:
+            bce = self.BCE_loss(pred, targ)
+        else:
+            bce = self.BCE_loss((pred>0.).float(), (targ>0.).float())
 
         # MSE component 
         mse = self.MSE_loss(pred, targ)
@@ -459,6 +487,11 @@ class DiceBCELoss:
         dice = dice.mean()  # average over instance channels
 
         return bce + self.dice_weight * dice
+
+# %% ../nbs/03_losses.ipynb #d31a7ced
+@add_method(CrossEntropyLoss)
+def activation(self, x):
+    return F.softmax(x, dim=1)
 
 # %% ../nbs/03_losses.ipynb #e6e9dbda
 class CrossEntropyLossFlat3D(CrossEntropyLossFlat):
