@@ -8,10 +8,10 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'BioDataLoaders', 'ReadDictDataset', 'from_monai', 'from_monai_ds', 'register_source', 'register_dataset',
            'register_loader', 'register_task', 'route_kwargs', 'detect_source', 'build_source', 'DataFrameSource',
            'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'NewBioDataBlock', 'MonaiDatasetBuilder',
-           'CacheDatasetBuilder', 'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair',
-           'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder',
-           'extract_patches', 'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string',
-           'remove_singleton_dims', 'extract_substacks']
+           'CacheDatasetBuilder', 'FastaiLoader', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
+           'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
+           'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
+           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -1453,6 +1453,46 @@ class CacheDatasetBuilder:
         monai.data.CacheDataset
         """
         return CacheDataset(datalist, **self.dataset_kwargs)
+
+# %% ../nbs/01_data.ipynb #f60ddb03
+@register_loader("fastai")
+class FastaiLoader:
+
+    def __init__(self, **dataloader_ops):
+        """
+        FastAI-style DataLoader wrapper.
+
+        Parameters
+        ----------
+        **dataloader_ops : dict
+            Keyword arguments passed to datablock.dataloaders(), e.g.
+            bs, num_workers, batch_tfms, item_tfms, shuffle, etc.
+        """
+        self.dataloader_ops = dataloader_ops
+
+    def build(self, datablock, data_source, show_summary=False):
+        """
+        Build FastAI DataLoaders from a BioDataBlock.
+
+        Parameters
+        ----------
+        datablock : BioDataBlock
+            Initialized block with blocks, get_x/get_y, splitter, etc.
+        data_source : Any
+            Raw data input: folder, dataframe, CSV, or datalist
+        show_summary : bool
+            Whether to print a summary of the DataLoader
+        """
+
+        # Create the DataLoader
+        dataloader = datablock.dataloaders(data_source, **self.dataloader_ops)
+
+        # Optionally show a summary
+        if show_summary:
+            bs = self.dataloader_ops.get('bs', 1)
+            print(datablock.summary(data_source, bs=bs))
+
+        return dataloader
 
 # %% ../nbs/01_data.ipynb #c8037343
 def _create_test_dl(
