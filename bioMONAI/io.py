@@ -7,19 +7,40 @@ __all__ = ['write_image', 'tiff2torch', 'string2dict', 'split_path', 'aics_image
            'image_reader']
 
 # %% ../nbs/02_io.ipynb #58b60095
+# =================================
+# Standard library
+# =================================
 from typing import Any
 
-from fastai.vision.all import *
-from fastai.data.all import *
-from torchio import ScalarImage, ToCanonical, Resample
+# =================================
+# Scientific / data
+# =================================
+import h5py
+import numpy as np
+
+# =================================
+# Bioimage IO
+# =================================
 from bioio import BioImage as AICSImage
 from bioio import Writer as writer
 from bioio_tifffile import Reader as TiffReader
 from bioio_ome_tiff import Reader as OmeTiffReader
-import h5py
-import numpy as np
 
-from .core import torchTensor, torch_from_numpy, L
+# =================================
+# Medical imaging
+# =================================
+from torchio import ScalarImage, ToCanonical, Resample
+
+# =================================
+# fastai
+# =================================
+from fastai.data.all import *
+from fastai.vision.all import *
+
+# =================================
+# bioMONAI
+# =================================
+from .core import L, torchTensor, torch_from_numpy
 
 # %% ../nbs/02_io.ipynb #453fb47a
 def write_image(data, file_path, dimension_order="TCZYX"):

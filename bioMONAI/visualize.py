@@ -4,21 +4,51 @@
 
 # %% auto #0
 __all__ = ['plot_image', 'show_multichannel', 'mosaic_image_3d', 'show_images_grid', 'show_plane', 'visualize_slices',
-           'slice_explorer', 'plot_volume', 'plot_intensity_histogram']
+           'slice_explorer', 'plot_volume', 'plot_metrics', 'plot_intensity_histogram']
 
 # %% ../nbs/09_visualize.ipynb #b19af8ae
+# =================================
+# Scientific / data
+# =================================
 import numpy as np
+import pandas as pd
+
+# =================================
+# Visualization
+# =================================
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import plotly.io as pio
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio
+
+# =================================
+# PyTorch / vision
+# =================================
 import torchvision
 
-from fastai.vision.all import plt, ifnone
+# =================================
+# fastai
+# =================================
+from fastai.vision.all import ifnone, plt
 
-from .core import torchTensor, tensor, delegates, torch_from_numpy, hasattrs, img2float, cells3d
+# =================================
+# bioMONAI
+# =================================
+from bioMONAI.core import (
+    cells3d,
+    delegates,
+    hasattrs,
+    img2float,
+    tensor,
+    torchTensor,
+    torch_from_numpy,
+)
+
+# =================================
+# Optional / commented
+# =================================
 # from bioMONAI.io import tiff2torch
 
 # %% ../nbs/09_visualize.ipynb #4273c3de
@@ -411,6 +441,64 @@ def plot_volume(values,             # A 3D array of pixel values representing th
     
     # Display the figure in a new window
     fig.show()
+
+# %% ../nbs/09_visualize.ipynb #c9528154
+def plot_metrics(learn):
+    """
+    Plot a losses and metrics from a fastai Recorder.
+    - Loss curves
+    - Metrics curves
+    - Best validation epoch markers
+    """
+
+    recorder = learn.recorder
+    metric_names = recorder.metric_names[1:-1]  # remove epoch/time
+
+    df = pd.DataFrame(recorder.values, columns=metric_names)
+    epochs = np.arange(1, len(df)+1)
+
+    loss_cols = [c for c in df.columns if "loss" in c]
+    metric_cols = [c for c in df.columns if "loss" not in c]
+
+    n_plots = 1 + len(metric_cols)
+    fig, axes = plt.subplots(n_plots, 1, figsize=(7, 4*n_plots), sharex=True)
+
+    if n_plots == 1:
+        axes = [axes]
+
+    # -------- Loss plot --------
+    ax = axes[0]
+    for col in loss_cols:
+        ax.plot(epochs, df[col], marker="o", label=col)
+
+    if "valid_loss" in df:
+        best_epoch = df["valid_loss"].idxmin()
+        ax.axvline(best_epoch+1, linestyle="--", alpha=0.6)
+        ax.scatter(best_epoch+1, df["valid_loss"][best_epoch], s=80)
+
+    ax.set_title("Training and Validation Loss")
+    ax.set_ylabel("Loss")
+    ax.legend()
+    ax.grid(True)
+
+    # -------- Metrics --------
+    for i, metric in enumerate(metric_cols):
+        ax = axes[i+1]
+
+        ax.plot(epochs, df[metric], marker="o", label=metric)
+
+        best_epoch = df[metric].idxmax()
+        ax.axvline(best_epoch+1, linestyle="--", alpha=0.6)
+        ax.scatter(best_epoch+1, df[metric][best_epoch], s=80)
+
+        ax.set_title(metric)
+        ax.set_ylabel(metric)
+        ax.grid(True)
+
+    axes[-1].set_xlabel("Epoch")
+
+    plt.tight_layout()
+    plt.show()
 
 # %% ../nbs/09_visualize.ipynb #74d544d6
 def plot_intensity_histogram(

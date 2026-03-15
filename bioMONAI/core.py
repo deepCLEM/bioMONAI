@@ -5,54 +5,100 @@
 # %% auto #0
 __all__ = ['coolwarm', 'warm_cmap', 'read_yaml', 'dictlist_to_funclist', 'fastTrainer', 'visionTrainer', 'compute_losses',
            'compute_metric', 'calculate_statistics', 'format_sig', 'plot_histogram_and_kde', 'display_statistics_table',
-           'evaluate_model', 'evaluate_classification_model', 'attributesFromDict', 'get_device', 'img2float',
-           'img2Tensor', 'TargetedTransform', 'apply_transforms']
+           'evaluate_model', 'evaluate_classification_model', 'add_method', 'attributesFromDict', 'get_device',
+           'img2float', 'img2Tensor', 'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/00_core.ipynb #e46d9793
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-from scipy.stats import gaussian_kde
-from matplotlib.colors import LinearSegmentedColormap
+# =================================
+# Standard library
+# =================================
+import yaml
+from random import randint, random as rand, choice
+from typing import MutableSequence
+from collections.abc import MutableSequence
 from attr import dataclass
 
-from torch import Tensor as torchTensor
-from torch import tensor
-from monai.data import MetaTensor
-from monai.utils import set_determinism
+# =================================
+# Scientific / data
+# =================================
+import numpy as np
+import pandas as pd
+from scipy.stats import gaussian_kde
 
-import torch.nn.functional as F
-from torch.nn.init import kaiming_normal_
+# =================================
+# Visualization
+# =================================
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
-from random import randint, random as rand, choice
-
+# =================================
+# Imaging
+# =================================
 from skimage import util
 from skimage.data import cells3d
 
-import yaml
+# =================================
+# PyTorch
+# =================================
+import torch.nn.functional as F
+import torch.optim as toptim
 
-# %% ../nbs/00_core.ipynb #998b6398
-from torch import squeeze as torchsqueeze, max as torchmax, from_numpy as torch_from_numpy, device as torch_device
+from torch import (
+    Tensor as torchTensor,
+    tensor,
+    squeeze as torchsqueeze,
+    max as torchmax,
+    from_numpy as torch_from_numpy,
+    device as torch_device,
+)
+
 from torch.cuda import is_available as is_cuda_available
+from torch.nn.init import kaiming_normal_
 
-# %% ../nbs/00_core.ipynb #7ce13c4f
-from collections.abc import MutableSequence
-from typing import MutableSequence
-    
-from fastai.callback.core import Callback
-from fastai.data.all import DataLoaders, Path, trainable_params, delegates, hasattrs, Path, List, L, Normalize
-from fastai.optimizer import Adam, OptimWrapper, Optimizer
-from fastai.vision.all import BypassNewMeta, DisplayedTransform, store_attr, DataBlock, Learner, ShowGraphCallback, CSVLogger, Any, minimum, steep, valley, slide, create_vision_model, create_timm_model, get_c, default_split, model_meta, ifnone, ClassificationInterpretation
-from fastcore.script import risinstance
-from fastai.callback.all import *
-from fastai.vision.all import *
-from plum import dispatch as typedispatch
-import fastai.optimizer
+# =================================
+# MONAI
+# =================================
+from monai.data import MetaTensor
+from monai.utils import set_determinism
+
+# =================================
+# fastai
+# =================================
 import fastai.losses
 import fastai.metrics
-import torch.optim as toptim
-from .datasets import download_medmnist
+import fastai.optimizer
 
+from fastai.callback.core import Callback
+from fastai.callback.all import *
+
+from fastai.data.all import (
+    DataLoaders, Path, trainable_params, delegates,
+    hasattrs, List, L, Normalize
+)
+
+from fastai.optimizer import Adam, OptimWrapper, Optimizer
+
+from fastai.vision.all import (
+    Any, BypassNewMeta, CSVLogger, ClassificationInterpretation,
+    DataBlock, DisplayedTransform, Learner, ShowGraphCallback,
+    create_vision_model, create_timm_model, default_split,
+    get_c, ifnone, minimum, model_meta, slide, steep, store_attr, valley
+)
+
+# =================================
+# fastcore
+# =================================
+from fastcore.script import risinstance
+
+# =================================
+# Multiple dispatch
+# =================================
+from plum import dispatch as typedispatch
+
+# =================================
+# bioMONAI
+# =================================
+from .datasets import download_medmnist
 
 # %% ../nbs/00_core.ipynb #792e9e80
 def read_yaml(yaml_path):
@@ -355,7 +401,7 @@ def plot_histogram_and_kde(data, stats, bw_method=0.3, fn_name=''):
 
     # Add loss function name to the title
     plt.title(f"Combined Histogram and KDE with Statistics\n{fn_name}")
-    plt.xlabel("Loss Value")
+    plt.xlabel("Value")
     plt.ylabel("Density")
     plt.legend()
     # plt.grid(True)
@@ -463,6 +509,7 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
                                   loss_fn=None,                 # Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.
                                   most_confused_n:int=1,        # Number of most confused class pairs to display. 
                                   normalize:bool=True,          # Whether to normalize the confusion matrix.
+                                  act=None,                     # Apply activation to predictions, defaults to `self.loss_func`'s activation
                                   metrics=None,                 # Single metric or a list of metrics to evaluate. 
                                   bw_method=0.3,                # Bandwidth method for KDE. 
                                   show_graph=True,              # Boolean flag to show the histogram and KDE plot.
@@ -481,14 +528,14 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     
     # Interpret the results on test data
     if test_data is None:
-        class_int = ClassificationInterpretation.from_learner(trainer)
-        p, t = trainer.get_preds()
+        class_int = ClassificationInterpretation.from_learner(trainer, act=act)
+        p, t = trainer.get_preds(act=act)
         # Show results for test data
         if show_results:
             trainer.show_results()
     else:
-        class_int = ClassificationInterpretation(trainer, test_data, loss_fn)
-        p, t = trainer.get_preds(dl=test_data)
+        class_int = ClassificationInterpretation(trainer, test_data, loss_fn, act=act)
+        p, t = trainer.get_preds(dl=test_data, act=act)
         # Show results for test data
         if show_results:
             trainer.show_results(dl=test_data)
@@ -500,8 +547,10 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     class_int.print_classification_report()
     
     # Show the most confused classes
+    out['most_confused'] = pd.DataFrame(class_int.most_confused(most_confused_n), 
+                                        columns=["Actual Class", "Predicted Class", "Count"])
     print("\nMost Confused Classes:")
-    print(class_int.most_confused(most_confused_n))
+    display(out['most_confused'])
 
     # Calculate loss for each prediction-target pair
     losses = compute_losses(p, t, loss_fn)
@@ -531,6 +580,13 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     
     return out
 
+
+# %% ../nbs/00_core.ipynb #3866c2cc
+def add_method(cls):
+    def decorator(func):
+        setattr(cls, func.__name__, func)
+        return func
+    return decorator
 
 # %% ../nbs/00_core.ipynb #1367cad5
 def attributesFromDict(d):

@@ -8,36 +8,61 @@ __all__ = ['SSIMMetric', 'MSSIMMetric', 'MSEMetric', 'MAEMetric', 'RMSEMetric', 
            'radial_mask', 'get_radial_masks', 'get_fourier_ring_correlations', 'FRCMetric']
 
 # %% ../nbs/06_metrics.ipynb #09106178
+# =================================
+# Scientific / numerical
+# =================================
 import numpy as np
 from numpy import trapezoid as trapz
-
-from torch import abs, sqrt, div, complex64, where, isinf, zeros_like, real, isnan, argmax, sigmoid, is_tensor
-from torch.fft import fftshift
-from torch.fft import fft2
-from torch.nn.functional import softmax
-
-from fastai.vision.all import AvgMetric
-from monai.losses import SSIMLoss
-from monai.metrics import (
-    PSNRMetric as _PSNR,
-    RMSEMetric as _RMSE,
-    MSEMetric as _MSE,
-    MAEMetric as _MAE,
-    SSIMMetric as _SSIM,
-    MultiScaleSSIMMetric as _MS_SSIM,
-    DiceMetric as _DiceMetric,
-    ROCAUCMetric as _ROCAUCMetric,
-    PanopticQualityMetric as _PanopticQualityMetric,
-    MetricsReloadedCategorical as _MetricsReloadedCategorical,
-    MetricsReloadedBinary as _MetricsReloadedBinary,
-)
-
-from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
-from sklearn.model_selection import StratifiedKFold
 from sklearn import svm
+from sklearn.datasets import load_iris
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import RocCurveDisplay, auc
 
+# =================================
+# PyTorch
+# =================================
+from torch import (
+    abs,
+    argmax,
+    complex64,
+    div,
+    isnan,
+    is_tensor,
+    isinf,
+    real,
+    sigmoid,
+    where,
+    zeros_like,
+)
+from torch.fft import fft2, fftshift
+from torch.nn.functional import one_hot, softmax
+
+# =================================
+# fastai
+# =================================
+from fastai.metrics import *
+from fastai.vision.all import AvgMetric
+
+# =================================
+# MONAI
+# =================================
+from monai.losses import SSIMLoss
+from monai.metrics import (
+    DiceMetric as _DiceMetric,
+    MAEMetric as _MAE,
+    MetricsReloadedBinary as _MetricsReloadedBinary,
+    MetricsReloadedCategorical as _MetricsReloadedCategorical,
+    MultiScaleSSIMMetric as _MS_SSIM,
+    PanopticQualityMetric as _PanopticQualityMetric,
+    PSNRMetric as _PSNR,
+    RMSEMetric as _RMSE,
+    SSIMMetric as _SSIM,
+)
+
+# =================================
+# bioMONAI
+# =================================
 from .core import torch_from_numpy
 
 # %% ../nbs/06_metrics.ipynb #4960aa4d
@@ -108,7 +133,7 @@ def DiceMetric(threshold=0.5, instance=False, **kwargs):
 
         dice_metric.reset()
         dice_metric(pred, target)
-        return dice_metric.aggregate().item()
+        return dice_metric.aggregate()
 
     return AvgMetric(Dice)
 
@@ -137,29 +162,44 @@ def PanopticQualityMetric(**kwargs):
 
         pq_metric.reset()
         pq_metric(y_pred=pred, y=target)
-        return pq_metric.aggregate().item()
+        return pq_metric.aggregate()
 
     return AvgMetric(PQ)
 
 # %% ../nbs/06_metrics.ipynb #0481c954
-def ROCAUCMetric(**kwargs):
+def ROCAUCMetric(num_classes=None, # if not None, checks if preds and targets are one-hot encoded
+                 act=None,         # activation operations, typically Sigmoid or Softmax.
+                 **kwargs):
     """
-    Wrapper around monai.metrics.ROCAUCMetric
-    Computes Area Under the Receiver Operating Characteristic Curve (ROC AUC).
+    Wrapper around monai.metrics.ROCAUCMetric.
+
+    If num_classes is None:
+        assumes pred and target are already one-hot / probability encoded.
+
+    If num_classes is provided:
+        automatically one-hot encodes pred/target when needed.
     """
     rocaucmetric = _ROCAUCMetric(**kwargs)
 
-    def ROCAUC(pred, target):
-        # logits -> probabilities
-        pred = sigmoid(pred)
+    def _maybe_one_hot(x):
+        # already encoded
+        if x.ndim > 1 and x.shape[1] == num_classes:
+            return x
 
-        # Check shapes 
-        if target.ndim == 3:
-            target = target.unsqueeze(1)
+        return one_hot(x.long(), num_classes=num_classes)
+
+    def ROCAUC(pred, target):
+        if act is not None:
+            pred = act(pred)
+
+        if num_classes is not None:
+            pred = _maybe_one_hot(pred)
+            target = _maybe_one_hot(target)
 
         rocaucmetric.reset()
         rocaucmetric(pred, target)
-        return rocaucmetric.aggregate().item()
+        return rocaucmetric.aggregate()
+
     return AvgMetric(ROCAUC)
 
 # %% ../nbs/06_metrics.ipynb #8481bc99

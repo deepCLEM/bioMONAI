@@ -4,34 +4,98 @@
 
 # %% auto #0
 __all__ = ['MetaResolver', 'BioImageBase', 'BioImage', 'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage',
-           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'test_biodataloader', 'get_images', 'get_gt',
-           'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'extract_patches', 'save_patches_grid',
-           'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'BioImageBlock', 'BioDataBlock', 'BioDataLoaders', 'ReadDictDataset', 'from_monai', 'from_monai_ds',
+           'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
+           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches',
+           'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims',
+           'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
+# =================================
+# Standard library
+# =================================
 import os
+import sys
+import random
+import re
+import types
+from typing import Callable, List, Optional, Union
+
+# =================================
+# Third-party scientific stack
+# =================================
+import h5py
 import numpy as np
 import pandas as pd
-import h5py
-from tqdm import tqdm 
-import random
+from tqdm import tqdm
+
+# =================================
+# Bioimage IO
+# =================================
 from bioio import BioImage as AICSImage
 from bioio.writers import OmeTiffWriter
-from sklearn.model_selection import train_test_split
-from torch import stack as torch_stack
 
-from .datasets import split_dataframe
-from .core import MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform, fastTrainer, torchsqueeze, Path, List, L, torchmax, randint, dictlist_to_funclist, read_yaml,  apply_transforms
-from plum import dispatch as typedispatch
+# =================================
+# Machine Learning
+# =================================
+from sklearn.model_selection import train_test_split
+
+# =================================
+# PyTorch
+# =================================
+from torch import stack as torch_stack
+from torch.utils.data import DataLoader as torchDataLoader
+from torch.utils.data import Dataset as torchDataset
+
+# =================================
+# fastai
+# =================================
+from fastai.data.all import (
+    DataLoaders, delegates, RegexLabeller, is_listy,
+    ColReader, ColSplitter
+)
+
+from fastai.torch_core import TensorImage
+
+from fastai.vision.all import (
+    DataBlock, CategoryBlock, MultiCategoryBlock, RegressionBlock,
+    TfmdDL, TransformBlock,
+    get_image_files, get_grid, merge, show_image,
+    RandomSplitter, GrandparentSplitter,
+    parent_label, CategoryMap,
+    partial, show_results, show_batch,
+)
+
+# =================================
+# MONAI
+# =================================
+from monai.data import Dataset as monaiDataset, CacheDataset, PersistentDataset, SmartCacheDataset
+from monai.data.utils import pickle_hashing
+
+# =================================
+# bioMONAI
+# =================================
+from bioMONAI.core import (
+    MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform,
+    fastTrainer, torchsqueeze, Path, List, L,
+    torchmax, randint,
+    dictlist_to_funclist, read_yaml, apply_transforms
+)
+
 from .io import image_reader
 from .visualize import show_images_grid, show_multichannel
 
-from fastai.data.all import DataLoaders, delegates, RegexLabeller, is_listy, ColReader, ColSplitter
-from fastai.vision.all import DataBlock, CategoryBlock, MultiCategoryBlock, RegressionBlock, TfmdDL, get_image_files, TransformBlock, get_grid, merge, show_image, RandomSplitter, GrandparentSplitter, partial, parent_label
-from fastai.torch_core import TensorImage
+# =================================
+# Multiple dispatch
+# =================================
+from plum import dispatch as typedispatch
 
-# Patch fasttransform to handle missing 'methods' attribute during __repr__
+
+# =================================
+# fasttransform patch
+# =================================
 import fasttransform
+
 _original_repr = fasttransform.transform.Transform.__repr__
 
 def _safe_repr(self):
@@ -39,7 +103,6 @@ def _safe_repr(self):
         return _original_repr(self)
     except AttributeError as e:
         if "'_BoundFunction' object has no attribute 'methods'" in str(e):
-            # Fallback for transforms with plum-dispatched methods
             return f"{self.__class__.__name__}(...)"
         raise
 
@@ -220,48 +283,60 @@ class BioImageProject(BioImageBase):
 # %% ../nbs/01_data.ipynb #b484acfa
 class BioImageMulti(BioImageBase):
     """
-    For multi-channel 2D images, `BioImageMulti` extends `BioImageBase` to handle data with multiple channels, such as different fluorescence markers in microscopy images. 
+    Multi-channel 2D/3D image assuming CDHW layout.
     """
-    
+
     @classmethod
-    def create(cls, fn: (Path, str, L, list, torchTensor), roi=None, **kwargs) -> torchTensor: 
-        """
-        Opens an image and casts it to BioImageBase object.
-        If `fn` is a torchTensor, it's cast to BioImageBase object.
+    def create(
+        cls,
+        fn: (Path, str, L, list, torchTensor),
+        roi=None,
+        merge_cd: bool = True,
+        interleaved: bool = True,
+        **kwargs
+    ) -> torchTensor:
 
-        Args:
-            fn : (Path, str, torchTensor)
-                Image path or a 4D torchTensor.
-            kwargs : dict
-                Additional parameters for the medical image reader.
-
-        Returns:
-            torchTensor : A 3D tensor as a BioImage object.
-        """
         if isinstance(fn, torchTensor):
-            return cls(fn)
+            img = fn
+        else:
+            img = image_reader(
+                fn,
+                dtype=cls,
+                resample=cls.resample,
+                reorder=cls.reorder,
+                **kwargs
+            )
+            img = torchsqueeze(img)
 
-        img = torchsqueeze(image_reader(fn, dtype=cls, resample=cls.resample, reorder=cls.reorder))
         if roi is not None:
-            return img[roi[0]:roi[1]]
-        return img
-    
-    def show(self, ctx=None, **kwargs):
-        "Show image using `merge(self._show_args, kwargs)`"
-        return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
-    
-    def __repr__(self) -> str:
-        """Returns the string representation of the ImageBase instance."""
-        return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
-        
+            img = img[roi[0]:roi[1]]
 
-# %% ../nbs/01_data.ipynb #a42a484e
+        # Assume layout: (C, D, H, W)
+        if merge_cd and img.ndim == 4:
+            c, d, h, w = img.shape
+
+            if interleaved:
+                # (C, D, H, W) → (D, C, H, W) → flatten
+                img = img.permute(1, 0, 2, 3).reshape(c * d, h, w)
+            else:
+                # Sequential flatten (C blocks)
+                img = img.reshape(c * d, h, w)
+
+        return cls(img)
+
+    def show(self, ctx=None, **kwargs):
+        return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
+
+    def __repr__(self) -> str:
+        return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
+
+# %% ../nbs/01_data.ipynb #98c6bb4c
 class Tensor2BioImage(DisplayedTransform):
     """
     The `Tensor2BioImage` transform converts tensors into `BioImageBase` instances, enabling the application of bioimaging-specific methods to tensor data. 
     This is essential for integrating deep learning models with bioimaging workflows.
     """
-    def __init__(self, cls:BioImageBase=BioImageStack):
+    def __init__(self, cls:BioImageBase=BioImage):
         self.cls = cls
 
     def encodes(self, o: MetaTensor):
@@ -295,24 +370,6 @@ class Tensor2BioImage(DisplayedTransform):
             except:
                 dec = 0
         return f'{self.name}(enc:{enc},dec:{dec})'
-
-# %% ../nbs/01_data.ipynb #56557263
-class Tensor2BioImage(DisplayedTransform):
-    """
-    The `Tensor2BioImage` transform converts tensors into `BioImageBase` instances, enabling the application of bioimaging-specific methods to tensor data. 
-    This is essential for integrating deep learning models with bioimaging workflows.
-    """
-    def __init__(self, cls:BioImageBase=BioImageStack):
-        self.cls = cls
-
-    def encodes(self, o):
-        if isinstance(o, MetaTensor):
-            # return self.cls(o.clone(), affine=o.affine, meta=o.meta)
-            return self.cls(o.clone(), meta=o.meta)
-        
-        if isinstance(o, torchTensor):
-            return self.cls(o)
-        
 
 # %% ../nbs/01_data.ipynb #68b31c0c
 def BioImageBlock(cls:BioImageBase=BioImage):
@@ -483,7 +540,7 @@ class BioDataLoaders(DataLoaders):
 
     @classmethod
     @delegates(from_source)
-    def class_from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col=0, folder=None, suff='', label_col=1, label_delim=None,
+    def class_from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col='filename', folder=None, suff='', label_col='label', label_delim=None,
                 y_block=None, valid_col=None, item_tfms=None, batch_tfms=None, img_cls=BioImage, **kwargs):
         "Create from `df` using `fn_col` and `label_col`"
         pref = f'{Path(path) if folder is None else Path(path)/folder}{os.path.sep}'
@@ -618,24 +675,549 @@ BioDataLoaders.class_from_csv = delegates(to=BioDataLoaders.class_from_df)(BioDa
 BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_func)(BioDataLoaders.class_from_path_re)
 
 
-# %% ../nbs/01_data.ipynb #5033a580
-def test_biodataloader(dls:DataLoaders, test_path:str|Path|pd.DataFrame, with_labels=True, csv_header='infer', csv_delimiter=None, csv_quoting=0):
+# %% ../nbs/01_data.ipynb #bdcfc91f
+class ReadDictDataset(torchDataset):
+    def __init__(self, ds, x_keys="image", y_keys="label"):
+        """
+        ds: MONAI dataset (or any dict-like dataset)
+        x_keys: single key (str) or list/tuple of keys for inputs
+        y_keys: single key (str) or list/tuple of keys for outputs
+        """
+        self.ds = ds
+        # Normalize to lists
+        self.x_keys = [x_keys] if isinstance(x_keys, str) else list(x_keys)
+        self.y_keys = [y_keys] if isinstance(y_keys, str) else list(y_keys)
+
+    def __len__(self):
+        return len(self.ds)
+
+    def __getitem__(self, idx):
+        item = self.ds[idx]
+        # Flatten all keys into a single tuple
+        output = tuple(item[k] for k in self.x_keys + self.y_keys)
+        return output
+
+    def __getattr__(self, name):
+        # Forward any unknown attribute to the underlying dataset
+        return getattr(self.ds, name)
+
+# %% ../nbs/01_data.ipynb #85d2071b
+def _patch_dataset(ds, **attrs):
+    """
+    Patch a dataset instance with arbitrary attributes.
+
+    This allows adding fastai-style attributes (like `vocab`) or other
+    metadata to a dataset instance without modifying the class.
+
+    Parameters
+    ----------
+    ds : Dataset
+        Dataset instance to patch.
+    **attrs : dict
+        Arbitrary attributes to attach to the dataset.
+
+    Returns
+    -------
+    Dataset
+        The patched dataset.
+    """
+    for k, v in attrs.items():
+        setattr(ds, k, v)
+    return ds
+
+# %% ../nbs/01_data.ipynb #fa5a5cd9
+def _patch_dataloader(dl):
+    """
+    Patch a PyTorch DataLoader for minimal fastai compatibility.
+
+    Adds:
+    - .one_batch(): returns a single batch
+    - .new(**kwargs): clone dataloader with overrides
+    - .show_results(): show batch results using BioImage/MetaTensor
+    - .show_batch(): show a batch using BioImage/MetaTensor
+    - .vocab: inferred from underlying dataset if present
+    """
+
+    # ---- helpers ----
+    def _attach_method(obj, fn):
+        setattr(obj, fn.__name__, types.MethodType(fn, obj))
+    
+    def _get_batch_items(b, max_n):
+        "Return first `max_n` items from batch `b`, handling single tensors."
+        # unpack batch
+        if isinstance(b, (tuple, list)) and len(b) == 2:
+            x, y = b
+        else:
+            x = b
+            y = None
+
+        # ensure x_items is a list
+        if isinstance(x, MetaTensor):
+            if x.dim() == 0:          # scalar
+                x_items = [x]
+            elif x.dim() == 3:        # single image (C,H,W)
+                x_items = [x]
+            else:                     # batched (B,C,H,W)
+                x_items = [x[i] for i in range(min(max_n, x.shape[0]))]
+        elif isinstance(x, list):
+            x_items = x[:max_n]
+        else:
+            x_items = list(x)[:max_n]
+
+        # same for y
+        if y is None:
+            y_items = [None]*len(x_items)
+        elif isinstance(y, MetaTensor):
+            if y.dim() == 0:
+                y_items = [y.item()]
+            elif y.dim() == 1:
+                y_items = [y[i].item() for i in range(min(max_n, len(y)))]
+            else:
+                y_items = [y[i] for i in range(min(max_n, y.shape[0]))]
+        else:
+            y_items = list(y)[:len(x_items)]
+
+        return x_items, y_items
+
+    # ---- methods ----
+
+    def do_item(self, i):
+        """
+        Return a single item from the dataset after minimal processing.
+        Mimics fastai DataLoader.do_item behavior.
+        """
+        item = self.dataset[i]
+
+        # if collate_fn exists, apply it to make batch-like
+        if getattr(self, "collate_fn", None) is not None:
+            try:
+                item = self.collate_fn([item])
+            except:
+                pass
+
+        return item
+
+    def one_batch(self): return next(iter(self))
+
+    def new(self, **kwargs):
+        params = dict(
+            dataset=self.dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            collate_fn=self.collate_fn,
+            pin_memory=self.pin_memory,
+            drop_last=self.drop_last,
+        )
+        params.update(kwargs)
+        new_dl = type(self)(**params)
+        _patch_dataloader(new_dl)
+        return new_dl
+
+    # alias the typedispatch function
+    from bioMONAI.data import show_batch as _show_batch
+
+    def show_batch(
+        self, b=None, max_n=9, ctxs=None, show=True, unique=False, **kwargs
+    ):
+        "Show `max_n` input(s) and target(s) from the batch."
+        if unique:
+            old_get_idxs = getattr(self, "get_idxs", lambda: None)
+            self.get_idxs = lambda: [0]
+
+        if b is None: b = self.one_batch()
+        x_items, y_items = _get_batch_items(b, max_n)
+
+        if show:
+            _show_batch(
+                x_items,
+                y_items,
+                samples=None,
+                ctxs=ctxs,
+                max_n=max_n,
+                vocab=getattr(self, "vocab", None),
+                **kwargs
+            )
+        else:
+            return x_items, y_items
+
+        if unique: self.get_idxs = old_get_idxs
+
+    # ---- attach methods ----
+    for fn in (one_batch, new, do_item, show_results, show_batch):
+        _attach_method(dl, fn)
+
+    # ---- attach vocab if available ----
+    if hasattr(dl.dataset, "vocab"):
+        vocab = dl.dataset.vocab
+        if isinstance(vocab, list):
+            from fastai.data.transforms import CategoryMap
+            vocab = CategoryMap(vocab)
+        dl.vocab = vocab
+
+    # ---- attach x/y keys if available ----
+    if hasattr(dl.dataset, "x_keys"):
+        dl.x_keys = dl.dataset.x_keys
+
+    if hasattr(dl.dataset, "y_keys"):
+        dl.y_keys = dl.dataset.y_keys
+
+    return dl
+
+# %% ../nbs/01_data.ipynb #1ea349cf
+def _show_summary(train_dl, val_dl=None):
+    """
+    Print a summary of the training and validation dataloaders.
+
+    Displays dataset size, batch size, number of batches,
+    batch shapes/dtypes, and approximate memory usage (MB).
+    """
+    def _describe_dl(dl, name):
+        print(f"\n{name} DataLoader")
+        print("-" * (len(name) + 11))
+
+        ds = dl.dataset
+
+        # dataset info
+        try:
+            ds_len = len(ds)
+        except:
+            ds_len = "unknown"
+
+        print(f"Dataset size : {ds_len}")
+        print(f"Batch size   : {dl.batch_size}")
+        print(f"Batches      : {len(dl)}")
+
+        if hasattr(ds, "vocab"):
+            print(f"Classes      : {ds.vocab}")
+
+        # inspect one batch
+        try:
+            batch = next(iter(dl))
+        except Exception as e:
+            print(f"Could not fetch batch: {e}")
+            return
+
+        print("\nBatch structure:")
+
+        def _tensor_size(x):
+            return x.numel() * x.element_size() / (1024 ** 2)  # MB
+
+        total_mem = 0.0
+
+        if isinstance(batch, (list, tuple)):
+            for i, item in enumerate(batch):
+                if isinstance(item, torchTensor):
+                    mem = _tensor_size(item)
+                    total_mem += mem
+                    print(f"  [{i}] shape={tuple(item.shape)} dtype={item.dtype} ~{mem:.2f} MB")
+                else:
+                    print(f"  [{i}] type={type(item)}")
+        elif isinstance(batch, dict):
+            for k, v in batch.items():
+                if isinstance(v, torchTensor):
+                    mem = _tensor_size(v)
+                    total_mem += mem
+                    print(f"  {k}: shape={tuple(v.shape)} dtype={v.dtype} ~{mem:.2f} MB")
+                else:
+                    print(f"  {k}: type={type(v)}")
+        else:
+            print(type(batch))
+
+        print(f"Approx batch memory: {total_mem:.2f} MB")
+
+    _describe_dl(train_dl, "Train")
+
+    if val_dl is not None:
+        _describe_dl(val_dl, "Valid")
+
+# %% ../nbs/01_data.ipynb #13f09332
+def from_monai(
+    cls,
+    train_ds,            # MONAI training dataset
+    val_ds=None,         # MONAI validation dataset
+    x_keys="image",      # Key(s) used as model inputs
+    y_keys="label",      # Key(s) used as targets
+    bs=64,               # Training batch size
+    val_bs=None,         # Validation batch size (overrides automatic scaling)
+    val_bs_factor=2,     # Multiplier applied to bs when val_bs is None
+    shuffle=True,        # Shuffle training dataset
+    val_shuffle=False,   # Shuffle validation dataset (defaults to False)
+    show_summary=False,  # Print basic dataloader summary
+    vocab=None,          # Optional class names for classification tasks
+    **dl_kwargs,         # Additional torch DataLoader kwargs (train + val_)
+):
+    """
+    Create fastai-compatible `DataLoaders` from MONAI dictionary datasets.
+
+    Parameters
+    ----------
+    train_ds : Dataset
+        Training dataset (typically MONAI `Dataset`, `CacheDataset`, etc.)
+
+    val_ds : Dataset, optional
+        Validation dataset.
+
+    x_keys : str or Sequence[str]
+        Dictionary key(s) to extract as model inputs.
+
+    y_keys : str or Sequence[str]
+        Dictionary key(s) to extract as targets.
+
+    bs : int
+        Training batch size.
+
+    val_bs : int, optional
+        Validation batch size. If None, computed as `bs * val_bs_factor`.
+
+    val_bs_factor : int
+        Multiplier applied to training batch size for validation.
+
+    shuffle : bool
+        Whether to shuffle the training dataset.
+
+    val_shuffle : bool
+        Whether to shuffle the validation dataset. Defaults to False.
+
+    show_summary : bool
+        If True, prints number of batches in each dataloader.
+
+    **dl_kwargs
+        Additional arguments passed to `torch.utils.data.DataLoader`.
+
+        Validation-specific arguments can be specified using the `val_`
+        prefix.
+
+        Example:
+
+        - `num_workers=8`
+        - `pin_memory=True`
+        - `prefetch_factor=4`
+        - `val_prefetch_factor=2`
+    """
+
+    # ---- wrap datasets ----
+    train_ds = ReadDictDataset(train_ds, x_keys=x_keys, y_keys=y_keys)
+    val_ds = ReadDictDataset(val_ds, x_keys=x_keys, y_keys=y_keys) if val_ds else None
+
+    # ----patch datasets ----
+    if vocab:
+        train_ds = _patch_dataset(train_ds, vocab=vocab)
+        val_ds = _patch_dataset(val_ds, vocab=vocab) if val_ds else None
+
+
+    # ---- split train / val kwargs ----
+    train_kwargs = {}
+    val_kwargs = {}
+
+    for k, v in dl_kwargs.items():
+        if k.startswith("val_"):
+            val_kwargs[k[4:]] = v
+        else:
+            train_kwargs[k] = v
+
+    # ---- mirror train → val defaults ----
+    for k, v in train_kwargs.items():
+        val_kwargs.setdefault(k, v)
+
+    # ---- enforce sensible validation defaults ----
+    val_kwargs.setdefault("shuffle", val_shuffle)
+    val_kwargs.setdefault("drop_last", False)
+
+    # ---- base train args ----
+    train_args = dict(
+        dataset=train_ds,
+        batch_size=bs,
+        shuffle=shuffle,
+    )
+    train_args.update(train_kwargs)
+
+    train_dl = torchDataLoader(**train_args)
+
+    # ---- validation batch size scaling ----
+    val_dl = None
+    if val_ds is not None:
+
+        if val_bs is None:
+            val_bs = bs * val_bs_factor
+
+        val_args = dict(
+            dataset=val_ds,
+            batch_size=val_bs,
+        )
+        val_args.update(val_kwargs)
+
+        val_dl = torchDataLoader(**val_args)
+
+    # ---- patch fastai compatibility ----
+    train_dl = _patch_dataloader(train_dl)
+    if val_dl is not None:
+        val_dl = _patch_dataloader(val_dl)
+
+    # ---- build fastai DataLoaders ----
+    dls = cls(train_dl, val_dl)
+
+    if show_summary:
+        _show_summary(train_dl, val_dl)
+
+    return dls
+
+BioDataLoaders.from_monai = classmethod(from_monai)
+
+# %% ../nbs/01_data.ipynb #4d90089b
+def from_monai_ds(
+    cls,
+    dataset_cls,                 # MONAI dataset class (Dataset, CacheDataset, etc.)
+    train_data,                  # Training datalist
+    train_transform=None,        # Training transform pipeline
+    val_data=None,               # Optional validation datalist
+    val_transform=None,          # Validation transforms
+    dataset_kwargs=None,         # Extra args for dataset constructor
+    val_dataset_kwargs=None,     # Validation dataset overrides
+    **dl_kwargs                  # Passed to `from_monai`
+):
+    """
+    Build `BioDataLoaders` from any MONAI dataset class.
+    """
+
+    dataset_kwargs = dataset_kwargs or {}
+    val_dataset_kwargs = val_dataset_kwargs or {}
+
+    # ---- training dataset ----
+    train_ds = dataset_cls(
+        train_data,
+        transform=train_transform,
+        **dataset_kwargs
+    )
+
+    # ---- validation dataset ----
+    val_ds = None
+    if val_data is not None:
+        val_ds = dataset_cls(
+            val_data,
+            transform=val_transform,
+            **{**dataset_kwargs, **val_dataset_kwargs}
+        )
+
+    # ---- delegate to main loader ----
+    return cls.from_monai(
+        train_ds=train_ds,
+        val_ds=val_ds,
+        **dl_kwargs
+    )
+
+BioDataLoaders.from_monai_ds = classmethod(from_monai_ds)
+
+# %% ../nbs/01_data.ipynb #c8037343
+def _create_test_dl(
+    test_ds,
+    data,                 # existing fastai DataLoaders
+    x_keys=None,
+    y_keys=None,
+    vocab=None,
+    **dl_kwargs           # overrides for dataloader settings
+):
+    """
+    Create a test DataLoader using validation DataLoader settings as defaults.
+
+    Parameters
+    ----------
+    test_ds : Dataset
+        MONAI test dataset.
+
+    data : DataLoaders
+        Existing fastai DataLoaders containing train/valid loaders.
+
+    x_keys : str or sequence, optional
+        Keys used as model inputs. Defaults to `data.valid.x_keys`.
+
+    y_keys : str or sequence, optional
+        Keys used as targets. Defaults to `data.valid.y_keys`.
+
+    vocab : optional
+        Vocabulary for classification tasks. Defaults to data.vocab if available.
+
+    **dl_kwargs
+        Explicit overrides for DataLoader parameters.
+
+    Returns
+    -------
+    torch.utils.data.DataLoader
+    """
+
+    valid_dl = data.valid
+
+    # ---- default keys from validation dataloader ----
+    if x_keys is None:
+        x_keys = getattr(valid_dl, "x_keys", "image")
+
+    if y_keys is None:
+        y_keys = getattr(valid_dl, "y_keys", "label")
+
+    # ---- wrap dataset ----
+    test_ds = ReadDictDataset(test_ds, x_keys=x_keys, y_keys=y_keys)
+
+    # ---- vocab fallback ----
+    if vocab is None and hasattr(data, "vocab"):
+        vocab = data.vocab
+
+    if vocab:
+        test_ds = _patch_dataset(test_ds, vocab=vocab)
+
+    # ---- copy validation dataloader settings ----
+    base_kwargs = {
+        "batch_size": valid_dl.batch_size,
+        "num_workers": valid_dl.num_workers,
+        "pin_memory": getattr(valid_dl, "pin_memory", False),
+        "drop_last": False,
+        "shuffle": False,
+    }
+
+    # optional attributes if present
+    for attr in ["prefetch_factor", "persistent_workers"]:
+        if hasattr(valid_dl, attr):
+            base_kwargs[attr] = getattr(valid_dl, attr)
+
+    # ---- allow explicit overrides ----
+    base_kwargs.update(dl_kwargs)
+
+    # ---- build dataloader ----
+    test_dl = torchDataLoader(
+        dataset=test_ds,
+        **base_kwargs
+    )
+
+    # ---- fastai compatibility patch ----
+    test_dl = _patch_dataloader(test_dl)
+
+    return test_dl
+
+# %% ../nbs/01_data.ipynb #29793415
+def test_biodataloader(dls:DataLoaders, 
+                       test_data:str|Path|pd.DataFrame|monaiDataset, 
+                       with_labels=True, 
+                       csv_header='infer', 
+                       csv_delimiter=None, 
+                       csv_quoting=0
+                       ):
     "Test a `DataLoader` on a set of `test_files` and return the results as a list of tuples containing the file name and the corresponding input and target tensors."
-    if isinstance(test_path, pd.DataFrame):
+    if isinstance(test_data, pd.DataFrame):
         # Handle DataFrame case directly
-        test_data = dls.test_dl(test_path, with_labels=with_labels)
-    elif isinstance(test_path, (str, Path)):
-        test_path = Path(test_path)
+        test_dl = dls.test_dl(test_data, with_labels=with_labels)
+    elif isinstance(test_data, (str, Path)):
+        test_data = Path(test_data)
         # Check if it's a CSV file
-        if test_path.suffix.lower() == '.csv':
+        if test_data.suffix.lower() == '.csv':
             # Handle CSV file case
-            df = pd.read_csv(test_path, header=csv_header, delimiter=csv_delimiter, quoting=csv_quoting)
-            test_data = dls.test_dl(df, with_labels=with_labels)
+            df = pd.read_csv(test_data, header=csv_header, delimiter=csv_delimiter, quoting=csv_quoting)
+            test_dl = dls.test_dl(df, with_labels=with_labels)
         else:
             # Handle non-CSV file case - get image files from directory
-            test_data = dls.test_dl(get_image_files(test_path), with_labels=with_labels)
+            test_dl = dls.test_dl(get_image_files(test_data), with_labels=with_labels)
+    elif isinstance(test_data, monaiDataset):
+        test_dl = _create_test_dl(test_data, dls)
     
-    return test_data
+    return test_dl
 
 # %% ../nbs/01_data.ipynb #12e03f1b
 from fastai.vision.all import get_image_files
@@ -853,7 +1435,7 @@ def show_batch(x: BioImageBase,     # The input image data.
                y: BioImageBase,     # The target image data.
                samples,             # List of sample indices to display.
                ctxs=None,           # List of contexts for displaying images. If None, create new ones using get_grid().
-               max_n: int=10,       # Maximum number of samples to display. Default is 10.
+               max_n: int=9,       # Maximum number of samples to display. Default is 9.
                nrows: int|None=None,     # Number of rows in the grid if ctxs are not provided.
                ncols: int|None=None,     # Number of columns in the grid if ctxs are not provided.
                figsize: tuple|None=None, # Figure size for the image display.
@@ -886,7 +1468,7 @@ def show_batch(x: BioImageBase,      # The input image data.
                y: TensorCategory,    # The target data (categorical labels).
                samples,              # List of sample indices to display.
                ctxs=None,            # List of contexts for displaying images. If None, create new ones using get_grid().
-               max_n: int=10,        # Maximum number of samples to display. Default is 10.
+               max_n: int=9,        # Maximum number of samples to display. Default is 9.
                nrows: int|None=None,      # Number of rows in the grid if ctxs are not provided.
                ncols: int|None=None,      # Number of columns in the grid if ctxs are not provided.
                figsize: tuple|None=None,  # Figure size for the image display.
@@ -916,9 +1498,80 @@ def show_batch(x: BioImageBase,      # The input image data.
     
     return ctxs
 
+# %% ../nbs/01_data.ipynb #bee716ba
+@typedispatch
+def show_batch(
+    x: list[MetaTensor|torchTensor],   # inputs
+    y: MetaTensor|torchTensor|list,    # targets
+    samples: list|None=None,           # List of sample indices to display.
+    ctxs=None,                         # List of contexts for displaying images. If None, create new ones using get_grid().
+    max_n: int=9,                      # Maximum number of samples to display. Default is 9.
+    nrows: int|None=None,      # Number of rows in the grid if ctxs are not provided.
+    ncols: int|None=None,      # Number of columns in the grid if ctxs are not provided.
+    figsize: tuple|None=None,  # Figure size for the image display.
+    vocab=None,
+    **kwargs
+):
+    """
+    Show `max_n` inputs and targets from a batch.
 
+    Supports both MetaTensor and torch.Tensor inputs.
+    Converts to BioImage/BioImageMulti automatically.
+    """
 
+    # -------------------------
+    # Create samples if not provided
+    # -------------------------
+    if samples is None:
 
+        # Ensure x is a list
+        if isinstance(x, (MetaTensor, torchTensor)):
+            if x.ndim == 4:        # batch tensor
+                x = [x[i] for i in range(len(x))]
+            else:
+                x = [x]
+
+        elif isinstance(x, list) and isinstance(x[0], (MetaTensor, torchTensor)) and x[0].ndim > 3:
+            # flatten batch dimension
+            x = [t[i] for t in x for i in range(t.shape[0])]
+
+        # -------------------------
+        # Convert tensors → BioImage
+        # -------------------------
+        cls = BioImage if x[0].shape[0] == 1 else BioImageMulti
+        x_bio = [Tensor2BioImage(cls)(t) for t in x]
+
+        # -------------------------
+        # Convert y to list
+        # -------------------------
+        if isinstance(y, (MetaTensor, torchTensor)):
+            if y.ndim == 0:
+                y_list = [int(y)]
+            else:
+                y_list = [int(y[i]) for i in range(len(y))]
+        else:
+            y_list = list(y)
+
+        if vocab is not None:
+            y_list = [vocab[o] for o in y_list]
+
+        samples = L(zip(x_bio, y_list))
+
+    # -------------------------
+    # Create grid if ctxs not provided
+    # -------------------------
+    if ctxs is None:
+        ctxs = get_grid(min(len(samples), max_n), nrows=nrows, ncols=ncols, figsize=figsize)
+
+    # -------------------------
+    # Display
+    # -------------------------
+    for i, ((img, lbl), ax) in enumerate(zip(samples, ctxs)):
+        if i >= max_n: break
+        img.show(ctx=ax, **kwargs)
+        ax.set_title(str(lbl), fontsize=10)
+
+    return ctxs
 
 # %% ../nbs/01_data.ipynb #c5cef986
 @typedispatch
@@ -984,6 +1637,300 @@ def show_results(x: BioImageBase,       # The input image data.
     
     return ctxs
 
+
+# %% ../nbs/01_data.ipynb #96d2aa11
+@typedispatch
+def show_results(dl: torchDataLoader,         # DataLoader containing the batch and optional vocab
+                 batch: list,                # The batch of data from the DataLoader (inputs, targets)
+                 preds: MetaTensor|torchTensor,          # Model predictions corresponding to the batch
+                 ctxs=None,                  # Optional: list of axes to plot on. If None, created automatically
+                 max_n: int=10,              # Maximum number of samples to display
+                 nrows: int|None=None,       # Number of rows in the grid if ctxs are not provided
+                 ncols: int|None=None,       # Number of columns in the grid if ctxs are not provided
+                 figsize: tuple|None=None,   # Figure size for the display grid
+                 **kwargs                     # Additional keyword arguments passed to `BioImage.show`
+                ):
+    """
+    Display a batch of images with their ground truth labels and predicted labels.
+
+    This version supports `BioImage` or `BioImageMulti` depending on input channels,
+    and will use `dl.vocab` to convert integer class indices to class names if available.
+
+    Args:
+        dl (torchDataLoader): DataLoader providing the batch and optional `vocab`.
+        batch (list): A tuple/list `(x, y)` containing input tensors and labels.
+        preds (MetaTensor): Model outputs for the batch.
+        ctxs (list, optional): Predefined plotting axes. If None, axes are created automatically.
+        max_n (int): Maximum number of samples to display.
+        nrows (int | None): Number of rows in the grid if ctxs not provided.
+        ncols (int | None): Number of columns in the grid if ctxs not provided.
+        figsize (tuple | None): Figure size for the display grid.
+        **kwargs: Additional arguments to pass to `BioImage.show`.
+
+    Returns:
+        list: List of matplotlib axes containing the displayed images with labels.
+    """
+
+    x, y = batch
+
+    # Choose the right BioImage class based on channels
+    cls = BioImage if x[0].shape[0]==1 else BioImageMulti
+    x_bio = [Tensor2BioImage(cls)(t) for t in x]
+
+    # Convert predictions and labels to lists
+    y_list = y.tolist()
+    preds_list = TensorCategory(preds).tolist()
+
+    # Map indices to class names if DataLoader has vocab
+    if hasattr(dl, 'vocab') and dl.vocab is not None:
+        y_list = [dl.vocab[o] for o in y_list]
+        preds_list = [dl.vocab[o] for o in preds_list]
+
+    # Combine images and true labels
+    samples = L(zip(x_bio, y_list))
+
+    # Create grid of axes if not provided
+    if ctxs is None:
+        ctxs = get_grid(min(len(samples), max_n), nrows=nrows, ncols=ncols, 
+                        figsize=figsize, title="Target / Prediction")
+
+    # Display images and overlay text for GT vs Pred
+    for i, ((img, true_label), pred_label) in enumerate(zip(samples, preds_list)):
+        if i >= max_n: break
+        ax = ctxs[i]
+        img.show(ctx=ax, **kwargs)
+        color = 'green' if true_label == pred_label else 'red'
+        ax.set_title(f"{true_label} / {pred_label}", color=color, fontsize=10)
+
+    return ctxs
+
+# %% ../nbs/01_data.ipynb #bac1e22a
+def split_dataframe(
+    input_data: Union[str, pd.DataFrame],
+    train_fraction: float = 0.8,
+    valid_fraction: float = 0.1,
+    split_column: Optional[str] = None,
+    stratify: bool = False,
+    add_is_valid: bool = False,
+    train_path: str = "train.csv",
+    test_path: str = "test.csv",
+    valid_path: str = "valid.csv",
+    data_save_path: Optional[str] = None,
+    random_seed: Optional[int] = None,
+    shuffle: bool = True,
+) -> tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]:
+    """
+    Split a dataset into train, test and optional validation sets.
+
+    Parameters
+    ----------
+    input_data : str | DataFrame
+        CSV file path or pandas DataFrame.
+    train_fraction : float
+        Fraction of samples for training.
+    valid_fraction : float
+        Fraction of samples for validation.
+    split_column : str, optional
+        Column containing predefined split labels ("train", "test", "validation").
+    stratify : bool
+        Stratify random splits by split_column.
+    add_is_valid : bool
+        Add an `is_valid` column to the train set instead of saving a separate validation file.
+    data_save_path : str, optional
+        Directory where CSV files will be saved.
+
+    Returns
+    -------
+    (train_df, test_df, valid_df)
+    """
+
+    # Load dataset
+    if isinstance(input_data, str):
+        df = pd.read_csv(input_data)
+    elif isinstance(input_data, pd.DataFrame):
+        df = input_data.copy()
+    else:
+        raise TypeError("input_data must be a file path or pandas DataFrame")
+
+    valid_df: Optional[pd.DataFrame] = None
+
+    if split_column and split_column in df.columns:
+        # Predefined split
+        print("Using predefined dataset split")
+
+        train_df = df[df[split_column] == "train"].copy()
+        test_df = df[df[split_column] == "test"].copy()
+
+        if "validation" in df[split_column].unique():
+            valid_df = df[df[split_column] == "validation"].copy()
+
+    else:
+        # Random split
+        test_fraction = 1 - train_fraction - valid_fraction
+
+        if test_fraction <= 0:
+            raise ValueError("train_fraction + valid_fraction must be < 1")
+
+        stratify_col = df[split_column] if stratify and split_column else None
+
+        train_df, test_df = train_test_split(
+            df,
+            test_size=test_fraction,
+            stratify=stratify_col,
+            random_state=random_seed,
+            shuffle=shuffle,
+        )
+
+        if (add_is_valid == False) and (valid_fraction > 0):
+
+            valid_ratio = valid_fraction / (train_fraction + valid_fraction)
+
+            stratify_col = (
+                train_df[split_column] if stratify and split_column else None
+            )
+
+            train_df, valid_df = train_test_split(
+                train_df,
+                test_size=valid_ratio,
+                stratify=stratify_col,
+                random_state=random_seed,
+                shuffle=shuffle,
+            )
+
+    # Add validation flag
+    if add_is_valid and (valid_df is None) and (valid_fraction > 0):
+
+        train_df = train_df.copy()
+        train_df["is_valid"] = 0
+
+        valid_idx = train_df.sample(
+            frac=valid_fraction / (train_fraction + valid_fraction),
+            random_state=random_seed,
+        ).index
+        train_df.loc[valid_idx, "is_valid"] = 1
+
+        train_df["is_valid"] = train_df["is_valid"].astype(int)
+        print(f"'is_valid' column added to train dataframe for validation samples.")
+
+    # Save datasets
+    if data_save_path:
+
+        os.makedirs(data_save_path, exist_ok=True)
+
+        train_file = os.path.join(data_save_path, train_path)
+        test_file = os.path.join(data_save_path, test_path)
+
+        train_df.to_csv(train_file, index=False)
+        test_df.to_csv(test_file, index=False)
+
+        if valid_df is not None and not add_is_valid:
+            valid_file = os.path.join(data_save_path, valid_path)
+            valid_df.to_csv(valid_file, index=False)
+
+        print("Datasets saved to %s", data_save_path)
+
+    return train_df, test_df, valid_df
+
+# %% ../nbs/01_data.ipynb #7d94df40
+def add_columns_to_csv(csv_path, # Path to the input CSV file
+                       column_data, # Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.
+                       output_path=None, # Path to save the updated CSV file. If None, it overwrites the input CSV file.
+                       ):
+    """
+    Adds one or more new columns to an existing CSV file.
+
+    """
+    # Load the CSV file into a DataFrame
+    df = pd.read_csv(csv_path)
+
+    # Iterate over each column and add to the DataFrame
+    for column_name, column_values in column_data.items():
+        # Check if column_values is a list and matches DataFrame length
+        if isinstance(column_values, list) and len(column_values) != len(df):
+            raise ValueError(f"Length of values for column '{column_name}' does not match the number of rows in the CSV.")
+        
+        # Add the new column
+        df[column_name] = column_values
+
+    # Save the updated DataFrame to a CSV file
+    output_path = output_path or csv_path
+    df.to_csv(output_path, index=False)
+
+    print(f"Columns {list(column_data.keys())} added successfully. Updated file saved to '{output_path}'")
+
+# %% ../nbs/01_data.ipynb #1e42b2d6
+def build_df(
+    filenames: Union[list[str|Path], L],                 # List of file names to process
+    *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
+    function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
+    output_csv: Optional[str|Path] = None,               # If provided, saves the full dataframe to this CSV path.
+    split: bool = False,                            # If True, applies split_dataframe to the generated dataframe.
+    split_kwargs: Optional[dict] = None,            # Keyword arguments passed to split_dataframe.
+) -> Union[
+    pd.DataFrame,
+    tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]
+]:
+    
+    """
+    Create a DataFrame from filenames and one or more transformation functions.
+    """
+
+    if function_names and len(function_names) != len(functions):
+        raise ValueError("Length of function_names must match number of functions.")
+
+    # Determine column names
+    if function_names is None:
+        column_names = [
+            f.__name__ if hasattr(f, "__name__") else f"func_{i}"
+            for i, f in enumerate(functions)
+        ]
+    else:
+        column_names = function_names
+
+    # Build dataframe
+    data = {"filename": filenames}
+
+    for col_name, func in zip(column_names, functions):
+        data[col_name] = [func(fname) for fname in filenames]
+
+    df = pd.DataFrame(data)
+
+    # Save full dataset if requested
+    if output_csv:
+        df.to_csv(output_csv, index=False)
+
+    # Apply splitting if requested
+    if split:
+        split_kwargs = split_kwargs or {}
+        return split_dataframe(df, **split_kwargs)
+
+    return df
+
+# %% ../nbs/01_data.ipynb #02b16df9
+def build_df_from_folder(
+    path: str|Path,
+    *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
+    function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
+    output_csv: Optional[str|Path] = None,               # If provided, saves the full dataframe to this CSV path.
+    subfolders: str|list[str]|None = None,
+    recurse: bool = True,
+    filename_filter: str|re.Pattern|Callable[[str], bool]|None = None,
+    split: bool = False,                            # If True, applies split_dataframe to the generated dataframe.
+    split_kwargs: Optional[dict] = None,            # Keyword arguments passed to split_dataframe.
+) -> Union[
+    pd.DataFrame,
+    tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]
+]:
+    """
+    Create a DataFrame from filenames and one or more transformation functions.
+    """
+
+    filenames = get_images(path, subfolders, recurse, filename_filter)
+    return build_df(filenames, *functions, 
+                    function_names=function_names,
+                    output_csv=output_csv, 
+                    split=split, 
+                    split_kwargs=split_kwargs)
 
 # %% ../nbs/01_data.ipynb #bf008823
 def extract_patches(
