@@ -7,8 +7,8 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock',
            'BioDataLoaders', 'ReadDictDataset', 'from_monai', 'from_monai_ds', 'register_source', 'register_dataset',
            'register_loader', 'register_task', 'route_kwargs', 'detect_source', 'build_source', 'DataFrameSource',
-           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'DataBlockBuilder',
-           'MonaiTransformMixin', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'test_cache_datasetbuilder',
+           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
+           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'test_cache_datasetbuilder',
            'FastaiLoader', 'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch',
            'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder',
            'extract_patches', 'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string',
@@ -1156,14 +1156,24 @@ import inspect
 
 # %% ../nbs/01_data.ipynb #bf806c0b
 def route_kwargs(func, kwargs):
+    """
+    Filter a dictionary of kwargs to only include those accepted by `func`.
 
+    Handles:
+      - Explicit parameters
+      - Functions with **kwargs (all extra keys are allowed)
+    """
     sig = inspect.signature(func)
+    accepts_kwargs = any(
+        p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
+    )
 
-    return {
-        k: v
-        for k, v in kwargs.items()
-        if k in sig.parameters
-    }
+    if accepts_kwargs:
+        # If func accepts **kwargs, pass everything
+        return kwargs.copy()
+    else:
+        # Otherwise, filter to matching parameters only
+        return {k: v for k, v in kwargs.items() if k in sig.parameters}
 
 # %% ../nbs/01_data.ipynb #238e315d
 import pandas as pd
@@ -1429,103 +1439,12 @@ class DataFrameSplitMixin:
 
         return datalist_train, datalist_valid
 
-# %% ../nbs/01_data.ipynb #8eaded46
-@register_dataset("dataset", backend="fastai")
-class DataBlockBuilder(DataFrameSplitMixin):
-
-    DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
-    DEFAULT_TARGET_COLS = ["label", "mask", "y", "target"]
-
-    def __init__(
-        self,
-        blocks=None,
-        dl_type=None,
-        get_items=None,
-        get_x=None,
-        get_y=None,
-        getters=None,
-        n_inp=None,
-        transforms=None,
-        val_transforms=None,
-        batch_transforms=None,
-        val_batch_transforms=None,
-        splitter=None,
-        valid_pct=0.2,
-        seed=None,
-        stratify=None, 
-        train_size=None,
-        shuffle:bool=True,
-        valid_col="is_valid",
-    ):
-
-        store_attr()
-
-    # --------------------------------------------------
-    def _infer_columns(self, df):
-        cols = list(df.columns)
-        x_col = next((c for c in self.DEFAULT_INPUT_COLS if c in cols), cols[0])
-        y_col = next((c for c in self.DEFAULT_TARGET_COLS if c in cols), None)
-        return x_col, y_col
-
-    # --------------------------------------------------
-    def _wrap_pipeline(self, transforms, val_transforms):
-        """
-        Wrap transforms and val_transforms in Pipelines.
-        If val_transforms is None, fallback to transforms.
-        """
-        train_pipeline = Pipeline(transforms) if transforms is not None else None
-        valid_pipeline = Pipeline(val_transforms) if val_transforms is not None else train_pipeline
-        return train_pipeline, valid_pipeline
-
-    # --------------------------------------------------
-    def build(self, df):
-
-        x_col, y_col = self._infer_columns(df)
-        get_x = self.get_x or ColReader(x_col)
-        get_y = self.get_y or (ColReader(y_col) if y_col else None)
-
-        blocks = self.blocks
-        if blocks is None:
-            if y_col:
-                blocks = (
-                    BioImageBlock(cls=BioImage),
-                    BioImageBlock(cls=BioImage),
-                )
-            else:
-                blocks = (BioImageBlock(cls=BioImage),)
-
-        splitter = self._resolve_splitter(df)
-
-        # Wrap train/valid transforms
-        item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
-        batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
-
-        datablock = DataBlock(
-            blocks=blocks,
-            dl_type=self.dl_type,
-            get_items=lambda x: x if self.get_items is None else self.get_items,
-            get_x=get_x,
-            get_y=get_y,
-            getters=self.getters,
-            n_inp=self.n_inp,
-            item_tfms=item_tfms,
-            batch_tfms=batch_tfms,
-            splitter=splitter,
-        )
-
-        # Attach validation transforms to datablock for future DataLoader use
-        datablock._val_item_tfms = val_item_tfms
-        datablock._val_batch_tfms = val_batch_tfms
-
-        return datablock
-
-# %% ../nbs/01_data.ipynb #9d4a3c59
+# %% ../nbs/01_data.ipynb #f65b5ddc
 class MonaiTransformMixin:
     """Shared MONAI transform helpers."""
 
     # --------------------------------------------------
     def _prepare_transform(self, transform):
-        from monai.transforms import Compose
         if transform is None:
             return None
         if isinstance(transform, (list, tuple)):
@@ -1534,7 +1453,6 @@ class MonaiTransformMixin:
 
     # --------------------------------------------------
     def _is_random(self, t):
-        from monai.transforms import Randomizable
         return isinstance(t, Randomizable)
 
     # --------------------------------------------------
@@ -1580,6 +1498,103 @@ class MonaiTransformMixin:
 
         return Compose(deterministic)
 
+# %% ../nbs/01_data.ipynb #8eaded46
+@register_dataset("dataset", backend="fastai")
+class DataBlockBuilder(DataFrameSplitMixin):
+
+    DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
+    DEFAULT_TARGET_COLS = ["label", "mask", "y", "target"]
+
+    def __init__(
+        self,
+        blocks=None,
+        dl_type=None,
+        get_items=None,
+        get_x=None,
+        get_y=None,
+        getters=None,
+        n_inp=None,
+        transforms=None,
+        val_transforms=None,
+        batch_transforms=None,
+        val_batch_transforms=None,
+        splitter=None,
+        valid_pct=0.2,
+        seed=None,
+        stratify=None, 
+        train_size=None,
+        shuffle:bool=True,
+        valid_col="is_valid",
+        x_keys=None,
+        y_keys=None,
+    ):
+        store_attr()
+
+    # --------------------------------------------------
+    def _infer_columns(self, df):
+        """
+        Determine input/output column names. If x_col/y_col are explicitly provided,
+        use them; otherwise infer from DataFrame columns.
+        """
+        cols = list(df.columns)
+        x_col = self.x_keys or next((c for c in self.DEFAULT_INPUT_COLS if c in cols), cols[0])
+        y_col = self.y_keys or next((c for c in self.DEFAULT_TARGET_COLS if c in cols), None)
+        return x_col, y_col
+
+    # --------------------------------------------------
+    def _wrap_pipeline(self, transforms, val_transforms):
+        """
+        Wrap transforms and val_transforms in Pipelines.
+        If val_transforms is None, fallback to transforms.
+        """
+        train_pipeline = Pipeline(transforms) if transforms is not None else None
+        valid_pipeline = Pipeline(val_transforms) if val_transforms is not None else train_pipeline
+        return train_pipeline, valid_pipeline
+
+    # --------------------------------------------------
+    def build(self, df):
+        """
+        Build a FastAI DataBlock from a DataFrame.
+        """
+        x_col, y_col = self._infer_columns(df)
+        get_x = self.get_x or ColReader(x_col)
+        get_y = self.get_y or (ColReader(y_col) if y_col else None)
+
+        blocks = self.blocks
+        if blocks is None:
+            if y_col:
+                blocks = (
+                    BioImageBlock(cls=BioImage),
+                    BioImageBlock(cls=BioImage),
+                )
+            else:
+                blocks = (BioImageBlock(cls=BioImage),)
+
+        splitter = self._resolve_splitter(df)
+
+        # Wrap train/valid transforms
+        item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
+        batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
+
+        datablock = DataBlock(
+            blocks=blocks,
+            dl_type=self.dl_type,
+            get_items=lambda x: x if self.get_items is None else self.get_items,
+            get_x=get_x,
+            get_y=get_y,
+            getters=self.getters,
+            n_inp=self.n_inp,
+            item_tfms=item_tfms,
+            batch_tfms=batch_tfms,
+            splitter=splitter,
+        )
+
+        # Attach validation transforms for DataLoader use
+        datablock._val_item_tfms = val_item_tfms
+        datablock._val_batch_tfms = val_batch_tfms
+
+        return datablock, df
+
 # %% ../nbs/01_data.ipynb #5b2ee761
 @register_dataset("monaidataset", backend="monai")
 class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
@@ -1591,12 +1606,9 @@ class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
         store_attr()
 
     # --------------------------------------------------
-    def build(self, df, output_format="dataset"):
+    def build(self, df):
 
         datalist_train, datalist_valid = self._split_dataframe(df)
-
-        if output_format == "datalist":
-            return datalist_train, datalist_valid
 
         train_transform = self._prepare_transform(self.transforms)
 
@@ -1652,12 +1664,9 @@ class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
         return train_kwargs, valid_kwargs
 
     # --------------------------------------------------
-    def build(self, df, output_format="dataset"):
+    def build(self, df):
 
         datalist_train, datalist_valid = self._split_dataframe(df)
-
-        if output_format == "datalist":
-            return datalist_train, datalist_valid
 
         train_transform = self._prepare_transform(self.transforms)
 
@@ -1702,15 +1711,7 @@ def test_cache_datasetbuilder():
     assert len(train_ds) == 2, "train_ds should contain 2 items"
     assert len(valid_ds) == 2, "valid_ds should contain 2 items"
 
-    # --- Test 2: datalist output ---
-    datalist_train, datalist_valid = builder.build(df, output_format="datalist")
-    assert isinstance(datalist_train, list), "Train output should be list"
-    assert isinstance(datalist_valid, list), "Valid output should be list"
-    assert all(isinstance(x, dict) for x in datalist_train), "Each train item should be dict"
-    assert all(isinstance(x, dict) for x in datalist_valid), "Each valid item should be dict"
-    assert len(datalist_train) == 2 and len(datalist_valid) == 2, "Split lengths should match"
-
-    # --- Test 3: val_ prefixed kwargs ---
+    # --- Test 2: val_ prefixed kwargs ---
     builder2 = CacheDatasetBuilder(transforms=None, num_workers=1, val_num_workers=2)
     train_ds2, valid_ds2 = builder2.build(df)
     # Train uses train cache_rate
@@ -1718,7 +1719,7 @@ def test_cache_datasetbuilder():
     # Valid uses val_cache_rate
     assert valid_ds2.num_workers == 2
 
-    # --- Test 4: custom splitter ---
+    # --- Test 3: custom splitter ---
     custom_splitter = RandomSplitter(valid_pct=0.5, seed=42)
     builder3 = CacheDatasetBuilder(transforms=None, cache_rate=0.0, splitter=custom_splitter)
     train_ds3, valid_ds3 = builder3.build(df)
@@ -1733,41 +1734,70 @@ test_eq(test_cache_datasetbuilder(), "All CacheDatasetBuilder tests passed")
 @register_loader("fastai")
 class FastaiLoader:
 
-    def __init__(self, **dataloader_ops):
+    def __init__(
+        self,
+        batch_size=64,
+        shuffle=True,
+        num_workers=0,
+        device=None,
+        drop_last=False,
+        pin_memory=False,
+        persistent_workers=False,
+        show_summary=False,
+    ):
         """
         FastAI-style DataLoader wrapper.
 
         Parameters
         ----------
-        **dataloader_ops : dict
-            Keyword arguments passed to datablock.dataloaders(), e.g.
-            bs, num_workers, batch_tfms, item_tfms, shuffle, etc.
+        bs : int
+            Batch size
+        shuffle : bool
+            Shuffle training dataset
+        num_workers : int
+            Number of worker processes
+        device : torch.device or str
+            Target device
+        drop_last : bool
+            Drop last incomplete batch
+        pin_memory : bool
+            Use pinned memory
+        persistent_workers : bool
+            Keep workers alive between epochs
         """
-        self.dataloader_ops = dataloader_ops
+        store_attr()
 
-    def build(self, datablock, data_source, show_summary=False):
-        """
-        Build FastAI DataLoaders from a BioDataBlock.
+    # --------------------------------------------------
+    def build(self, datablock, data_source):
 
-        Parameters
-        ----------
-        datablock : BioDataBlock
-            Initialized block with blocks, get_x/get_y, splitter, etc.
-        data_source : Any
-            Raw data input: folder, dataframe, CSV, or datalist
-        show_summary : bool
-            Whether to print a summary of the DataLoader
-        """
+        # Create DataLoaders
+        dls = datablock.dataloaders(
+            data_source,
+            bs=self.batch_size,
+            shuffle=self.shuffle,
+            num_workers=self.num_workers,
+            device=self.device,
+            drop_last=self.drop_last,
+            pin_memory=self.pin_memory,
+            persistent_workers=self.persistent_workers,
+        )
 
-        # Create the DataLoader
-        dataloader = datablock.dataloaders(data_source, **self.dataloader_ops)
+        # --------------------------------------------------
+        # Inject validation transforms if present
+        # --------------------------------------------------
+        if hasattr(datablock, "_val_item_tfms") and datablock._val_item_tfms is not None:
+            dls.valid.after_item = datablock._val_item_tfms
 
-        # Optionally show a summary
-        if show_summary:
-            bs = self.dataloader_ops.get('bs', 1)
-            print(datablock.summary(data_source, bs=bs))
+        if hasattr(datablock, "_val_batch_tfms") and datablock._val_batch_tfms is not None:
+            dls.valid.after_batch = datablock._val_batch_tfms
 
-        return dataloader
+        # --------------------------------------------------
+        # Optional summary
+        # --------------------------------------------------
+        if self.show_summary:
+            print(datablock.summary(data_source, bs=self.batch_size))
+
+        return dls
 
 # %% ../nbs/01_data.ipynb #c8037343
 def _create_test_dl(
