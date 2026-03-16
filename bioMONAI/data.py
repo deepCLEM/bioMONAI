@@ -1542,54 +1542,41 @@ class MonaiTransformMixin:
         """
         Convert random transforms into deterministic equivalents.
         """
-        
+
         if transforms is None:
             return None
 
+        # Normalize to list
         if isinstance(transforms, Compose):
             transforms = transforms.transforms
 
         deterministic = []
 
+        # Mapping of random -> deterministic replacements
+        replacements = {
+            "RandSpatialCrop": lambda t: CenterSpatialCrop(
+                roi_size=t.roi_size,
+                lazy=getattr(t, "lazy", False),
+            ),
+            "RandScaleCrop": lambda t: CenterScaleCrop(
+                roi_scale=t.roi_scale,
+                lazy=getattr(t, "lazy", False),
+            ),
+        }
+
         for t in transforms:
             name = t.__class__.__name__
 
-            # explicit overrides
-            if name == "RandSpatialCrop":
-                deterministic.append(
-                    CenterSpatialCrop(
-                        roi_size=t.roi_size,
-                        lazy=getattr(t, "lazy", False)
-                    )
-                )
+            # Replace known random transforms with deterministic versions
+            if name in replacements:
+                deterministic.append(replacements[name](t))
                 continue
 
-            if name == "RandScaleCrop":
-                deterministic.append(
-                    CenterScaleCrop(
-                        roi_scale=t.roi_scale,
-                        lazy=getattr(t, "lazy", False)
-                    )
-                )
-                continue
-
+            # Skip other random transforms
             if self._is_random(t):
-                det_name = name.replace("Rand", "", 1)
+                continue
 
-                if hasattr(mt, det_name):
-                    det_cls = getattr(mt, det_name)
-                    sig = inspect.signature(det_cls.__init__)
-
-                    params = {
-                        k: v
-                        for k, v in vars(t).items()
-                        if k in sig.parameters
-                    }
-
-                    deterministic.append(det_cls(**params))
-
-            else:
-                deterministic.append(t)
+            deterministic.append(t)
 
         return Compose(deterministic)
 
