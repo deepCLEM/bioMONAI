@@ -7,11 +7,12 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock',
            'BioDataLoaders', 'ReadDictDataset', 'from_monai', 'from_monai_ds', 'register_source', 'register_dataset',
            'register_loader', 'register_task', 'route_kwargs', 'detect_source', 'build_source', 'DataFrameSource',
-           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataBlockBuilder', 'MonaiDatasetBuilder',
-           'CacheDatasetBuilder', 'test_cache_datasetbuilder', 'FastaiLoader', 'test_biodataloader', 'get_images',
-           'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe',
-           'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches', 'save_patches_grid',
-           'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'DataBlockBuilder',
+           'MonaiTransformMixin', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'test_cache_datasetbuilder',
+           'FastaiLoader', 'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch',
+           'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder',
+           'extract_patches', 'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string',
+           'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -23,6 +24,7 @@ import random
 import re
 import types
 from typing import Callable, List, Optional, Union
+import inspect
 
 # =================================
 # Third-party scientific stack
@@ -75,6 +77,10 @@ from fastai.vision.all import (
 from monai.data import Dataset as MonaiDataset, CacheDataset, PersistentDataset, SmartCacheDataset
 from monai.data.utils import pickle_hashing
 from monai.transforms import Compose
+from monai import transforms as mt
+from monai.transforms.transform import Randomizable
+from monai.transforms import Compose
+from monai.transforms import CenterSpatialCrop, CenterScaleCrop
 
 # =================================
 # bioMONAI
@@ -1391,9 +1397,41 @@ class CallableSource:
 
         return df
 
+# %% ../nbs/01_data.ipynb #18522c79
+class DataFrameSplitMixin:
+    """Shared logic for splitting DataFrames into MONAI datalists."""
+
+    # --------------------------------------------------
+    def _resolve_splitter(self, df):
+        if self.splitter:
+            return self.splitter
+        if self.valid_col in df.columns:
+            return ColSplitter(self.valid_col)
+
+        return TrainTestSplitter(
+            test_size=self.valid_pct,
+            random_state=self.seed,
+            stratify=self.stratify,
+            train_size=self.train_size,
+            shuffle=self.shuffle,
+        )
+
+    # --------------------------------------------------
+    def _split_dataframe(self, df):
+        splitter = self._resolve_splitter(df)
+        train_idx, valid_idx = splitter(df)
+
+        df_train = df.iloc[train_idx].copy()
+        df_valid = df.iloc[valid_idx].copy()
+
+        datalist_train = df_train.to_dict("records")
+        datalist_valid = df_valid.to_dict("records")
+
+        return datalist_train, datalist_valid
+
 # %% ../nbs/01_data.ipynb #8eaded46
 @register_dataset("dataset", backend="fastai")
-class DataBlockBuilder:
+class DataBlockBuilder(DataFrameSplitMixin):
 
     DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
     DEFAULT_TARGET_COLS = ["label", "mask", "y", "target"]
@@ -1428,20 +1466,6 @@ class DataBlockBuilder:
         x_col = next((c for c in self.DEFAULT_INPUT_COLS if c in cols), cols[0])
         y_col = next((c for c in self.DEFAULT_TARGET_COLS if c in cols), None)
         return x_col, y_col
-
-    # --------------------------------------------------
-    def _resolve_splitter(self, df):
-        if self.splitter:
-            return self.splitter
-        if self.valid_col in df.columns:
-            return ColSplitter(self.valid_col)
-        return TrainTestSplitter(
-            test_size=self.valid_pct, 
-            random_state=self.seed, 
-            stratify=self.stratify, 
-            train_size=self.train_size, 
-            shuffle=self.shuffle
-        )
 
     # --------------------------------------------------
     def _wrap_pipeline(self, transforms, val_transforms):
@@ -1495,84 +1519,126 @@ class DataBlockBuilder:
 
         return datablock
 
+# %% ../nbs/01_data.ipynb #9d4a3c59
+class MonaiTransformMixin:
+    """Shared MONAI transform helpers."""
+
+    # --------------------------------------------------
+    def _prepare_transform(self, transform):
+        from monai.transforms import Compose
+        if transform is None:
+            return None
+        if isinstance(transform, (list, tuple)):
+            return Compose(transform)
+        return transform
+
+    # --------------------------------------------------
+    def _is_random(self, t):
+        from monai.transforms import Randomizable
+        return isinstance(t, Randomizable)
+
+    # --------------------------------------------------
+    def _make_deterministic_transforms(self, transforms):
+        """
+        Convert random transforms into deterministic equivalents.
+        """
+        
+        if transforms is None:
+            return None
+
+        if isinstance(transforms, Compose):
+            transforms = transforms.transforms
+
+        deterministic = []
+
+        for t in transforms:
+            name = t.__class__.__name__
+
+            # explicit overrides
+            if name == "RandSpatialCrop":
+                deterministic.append(
+                    CenterSpatialCrop(
+                        roi_size=t.roi_size,
+                        lazy=getattr(t, "lazy", False)
+                    )
+                )
+                continue
+
+            if name == "RandScaleCrop":
+                deterministic.append(
+                    CenterScaleCrop(
+                        roi_scale=t.roi_scale,
+                        lazy=getattr(t, "lazy", False)
+                    )
+                )
+                continue
+
+            if self._is_random(t):
+                det_name = name.replace("Rand", "", 1)
+
+                if hasattr(mt, det_name):
+                    det_cls = getattr(mt, det_name)
+                    sig = inspect.signature(det_cls.__init__)
+
+                    params = {
+                        k: v
+                        for k, v in vars(t).items()
+                        if k in sig.parameters
+                    }
+
+                    deterministic.append(det_cls(**params))
+
+            else:
+                deterministic.append(t)
+
+        return Compose(deterministic)
+
 # %% ../nbs/01_data.ipynb #5b2ee761
 @register_dataset("monaidataset", backend="monai")
-class MonaiDatasetBuilder:
-    """
-    Builds MONAI Datasets from a DataFrame.
+class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
 
-    Features:
-    - Infers input and target columns automatically (via datalist keys).
-    - Supports splitters (ColSplitter, TrainTestSplitter, etc.).
-    - Converts each split into a MONAI Dataset.
-    - Train/validation can have separate transform or other kwargs (val_ prefix).
-    """
-
-    def __init__(self, transforms=None, val_transforms=None, splitter=None, valid_pct=0.2, seed=None,
-                 stratify=None, train_size=None, shuffle=True, valid_col="is_valid"):
+    def __init__(self, transforms=None, val_transforms=None,
+                 splitter=None, valid_pct=0.2, seed=None,
+                 stratify=None, train_size=None,
+                 shuffle=True, valid_col="is_valid"):
         store_attr()
 
     # --------------------------------------------------
-    def _resolve_splitter(self, df):
-        if self.splitter:
-            return self.splitter
-        if self.valid_col in df.columns:
-            return ColSplitter(self.valid_col)
-        return TrainTestSplitter(test_size=self.valid_pct,
-                                 random_state=self.seed,
-                                 stratify=self.stratify,
-                                 train_size=self.train_size,
-                                 shuffle=self.shuffle)
-
-    # --------------------------------------------------
-    def _prepare_transform(self, transforms):
-        # Wrap a list of transforms into MONAI Compose automatically
-        if transforms is None:
-            return None
-        if isinstance(transforms, (list, tuple)):
-            return Compose(transforms)
-        return transforms
-
-    # --------------------------------------------------
     def build(self, df, output_format="dataset"):
-        splitter = self._resolve_splitter(df)
-        train_idx, valid_idx = splitter(df)
 
-        df_train = df.iloc[train_idx].copy()
-        df_valid = df.iloc[valid_idx].copy()
-
-        datalist_train = df_train.to_dict("records")
-        datalist_valid = df_valid.to_dict("records")
+        datalist_train, datalist_valid = self._split_dataframe(df)
 
         if output_format == "datalist":
             return datalist_train, datalist_valid
 
-        # Wrap transforms
-        train_transforms = self._prepare_transform(self.transforms)
-        valid_transforms = self._prepare_transform(getattr(self, "val_transform", self.transforms))
+        train_transform = self._prepare_transform(self.transforms)
 
-        train_ds = MonaiDataset(datalist_train, transform=train_transforms)
-        valid_ds = MonaiDataset(datalist_valid, transform=valid_transforms)
+        if self.val_transforms is None:
+            valid_transform = self._make_deterministic_transforms(train_transform)
+        else:
+            valid_transform = self._prepare_transform(self.val_transforms)
+
+        train_ds = MonaiDataset(
+            datalist_train,
+            transform=train_transform
+        )
+
+        valid_ds = MonaiDataset(
+            datalist_valid,
+            transform=valid_transform
+        )
 
         return train_ds, valid_ds
 
 # %% ../nbs/01_data.ipynb #ef50150b
 @register_dataset("cache", backend="monai")
-class CacheDatasetBuilder:
-    """
-    Builds MONAI CacheDatasets from a DataFrame or datalist.
-
-    Features:
-    - Automatically supports input/target columns from DataFrame.
-    - Supports splitters (ColSplitter, TrainTestSplitter, etc.).
-    - Train and valid datasets can have separate kwargs (val_ prefix).
-    - Accepts explicit `transforms` and `val_transforms`.
-    - Returns train/valid CacheDataset objects.
-    """
+class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
 
     def __init__(self, splitter=None, valid_pct=0.2, seed=None,
-                 stratify=None, train_size=None, shuffle=True, valid_col="is_valid",
-                 transforms=None, val_transforms=None, **dataset_kwargs):
+                 stratify=None, train_size=None, shuffle=True,
+                 valid_col="is_valid", transforms=None,
+                 val_transforms=None, **dataset_kwargs):
+
         self.splitter = splitter
         self.valid_pct = valid_pct
         self.seed = seed
@@ -1583,95 +1649,49 @@ class CacheDatasetBuilder:
 
         self.transforms = transforms
         self.val_transforms = val_transforms
-
-        # Other CacheDataset kwargs
         self.dataset_kwargs = dataset_kwargs
 
     # --------------------------------------------------
-    def _resolve_splitter(self, df):
-        if self.splitter:
-            return self.splitter
-        if self.valid_col in df.columns:
-            return ColSplitter(self.valid_col)
-        return TrainTestSplitter(test_size=self.valid_pct,
-                                 random_state=self.seed,
-                                 stratify=self.stratify,
-                                 train_size=self.train_size,
-                                 shuffle=self.shuffle)
-
-    # --------------------------------------------------
     def _split_kwargs(self):
-        """
-        Separate dataset kwargs into train vs valid.
-        `val_` prefix is applied to validation kwargs.
-        """
-        train_kwargs = {}
-        valid_kwargs = {}
+        train_kwargs, valid_kwargs = {}, {}
 
         for k, v in self.dataset_kwargs.items():
             if k.startswith("val_"):
                 valid_kwargs[k[4:]] = v
             else:
                 train_kwargs[k] = v
-                valid_kwargs.setdefault(k, v)  # default for validation
+                valid_kwargs.setdefault(k, v)
 
         return train_kwargs, valid_kwargs
 
     # --------------------------------------------------
-    def _prepare_transform(self, transform):
-        """
-        Wrap list/tuple of transforms into MONAI Compose if needed.
-        """
-        from monai.transforms import Compose
-        if transform is None:
-            return None
-        if isinstance(transform, (list, tuple)):
-            return Compose(transform)
-        return transform
-
-    # --------------------------------------------------
     def build(self, df, output_format="dataset"):
-        """
-        Convert a DataFrame into train/valid MONAI CacheDataset.
 
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data source containing input/target columns.
-        output_format : str
-            "dataset" (default) returns MONAI CacheDataset objects.
-            "datalist" returns list-of-dict format.
-
-        Returns
-        -------
-        train_ds, valid_ds : CacheDataset or tuple of datalists
-        """
-
-        # Split indices
-        splitter = self._resolve_splitter(df)
-        train_idx, valid_idx = splitter(df)
-
-        # Convert df to datalist
-        df_train = df.iloc[train_idx].copy()
-        df_valid = df.iloc[valid_idx].copy()
-        datalist_train = df_train.to_dict("records")
-        datalist_valid = df_valid.to_dict("records")
+        datalist_train, datalist_valid = self._split_dataframe(df)
 
         if output_format == "datalist":
             return datalist_train, datalist_valid
 
-        # Prepare transforms
         train_transform = self._prepare_transform(self.transforms)
-        valid_transform = self._prepare_transform(self.val_transforms or self.transforms)
 
-        # Separate kwargs for train/valid
+        if self.val_transforms is None:
+            valid_transform = self._make_deterministic_transforms(train_transform)
+        else:
+            valid_transform = self._prepare_transform(self.val_transforms)
+
         train_kwargs, valid_kwargs = self._split_kwargs()
-        train_kwargs["transform"] = train_transform
-        valid_kwargs["transform"] = valid_transform
 
-        # Build MONAI CacheDatasets
-        train_ds = CacheDataset(datalist_train, **train_kwargs)
-        valid_ds = CacheDataset(datalist_valid, **valid_kwargs)
+        train_ds = CacheDataset(
+            datalist_train,
+            transform=train_transform,
+            **train_kwargs
+        )
+
+        valid_ds = CacheDataset(
+            datalist_valid,
+            transform=valid_transform,
+            **valid_kwargs
+        )
 
         return train_ds, valid_ds
 
@@ -1688,7 +1708,7 @@ def test_cache_datasetbuilder():
     })
 
     # --- Test 1: default split using valid_col ---
-    builder = CacheDatasetBuilder(transform=None, cache_rate=0.0)
+    builder = CacheDatasetBuilder(transforms=None, cache_rate=0.0)
     train_ds, valid_ds = builder.build(df)
     assert isinstance(train_ds, CacheDataset), "train_ds should be CacheDataset"
     assert isinstance(valid_ds, CacheDataset), "valid_ds should be CacheDataset"
@@ -1704,7 +1724,7 @@ def test_cache_datasetbuilder():
     assert len(datalist_train) == 2 and len(datalist_valid) == 2, "Split lengths should match"
 
     # --- Test 3: val_ prefixed kwargs ---
-    builder2 = CacheDatasetBuilder(transform=None, num_workers=1, val_num_workers=2)
+    builder2 = CacheDatasetBuilder(transforms=None, num_workers=1, val_num_workers=2)
     train_ds2, valid_ds2 = builder2.build(df)
     # Train uses train cache_rate
     assert train_ds2.num_workers == 1
@@ -1712,9 +1732,8 @@ def test_cache_datasetbuilder():
     assert valid_ds2.num_workers == 2
 
     # --- Test 4: custom splitter ---
-    from fastai.data.transforms import RandomSplitter
     custom_splitter = RandomSplitter(valid_pct=0.5, seed=42)
-    builder3 = CacheDatasetBuilder(transform=None, cache_rate=0.0, splitter=custom_splitter)
+    builder3 = CacheDatasetBuilder(transforms=None, cache_rate=0.0, splitter=custom_splitter)
     train_ds3, valid_ds3 = builder3.build(df)
     assert len(train_ds3) == 2 and len(valid_ds3) == 2, "RandomSplitter with 50% should split evenly"
 
