@@ -1283,7 +1283,8 @@ class BioDataLoaders(DataLoaders):
     Basic wrapper around several `DataLoader`s with factory methods for biomedical imaging problems.
     Managing multiple `DataLoader` instances, `BioDataLoaders` handles data loading for different phases of model training, such as training, validation, and testing. It ensures efficient data handling and supports various batch processing strategies.
     """
-    def create(self,
+    @classmethod
+    def create(cls,
                data,
                val_data=None,
                task=None,
