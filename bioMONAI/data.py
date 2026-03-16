@@ -9,8 +9,8 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'register_loader', 'register_task', 'route_kwargs', 'detect_source', 'build_source', 'DataFrameSource',
            'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
            'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'test_cache_datasetbuilder',
-           'FastaiLoader', 'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch',
-           'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder',
+           'FastaiLoader', 'create_dls', 'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair',
+           'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder',
            'extract_patches', 'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string',
            'remove_singleton_dims', 'extract_substacks']
 
@@ -1798,6 +1798,101 @@ class FastaiLoader:
             print(datablock.summary(data_source, bs=self.batch_size))
 
         return dls
+
+# %% ../nbs/01_data.ipynb #6220db19
+def create_dls(cls,
+                data,
+                val_data=None,
+                task=None,
+                dataset=None,
+                backend=None,
+                show_summary=False,
+                **kwargs):
+    """
+    Create a complete DataLoader pipeline from raw data.
+
+    Parameters
+    ----------
+    data : Any
+        Raw training data input (folder, dataframe, CSV, list, callable)
+    val_data : Any, optional
+        Raw validation data. If provided, is combined with `data` and
+        `is_valid` column is added automatically.
+    task : str, optional
+        Name of a registered task to provide defaults (transforms, dataset defaults)
+    dataset : str, optional
+        Name of a registered dataset type; default comes from task if provided
+    backend : str, optional
+        Backend to select loader ("fastai" or "monai"); inferred from dataset if not provided
+    **kwargs : dict
+        Additional kwargs passed to source, dataset builder, and loader
+    """
+
+    # ------------------------
+    # Task defaults
+    # ------------------------
+    if task is not None:
+        TaskClass = TASK_REGISTRY[task]
+        task_obj = TaskClass()
+
+        if dataset is None:
+            dataset = task_obj.default_dataset
+
+        # Inject default transforms if missing
+        kwargs.setdefault("transforms", task_obj.transforms())
+        kwargs.setdefault("batch_transforms", task_obj.batch_transforms())
+        kwargs.setdefault("val_transforms", task_obj.val_transforms())
+        kwargs.setdefault("val_batch_transforms", task_obj.val_batch_transforms())
+
+        # Merge task configs with user kwargs (user kwargs take precedence)
+        task_conf = {**task_obj.dataset_config(), **task_obj.loader_config()}
+        kwargs = {**task_conf, **kwargs}
+
+    # ------------------------
+    # Source detection
+    # ------------------------
+    source_name = detect_source(data)
+    SourceClass = SOURCE_REGISTRY[source_name]
+    source_kwargs = route_kwargs(SourceClass.__init__, kwargs)
+
+    # Load train dataframe
+    train_source = SourceClass(data, **source_kwargs)
+    train_df = train_source.load().copy()
+
+    # Load validation dataframe if provided
+    if val_data is not None:
+        val_source = SourceClass(val_data, **source_kwargs)
+        val_df = val_source.load().copy()
+
+        valid_col = kwargs.get("valid_col", "is_valid")
+        train_df[valid_col] = False
+        val_df[valid_col] = True
+
+        df = pd.concat([train_df, val_df], ignore_index=True)
+    else:
+        df = train_df
+
+    # ------------------------
+    # Dataset builder
+    # ------------------------
+    DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
+    backend = backend or inferred_backend
+
+    dataset_kwargs = route_kwargs(DatasetBuilderClass.__init__, kwargs)
+    builder = DatasetBuilderClass(**dataset_kwargs)
+    ds_train, ds_valid = builder.build(df)
+
+    # ------------------------
+    # Loader builder
+    # ------------------------
+    LoaderClass = LOADER_REGISTRY[backend]
+    loader_kwargs = route_kwargs(LoaderClass.__init__, kwargs)
+    loader = LoaderClass(**loader_kwargs)
+
+    return loader.build(ds_train, ds_valid)
+
+
+BioDataLoaders.create = classmethod(create_dls)
 
 # %% ../nbs/01_data.ipynb #c8037343
 def _create_test_dl(
