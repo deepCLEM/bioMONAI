@@ -4,15 +4,15 @@
 
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
-           'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock',
-           'BioDataLoaders', 'ReadDictDataset', 'from_monai', 'from_monai_ds', 'register_source', 'register_dataset',
-           'register_loader', 'register_task', 'route_kwargs', 'detect_source', 'build_source', 'DataFrameSource',
-           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
-           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'test_cache_datasetbuilder',
-           'FastaiLoader', 'create_dls', 'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair',
-           'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder',
-           'extract_patches', 'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string',
-           'remove_singleton_dims', 'extract_substacks']
+           'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'register_source',
+           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'detect_source', 'build_source',
+           'DataFrameSource', 'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin',
+           'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder',
+           'test_cache_datasetbuilder', 'FastaiLoader', 'create_dls', 'BioImageBlock', 'BioDataBlock', 'BioDataLoaders',
+           'ReadDictDataset', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
+           'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
+           'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
+           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -380,6 +380,782 @@ class Tensor2BioImage(DisplayedTransform):
             except:
                 dec = 0
         return f'{self.name}(enc:{enc},dec:{dec})'
+
+# %% ../nbs/01_data.ipynb #b7a23d94
+SOURCE_REGISTRY = {}
+DATASET_REGISTRY = {}
+LOADER_REGISTRY = {}
+TASK_REGISTRY = {}
+
+def register_source(name):
+    def wrapper(cls):
+        SOURCE_REGISTRY[name] = cls
+        return cls
+    return wrapper
+
+
+def register_dataset(name, backend):
+    def wrapper(cls):
+        DATASET_REGISTRY[name] = (cls, backend)
+        return cls
+    return wrapper
+
+
+def register_loader(name):
+    def wrapper(cls):
+        LOADER_REGISTRY[name] = cls
+        return cls
+    return wrapper
+
+def register_task(name):
+    def wrapper(cls):
+        TASK_REGISTRY[name] = cls
+        return cls
+    return wrapper
+
+# %% ../nbs/01_data.ipynb #23567688
+import inspect
+
+
+# %% ../nbs/01_data.ipynb #523b0f7c
+def route_kwargs(func, kwargs):
+    """
+    Filter a dictionary of kwargs to only include those accepted by `func`.
+
+    Handles:
+      - Explicit parameters
+      - Functions with **kwargs (all extra keys are allowed)
+    """
+    sig = inspect.signature(func)
+    accepts_kwargs = any(
+        p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
+    )
+
+    if accepts_kwargs:
+        # If func accepts **kwargs, pass everything
+        return kwargs.copy()
+    else:
+        # Otherwise, filter to matching parameters only
+        return {k: v for k, v in kwargs.items() if k in sig.parameters}
+
+# %% ../nbs/01_data.ipynb #2aad264a
+import pandas as pd
+from pathlib import Path
+
+
+# %% ../nbs/01_data.ipynb #d8e838b9
+def detect_source(data):
+
+    if callable(data):
+        return "callable"
+
+    if isinstance(data, pd.DataFrame):
+        return "dataframe"
+
+    if isinstance(data, (list, tuple)):
+        return "list"
+
+    if isinstance(data, str):
+
+        if data.endswith(".csv"):
+            return "csv"
+
+        if Path(data).is_dir():
+            return "folder"
+
+    raise ValueError("Cannot detect data source")
+
+# %% ../nbs/01_data.ipynb #cb63b640
+def build_source(data, **kwargs):
+
+    name = detect_source(data)
+
+    source_cls = SOURCE_REGISTRY[name]
+
+    return source_cls(data, **kwargs)
+
+# %% ../nbs/01_data.ipynb #f998bcd6
+@register_source("dataframe")
+class DataFrameSource:
+
+    def __init__(
+        self,
+        df,
+        colmap=None,
+        base_path=".",
+        folders=None,
+        suffixes=None,
+        keep_original=False,
+    ):
+        """
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Input dataframe.
+
+        colmap : dict
+            Mapping {"new_column": "existing_column"}.
+
+        base_path : str | Path
+            Base path prepended to files.
+
+        folders : dict
+            Optional subfolder for each new column.
+
+        suffixes : dict
+            Optional suffix for each new column.
+
+        keep_original : bool
+            If True keep original dataframe columns.
+        """
+
+        self.df = df
+        self.colmap = colmap or {}
+        self.base_path = Path(base_path)
+        self.folders = folders or {}
+        self.suffixes = suffixes or {}
+        self.keep_original = keep_original
+
+    def _resolve_paths(self):
+
+        df = self.df.copy()
+
+        for new_col, src_col in self.colmap.items():
+
+            folder = self.folders.get(new_col)
+            suffix = self.suffixes.get(new_col, "")
+
+            base = self.base_path
+            if folder:
+                base = base / folder
+
+            df[new_col] = (
+                base.as_posix()
+                + "/"
+                + df[src_col].astype(str)
+                + suffix
+            )
+
+        return df
+
+    def load(self):
+
+        df = self._resolve_paths()
+
+        if not self.keep_original and self.colmap:
+            df = df[list(self.colmap.keys())]
+
+        return df
+
+# %% ../nbs/01_data.ipynb #a04d0f49
+@register_source("csv")
+class CSVSource:
+
+    def __init__(self, path, **kwargs):
+        self.path = path
+        self.kwargs = kwargs
+
+    def load(self):
+
+        df = pd.read_csv(self.path)
+
+        source = DataFrameSource(df, **self.kwargs)
+
+        return source.load()
+
+# %% ../nbs/01_data.ipynb #7111765f
+@register_source("folder")
+class FolderSource:
+
+    def __init__(self, root, colmap):
+        self.root = Path(root)
+        self.colmap = colmap
+
+    def _scan(self, folder):
+
+        path = self.root / folder
+        return sorted([f.name for f in path.iterdir()])
+
+    def load(self):
+
+        data = {}
+
+        for key, folder in self.colmap.items():
+            data[key] = self._scan(folder)
+
+        df = pd.DataFrame(data)
+
+        source = DataFrameSource(
+            df,
+            colmap={k: k for k in df.columns},
+            base_path=str(self.root),
+            folders=self.colmap,
+        )
+
+        return source.load()
+
+# %% ../nbs/01_data.ipynb #be11809c
+@register_source("list")
+class ListSource:
+
+    def __init__(self, items, colmap=None, base_path="."):
+        self.items = items
+        self.base_path = base_path
+        self.colmap = colmap or {}
+
+    def load(self):
+
+        first = self.items[0]
+
+        # case 1: list of paths
+        if isinstance(first, (str, Path)):
+
+            df = pd.DataFrame({"image": self.items})
+            colmap = {"image": "image"}
+
+        # case 2: list of dicts
+        else:
+
+            df = pd.DataFrame(self.items)
+
+            if self.colmap:
+                df = df.rename(columns={v: k for k, v in self.colmap.items()})
+                colmap = {k: k for k in self.colmap}
+            else:
+                colmap = {c: c for c in df.columns}
+
+        source = DataFrameSource(
+            df,
+            colmap=colmap,
+            base_path=self.base_path,
+        )
+
+        return source.load()
+
+# %% ../nbs/01_data.ipynb #57918c64
+@register_source("callable")
+class CallableSource:
+
+    def __init__(
+        self,
+        items_fn,
+        target_fn=None,
+        input_key="image",
+        target_key="label",
+    ):
+        self.items_fn = items_fn
+        self.target_fn = target_fn
+        self.input_key = input_key
+        self.target_key = target_key
+
+    def load(self):
+
+        items = list(self.items_fn())
+
+        first = items[0]
+
+        # Case 1: items already dictionaries
+        if isinstance(first, dict):
+            df = pd.DataFrame(items)
+
+        # Case 2: items are inputs only (paths, ids, etc.)
+        else:
+
+            data = {self.input_key: items}
+
+            if self.target_fn:
+                data[self.target_key] = [self.target_fn(x) for x in items]
+
+            df = pd.DataFrame(data)
+
+        return df
+
+# %% ../nbs/01_data.ipynb #615d3f08
+class DataFrameSplitMixin:
+    """Shared logic for splitting DataFrames into MONAI datalists."""
+
+    # --------------------------------------------------
+    def _resolve_splitter(self, df):
+        if self.splitter:
+            return self.splitter
+        if self.valid_col in df.columns:
+            return ColSplitter(self.valid_col)
+
+        return TrainTestSplitter(
+            test_size=self.valid_pct,
+            random_state=self.seed,
+            stratify=self.stratify,
+            train_size=self.train_size,
+            shuffle=self.shuffle,
+        )
+
+    # --------------------------------------------------
+    def _split_dataframe(self, df):
+        splitter = self._resolve_splitter(df)
+        train_idx, valid_idx = splitter(df)
+
+        df_train = df.iloc[train_idx].copy()
+        df_valid = df.iloc[valid_idx].copy()
+
+        datalist_train = df_train.to_dict("records")
+        datalist_valid = df_valid.to_dict("records")
+
+        return datalist_train, datalist_valid
+
+# %% ../nbs/01_data.ipynb #84fb0210
+class MonaiTransformMixin:
+    """Shared MONAI transform helpers."""
+
+    # --------------------------------------------------
+    def _prepare_transform(self, transform):
+        if transform is None:
+            return None
+        if isinstance(transform, (list, tuple)):
+            return Compose(transform)
+        return transform
+
+    # --------------------------------------------------
+    def _is_random(self, t):
+        return isinstance(t, Randomizable)
+
+    # --------------------------------------------------
+    def _make_deterministic_transforms(self, transforms):
+        """
+        Convert random transforms into deterministic equivalents.
+        """
+
+        if transforms is None:
+            return None
+
+        # Normalize to list
+        if isinstance(transforms, Compose):
+            transforms = transforms.transforms
+
+        deterministic = []
+
+        # Mapping of random -> deterministic replacements
+        replacements = {
+            "RandSpatialCrop": lambda t: CenterSpatialCrop(
+                roi_size=t.roi_size,
+                lazy=getattr(t, "lazy", False),
+            ),
+            "RandScaleCrop": lambda t: CenterScaleCrop(
+                roi_scale=t.roi_scale,
+                lazy=getattr(t, "lazy", False),
+            ),
+        }
+
+        for t in transforms:
+            name = t.__class__.__name__
+
+            # Replace known random transforms with deterministic versions
+            if name in replacements:
+                deterministic.append(replacements[name](t))
+                continue
+
+            # Skip other random transforms
+            if self._is_random(t):
+                continue
+
+            deterministic.append(t)
+
+        return Compose(deterministic)
+
+# %% ../nbs/01_data.ipynb #85a42e13
+@register_dataset("dataset", backend="fastai")
+class DataBlockBuilder(DataFrameSplitMixin):
+
+    DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
+    DEFAULT_TARGET_COLS = ["label", "mask", "y", "target"]
+
+    def __init__(
+        self,
+        blocks=None,
+        dl_type=None,
+        get_items=None,
+        get_x=None,
+        get_y=None,
+        getters=None,
+        n_inp=None,
+        transforms=None,
+        val_transforms=None,
+        batch_transforms=None,
+        val_batch_transforms=None,
+        splitter=None,
+        valid_pct=0.2,
+        seed=None,
+        stratify=None, 
+        train_size=None,
+        shuffle:bool=True,
+        valid_col="is_valid",
+        x_keys=None,
+        y_keys=None,
+    ):
+        store_attr()
+
+    # --------------------------------------------------
+    def _infer_columns(self, df):
+        """
+        Determine input/output column names. If x_col/y_col are explicitly provided,
+        use them; otherwise infer from DataFrame columns.
+        """
+        cols = list(df.columns)
+        x_col = self.x_keys or next((c for c in self.DEFAULT_INPUT_COLS if c in cols), cols[0])
+        y_col = self.y_keys or next((c for c in self.DEFAULT_TARGET_COLS if c in cols), None)
+        return x_col, y_col
+
+    # --------------------------------------------------
+    def _wrap_pipeline(self, transforms, val_transforms):
+        """
+        Wrap transforms and val_transforms in Pipelines.
+        If val_transforms is None, fallback to transforms.
+        """
+        train_pipeline = Pipeline(transforms) if transforms is not None else None
+        valid_pipeline = Pipeline(val_transforms) if val_transforms is not None else train_pipeline
+        return train_pipeline, valid_pipeline
+
+    # --------------------------------------------------
+    def build(self, df):
+        """
+        Build a FastAI DataBlock from a DataFrame.
+        """
+        x_col, y_col = self._infer_columns(df)
+        get_x = self.get_x or ColReader(x_col)
+        get_y = self.get_y or (ColReader(y_col) if y_col else None)
+
+        blocks = self.blocks
+        if blocks is None:
+            if y_col:
+                blocks = (
+                    BioImageBlock(cls=BioImage),
+                    BioImageBlock(cls=BioImage),
+                )
+            else:
+                blocks = (BioImageBlock(cls=BioImage),)
+
+        splitter = self._resolve_splitter(df)
+
+        # Wrap train/valid transforms
+        item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
+        batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
+
+        datablock = DataBlock(
+            blocks=blocks,
+            dl_type=self.dl_type,
+            get_items=lambda x: x if self.get_items is None else self.get_items,
+            get_x=get_x,
+            get_y=get_y,
+            getters=self.getters,
+            n_inp=self.n_inp,
+            item_tfms=item_tfms,
+            batch_tfms=batch_tfms,
+            splitter=splitter,
+        )
+
+        # Attach validation transforms for DataLoader use
+        datablock._val_item_tfms = val_item_tfms
+        datablock._val_batch_tfms = val_batch_tfms
+
+        return datablock, df
+
+# %% ../nbs/01_data.ipynb #795e12ca
+@register_dataset("monaidataset", backend="monai")
+class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
+
+    def __init__(self, transforms=None, val_transforms=None,
+                 splitter=None, valid_pct=0.2, seed=None,
+                 stratify=None, train_size=None,
+                 shuffle=True, valid_col="is_valid"):
+        store_attr()
+
+    # --------------------------------------------------
+    def build(self, df):
+
+        datalist_train, datalist_valid = self._split_dataframe(df)
+
+        train_transform = self._prepare_transform(self.transforms)
+
+        if self.val_transforms is None:
+            valid_transform = self._make_deterministic_transforms(train_transform)
+        else:
+            valid_transform = self._prepare_transform(self.val_transforms)
+
+        train_ds = MonaiDataset(
+            datalist_train,
+            transform=train_transform
+        )
+
+        valid_ds = MonaiDataset(
+            datalist_valid,
+            transform=valid_transform
+        )
+
+        return train_ds, valid_ds
+
+# %% ../nbs/01_data.ipynb #f7b3f8b3
+@register_dataset("cache", backend="monai")
+class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
+
+    def __init__(self, splitter=None, valid_pct=0.2, seed=None,
+                 stratify=None, train_size=None, shuffle=True,
+                 valid_col="is_valid", transforms=None,
+                 val_transforms=None, **dataset_kwargs):
+
+        self.splitter = splitter
+        self.valid_pct = valid_pct
+        self.seed = seed
+        self.stratify = stratify
+        self.train_size = train_size
+        self.shuffle = shuffle
+        self.valid_col = valid_col
+
+        self.transforms = transforms
+        self.val_transforms = val_transforms
+        self.dataset_kwargs = dataset_kwargs
+
+    # --------------------------------------------------
+    def _split_kwargs(self):
+        train_kwargs, valid_kwargs = {}, {}
+
+        for k, v in self.dataset_kwargs.items():
+            if k.startswith("val_"):
+                valid_kwargs[k[4:]] = v
+            else:
+                train_kwargs[k] = v
+                valid_kwargs.setdefault(k, v)
+
+        return train_kwargs, valid_kwargs
+
+    # --------------------------------------------------
+    def build(self, df):
+
+        datalist_train, datalist_valid = self._split_dataframe(df)
+
+        train_transform = self._prepare_transform(self.transforms)
+
+        if self.val_transforms is None:
+            valid_transform = self._make_deterministic_transforms(train_transform)
+        else:
+            valid_transform = self._prepare_transform(self.val_transforms)
+
+        train_kwargs, valid_kwargs = self._split_kwargs()
+
+        train_ds = CacheDataset(
+            datalist_train,
+            transform=train_transform,
+            **train_kwargs
+        )
+
+        valid_ds = CacheDataset(
+            datalist_valid,
+            transform=valid_transform,
+            **valid_kwargs
+        )
+
+        return train_ds, valid_ds
+
+# %% ../nbs/01_data.ipynb #575cb804
+def test_cache_datasetbuilder():
+    import pandas as pd
+    from monai.data import CacheDataset
+
+    # --- Sample DataFrame ---
+    df = pd.DataFrame({
+        "image": ["img1.nii.gz", "img2.nii.gz", "img3.nii.gz", "img4.nii.gz"],
+        "label": ["mask1.nii.gz", "mask2.nii.gz", "mask3.nii.gz", "mask4.nii.gz"],
+        "is_valid": [0, 1, 0, 1],
+    })
+
+    # --- Test 1: default split using valid_col ---
+    builder = CacheDatasetBuilder(transforms=None, cache_rate=0.0)
+    train_ds, valid_ds = builder.build(df)
+    assert isinstance(train_ds, CacheDataset), "train_ds should be CacheDataset"
+    assert isinstance(valid_ds, CacheDataset), "valid_ds should be CacheDataset"
+    assert len(train_ds) == 2, "train_ds should contain 2 items"
+    assert len(valid_ds) == 2, "valid_ds should contain 2 items"
+
+    # --- Test 2: val_ prefixed kwargs ---
+    builder2 = CacheDatasetBuilder(transforms=None, num_workers=1, val_num_workers=2)
+    train_ds2, valid_ds2 = builder2.build(df)
+    # Train uses train cache_rate
+    assert train_ds2.num_workers == 1
+    # Valid uses val_cache_rate
+    assert valid_ds2.num_workers == 2
+
+    # --- Test 3: custom splitter ---
+    custom_splitter = RandomSplitter(valid_pct=0.5, seed=42)
+    builder3 = CacheDatasetBuilder(transforms=None, cache_rate=0.0, splitter=custom_splitter)
+    train_ds3, valid_ds3 = builder3.build(df)
+    assert len(train_ds3) == 2 and len(valid_ds3) == 2, "RandomSplitter with 50% should split evenly"
+
+    return "All CacheDatasetBuilder tests passed"
+
+# Run the test
+test_eq(test_cache_datasetbuilder(), "All CacheDatasetBuilder tests passed")
+
+# %% ../nbs/01_data.ipynb #825b575e
+@register_loader("fastai")
+class FastaiLoader:
+
+    def __init__(
+        self,
+        batch_size=64,
+        shuffle=True,
+        num_workers=0,
+        device=None,
+        drop_last=False,
+        pin_memory=False,
+        persistent_workers=False,
+        show_summary=False,
+    ):
+        """
+        FastAI-style DataLoader wrapper.
+
+        Parameters
+        ----------
+        bs : int
+            Batch size
+        shuffle : bool
+            Shuffle training dataset
+        num_workers : int
+            Number of worker processes
+        device : torch.device or str
+            Target device
+        drop_last : bool
+            Drop last incomplete batch
+        pin_memory : bool
+            Use pinned memory
+        persistent_workers : bool
+            Keep workers alive between epochs
+        """
+        store_attr()
+
+    # --------------------------------------------------
+    def build(self, datablock, data_source):
+
+        # Create DataLoaders
+        dls = datablock.dataloaders(
+            data_source,
+            bs=self.batch_size,
+            shuffle=self.shuffle,
+            num_workers=self.num_workers,
+            device=self.device,
+            drop_last=self.drop_last,
+            pin_memory=self.pin_memory,
+            persistent_workers=self.persistent_workers,
+        )
+
+        # --------------------------------------------------
+        # Inject validation transforms if present
+        # --------------------------------------------------
+        if hasattr(datablock, "_val_item_tfms") and datablock._val_item_tfms is not None:
+            dls.valid.after_item = datablock._val_item_tfms
+
+        if hasattr(datablock, "_val_batch_tfms") and datablock._val_batch_tfms is not None:
+            dls.valid.after_batch = datablock._val_batch_tfms
+
+        # --------------------------------------------------
+        # Optional summary
+        # --------------------------------------------------
+        if self.show_summary:
+            print(datablock.summary(data_source, bs=self.batch_size))
+
+        return dls
+
+# %% ../nbs/01_data.ipynb #2cffab91
+def create_dls(cls,
+                data,
+                val_data=None,
+                task=None,
+                dataset=None,
+                backend=None,
+                show_summary=False,
+                **kwargs):
+    """
+    Create a complete DataLoader pipeline from raw data.
+
+    Parameters
+    ----------
+    data : Any
+        Raw training data input (folder, dataframe, CSV, list, callable)
+    val_data : Any, optional
+        Raw validation data. If provided, is combined with `data` and
+        `is_valid` column is added automatically.
+    task : str, optional
+        Name of a registered task to provide defaults (transforms, dataset defaults)
+    dataset : str, optional
+        Name of a registered dataset type; default comes from task if provided
+    backend : str, optional
+        Backend to select loader ("fastai" or "monai"); inferred from dataset if not provided
+    **kwargs : dict
+        Additional kwargs passed to source, dataset builder, and loader
+    """
+
+    # ------------------------
+    # Task defaults
+    # ------------------------
+    if task is not None:
+        TaskClass = TASK_REGISTRY[task]
+        task_obj = TaskClass()
+
+        if dataset is None:
+            dataset = task_obj.default_dataset
+
+        # Inject default transforms if missing
+        kwargs.setdefault("transforms", task_obj.transforms())
+        kwargs.setdefault("batch_transforms", task_obj.batch_transforms())
+        kwargs.setdefault("val_transforms", task_obj.val_transforms())
+        kwargs.setdefault("val_batch_transforms", task_obj.val_batch_transforms())
+
+        # Merge task configs with user kwargs (user kwargs take precedence)
+        task_conf = {**task_obj.dataset_config(), **task_obj.loader_config()}
+        kwargs = {**task_conf, **kwargs}
+
+    # ------------------------
+    # Source detection
+    # ------------------------
+    source_name = detect_source(data)
+    SourceClass = SOURCE_REGISTRY[source_name]
+    source_kwargs = route_kwargs(SourceClass.__init__, kwargs)
+
+    # Load train dataframe
+    train_source = SourceClass(data, **source_kwargs)
+    train_df = train_source.load().copy()
+
+    # Load validation dataframe if provided
+    if val_data is not None:
+        val_source = SourceClass(val_data, **source_kwargs)
+        val_df = val_source.load().copy()
+
+        valid_col = kwargs.get("valid_col", "is_valid")
+        train_df[valid_col] = False
+        val_df[valid_col] = True
+
+        df = pd.concat([train_df, val_df], ignore_index=True)
+    else:
+        df = train_df
+
+    # ------------------------
+    # Dataset builder
+    # ------------------------
+    DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
+    backend = backend or inferred_backend
+
+    dataset_kwargs = route_kwargs(DatasetBuilderClass.__init__, kwargs)
+    builder = DatasetBuilderClass(**dataset_kwargs)
+    ds_train, ds_valid = builder.build(df)
+
+    # ------------------------
+    # Loader builder
+    # ------------------------
+    LoaderClass = LOADER_REGISTRY[backend]
+    loader_kwargs = route_kwargs(LoaderClass.__init__, kwargs)
+    loader = LoaderClass(**loader_kwargs)
+
+    return loader.build(ds_train, ds_valid)
+
+
+BioDataLoaders.create = classmethod(create_dls)
 
 # %% ../nbs/01_data.ipynb #68b31c0c
 def BioImageBlock(cls:BioImageBase=BioImage):
@@ -1117,782 +1893,6 @@ def from_monai_ds(
     )
 
 BioDataLoaders.from_monai_ds = classmethod(from_monai_ds)
-
-# %% ../nbs/01_data.ipynb #2190f0a8
-SOURCE_REGISTRY = {}
-DATASET_REGISTRY = {}
-LOADER_REGISTRY = {}
-TASK_REGISTRY = {}
-
-def register_source(name):
-    def wrapper(cls):
-        SOURCE_REGISTRY[name] = cls
-        return cls
-    return wrapper
-
-
-def register_dataset(name, backend):
-    def wrapper(cls):
-        DATASET_REGISTRY[name] = (cls, backend)
-        return cls
-    return wrapper
-
-
-def register_loader(name):
-    def wrapper(cls):
-        LOADER_REGISTRY[name] = cls
-        return cls
-    return wrapper
-
-def register_task(name):
-    def wrapper(cls):
-        TASK_REGISTRY[name] = cls
-        return cls
-    return wrapper
-
-# %% ../nbs/01_data.ipynb #1b622bce
-import inspect
-
-
-# %% ../nbs/01_data.ipynb #bf806c0b
-def route_kwargs(func, kwargs):
-    """
-    Filter a dictionary of kwargs to only include those accepted by `func`.
-
-    Handles:
-      - Explicit parameters
-      - Functions with **kwargs (all extra keys are allowed)
-    """
-    sig = inspect.signature(func)
-    accepts_kwargs = any(
-        p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
-    )
-
-    if accepts_kwargs:
-        # If func accepts **kwargs, pass everything
-        return kwargs.copy()
-    else:
-        # Otherwise, filter to matching parameters only
-        return {k: v for k, v in kwargs.items() if k in sig.parameters}
-
-# %% ../nbs/01_data.ipynb #238e315d
-import pandas as pd
-from pathlib import Path
-
-
-# %% ../nbs/01_data.ipynb #3263a08e
-def detect_source(data):
-
-    if callable(data):
-        return "callable"
-
-    if isinstance(data, pd.DataFrame):
-        return "dataframe"
-
-    if isinstance(data, (list, tuple)):
-        return "list"
-
-    if isinstance(data, str):
-
-        if data.endswith(".csv"):
-            return "csv"
-
-        if Path(data).is_dir():
-            return "folder"
-
-    raise ValueError("Cannot detect data source")
-
-# %% ../nbs/01_data.ipynb #4c1e0fb7
-def build_source(data, **kwargs):
-
-    name = detect_source(data)
-
-    source_cls = SOURCE_REGISTRY[name]
-
-    return source_cls(data, **kwargs)
-
-# %% ../nbs/01_data.ipynb #a4f995ac
-@register_source("dataframe")
-class DataFrameSource:
-
-    def __init__(
-        self,
-        df,
-        colmap=None,
-        base_path=".",
-        folders=None,
-        suffixes=None,
-        keep_original=False,
-    ):
-        """
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Input dataframe.
-
-        colmap : dict
-            Mapping {"new_column": "existing_column"}.
-
-        base_path : str | Path
-            Base path prepended to files.
-
-        folders : dict
-            Optional subfolder for each new column.
-
-        suffixes : dict
-            Optional suffix for each new column.
-
-        keep_original : bool
-            If True keep original dataframe columns.
-        """
-
-        self.df = df
-        self.colmap = colmap or {}
-        self.base_path = Path(base_path)
-        self.folders = folders or {}
-        self.suffixes = suffixes or {}
-        self.keep_original = keep_original
-
-    def _resolve_paths(self):
-
-        df = self.df.copy()
-
-        for new_col, src_col in self.colmap.items():
-
-            folder = self.folders.get(new_col)
-            suffix = self.suffixes.get(new_col, "")
-
-            base = self.base_path
-            if folder:
-                base = base / folder
-
-            df[new_col] = (
-                base.as_posix()
-                + "/"
-                + df[src_col].astype(str)
-                + suffix
-            )
-
-        return df
-
-    def load(self):
-
-        df = self._resolve_paths()
-
-        if not self.keep_original and self.colmap:
-            df = df[list(self.colmap.keys())]
-
-        return df
-
-# %% ../nbs/01_data.ipynb #a5cf135b
-@register_source("csv")
-class CSVSource:
-
-    def __init__(self, path, **kwargs):
-        self.path = path
-        self.kwargs = kwargs
-
-    def load(self):
-
-        df = pd.read_csv(self.path)
-
-        source = DataFrameSource(df, **self.kwargs)
-
-        return source.load()
-
-# %% ../nbs/01_data.ipynb #24e93124
-@register_source("folder")
-class FolderSource:
-
-    def __init__(self, root, colmap):
-        self.root = Path(root)
-        self.colmap = colmap
-
-    def _scan(self, folder):
-
-        path = self.root / folder
-        return sorted([f.name for f in path.iterdir()])
-
-    def load(self):
-
-        data = {}
-
-        for key, folder in self.colmap.items():
-            data[key] = self._scan(folder)
-
-        df = pd.DataFrame(data)
-
-        source = DataFrameSource(
-            df,
-            colmap={k: k for k in df.columns},
-            base_path=str(self.root),
-            folders=self.colmap,
-        )
-
-        return source.load()
-
-# %% ../nbs/01_data.ipynb #db644888
-@register_source("list")
-class ListSource:
-
-    def __init__(self, items, colmap=None, base_path="."):
-        self.items = items
-        self.base_path = base_path
-        self.colmap = colmap or {}
-
-    def load(self):
-
-        first = self.items[0]
-
-        # case 1: list of paths
-        if isinstance(first, (str, Path)):
-
-            df = pd.DataFrame({"image": self.items})
-            colmap = {"image": "image"}
-
-        # case 2: list of dicts
-        else:
-
-            df = pd.DataFrame(self.items)
-
-            if self.colmap:
-                df = df.rename(columns={v: k for k, v in self.colmap.items()})
-                colmap = {k: k for k in self.colmap}
-            else:
-                colmap = {c: c for c in df.columns}
-
-        source = DataFrameSource(
-            df,
-            colmap=colmap,
-            base_path=self.base_path,
-        )
-
-        return source.load()
-
-# %% ../nbs/01_data.ipynb #d0c5579d
-@register_source("callable")
-class CallableSource:
-
-    def __init__(
-        self,
-        items_fn,
-        target_fn=None,
-        input_key="image",
-        target_key="label",
-    ):
-        self.items_fn = items_fn
-        self.target_fn = target_fn
-        self.input_key = input_key
-        self.target_key = target_key
-
-    def load(self):
-
-        items = list(self.items_fn())
-
-        first = items[0]
-
-        # Case 1: items already dictionaries
-        if isinstance(first, dict):
-            df = pd.DataFrame(items)
-
-        # Case 2: items are inputs only (paths, ids, etc.)
-        else:
-
-            data = {self.input_key: items}
-
-            if self.target_fn:
-                data[self.target_key] = [self.target_fn(x) for x in items]
-
-            df = pd.DataFrame(data)
-
-        return df
-
-# %% ../nbs/01_data.ipynb #18522c79
-class DataFrameSplitMixin:
-    """Shared logic for splitting DataFrames into MONAI datalists."""
-
-    # --------------------------------------------------
-    def _resolve_splitter(self, df):
-        if self.splitter:
-            return self.splitter
-        if self.valid_col in df.columns:
-            return ColSplitter(self.valid_col)
-
-        return TrainTestSplitter(
-            test_size=self.valid_pct,
-            random_state=self.seed,
-            stratify=self.stratify,
-            train_size=self.train_size,
-            shuffle=self.shuffle,
-        )
-
-    # --------------------------------------------------
-    def _split_dataframe(self, df):
-        splitter = self._resolve_splitter(df)
-        train_idx, valid_idx = splitter(df)
-
-        df_train = df.iloc[train_idx].copy()
-        df_valid = df.iloc[valid_idx].copy()
-
-        datalist_train = df_train.to_dict("records")
-        datalist_valid = df_valid.to_dict("records")
-
-        return datalist_train, datalist_valid
-
-# %% ../nbs/01_data.ipynb #f65b5ddc
-class MonaiTransformMixin:
-    """Shared MONAI transform helpers."""
-
-    # --------------------------------------------------
-    def _prepare_transform(self, transform):
-        if transform is None:
-            return None
-        if isinstance(transform, (list, tuple)):
-            return Compose(transform)
-        return transform
-
-    # --------------------------------------------------
-    def _is_random(self, t):
-        return isinstance(t, Randomizable)
-
-    # --------------------------------------------------
-    def _make_deterministic_transforms(self, transforms):
-        """
-        Convert random transforms into deterministic equivalents.
-        """
-
-        if transforms is None:
-            return None
-
-        # Normalize to list
-        if isinstance(transforms, Compose):
-            transforms = transforms.transforms
-
-        deterministic = []
-
-        # Mapping of random -> deterministic replacements
-        replacements = {
-            "RandSpatialCrop": lambda t: CenterSpatialCrop(
-                roi_size=t.roi_size,
-                lazy=getattr(t, "lazy", False),
-            ),
-            "RandScaleCrop": lambda t: CenterScaleCrop(
-                roi_scale=t.roi_scale,
-                lazy=getattr(t, "lazy", False),
-            ),
-        }
-
-        for t in transforms:
-            name = t.__class__.__name__
-
-            # Replace known random transforms with deterministic versions
-            if name in replacements:
-                deterministic.append(replacements[name](t))
-                continue
-
-            # Skip other random transforms
-            if self._is_random(t):
-                continue
-
-            deterministic.append(t)
-
-        return Compose(deterministic)
-
-# %% ../nbs/01_data.ipynb #8eaded46
-@register_dataset("dataset", backend="fastai")
-class DataBlockBuilder(DataFrameSplitMixin):
-
-    DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
-    DEFAULT_TARGET_COLS = ["label", "mask", "y", "target"]
-
-    def __init__(
-        self,
-        blocks=None,
-        dl_type=None,
-        get_items=None,
-        get_x=None,
-        get_y=None,
-        getters=None,
-        n_inp=None,
-        transforms=None,
-        val_transforms=None,
-        batch_transforms=None,
-        val_batch_transforms=None,
-        splitter=None,
-        valid_pct=0.2,
-        seed=None,
-        stratify=None, 
-        train_size=None,
-        shuffle:bool=True,
-        valid_col="is_valid",
-        x_keys=None,
-        y_keys=None,
-    ):
-        store_attr()
-
-    # --------------------------------------------------
-    def _infer_columns(self, df):
-        """
-        Determine input/output column names. If x_col/y_col are explicitly provided,
-        use them; otherwise infer from DataFrame columns.
-        """
-        cols = list(df.columns)
-        x_col = self.x_keys or next((c for c in self.DEFAULT_INPUT_COLS if c in cols), cols[0])
-        y_col = self.y_keys or next((c for c in self.DEFAULT_TARGET_COLS if c in cols), None)
-        return x_col, y_col
-
-    # --------------------------------------------------
-    def _wrap_pipeline(self, transforms, val_transforms):
-        """
-        Wrap transforms and val_transforms in Pipelines.
-        If val_transforms is None, fallback to transforms.
-        """
-        train_pipeline = Pipeline(transforms) if transforms is not None else None
-        valid_pipeline = Pipeline(val_transforms) if val_transforms is not None else train_pipeline
-        return train_pipeline, valid_pipeline
-
-    # --------------------------------------------------
-    def build(self, df):
-        """
-        Build a FastAI DataBlock from a DataFrame.
-        """
-        x_col, y_col = self._infer_columns(df)
-        get_x = self.get_x or ColReader(x_col)
-        get_y = self.get_y or (ColReader(y_col) if y_col else None)
-
-        blocks = self.blocks
-        if blocks is None:
-            if y_col:
-                blocks = (
-                    BioImageBlock(cls=BioImage),
-                    BioImageBlock(cls=BioImage),
-                )
-            else:
-                blocks = (BioImageBlock(cls=BioImage),)
-
-        splitter = self._resolve_splitter(df)
-
-        # Wrap train/valid transforms
-        item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
-        batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
-
-        datablock = DataBlock(
-            blocks=blocks,
-            dl_type=self.dl_type,
-            get_items=lambda x: x if self.get_items is None else self.get_items,
-            get_x=get_x,
-            get_y=get_y,
-            getters=self.getters,
-            n_inp=self.n_inp,
-            item_tfms=item_tfms,
-            batch_tfms=batch_tfms,
-            splitter=splitter,
-        )
-
-        # Attach validation transforms for DataLoader use
-        datablock._val_item_tfms = val_item_tfms
-        datablock._val_batch_tfms = val_batch_tfms
-
-        return datablock, df
-
-# %% ../nbs/01_data.ipynb #5b2ee761
-@register_dataset("monaidataset", backend="monai")
-class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
-
-    def __init__(self, transforms=None, val_transforms=None,
-                 splitter=None, valid_pct=0.2, seed=None,
-                 stratify=None, train_size=None,
-                 shuffle=True, valid_col="is_valid"):
-        store_attr()
-
-    # --------------------------------------------------
-    def build(self, df):
-
-        datalist_train, datalist_valid = self._split_dataframe(df)
-
-        train_transform = self._prepare_transform(self.transforms)
-
-        if self.val_transforms is None:
-            valid_transform = self._make_deterministic_transforms(train_transform)
-        else:
-            valid_transform = self._prepare_transform(self.val_transforms)
-
-        train_ds = MonaiDataset(
-            datalist_train,
-            transform=train_transform
-        )
-
-        valid_ds = MonaiDataset(
-            datalist_valid,
-            transform=valid_transform
-        )
-
-        return train_ds, valid_ds
-
-# %% ../nbs/01_data.ipynb #ef50150b
-@register_dataset("cache", backend="monai")
-class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
-
-    def __init__(self, splitter=None, valid_pct=0.2, seed=None,
-                 stratify=None, train_size=None, shuffle=True,
-                 valid_col="is_valid", transforms=None,
-                 val_transforms=None, **dataset_kwargs):
-
-        self.splitter = splitter
-        self.valid_pct = valid_pct
-        self.seed = seed
-        self.stratify = stratify
-        self.train_size = train_size
-        self.shuffle = shuffle
-        self.valid_col = valid_col
-
-        self.transforms = transforms
-        self.val_transforms = val_transforms
-        self.dataset_kwargs = dataset_kwargs
-
-    # --------------------------------------------------
-    def _split_kwargs(self):
-        train_kwargs, valid_kwargs = {}, {}
-
-        for k, v in self.dataset_kwargs.items():
-            if k.startswith("val_"):
-                valid_kwargs[k[4:]] = v
-            else:
-                train_kwargs[k] = v
-                valid_kwargs.setdefault(k, v)
-
-        return train_kwargs, valid_kwargs
-
-    # --------------------------------------------------
-    def build(self, df):
-
-        datalist_train, datalist_valid = self._split_dataframe(df)
-
-        train_transform = self._prepare_transform(self.transforms)
-
-        if self.val_transforms is None:
-            valid_transform = self._make_deterministic_transforms(train_transform)
-        else:
-            valid_transform = self._prepare_transform(self.val_transforms)
-
-        train_kwargs, valid_kwargs = self._split_kwargs()
-
-        train_ds = CacheDataset(
-            datalist_train,
-            transform=train_transform,
-            **train_kwargs
-        )
-
-        valid_ds = CacheDataset(
-            datalist_valid,
-            transform=valid_transform,
-            **valid_kwargs
-        )
-
-        return train_ds, valid_ds
-
-# %% ../nbs/01_data.ipynb #4c1adaa5
-def test_cache_datasetbuilder():
-    import pandas as pd
-    from monai.data import CacheDataset
-
-    # --- Sample DataFrame ---
-    df = pd.DataFrame({
-        "image": ["img1.nii.gz", "img2.nii.gz", "img3.nii.gz", "img4.nii.gz"],
-        "label": ["mask1.nii.gz", "mask2.nii.gz", "mask3.nii.gz", "mask4.nii.gz"],
-        "is_valid": [0, 1, 0, 1],
-    })
-
-    # --- Test 1: default split using valid_col ---
-    builder = CacheDatasetBuilder(transforms=None, cache_rate=0.0)
-    train_ds, valid_ds = builder.build(df)
-    assert isinstance(train_ds, CacheDataset), "train_ds should be CacheDataset"
-    assert isinstance(valid_ds, CacheDataset), "valid_ds should be CacheDataset"
-    assert len(train_ds) == 2, "train_ds should contain 2 items"
-    assert len(valid_ds) == 2, "valid_ds should contain 2 items"
-
-    # --- Test 2: val_ prefixed kwargs ---
-    builder2 = CacheDatasetBuilder(transforms=None, num_workers=1, val_num_workers=2)
-    train_ds2, valid_ds2 = builder2.build(df)
-    # Train uses train cache_rate
-    assert train_ds2.num_workers == 1
-    # Valid uses val_cache_rate
-    assert valid_ds2.num_workers == 2
-
-    # --- Test 3: custom splitter ---
-    custom_splitter = RandomSplitter(valid_pct=0.5, seed=42)
-    builder3 = CacheDatasetBuilder(transforms=None, cache_rate=0.0, splitter=custom_splitter)
-    train_ds3, valid_ds3 = builder3.build(df)
-    assert len(train_ds3) == 2 and len(valid_ds3) == 2, "RandomSplitter with 50% should split evenly"
-
-    return "All CacheDatasetBuilder tests passed"
-
-# Run the test
-test_eq(test_cache_datasetbuilder(), "All CacheDatasetBuilder tests passed")
-
-# %% ../nbs/01_data.ipynb #f60ddb03
-@register_loader("fastai")
-class FastaiLoader:
-
-    def __init__(
-        self,
-        batch_size=64,
-        shuffle=True,
-        num_workers=0,
-        device=None,
-        drop_last=False,
-        pin_memory=False,
-        persistent_workers=False,
-        show_summary=False,
-    ):
-        """
-        FastAI-style DataLoader wrapper.
-
-        Parameters
-        ----------
-        bs : int
-            Batch size
-        shuffle : bool
-            Shuffle training dataset
-        num_workers : int
-            Number of worker processes
-        device : torch.device or str
-            Target device
-        drop_last : bool
-            Drop last incomplete batch
-        pin_memory : bool
-            Use pinned memory
-        persistent_workers : bool
-            Keep workers alive between epochs
-        """
-        store_attr()
-
-    # --------------------------------------------------
-    def build(self, datablock, data_source):
-
-        # Create DataLoaders
-        dls = datablock.dataloaders(
-            data_source,
-            bs=self.batch_size,
-            shuffle=self.shuffle,
-            num_workers=self.num_workers,
-            device=self.device,
-            drop_last=self.drop_last,
-            pin_memory=self.pin_memory,
-            persistent_workers=self.persistent_workers,
-        )
-
-        # --------------------------------------------------
-        # Inject validation transforms if present
-        # --------------------------------------------------
-        if hasattr(datablock, "_val_item_tfms") and datablock._val_item_tfms is not None:
-            dls.valid.after_item = datablock._val_item_tfms
-
-        if hasattr(datablock, "_val_batch_tfms") and datablock._val_batch_tfms is not None:
-            dls.valid.after_batch = datablock._val_batch_tfms
-
-        # --------------------------------------------------
-        # Optional summary
-        # --------------------------------------------------
-        if self.show_summary:
-            print(datablock.summary(data_source, bs=self.batch_size))
-
-        return dls
-
-# %% ../nbs/01_data.ipynb #6220db19
-def create_dls(cls,
-                data,
-                val_data=None,
-                task=None,
-                dataset=None,
-                backend=None,
-                show_summary=False,
-                **kwargs):
-    """
-    Create a complete DataLoader pipeline from raw data.
-
-    Parameters
-    ----------
-    data : Any
-        Raw training data input (folder, dataframe, CSV, list, callable)
-    val_data : Any, optional
-        Raw validation data. If provided, is combined with `data` and
-        `is_valid` column is added automatically.
-    task : str, optional
-        Name of a registered task to provide defaults (transforms, dataset defaults)
-    dataset : str, optional
-        Name of a registered dataset type; default comes from task if provided
-    backend : str, optional
-        Backend to select loader ("fastai" or "monai"); inferred from dataset if not provided
-    **kwargs : dict
-        Additional kwargs passed to source, dataset builder, and loader
-    """
-
-    # ------------------------
-    # Task defaults
-    # ------------------------
-    if task is not None:
-        TaskClass = TASK_REGISTRY[task]
-        task_obj = TaskClass()
-
-        if dataset is None:
-            dataset = task_obj.default_dataset
-
-        # Inject default transforms if missing
-        kwargs.setdefault("transforms", task_obj.transforms())
-        kwargs.setdefault("batch_transforms", task_obj.batch_transforms())
-        kwargs.setdefault("val_transforms", task_obj.val_transforms())
-        kwargs.setdefault("val_batch_transforms", task_obj.val_batch_transforms())
-
-        # Merge task configs with user kwargs (user kwargs take precedence)
-        task_conf = {**task_obj.dataset_config(), **task_obj.loader_config()}
-        kwargs = {**task_conf, **kwargs}
-
-    # ------------------------
-    # Source detection
-    # ------------------------
-    source_name = detect_source(data)
-    SourceClass = SOURCE_REGISTRY[source_name]
-    source_kwargs = route_kwargs(SourceClass.__init__, kwargs)
-
-    # Load train dataframe
-    train_source = SourceClass(data, **source_kwargs)
-    train_df = train_source.load().copy()
-
-    # Load validation dataframe if provided
-    if val_data is not None:
-        val_source = SourceClass(val_data, **source_kwargs)
-        val_df = val_source.load().copy()
-
-        valid_col = kwargs.get("valid_col", "is_valid")
-        train_df[valid_col] = False
-        val_df[valid_col] = True
-
-        df = pd.concat([train_df, val_df], ignore_index=True)
-    else:
-        df = train_df
-
-    # ------------------------
-    # Dataset builder
-    # ------------------------
-    DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
-    backend = backend or inferred_backend
-
-    dataset_kwargs = route_kwargs(DatasetBuilderClass.__init__, kwargs)
-    builder = DatasetBuilderClass(**dataset_kwargs)
-    ds_train, ds_valid = builder.build(df)
-
-    # ------------------------
-    # Loader builder
-    # ------------------------
-    LoaderClass = LOADER_REGISTRY[backend]
-    loader_kwargs = route_kwargs(LoaderClass.__init__, kwargs)
-    loader = LoaderClass(**loader_kwargs)
-
-    return loader.build(ds_train, ds_valid)
-
-
-BioDataLoaders.create = classmethod(create_dls)
 
 # %% ../nbs/01_data.ipynb #c8037343
 def _create_test_dl(
