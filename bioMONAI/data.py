@@ -5,14 +5,14 @@
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
            'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'register_source',
-           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'detect_source', 'build_source',
-           'DataFrameSource', 'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin',
-           'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder',
-           'test_cache_datasetbuilder', 'FastaiLoader', 'create_dls', 'BioImageBlock', 'BioDataBlock', 'BioDataLoaders',
-           'ReadDictDataset', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
-           'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
-           'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
-           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'ReadDictDataset', 'detect_source',
+           'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource', 'ListSource', 'CallableSource',
+           'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder',
+           'CacheDatasetBuilder', 'FastaiLoader', 'create_dls', 'BioImageBlock', 'BioDataBlock', 'BioDataLoaders',
+           'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair',
+           'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder',
+           'extract_patches', 'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string',
+           'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -413,10 +413,6 @@ def register_task(name):
         return cls
     return wrapper
 
-# %% ../nbs/01_data.ipynb #23567688
-import inspect
-
-
 # %% ../nbs/01_data.ipynb #523b0f7c
 def route_kwargs(func, kwargs):
     """
@@ -437,6 +433,262 @@ def route_kwargs(func, kwargs):
     else:
         # Otherwise, filter to matching parameters only
         return {k: v for k, v in kwargs.items() if k in sig.parameters}
+
+# %% ../nbs/01_data.ipynb #fdcce7d8
+class ReadDictDataset(torchDataset):
+    def __init__(self, ds, x_keys="image", y_keys="label"):
+        """
+        ds: MONAI dataset (or any dict-like dataset)
+        x_keys: single key (str) or list/tuple of keys for inputs
+        y_keys: single key (str) or list/tuple of keys for outputs
+        """
+        self.ds = ds
+        # Normalize to lists
+        self.x_keys = [x_keys] if isinstance(x_keys, str) else list(x_keys)
+        self.y_keys = [y_keys] if isinstance(y_keys, str) else list(y_keys)
+
+    def __len__(self):
+        return len(self.ds)
+
+    def __getitem__(self, idx):
+        item = self.ds[idx]
+        # Flatten all keys into a single tuple
+        output = tuple(item[k] for k in self.x_keys + self.y_keys)
+        return output
+
+    def __getattr__(self, name):
+        # Forward any unknown attribute to the underlying dataset
+        return getattr(self.ds, name)
+
+# %% ../nbs/01_data.ipynb #63cfa09a
+def _patch_dataset(ds, **attrs):
+    """
+    Patch a dataset instance with arbitrary attributes.
+
+    This allows adding fastai-style attributes (like `vocab`) or other
+    metadata to a dataset instance without modifying the class.
+
+    Parameters
+    ----------
+    ds : Dataset
+        Dataset instance to patch.
+    **attrs : dict
+        Arbitrary attributes to attach to the dataset.
+
+    Returns
+    -------
+    Dataset
+        The patched dataset.
+    """
+    for k, v in attrs.items():
+        setattr(ds, k, v)
+    return ds
+
+# %% ../nbs/01_data.ipynb #44506785
+def _patch_dataloader(dl):
+    """
+    Patch a PyTorch DataLoader for minimal fastai compatibility.
+
+    Adds:
+    - .one_batch(): returns a single batch
+    - .new(**kwargs): clone dataloader with overrides
+    - .show_results(): show batch results using BioImage/MetaTensor
+    - .show_batch(): show a batch using BioImage/MetaTensor
+    - .vocab: inferred from underlying dataset if present
+    """
+
+    # ---- helpers ----
+    def _attach_method(obj, fn):
+        setattr(obj, fn.__name__, types.MethodType(fn, obj))
+    
+    def _get_batch_items(b, max_n):
+        "Return first `max_n` items from batch `b`, handling single tensors."
+        # unpack batch
+        if isinstance(b, (tuple, list)) and len(b) == 2:
+            x, y = b
+        else:
+            x = b
+            y = None
+
+        # ensure x_items is a list
+        if isinstance(x, MetaTensor):
+            if x.dim() == 0:          # scalar
+                x_items = [x]
+            elif x.dim() == 3:        # single image (C,H,W)
+                x_items = [x]
+            else:                     # batched (B,C,H,W)
+                x_items = [x[i] for i in range(min(max_n, x.shape[0]))]
+        elif isinstance(x, list):
+            x_items = x[:max_n]
+        else:
+            x_items = list(x)[:max_n]
+
+        # same for y
+        if y is None:
+            y_items = [None]*len(x_items)
+        elif isinstance(y, MetaTensor):
+            if y.dim() == 0:
+                y_items = [y.item()]
+            elif y.dim() == 1:
+                y_items = [y[i].item() for i in range(min(max_n, len(y)))]
+            else:
+                y_items = [y[i] for i in range(min(max_n, y.shape[0]))]
+        else:
+            y_items = list(y)[:len(x_items)]
+
+        return x_items, y_items
+
+    # ---- methods ----
+
+    def do_item(self, i):
+        """
+        Return a single item from the dataset after minimal processing.
+        Mimics fastai DataLoader.do_item behavior.
+        """
+        item = self.dataset[i]
+
+        # if collate_fn exists, apply it to make batch-like
+        if getattr(self, "collate_fn", None) is not None:
+            try:
+                item = self.collate_fn([item])
+            except:
+                pass
+
+        return item
+
+    def one_batch(self): return next(iter(self))
+
+    def new(self, **kwargs):
+        params = dict(
+            dataset=self.dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            collate_fn=self.collate_fn,
+            pin_memory=self.pin_memory,
+            drop_last=self.drop_last,
+        )
+        params.update(kwargs)
+        new_dl = type(self)(**params)
+        _patch_dataloader(new_dl)
+        return new_dl
+
+    # alias the typedispatch function
+    from bioMONAI.data import show_batch as _show_batch
+
+    def show_batch(
+        self, b=None, max_n=9, ctxs=None, show=True, unique=False, **kwargs
+    ):
+        "Show `max_n` input(s) and target(s) from the batch."
+        if unique:
+            old_get_idxs = getattr(self, "get_idxs", lambda: None)
+            self.get_idxs = lambda: [0]
+
+        if b is None: b = self.one_batch()
+        x_items, y_items = _get_batch_items(b, max_n)
+
+        if show:
+            _show_batch(
+                x_items,
+                y_items,
+                samples=None,
+                ctxs=ctxs,
+                max_n=max_n,
+                vocab=getattr(self, "vocab", None),
+                **kwargs
+            )
+        else:
+            return x_items, y_items
+
+        if unique: self.get_idxs = old_get_idxs
+
+    # ---- attach methods ----
+    for fn in (one_batch, new, do_item, show_results, show_batch):
+        _attach_method(dl, fn)
+
+    # ---- attach vocab if available ----
+    if hasattr(dl.dataset, "vocab"):
+        vocab = dl.dataset.vocab
+        if isinstance(vocab, list):
+            from fastai.data.transforms import CategoryMap
+            vocab = CategoryMap(vocab)
+        dl.vocab = vocab
+
+    # ---- attach x/y keys if available ----
+    if hasattr(dl.dataset, "x_keys"):
+        dl.x_keys = dl.dataset.x_keys
+
+    if hasattr(dl.dataset, "y_keys"):
+        dl.y_keys = dl.dataset.y_keys
+
+    return dl
+
+# %% ../nbs/01_data.ipynb #b5833e23
+def _show_summary(train_dl, val_dl=None):
+    """
+    Print a summary of the training and validation dataloaders.
+
+    Displays dataset size, batch size, number of batches,
+    batch shapes/dtypes, and approximate memory usage (MB).
+    """
+    def _describe_dl(dl, name):
+        print(f"\n{name} DataLoader")
+        print("-" * (len(name) + 11))
+
+        ds = dl.dataset
+
+        # dataset info
+        try:
+            ds_len = len(ds)
+        except:
+            ds_len = "unknown"
+
+        print(f"Dataset size : {ds_len}")
+        print(f"Batch size   : {dl.batch_size}")
+        print(f"Batches      : {len(dl)}")
+
+        if hasattr(ds, "vocab"):
+            print(f"Classes      : {ds.vocab}")
+
+        # inspect one batch
+        try:
+            batch = next(iter(dl))
+        except Exception as e:
+            print(f"Could not fetch batch: {e}")
+            return
+
+        print("\nBatch structure:")
+
+        def _tensor_size(x):
+            return x.numel() * x.element_size() / (1024 ** 2)  # MB
+
+        total_mem = 0.0
+
+        if isinstance(batch, (list, tuple)):
+            for i, item in enumerate(batch):
+                if isinstance(item, torchTensor):
+                    mem = _tensor_size(item)
+                    total_mem += mem
+                    print(f"  [{i}] shape={tuple(item.shape)} dtype={item.dtype} ~{mem:.2f} MB")
+                else:
+                    print(f"  [{i}] type={type(item)}")
+        elif isinstance(batch, dict):
+            for k, v in batch.items():
+                if isinstance(v, torchTensor):
+                    mem = _tensor_size(v)
+                    total_mem += mem
+                    print(f"  {k}: shape={tuple(v.shape)} dtype={v.dtype} ~{mem:.2f} MB")
+                else:
+                    print(f"  {k}: type={type(v)}")
+        else:
+            print(type(batch))
+
+        print(f"Approx batch memory: {total_mem:.2f} MB")
+
+    _describe_dl(train_dl, "Train")
+
+    if val_dl is not None:
+        _describe_dl(val_dl, "Valid")
 
 # %% ../nbs/01_data.ipynb #2aad264a
 import pandas as pd
@@ -954,45 +1206,6 @@ class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
 
         return train_ds, valid_ds
 
-# %% ../nbs/01_data.ipynb #575cb804
-def test_cache_datasetbuilder():
-    import pandas as pd
-    from monai.data import CacheDataset
-
-    # --- Sample DataFrame ---
-    df = pd.DataFrame({
-        "image": ["img1.nii.gz", "img2.nii.gz", "img3.nii.gz", "img4.nii.gz"],
-        "label": ["mask1.nii.gz", "mask2.nii.gz", "mask3.nii.gz", "mask4.nii.gz"],
-        "is_valid": [0, 1, 0, 1],
-    })
-
-    # --- Test 1: default split using valid_col ---
-    builder = CacheDatasetBuilder(transforms=None, cache_rate=0.0)
-    train_ds, valid_ds = builder.build(df)
-    assert isinstance(train_ds, CacheDataset), "train_ds should be CacheDataset"
-    assert isinstance(valid_ds, CacheDataset), "valid_ds should be CacheDataset"
-    assert len(train_ds) == 2, "train_ds should contain 2 items"
-    assert len(valid_ds) == 2, "valid_ds should contain 2 items"
-
-    # --- Test 2: val_ prefixed kwargs ---
-    builder2 = CacheDatasetBuilder(transforms=None, num_workers=1, val_num_workers=2)
-    train_ds2, valid_ds2 = builder2.build(df)
-    # Train uses train cache_rate
-    assert train_ds2.num_workers == 1
-    # Valid uses val_cache_rate
-    assert valid_ds2.num_workers == 2
-
-    # --- Test 3: custom splitter ---
-    custom_splitter = RandomSplitter(valid_pct=0.5, seed=42)
-    builder3 = CacheDatasetBuilder(transforms=None, cache_rate=0.0, splitter=custom_splitter)
-    train_ds3, valid_ds3 = builder3.build(df)
-    assert len(train_ds3) == 2 and len(valid_ds3) == 2, "RandomSplitter with 50% should split evenly"
-
-    return "All CacheDatasetBuilder tests passed"
-
-# Run the test
-test_eq(test_cache_datasetbuilder(), "All CacheDatasetBuilder tests passed")
-
 # %% ../nbs/01_data.ipynb #825b575e
 @register_loader("fastai")
 class FastaiLoader:
@@ -1460,262 +1673,6 @@ class BioDataLoaders(DataLoaders):
 BioDataLoaders.class_from_csv = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_csv)
 BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_func)(BioDataLoaders.class_from_path_re)
 
-
-# %% ../nbs/01_data.ipynb #bdcfc91f
-class ReadDictDataset(torchDataset):
-    def __init__(self, ds, x_keys="image", y_keys="label"):
-        """
-        ds: MONAI dataset (or any dict-like dataset)
-        x_keys: single key (str) or list/tuple of keys for inputs
-        y_keys: single key (str) or list/tuple of keys for outputs
-        """
-        self.ds = ds
-        # Normalize to lists
-        self.x_keys = [x_keys] if isinstance(x_keys, str) else list(x_keys)
-        self.y_keys = [y_keys] if isinstance(y_keys, str) else list(y_keys)
-
-    def __len__(self):
-        return len(self.ds)
-
-    def __getitem__(self, idx):
-        item = self.ds[idx]
-        # Flatten all keys into a single tuple
-        output = tuple(item[k] for k in self.x_keys + self.y_keys)
-        return output
-
-    def __getattr__(self, name):
-        # Forward any unknown attribute to the underlying dataset
-        return getattr(self.ds, name)
-
-# %% ../nbs/01_data.ipynb #85d2071b
-def _patch_dataset(ds, **attrs):
-    """
-    Patch a dataset instance with arbitrary attributes.
-
-    This allows adding fastai-style attributes (like `vocab`) or other
-    metadata to a dataset instance without modifying the class.
-
-    Parameters
-    ----------
-    ds : Dataset
-        Dataset instance to patch.
-    **attrs : dict
-        Arbitrary attributes to attach to the dataset.
-
-    Returns
-    -------
-    Dataset
-        The patched dataset.
-    """
-    for k, v in attrs.items():
-        setattr(ds, k, v)
-    return ds
-
-# %% ../nbs/01_data.ipynb #fa5a5cd9
-def _patch_dataloader(dl):
-    """
-    Patch a PyTorch DataLoader for minimal fastai compatibility.
-
-    Adds:
-    - .one_batch(): returns a single batch
-    - .new(**kwargs): clone dataloader with overrides
-    - .show_results(): show batch results using BioImage/MetaTensor
-    - .show_batch(): show a batch using BioImage/MetaTensor
-    - .vocab: inferred from underlying dataset if present
-    """
-
-    # ---- helpers ----
-    def _attach_method(obj, fn):
-        setattr(obj, fn.__name__, types.MethodType(fn, obj))
-    
-    def _get_batch_items(b, max_n):
-        "Return first `max_n` items from batch `b`, handling single tensors."
-        # unpack batch
-        if isinstance(b, (tuple, list)) and len(b) == 2:
-            x, y = b
-        else:
-            x = b
-            y = None
-
-        # ensure x_items is a list
-        if isinstance(x, MetaTensor):
-            if x.dim() == 0:          # scalar
-                x_items = [x]
-            elif x.dim() == 3:        # single image (C,H,W)
-                x_items = [x]
-            else:                     # batched (B,C,H,W)
-                x_items = [x[i] for i in range(min(max_n, x.shape[0]))]
-        elif isinstance(x, list):
-            x_items = x[:max_n]
-        else:
-            x_items = list(x)[:max_n]
-
-        # same for y
-        if y is None:
-            y_items = [None]*len(x_items)
-        elif isinstance(y, MetaTensor):
-            if y.dim() == 0:
-                y_items = [y.item()]
-            elif y.dim() == 1:
-                y_items = [y[i].item() for i in range(min(max_n, len(y)))]
-            else:
-                y_items = [y[i] for i in range(min(max_n, y.shape[0]))]
-        else:
-            y_items = list(y)[:len(x_items)]
-
-        return x_items, y_items
-
-    # ---- methods ----
-
-    def do_item(self, i):
-        """
-        Return a single item from the dataset after minimal processing.
-        Mimics fastai DataLoader.do_item behavior.
-        """
-        item = self.dataset[i]
-
-        # if collate_fn exists, apply it to make batch-like
-        if getattr(self, "collate_fn", None) is not None:
-            try:
-                item = self.collate_fn([item])
-            except:
-                pass
-
-        return item
-
-    def one_batch(self): return next(iter(self))
-
-    def new(self, **kwargs):
-        params = dict(
-            dataset=self.dataset,
-            batch_size=self.batch_size,
-            shuffle=False,
-            num_workers=self.num_workers,
-            collate_fn=self.collate_fn,
-            pin_memory=self.pin_memory,
-            drop_last=self.drop_last,
-        )
-        params.update(kwargs)
-        new_dl = type(self)(**params)
-        _patch_dataloader(new_dl)
-        return new_dl
-
-    # alias the typedispatch function
-    from bioMONAI.data import show_batch as _show_batch
-
-    def show_batch(
-        self, b=None, max_n=9, ctxs=None, show=True, unique=False, **kwargs
-    ):
-        "Show `max_n` input(s) and target(s) from the batch."
-        if unique:
-            old_get_idxs = getattr(self, "get_idxs", lambda: None)
-            self.get_idxs = lambda: [0]
-
-        if b is None: b = self.one_batch()
-        x_items, y_items = _get_batch_items(b, max_n)
-
-        if show:
-            _show_batch(
-                x_items,
-                y_items,
-                samples=None,
-                ctxs=ctxs,
-                max_n=max_n,
-                vocab=getattr(self, "vocab", None),
-                **kwargs
-            )
-        else:
-            return x_items, y_items
-
-        if unique: self.get_idxs = old_get_idxs
-
-    # ---- attach methods ----
-    for fn in (one_batch, new, do_item, show_results, show_batch):
-        _attach_method(dl, fn)
-
-    # ---- attach vocab if available ----
-    if hasattr(dl.dataset, "vocab"):
-        vocab = dl.dataset.vocab
-        if isinstance(vocab, list):
-            from fastai.data.transforms import CategoryMap
-            vocab = CategoryMap(vocab)
-        dl.vocab = vocab
-
-    # ---- attach x/y keys if available ----
-    if hasattr(dl.dataset, "x_keys"):
-        dl.x_keys = dl.dataset.x_keys
-
-    if hasattr(dl.dataset, "y_keys"):
-        dl.y_keys = dl.dataset.y_keys
-
-    return dl
-
-# %% ../nbs/01_data.ipynb #1ea349cf
-def _show_summary(train_dl, val_dl=None):
-    """
-    Print a summary of the training and validation dataloaders.
-
-    Displays dataset size, batch size, number of batches,
-    batch shapes/dtypes, and approximate memory usage (MB).
-    """
-    def _describe_dl(dl, name):
-        print(f"\n{name} DataLoader")
-        print("-" * (len(name) + 11))
-
-        ds = dl.dataset
-
-        # dataset info
-        try:
-            ds_len = len(ds)
-        except:
-            ds_len = "unknown"
-
-        print(f"Dataset size : {ds_len}")
-        print(f"Batch size   : {dl.batch_size}")
-        print(f"Batches      : {len(dl)}")
-
-        if hasattr(ds, "vocab"):
-            print(f"Classes      : {ds.vocab}")
-
-        # inspect one batch
-        try:
-            batch = next(iter(dl))
-        except Exception as e:
-            print(f"Could not fetch batch: {e}")
-            return
-
-        print("\nBatch structure:")
-
-        def _tensor_size(x):
-            return x.numel() * x.element_size() / (1024 ** 2)  # MB
-
-        total_mem = 0.0
-
-        if isinstance(batch, (list, tuple)):
-            for i, item in enumerate(batch):
-                if isinstance(item, torchTensor):
-                    mem = _tensor_size(item)
-                    total_mem += mem
-                    print(f"  [{i}] shape={tuple(item.shape)} dtype={item.dtype} ~{mem:.2f} MB")
-                else:
-                    print(f"  [{i}] type={type(item)}")
-        elif isinstance(batch, dict):
-            for k, v in batch.items():
-                if isinstance(v, torchTensor):
-                    mem = _tensor_size(v)
-                    total_mem += mem
-                    print(f"  {k}: shape={tuple(v.shape)} dtype={v.dtype} ~{mem:.2f} MB")
-                else:
-                    print(f"  {k}: type={type(v)}")
-        else:
-            print(type(batch))
-
-        print(f"Approx batch memory: {total_mem:.2f} MB")
-
-    _describe_dl(train_dl, "Train")
-
-    if val_dl is not None:
-        _describe_dl(val_dl, "Valid")
 
 # %% ../nbs/01_data.ipynb #13f09332
 def from_monai(
