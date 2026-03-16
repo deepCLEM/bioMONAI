@@ -1947,7 +1947,7 @@ def _create_test_dl(
 
 # %% ../nbs/01_data.ipynb #29793415
 def test_biodataloader(dls:DataLoaders, 
-                       test_data:str|Path|pd.DataFrame|monaiDataset, 
+                       test_data:str|Path|pd.DataFrame|MonaiDataset, 
                        with_labels=True, 
                        csv_header='infer', 
                        csv_delimiter=None, 
@@ -1967,7 +1967,7 @@ def test_biodataloader(dls:DataLoaders,
         else:
             # Handle non-CSV file case - get image files from directory
             test_dl = dls.test_dl(get_image_files(test_data), with_labels=with_labels)
-    elif isinstance(test_data, monaiDataset):
+    elif isinstance(test_data, MonaiDataset):
         test_dl = _create_test_dl(test_data, dls)
     
     return test_dl
