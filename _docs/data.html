@@ -456,8 +456,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#loading-monai-datasets" id="toc-loading-monai-datasets" class="nav-link" data-scroll-target="#loading-monai-datasets">Loading Monai Datasets</a></li>
   <li><a href="#from_monai" id="toc-from_monai" class="nav-link" data-scroll-target="#from_monai">from_monai</a></li>
   <li><a href="#from_monai_ds" id="toc-from_monai_ds" class="nav-link" data-scroll-target="#from_monai_ds">from_monai_ds</a></li>
-  <li><a href="#from_monai-1" id="toc-from_monai-1" class="nav-link" data-scroll-target="#from_monai-1">from_monai</a></li>
-  <li><a href="#from_monai_ds-1" id="toc-from_monai_ds-1" class="nav-link" data-scroll-target="#from_monai_ds-1">from_monai_ds</a></li>
   </ul></li>
   <li><a href="#test-datasets" id="toc-test-datasets" class="nav-link" data-scroll-target="#test-datasets">Test Datasets</a>
   <ul>
@@ -1160,8 +1158,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the test</span></span>
 <span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>test_eq(test_cache_datasetbuilder(), <span class="st">"All CacheDatasetBuilder tests passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|##########| 2/2 [00:00&lt;00:00, 44384.17it/s]
-Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|##########| 2/2 [00:00&lt;00:00, 5614.86it/s]</code></pre>
+<pre><code>Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|##########| 2/2 [00:00&lt;00:00, 74898.29it/s]
+Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|##########| 2/2 [00:00&lt;00:00, 6274.20it/s]</code></pre>
 </div>
 </div>
 </section>
@@ -1358,7 +1356,7 @@ Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|#
 <h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioDataBlock(</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    blocks:<span class="bu">list</span><span class="op">=</span>(<span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x70ec9e26bbd0</span><span class="op">&gt;</span>, <span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x70e9fbe9ba10</span><span class="op">&gt;</span>), <span class="co"># One or more `TransformBlock`s</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    blocks:<span class="bu">list</span><span class="op">=</span>(<span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x7bd64aedff50</span><span class="op">&gt;</span>, <span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x7bd3a8a45010</span><span class="op">&gt;</span>), <span class="co"># One or more `TransformBlock`s</span></span>
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    dl_type:TfmdDL<span class="op">=</span><span class="va">None</span>, <span class="co"># Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`</span></span>
 <span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    get_items:function<span class="op">=</span>get_image_files, get_y:NoneType<span class="op">=</span><span class="va">None</span>, get_x:NoneType<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    getters:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Getter functions applied to results of `get_items`</span></span>
@@ -1551,46 +1549,6 @@ Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|#
 <span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Build <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> from any MONAI dataset class.</em></p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2006" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="from_monai-1" class="level3">
-<h3 class="anchored" data-anchor-id="from_monai-1">from_monai</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_monai(</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    train_ds, <span class="co"># MONAI training dataset</span></span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    val_ds:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># MONAI validation dataset</span></span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>    x_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, <span class="co"># Key(s) used as model inputs</span></span>
-<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>    y_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'label'</span>, <span class="co"># Key(s) used as targets</span></span>
-<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>    bs:<span class="bu">int</span><span class="op">=</span><span class="dv">64</span>, <span class="co"># Training batch size</span></span>
-<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>    val_bs:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Validation batch size (overrides automatic scaling)</span></span>
-<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>    val_bs_factor:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Multiplier applied to bs when val_bs is None</span></span>
-<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>    shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Shuffle training dataset</span></span>
-<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>    val_shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Shuffle validation dataset (defaults to False)</span></span>
-<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>    show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Print basic dataloader summary</span></span>
-<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>    vocab:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional class names for classification tasks</span></span>
-<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>    dl_kwargs:VAR_KEYWORD</span>
-<span id="cb62-15"><a href="#cb62-15" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb62-16"><a href="#cb62-16" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Create fastai-compatible <code>DataLoaders</code> from MONAI dictionary datasets.</em></p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2139" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="from_monai_ds-1" class="level3">
-<h3 class="anchored" data-anchor-id="from_monai_ds-1">from_monai_ds</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_monai_ds(</span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    dataset_cls, <span class="co"># MONAI dataset class (Dataset, CacheDataset, etc.)</span></span>
-<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    train_data, <span class="co"># Training datalist</span></span>
-<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>    train_transform:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Training transform pipeline</span></span>
-<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>    val_data:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional validation datalist</span></span>
-<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>    val_transform:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Validation transforms</span></span>
-<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>    dataset_kwargs:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Extra args for dataset constructor</span></span>
-<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>    val_dataset_kwargs:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Validation dataset overrides</span></span>
-<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>    dl_kwargs:VAR_KEYWORD</span>
-<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Build <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> from any MONAI dataset class.</em></p>
 </section>
 </section>
 <section id="test-datasets" class="level2">
@@ -1599,12 +1557,12 @@ Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|#
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2267" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="test_biodataloader" class="level3">
 <h3 class="anchored" data-anchor-id="test_biodataloader">test_biodataloader</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_biodataloader(</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    dls:DataLoaders, test_data:<span class="bu">str</span> <span class="op">|</span> pathlib.Path <span class="op">|</span> pandas.DataFrame <span class="op">|</span> monai.data.dataset.Dataset,</span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>    with_labels:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, csv_header:<span class="bu">str</span><span class="op">=</span><span class="st">'infer'</span>, csv_delimiter:NoneType<span class="op">=</span><span class="va">None</span>, csv_quoting:<span class="bu">int</span><span class="op">=</span><span class="dv">0</span></span>
-<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_biodataloader(</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    dls:DataLoaders, test_data:<span class="bu">str</span> <span class="op">|</span> pathlib.Path <span class="op">|</span> pandas.DataFrame <span class="op">|</span> monai.data.dataset.Dataset,</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    with_labels:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, csv_header:<span class="bu">str</span><span class="op">=</span><span class="st">'infer'</span>, csv_delimiter:NoneType<span class="op">=</span><span class="va">None</span>, csv_quoting:<span class="bu">int</span><span class="op">=</span><span class="dv">0</span></span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Test a <code>DataLoader</code> on a set of <code>test_files</code> and return the results as a list of tuples containing the file name and the corresponding input and target tensors.</em></p>
 </section>
 </section>
@@ -1615,23 +1573,23 @@ Loading dataset:   0%|          | 0/2 [00:00&lt;?, ?it/s]Loading dataset: 100%|#
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2331" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="get_images" class="level3">
 <h3 class="anchored" data-anchor-id="get_images">get_images</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_images(</span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span> <span class="op">|</span> pathlib.Path, folders:<span class="bu">str</span> <span class="op">|</span> <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, recurse:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, filename_filter:Union<span class="op">=</span><span class="va">None</span></span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>L:</span>
-<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_images(</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span> <span class="op">|</span> pathlib.Path, folders:<span class="bu">str</span> <span class="op">|</span> <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, recurse:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, filename_filter:Union<span class="op">=</span><span class="va">None</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>L:</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Get image files from a list of folders or a glob expression.</em></p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2376" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_gt" class="level3">
 <h3 class="anchored" data-anchor-id="get_gt">get_gt</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_gt(</span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    path_gt, <span class="co"># The base directory where the ground truth files are stored, or a file path from which to derive the parent directory.</span></span>
-<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>    gt_file_name:<span class="bu">str</span><span class="op">=</span><span class="st">'avg50.png'</span>, <span class="co"># The name of the ground truth file.</span></span>
-<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_gt(</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    path_gt, <span class="co"># The base directory where the ground truth files are stored, or a file path from which to derive the parent directory.</span></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>    gt_file_name:<span class="bu">str</span><span class="op">=</span><span class="st">'avg50.png'</span>, <span class="co"># The name of the ground truth file.</span></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_gt"><code>get_gt</code></a> function retrieves ground truth data, essential for supervised learning tasks. </em> It ensures that the correct labels or annotations are associated with each data sample.</p>
 <p>This function constructs a path to a ground truth file based on the given <code>path_gt</code> and <code>gt_file_name</code>.<br>
 It uses a lambda function to create a new path by appending <code>gt_file_name</code> to the parent directory of the input file, as specified by <code>path_gt</code>.</p>
@@ -1642,19 +1600,19 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </section>
 <section id="get_target" class="level3">
 <h3 class="anchored" data-anchor-id="get_target">get_target</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_target(</span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span>, <span class="co"># The base directory where the files are located. This should be a string representing an absolute or relative path.</span></span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>    same_filename:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, the target file name will match the original file name; otherwise, it will use the specified prefix.</span></span>
-<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>    same_foldername:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, the target folder name will match the original folder name; otherwise, it will use the specified prefix.</span></span>
-<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>    target_file_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'target'</span>, <span class="co"># The prefix to insert into the target file name if `same_filename` is False.</span></span>
-<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>    signal_file_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'signal'</span>, <span class="co"># The prefix used in the original file names that should be replaced by the target prefix.</span></span>
-<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>    map_foldername:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, the target folder name will match the original folder name; otherwise, it will use the specified prefix.</span></span>
-<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>    target_folder_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'target'</span>, <span class="co"># The prefix to insert into the target folder name if `same_foldername` is False.</span></span>
-<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>    signal_folder_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'signal'</span>, <span class="co"># The prefix used in the original folder names that should be replaced by the target prefix.</span></span>
-<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>    relative_path:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, it indicates that the path is relative to the parent folder in the path where the input files are located.</span></span>
-<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_target(</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span>, <span class="co"># The base directory where the files are located. This should be a string representing an absolute or relative path.</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    same_filename:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, the target file name will match the original file name; otherwise, it will use the specified prefix.</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>    same_foldername:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, the target folder name will match the original folder name; otherwise, it will use the specified prefix.</span></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    target_file_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'target'</span>, <span class="co"># The prefix to insert into the target file name if `same_filename` is False.</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>    signal_file_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'signal'</span>, <span class="co"># The prefix used in the original file names that should be replaced by the target prefix.</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>    map_foldername:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, the target folder name will match the original folder name; otherwise, it will use the specified prefix.</span></span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>    target_folder_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'target'</span>, <span class="co"># The prefix to insert into the target folder name if `same_foldername` is False.</span></span>
+<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a>    signal_folder_prefix:<span class="bu">str</span><span class="op">=</span><span class="st">'signal'</span>, <span class="co"># The prefix used in the original folder names that should be replaced by the target prefix.</span></span>
+<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a>    relative_path:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, it indicates that the path is relative to the parent folder in the path where the input files are located.</span></span>
+<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Constructs and returns functions for generating file paths to “target” files based on given input parameters.</em></p>
 <p>This function defines two nested helper functions within its scope:</p>
 <pre><code>- `construct_target_filename(file_name)`: Constructs a target file name by inserting the specified prefix into the original file name.
@@ -1663,19 +1621,19 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <p>Returns a callable: A function that takes a file name as input and returns its corresponding target file path based on the specified parameters.</p>
 <p>The function <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_target"><code>get_target</code></a> can be used to look for target files in different folders using either absolute or relative paths:</p>
 <div id="41cabf91" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'train_folder/target'</span>, same_filename<span class="op">=</span><span class="va">False</span>)(<span class="st">'../signal/signal01.tif'</span>))</span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'target'</span>, relative_path<span class="op">=</span><span class="va">True</span>)(<span class="st">'../train_folder/signal/image01.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'train_folder/target'</span>, same_filename<span class="op">=</span><span class="va">False</span>)(<span class="st">'../signal/signal01.tif'</span>))</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'target'</span>, relative_path<span class="op">=</span><span class="va">True</span>)(<span class="st">'../train_folder/signal/image01.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>…and it can look for target files with different names but same numbering:</p>
 <div id="175a92b1" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"image_clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"image_noisy"</span>)(<span class="st">'train_folder/signal/image_noisy_01.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"image_clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"image_noisy"</span>)(<span class="st">'train_folder/signal/image_noisy_01.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>It also supports more general cases:</p>
 <div id="7395ebe8" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"noisy"</span>)(<span class="st">'train_folder/signal/01_image_noisy_dataset.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">'GT'</span>, relative_path<span class="op">=</span><span class="va">True</span>, same_filename<span class="op">=</span><span class="va">False</span>, target_file_prefix<span class="op">=</span><span class="st">"clean"</span>, signal_file_prefix<span class="op">=</span><span class="st">"noisy"</span>)(<span class="st">'train_folder/signal/01_image_noisy_dataset.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="cf5bc0a4" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">''</span>, relative_path<span class="op">=</span><span class="va">True</span>, map_foldername<span class="op">=</span><span class="va">True</span>, target_folder_prefix<span class="op">=</span><span class="st">"GT"</span>, signal_folder_prefix<span class="op">=</span><span class="st">"signal"</span>)(<span class="st">'train_folder/signal_01/01_1.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_target(<span class="st">''</span>, relative_path<span class="op">=</span><span class="va">True</span>, map_foldername<span class="op">=</span><span class="va">True</span>, target_folder_prefix<span class="op">=</span><span class="st">"GT"</span>, signal_folder_prefix<span class="op">=</span><span class="st">"signal"</span>)(<span class="st">'train_folder/signal_01/01_1.tif'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For tasks involving unsupervised denoising or noise analysis, <a href="https://deepCLEM.github.io/bioMONAI/data.html#get_noisy_pair"><code>get_noisy_pair</code></a> retrieves pairs of noisy data, enabling the training of models such as N2N.</p>
 <hr>
@@ -1683,11 +1641,11 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </section>
 <section id="get_noisy_pair" class="level3">
 <h3 class="anchored" data-anchor-id="get_noisy_pair">get_noisy_pair</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_noisy_pair(</span>
-<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>    fn</span>
-<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_noisy_pair(</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>    fn</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Get another “noisy” version of the input file by selecting a file from the same directory.</em></p>
 <p>This function first retrieves all image files in the directory of the input file <code>fn</code> (excluding subdirectories). It then selects one of these files at random, ensuring that it is not the original file itself to avoid creating a trivial “noisy” pair.</p>
 <p>Parameters:</p>
@@ -1864,65 +1822,65 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2779" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="split_dataframe" class="level3">
 <h3 class="anchored" data-anchor-id="split_dataframe">split_dataframe</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_dataframe(</span>
-<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>    input_data:Union, <span class="co"># CSV file path or pandas DataFrame.</span></span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>    train_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.8</span>, <span class="co"># Fraction of samples for training.</span></span>
-<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>    valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>, <span class="co"># Fraction of samples for validation.</span></span>
-<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>    split_column:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Column containing predefined split labels ("train", "test", "validation").</span></span>
-<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>    stratify:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Stratify random splits by split_column.</span></span>
-<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>    add_is_valid:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Add an `is_valid` column to the train set instead of saving a separate validation file.</span></span>
-<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>    train_path:<span class="bu">str</span><span class="op">=</span><span class="st">'train.csv'</span>, test_path:<span class="bu">str</span><span class="op">=</span><span class="st">'test.csv'</span>, valid_path:<span class="bu">str</span><span class="op">=</span><span class="st">'valid.csv'</span>,</span>
-<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>    data_save_path:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Directory where CSV files will be saved.</span></span>
-<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>    random_seed:Optional<span class="op">=</span><span class="va">None</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span></span>
-<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="bu">tuple</span>:</span>
-<span id="cb78-13"><a href="#cb78-13" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_dataframe(</span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>    input_data:Union, <span class="co"># CSV file path or pandas DataFrame.</span></span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>    train_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.8</span>, <span class="co"># Fraction of samples for training.</span></span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>    valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>, <span class="co"># Fraction of samples for validation.</span></span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>    split_column:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Column containing predefined split labels ("train", "test", "validation").</span></span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>    stratify:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Stratify random splits by split_column.</span></span>
+<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>    add_is_valid:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Add an `is_valid` column to the train set instead of saving a separate validation file.</span></span>
+<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>    train_path:<span class="bu">str</span><span class="op">=</span><span class="st">'train.csv'</span>, test_path:<span class="bu">str</span><span class="op">=</span><span class="st">'test.csv'</span>, valid_path:<span class="bu">str</span><span class="op">=</span><span class="st">'valid.csv'</span>,</span>
+<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>    data_save_path:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Directory where CSV files will be saved.</span></span>
+<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>    random_seed:Optional<span class="op">=</span><span class="va">None</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span></span>
+<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="bu">tuple</span>:</span>
+<span id="cb76-13"><a href="#cb76-13" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Split a dataset into train, test and optional validation sets.</em></p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2906" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="add_columns_to_csv" class="level3">
 <h3 class="anchored" data-anchor-id="add_columns_to_csv">add_columns_to_csv</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_columns_to_csv(</span>
-<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>    csv_path, <span class="co"># Path to the input CSV file</span></span>
-<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>    column_data, <span class="co"># Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.</span></span>
-<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>    output_path:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Path to save the updated CSV file. If None, it overwrites the input CSV file.</span></span>
-<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_columns_to_csv(</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>    csv_path, <span class="co"># Path to the input CSV file</span></span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>    column_data, <span class="co"># Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.</span></span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>    output_path:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Path to save the updated CSV file. If None, it overwrites the input CSV file.</span></span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Adds one or more new columns to an existing CSV file.</em></p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2933" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="build_df" class="level3">
 <h3 class="anchored" data-anchor-id="build_df">build_df</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb80"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_df(</span>
-<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>    filenames:Union, <span class="co"># List of file names to process</span></span>
-<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>    functions:Callable, <span class="co"># One or more functions that take a filename and return a string (e.g., for generating target paths).</span></span>
-<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>    function_names:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional column names for the function outputs. If None, function.__name__ is used.</span></span>
-<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>    output_csv:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, saves the full dataframe to this CSV path.</span></span>
-<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>    split:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, applies split_dataframe to the generated dataframe.</span></span>
-<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>    split_kwargs:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Keyword arguments passed to split_dataframe.</span></span>
-<span id="cb80-9"><a href="#cb80-9" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Union:</span>
-<span id="cb80-10"><a href="#cb80-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_df(</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>    filenames:Union, <span class="co"># List of file names to process</span></span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>    functions:Callable, <span class="co"># One or more functions that take a filename and return a string (e.g., for generating target paths).</span></span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>    function_names:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional column names for the function outputs. If None, function.__name__ is used.</span></span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>    output_csv:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, saves the full dataframe to this CSV path.</span></span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>    split:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, applies split_dataframe to the generated dataframe.</span></span>
+<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>    split_kwargs:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Keyword arguments passed to split_dataframe.</span></span>
+<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Union:</span>
+<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Create a DataFrame from filenames and one or more transformation functions.</em></p>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L2981" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="build_df_from_folder" class="level3">
 <h3 class="anchored" data-anchor-id="build_df_from_folder">build_df_from_folder</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_df_from_folder(</span>
-<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span> <span class="op">|</span> pathlib.Path,</span>
-<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    functions:Callable, <span class="co"># One or more functions that take a filename and return a string (e.g., for generating target paths).</span></span>
-<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>    function_names:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional column names for the function outputs. If None, function.__name__ is used.</span></span>
-<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>    output_csv:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, saves the full dataframe to this CSV path.</span></span>
-<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>    subfolders:<span class="bu">str</span> <span class="op">|</span> <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, recurse:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, filename_filter:Union<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>    split:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, applies split_dataframe to the generated dataframe.</span></span>
-<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>    split_kwargs:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Keyword arguments passed to split_dataframe.</span></span>
-<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Union:</span>
-<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_df_from_folder(</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span> <span class="op">|</span> pathlib.Path,</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>    functions:Callable, <span class="co"># One or more functions that take a filename and return a string (e.g., for generating target paths).</span></span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>    function_names:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional column names for the function outputs. If None, function.__name__ is used.</span></span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>    output_csv:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, saves the full dataframe to this CSV path.</span></span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>    subfolders:<span class="bu">str</span> <span class="op">|</span> <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, recurse:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, filename_filter:Union<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>    split:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, applies split_dataframe to the generated dataframe.</span></span>
+<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>    split_kwargs:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Keyword arguments passed to split_dataframe.</span></span>
+<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Union:</span>
+<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Create a DataFrame from filenames and one or more transformation functions.</em></p>
 </section>
 </section>
@@ -1933,126 +1891,126 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L3007" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="extract_patches" class="level3">
 <h3 class="anchored" data-anchor-id="extract_patches">extract_patches</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb82"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_patches(</span>
-<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>    data:ndarray, <span class="co"># Input array (n-dimensional)</span></span>
-<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>    patch_size:<span class="bu">tuple</span>, <span class="co"># Patch size per dimension</span></span>
-<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>    overlap:<span class="bu">float</span> <span class="op">|</span> <span class="bu">tuple</span>, <span class="co"># Overlap fraction(s)</span></span>
-<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>    transforms:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional list of transforms</span></span>
-<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb82-8"><a href="#cb82-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb80"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_patches(</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>    data:ndarray, <span class="co"># Input array (n-dimensional)</span></span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>    patch_size:<span class="bu">tuple</span>, <span class="co"># Patch size per dimension</span></span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>    overlap:<span class="bu">float</span> <span class="op">|</span> <span class="bu">tuple</span>, <span class="co"># Overlap fraction(s)</span></span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>    transforms:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional list of transforms</span></span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Extract n-dimensional patches from input data.</em> Optionally applies transforms to the full data before extracting patches.</p>
 <p>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#extract_patches"><code>extract_patches</code></a> function divides images into smaller patches, which is useful for training models on localized regions of interest, especially when dealing with high-resolution images.</p>
 <div id="3e3e9628" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb83"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.random.rand(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">3</span>)  <span class="co"># Example 3D data</span></span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>,<span class="dv">2</span>)</span>
-<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>patches <span class="op">=</span> extract_patches(data, patch_size, overlap)</span>
-<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of generated patches:"</span>, <span class="bu">len</span>(patches))</span>
-<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a>patches[<span class="dv">0</span>].shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.random.rand(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">3</span>)  <span class="co"># Example 3D data</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>,<span class="dv">2</span>)</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>patches <span class="op">=</span> extract_patches(data, patch_size, overlap)</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of generated patches:"</span>, <span class="bu">len</span>(patches))</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>patches[<span class="dv">0</span>].shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="417ff3f9" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> RandFlip, RandRot90</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> RandFlip, RandRot90</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="e0f95e8c" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb85"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>patches <span class="op">=</span> extract_patches(data, patch_size, overlap, transforms<span class="op">=</span>[RandFlip(spatial_dims<span class="op">=</span><span class="dv">3</span>, prob<span class="op">=</span><span class="fl">1.0</span>), RandRot90(prob<span class="op">=</span><span class="fl">1.0</span>)])</span>
-<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of generated patches:"</span>, <span class="bu">len</span>(patches))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb83"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>patches <span class="op">=</span> extract_patches(data, patch_size, overlap, transforms<span class="op">=</span>[RandFlip(spatial_dims<span class="op">=</span><span class="dv">3</span>, prob<span class="op">=</span><span class="fl">1.0</span>), RandRot90(prob<span class="op">=</span><span class="fl">1.0</span>)])</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of generated patches:"</span>, <span class="bu">len</span>(patches))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L3080" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="save_patches_grid" class="level3">
 <h3 class="anchored" data-anchor-id="save_patches_grid">save_patches_grid</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb86"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_patches_grid(</span>
-<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>    data_paths, <span class="co"># Path to folder or list of paths to data files (n-dimensional data).</span></span>
-<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>    gt_paths, <span class="co"># Path to folder or list of paths to ground truth (gt) files (n-dimensional data).</span></span>
-<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>    output_folder, <span class="co"># Path to the folder where the HDF5 files will be saved.</span></span>
-<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>    patch_size, <span class="co"># tuple of integers defining the size of the patches.</span></span>
-<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>    overlap, <span class="co"># float (between 0 and 1) defining the overlap between patches.</span></span>
-<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>    use_parent_folder:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, use the parent folder name of the input files for naming the output HDF5 files.</span></span>
-<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>    threshold:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, patches with a mean value below this threshold will be discarded.</span></span>
-<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>    squeeze_input:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, squeeze the input data to remove single-dimensional entries.</span></span>
-<span id="cb86-11"><a href="#cb86-11" aria-hidden="true" tabindex="-1"></a>    squeeze_patches:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, squeeze the patches to remove single-dimensional entries.</span></span>
-<span id="cb86-12"><a href="#cb86-12" aria-hidden="true" tabindex="-1"></a>    csv_output:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, a CSV file listing all patch paths is created.</span></span>
-<span id="cb86-13"><a href="#cb86-13" aria-hidden="true" tabindex="-1"></a>    split_dataset:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Split dataset into train and test CSV files (e.g., 0.8 for 80% train).</span></span>
-<span id="cb86-14"><a href="#cb86-14" aria-hidden="true" tabindex="-1"></a>    tfms_before:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply before extracting patches.</span></span>
-<span id="cb86-15"><a href="#cb86-15" aria-hidden="true" tabindex="-1"></a>    tfms_after:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply after extracting patches.</span></span>
-<span id="cb86-16"><a href="#cb86-16" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
-<span id="cb86-17"><a href="#cb86-17" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb86-18"><a href="#cb86-18" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb84"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_patches_grid(</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>    data_paths, <span class="co"># Path to folder or list of paths to data files (n-dimensional data).</span></span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>    gt_paths, <span class="co"># Path to folder or list of paths to ground truth (gt) files (n-dimensional data).</span></span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    output_folder, <span class="co"># Path to the folder where the HDF5 files will be saved.</span></span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>    patch_size, <span class="co"># tuple of integers defining the size of the patches.</span></span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>    overlap, <span class="co"># float (between 0 and 1) defining the overlap between patches.</span></span>
+<span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a>    use_parent_folder:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, use the parent folder name of the input files for naming the output HDF5 files.</span></span>
+<span id="cb84-9"><a href="#cb84-9" aria-hidden="true" tabindex="-1"></a>    threshold:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, patches with a mean value below this threshold will be discarded.</span></span>
+<span id="cb84-10"><a href="#cb84-10" aria-hidden="true" tabindex="-1"></a>    squeeze_input:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, squeeze the input data to remove single-dimensional entries.</span></span>
+<span id="cb84-11"><a href="#cb84-11" aria-hidden="true" tabindex="-1"></a>    squeeze_patches:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, squeeze the patches to remove single-dimensional entries.</span></span>
+<span id="cb84-12"><a href="#cb84-12" aria-hidden="true" tabindex="-1"></a>    csv_output:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, a CSV file listing all patch paths is created.</span></span>
+<span id="cb84-13"><a href="#cb84-13" aria-hidden="true" tabindex="-1"></a>    split_dataset:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Split dataset into train and test CSV files (e.g., 0.8 for 80% train).</span></span>
+<span id="cb84-14"><a href="#cb84-14" aria-hidden="true" tabindex="-1"></a>    tfms_before:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply before extracting patches.</span></span>
+<span id="cb84-15"><a href="#cb84-15" aria-hidden="true" tabindex="-1"></a>    tfms_after:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply after extracting patches.</span></span>
+<span id="cb84-16"><a href="#cb84-16" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb84-17"><a href="#cb84-17" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb84-18"><a href="#cb84-18" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Loads n-dimensional data from data_paths and gt_paths, generates patches, and saves them into individual HDF5 files.</em> Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</p>
 <p>Parameters: - data_paths: Can be a folder path (string) or a list of file paths to data files - gt_paths: Can be a folder path (string) or a list of file paths to ground truth files</p>
 <p>After extracting patches, <a href="https://deepCLEM.github.io/bioMONAI/data.html#save_patches_grid"><code>save_patches_grid</code></a> saves them in a grid format, facilitating visualization and inspection of the patches.</p>
 <div id="4855e337" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb87"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> Blur</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb85"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> Blur</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="e73c059b" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
-<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
-<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_paths, gt_paths, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_after<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test'</span></span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_paths, gt_paths, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_after<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="cfab733a" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb89"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader, split_hdf_path</span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb87"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader, split_hdf_path</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_image</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="4121fd54" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/X/1'</span></span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/X/1'</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="d54228ed" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/y/1'</span></span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb89"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test/HV110_P0500510000.h5/y/1'</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="example" class="level3">
 <h3 class="anchored" data-anchor-id="example">Example</h3>
 <div id="44c37c52" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.core <span class="im">import</span> apply_transforms</span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> Blur, RandFlip</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.core <span class="im">import</span> apply_transforms</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> Blur, RandFlip</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="07ec6fa8" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List of transformations defined from the bioMONAI transforms module </span></span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>transforms_list <span class="op">=</span> [</span>
-<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>    Blur(ksize<span class="op">=</span><span class="dv">15</span>, prob<span class="op">=</span><span class="fl">1.0</span>), </span>
-<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>    RandFlip(prob<span class="op">=</span><span class="fl">1.0</span>, spatial_axis<span class="op">=</span><span class="dv">1</span>, ndim<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List of transformations defined from the bioMONAI transforms module </span></span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>transforms_list <span class="op">=</span> [</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>    Blur(ksize<span class="op">=</span><span class="dv">15</span>, prob<span class="op">=</span><span class="fl">1.0</span>), </span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>    RandFlip(prob<span class="op">=</span><span class="fl">1.0</span>, spatial_axis<span class="op">=</span><span class="dv">1</span>, ndim<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="23ffbd13" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
-<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test_tfms'</span></span>
-<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb94-7"><a href="#cb94-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_paths, gt_paths, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_after<span class="op">=</span>transforms_list)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For the sake of simplicity, in this example we use the same folder for ground truth</span></span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test_tfms'</span></span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>save_patches_grid(data_paths, gt_paths, output_folder, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_after<span class="op">=</span>transforms_list)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="94bc94b5" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb95"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test_tfms/HV110_P0500510000.h5/X/1'</span></span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test_tfms/HV110_P0500510000.h5/X/1'</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L3230" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="extract_random_patches" class="level3">
 <h3 class="anchored" data-anchor-id="extract_random_patches">extract_random_patches</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb96"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_random_patches(</span>
-<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>    data_tuple, <span class="co"># tuple of numpy arrays (input data, ground truth data).</span></span>
-<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>    patch_size, <span class="co"># tuple of integers defining the size of the patches in each dimension.</span></span>
-<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>    num_patches, <span class="co"># number of random patches to extract.</span></span>
-<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb94"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_random_patches(</span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>    data_tuple, <span class="co"># tuple of numpy arrays (input data, ground truth data).</span></span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>    patch_size, <span class="co"># tuple of integers defining the size of the patches in each dimension.</span></span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>    num_patches, <span class="co"># number of random patches to extract.</span></span>
+<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb94-7"><a href="#cb94-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Extracts a specified number of random n-dimensional patches from the input data and ground truth data.</em></p>
 <p>Returns: - A tuple of lists containing randomly cropped patches as numpy arrays (input_patches, gt_patches).</p>
 <hr>
@@ -2060,74 +2018,74 @@ It uses a lambda function to create a new path by appending <code>gt_file_name</
 </section>
 <section id="save_patches_random" class="level3">
 <h3 class="anchored" data-anchor-id="save_patches_random">save_patches_random</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb97"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_patches_random(</span>
-<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>    data_paths, <span class="co"># Path to folder or list of paths to data files (n-dimensional data).</span></span>
-<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>    gt_paths, <span class="co"># Path to folder or list of paths to ground truth (gt) files (n-dimensional data).</span></span>
-<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>    output_folder, <span class="co"># Path to the folder where the HDF5 files will be saved.</span></span>
-<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>    patch_size, <span class="co"># tuple of integers defining the size of the patches.</span></span>
-<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>    num_patches, <span class="co"># number of random patches to extract per file.</span></span>
-<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>    threshold:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, patches with a mean value below this threshold will be discarded.</span></span>
-<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>    squeeze_input:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, squeezes singleton dimensions in the input data.</span></span>
-<span id="cb97-10"><a href="#cb97-10" aria-hidden="true" tabindex="-1"></a>    squeeze_patches:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, squeezes singleton dimensions in the patches.</span></span>
-<span id="cb97-11"><a href="#cb97-11" aria-hidden="true" tabindex="-1"></a>    csv_output:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, a CSV file listing all patch paths is created.</span></span>
-<span id="cb97-12"><a href="#cb97-12" aria-hidden="true" tabindex="-1"></a>    train_test_split_ratio:<span class="bu">float</span><span class="op">=</span><span class="fl">0.8</span>, <span class="co"># Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</span></span>
-<span id="cb97-13"><a href="#cb97-13" aria-hidden="true" tabindex="-1"></a>    tfms_before:List<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply before extracting patches.</span></span>
-<span id="cb97-14"><a href="#cb97-14" aria-hidden="true" tabindex="-1"></a>    tfms_after:List<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply after extracting patches.</span></span>
-<span id="cb97-15"><a href="#cb97-15" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb97-16"><a href="#cb97-16" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb95"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_patches_random(</span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>    data_paths, <span class="co"># Path to folder or list of paths to data files (n-dimensional data).</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>    gt_paths, <span class="co"># Path to folder or list of paths to ground truth (gt) files (n-dimensional data).</span></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>    output_folder, <span class="co"># Path to the folder where the HDF5 files will be saved.</span></span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>    patch_size, <span class="co"># tuple of integers defining the size of the patches.</span></span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>    num_patches, <span class="co"># number of random patches to extract per file.</span></span>
+<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>    threshold:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, patches with a mean value below this threshold will be discarded.</span></span>
+<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>    squeeze_input:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, squeezes singleton dimensions in the input data.</span></span>
+<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>    squeeze_patches:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, squeezes singleton dimensions in the patches.</span></span>
+<span id="cb95-11"><a href="#cb95-11" aria-hidden="true" tabindex="-1"></a>    csv_output:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># If True, a CSV file listing all patch paths is created.</span></span>
+<span id="cb95-12"><a href="#cb95-12" aria-hidden="true" tabindex="-1"></a>    train_test_split_ratio:<span class="bu">float</span><span class="op">=</span><span class="fl">0.8</span>, <span class="co"># Ratio of data to split into train and test CSV files (e.g., 0.8 for 80% train).</span></span>
+<span id="cb95-13"><a href="#cb95-13" aria-hidden="true" tabindex="-1"></a>    tfms_before:List<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply before extracting patches.</span></span>
+<span id="cb95-14"><a href="#cb95-14" aria-hidden="true" tabindex="-1"></a>    tfms_after:List<span class="op">=</span><span class="va">None</span>, <span class="co"># List of transforms to apply after extracting patches.</span></span>
+<span id="cb95-15"><a href="#cb95-15" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb95-16"><a href="#cb95-16" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Loads n-dimensional data from data_folder and gt_folder, generates random patches, and saves them into individual HDF5 files.</em> Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.</p>
 <div id="29235d1b" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
-<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
-<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
-<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_paths, gt_paths, output_folder, patch_size, num_patches, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_before<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> <span class="st">'./data_examples/Confocal_BPAE_B'</span> </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>output_folder <span class="op">=</span> <span class="st">'./_test2'</span></span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">64</span>,<span class="dv">64</span>)</span>
+<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>num_patches<span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>save_patches_random(data_paths, gt_paths, output_folder, patch_size, num_patches, squeeze_input<span class="op">=</span><span class="va">True</span>, tfms_before<span class="op">=</span>[Blur(ksize<span class="op">=</span><span class="dv">15</span>)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="bcd59f28" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/X/1'</span></span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/X/1'</span></span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="45599820" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/y/1'</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> <span class="st">'./_test2/HV110_P0500510000_random_patches.h5/y/1'</span></span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>plot_image(im)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L3396" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dict2string" class="level3">
 <h3 class="anchored" data-anchor-id="dict2string">dict2string</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb101"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dict2string(</span>
-<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>    d, <span class="co"># The dictionary to convert.</span></span>
-<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>    item_sep:<span class="bu">str</span><span class="op">=</span><span class="st">'_'</span>, <span class="co"># The separator between dictionary items (default is ", ").</span></span>
-<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>    key_value_sep:<span class="bu">str</span><span class="op">=</span><span class="st">''</span>, <span class="co"># The separator between keys and values (default is ": ").</span></span>
-<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>    pad_zeroes:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># The minimum width for integer values, padded with zeros. If None, no padding is applied.</span></span>
-<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb99"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dict2string(</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>    d, <span class="co"># The dictionary to convert.</span></span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>    item_sep:<span class="bu">str</span><span class="op">=</span><span class="st">'_'</span>, <span class="co"># The separator between dictionary items (default is ", ").</span></span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>    key_value_sep:<span class="bu">str</span><span class="op">=</span><span class="st">''</span>, <span class="co"># The separator between keys and values (default is ": ").</span></span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>    pad_zeroes:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># The minimum width for integer values, padded with zeros. If None, no padding is applied.</span></span>
+<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Transforms a dictionary into a string with customizable separators and optional zero padding for integers.</em></p>
 <p>Returns the formatted dictionary as a string.</p>
 <div id="49b9f34a" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>my_dict <span class="op">=</span> {<span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'Z'</span>: <span class="dv">30</span>, <span class="st">'S'</span>: <span class="dv">1</span>}</span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dict2string(my_dict, pad_zeroes<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>my_dict <span class="op">=</span> {<span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'Z'</span>: <span class="dv">30</span>, <span class="st">'S'</span>: <span class="dv">1</span>}</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dict2string(my_dict, pad_zeroes<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L3415" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="remove_singleton_dims" class="level3">
 <h3 class="anchored" data-anchor-id="remove_singleton_dims">remove_singleton_dims</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb103"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> remove_singleton_dims(</span>
-<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>    substack, <span class="co"># The extracted substack data.</span></span>
-<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>    order, <span class="co"># The dimension order string (e.g., 'CZYX').</span></span>
-<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb101"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> remove_singleton_dims(</span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>    substack, <span class="co"># The extracted substack data.</span></span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>    order, <span class="co"># The dimension order string (e.g., 'CZYX').</span></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Remove dimensions with a size of 1 from both the substack and the order string.</em></p>
 <p>Returns:</p>
 <pre><code>substack (np.array): The substack with singleton dimensions removed.
@@ -2137,38 +2095,38 @@ new_order (str): The updated dimension order string.</code></pre>
 </section>
 <section id="extract_substacks" class="level3">
 <h3 class="anchored" data-anchor-id="extract_substacks">extract_substacks</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb105"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_substacks(</span>
-<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>    input_file, <span class="co"># Path to the input OME-TIFF file.</span></span>
-<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>    output_dir:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Directory to save the extracted substacks. If a list, the substacks will be saved in the corresponding subdirectories from the list.</span></span>
-<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>    indices:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># A dictionary specifying which indices to extract. Keys can include 'C' for channel, 'Z' for z-slice, 'T' for time point, and 'S' for scene. If None, all indices are extracted.</span></span>
-<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>    split_dimension:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Dimension to split substacks along. If provided, separate substacks will be generated for each index in the split_dimension. Must be one of the keys in indices.</span></span>
-<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>    squeeze_dims:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Dimension to squeeze substacks along.</span></span>
-<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_POSITIONAL</span>
-<span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb105-10"><a href="#cb105-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb103"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_substacks(</span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>    input_file, <span class="co"># Path to the input OME-TIFF file.</span></span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>    output_dir:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Directory to save the extracted substacks. If a list, the substacks will be saved in the corresponding subdirectories from the list.</span></span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>    indices:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># A dictionary specifying which indices to extract. Keys can include 'C' for channel, 'Z' for z-slice, 'T' for time point, and 'S' for scene. If None, all indices are extracted.</span></span>
+<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>    split_dimension:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Dimension to split substacks along. If provided, separate substacks will be generated for each index in the split_dimension. Must be one of the keys in indices.</span></span>
+<span id="cb103-7"><a href="#cb103-7" aria-hidden="true" tabindex="-1"></a>    squeeze_dims:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Dimension to squeeze substacks along.</span></span>
+<span id="cb103-8"><a href="#cb103-8" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_POSITIONAL</span>
+<span id="cb103-9"><a href="#cb103-9" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb103-10"><a href="#cb103-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Extract substacks from a multidimensional OME-TIFF stack using AICSImageIO.</em></p>
 <div id="77413f61" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./_test_folder/"</span></span>
-<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>subdirs <span class="op">=</span> [output_dir <span class="op">+</span> folder <span class="cf">for</span> folder <span class="kw">in</span> [<span class="st">"channel_0"</span>, <span class="st">"channel_1"</span>, <span class="st">"channel_2"</span>]]</span>
-<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>subdirs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./_test_folder/"</span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>subdirs <span class="op">=</span> [output_dir <span class="op">+</span> folder <span class="cf">for</span> folder <span class="kw">in</span> [<span class="st">"channel_0"</span>, <span class="st">"channel_1"</span>, <span class="st">"channel_2"</span>]]</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>subdirs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="8e460d9c" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>[os.path.join([output_dir][<span class="dv">0</span>], <span class="ss">f"</span><span class="sc">{</span>subdirs[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>ii<span class="sc">}</span><span class="ss">"</span>) <span class="cf">for</span> ii <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb105"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>[os.path.join([output_dir][<span class="dv">0</span>], <span class="ss">f"</span><span class="sc">{</span>subdirs[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>ii<span class="sc">}</span><span class="ss">"</span>) <span class="cf">for</span> ii <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="7b1319fe" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'./data_examples/2155a4fe_3500000635_100X_20170227_E08_P21.ome.tiff'</span></span>
-<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
-<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'./data_examples/2155a4fe_3500000635_100X_20170227_E08_P21.ome.tiff'</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts a single substack for channel 0, z-slice 5, and time point 0.</span></span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>output_dir, indices<span class="op">=</span>{<span class="st">"C"</span>: <span class="dv">0</span>, <span class="st">"Z"</span>: <span class="bu">range</span>(<span class="dv">35</span>), <span class="st">"T"</span>: <span class="dv">0</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="f2892ad8" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb109"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
-<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel (`C`) and saves them in separate subfolders named "C_0", "C_1", "C_2", etc.</span></span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>[output_dir], indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>, <span class="st">"T"</span>: <span class="dv">0</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="08e5191e" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb110"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
-<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This extracts substacks for each channel and saves them in directories "channel_0", "channel_1", and "channel_2".</span></span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>extract_substacks(filename, output_dir<span class="op">=</span>subdirs, indices<span class="op">=</span>{<span class="st">"C"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], <span class="st">"Z"</span>: <span class="dv">5</span>}, split_dimension<span class="op">=</span><span class="st">"C"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
