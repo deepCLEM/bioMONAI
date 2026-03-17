@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -321,16 +321,69 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_histopathology_2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Histopathology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_segmentation3d.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">3D Segmentation</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Comparison</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/unet_segmentation_3d_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Segmentation with UNet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/unetr_btcv_segmentation_3d_lightning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Multi-organ Segmentation with UNETR (BTCV Challenge)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -363,8 +416,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#slice_explorer" id="toc-slice_explorer" class="nav-link" data-scroll-target="#slice_explorer">slice_explorer</a></li>
   <li><a href="#plot_volume" id="toc-plot_volume" class="nav-link" data-scroll-target="#plot_volume">plot_volume</a></li>
   </ul></li>
-  <li><a href="#histogram" id="toc-histogram" class="nav-link" data-scroll-target="#histogram">Histogram</a>
+  <li><a href="#plots" id="toc-plots" class="nav-link" data-scroll-target="#plots">Plots</a>
   <ul>
+  <li><a href="#plot_metrics" id="toc-plot_metrics" class="nav-link" data-scroll-target="#plot_metrics">plot_metrics</a></li>
   <li><a href="#plot_intensity_histogram" id="toc-plot_intensity_histogram" class="nav-link" data-scroll-target="#plot_intensity_histogram">plot_intensity_histogram</a></li>
   </ul></li>
   </ul>
@@ -407,7 +461,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="display-2d-images">Display 2D images</h2>
 <p>Function to quickly display 2D images</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L25" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L55" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="plot_image" class="level3">
 <h3 class="anchored" data-anchor-id="plot_image">plot_image</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -443,7 +497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="display-multichannel-images">Display Multichannel images</h2>
 <p>Function to display RGB and multichannel images</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L56" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L86" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="show_multichannel" class="level3">
 <h3 class="anchored" data-anchor-id="show_multichannel">show_multichannel</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -483,7 +537,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="display-3d-images">Display 3D images</h2>
 <p>Function to display 3D images</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L153" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L183" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="mosaic_image_3d" class="level3">
 <h3 class="anchored" data-anchor-id="mosaic_image_3d">mosaic_image_3d</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -501,7 +555,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Plots 2D slices of a 3D image alongside a prior specified axis.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L201" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L231" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="show_images_grid" class="level3">
 <h3 class="anchored" data-anchor-id="show_images_grid">show_images_grid</h3>
@@ -548,7 +602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="show-slices" class="level2">
 <h2 class="anchored" data-anchor-id="show-slices">Show slices</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L272" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L302" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="show_plane" class="level3">
 <h3 class="anchored" data-anchor-id="show_plane">show_plane</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -564,7 +618,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Display a slice of the image tensor on a given axis with optional dashed lines.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L296" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L326" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="visualize_slices" class="level3">
 <h3 class="anchored" data-anchor-id="visualize_slices">visualize_slices</h3>
@@ -598,7 +652,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L330" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L360" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="slice_explorer" class="level3">
 <h3 class="anchored" data-anchor-id="slice_explorer">slice_explorer</h3>
@@ -623,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L377" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L407" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="plot_volume" class="level3">
 <h3 class="anchored" data-anchor-id="plot_volume">plot_volume</h3>
@@ -631,13 +685,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_volume(</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    values, <span class="co"># A 3D array of pixel values representing the volume.</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    opacity:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>, <span class="co"># Opacity level for the surfaces in the volume plot.</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">min</span>:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>, <span class="co"># Minimum threshold multiplier for the visualization.</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">max</span>:<span class="bu">float</span><span class="op">=</span><span class="fl">0.8</span>, <span class="co"># Maximum threshold multiplier for the visualization.</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">min</span>:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Minimum threshold for the visualization.</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">max</span>:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Maximum threshold for the visualization.</span></span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    surface_count:<span class="bu">int</span><span class="op">=</span><span class="dv">5</span>, <span class="co"># Number of surfaces to display in the volume plot.</span></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    width:<span class="bu">int</span><span class="op">=</span><span class="dv">800</span>, <span class="co"># Width of the plotted figure.</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    height:<span class="bu">int</span><span class="op">=</span><span class="dv">600</span>, <span class="co"># Height of the plotted figure.</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Interactive visualization of a 3D volume using Plotly. The function assumes that ‘values’ is a 3D array representing the volume data.</em></p>
 <div id="57dcce23" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>plot_volume(data[:, <span class="dv">50</span>:<span class="dv">150</span>, <span class="dv">50</span>:<span class="dv">150</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -653,18 +708,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="histogram" class="level2">
-<h2 class="anchored" data-anchor-id="histogram">Histogram</h2>
+<section id="plots" class="level2">
+<h2 class="anchored" data-anchor-id="plots">Plots</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L410" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L446" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="plot_metrics" class="level3">
+<h3 class="anchored" data-anchor-id="plot_metrics">plot_metrics</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_metrics(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    learn</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Plot a losses and metrics from a fastai Recorder.</em> - Loss curves - Metrics curves - Best validation epoch markers</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/visualize.py#L504" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
 <section id="plot_intensity_histogram" class="level3">
 <h3 class="anchored" data-anchor-id="plot_intensity_histogram">plot_intensity_histogram</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_intensity_histogram(</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    image, threshold:NoneType<span class="op">=</span><span class="va">None</span>, mode:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># None, "greater", "lower"</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    bins:<span class="bu">int</span><span class="op">=</span><span class="dv">256</span>, per_channel:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, density:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, int_ticks:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, int_y_ticks:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_intensity_histogram(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    image, threshold:NoneType<span class="op">=</span><span class="va">None</span>, mode:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># None, "greater", "lower"</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    bins:<span class="bu">int</span><span class="op">=</span><span class="dv">256</span>, per_channel:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, density:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, int_ticks:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, int_y_ticks:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Plot intensity histogram of an image.</em></p>
 
 

@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -104,20 +104,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="../styles.css">
 <meta property="og:title" content="3D Segmentation – bioMONAI">
 <meta property="og:description" content="Tutorial 3D Segmentation: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for nuclei segmentation in histopathology images.">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/906_tutorial_Segmentation3D_files/figure-html/cell-10-output-1.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/906_tutorial_Segmentation3D_files/figure-html/cell-11-output-1.png">
 <meta property="og:site_name" content="bioMONAI">
-<meta property="og:image:height" content="309">
-<meta property="og:image:width" content="794">
+<meta property="og:image:height" content="405">
+<meta property="og:image:width" content="775">
 <meta name="twitter:title" content="3D Segmentation – bioMONAI">
 <meta name="twitter:description" content="Tutorial 3D Segmentation: This tutorial provides a comprehensive, step-by-step guide to using the bioMONAI platform for nuclei segmentation in histopathology images.">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/906_tutorial_Segmentation3D_files/figure-html/cell-10-output-1.png">
-<meta name="twitter:image-height" content="309">
-<meta name="twitter:image-width" content="794">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/906_tutorial_Segmentation3D_files/figure-html/cell-11-output-1.png">
+<meta name="twitter:image-height" content="405">
+<meta name="twitter:image-width" content="775">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -321,16 +324,69 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Tutorials/tutorial_histopathology_2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Histopathology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../Tutorials/tutorial_segmentation3d.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">3D Segmentation</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Comparison</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/unet_segmentation_3d_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Segmentation with UNet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/Comparison/unetr_btcv_segmentation_3d_lightning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Multi-organ Segmentation with UNETR (BTCV Challenge)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -421,26 +477,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="5751c304" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the directory where you want to save the downloaded files</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>output_directory <span class="op">=</span> <span class="st">"../_data/HL60"</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>output_dirs <span class="op">=</span> [<span class="st">'LowNoise_C00'</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">'LowNoise_C25'</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">'LowNoise_C50'</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">'LowNoise_C75'</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">'HighNoise_C00'</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>               <span class="st">'HighNoise_C25'</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>               <span class="st">'HighNoise_C50'</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>               <span class="st">'HighNoise_C75'</span>]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>output_dirs <span class="op">=</span> [Path(output_directory)<span class="op">/</span>d <span class="cf">for</span> d <span class="kw">in</span> output_dirs]</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the URLs for the dataset</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>urls <span class="op">=</span> [<span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_LowNoise_C00_3D_TIFF.zip'</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_LowNoise_C25_3D_TIFF.zip'</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_LowNoise_C50_3D_TIFF.zip'</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_LowNoise_C75_3D_TIFF.zip'</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C00_3D_TIFF.zip'</span>,</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C25_3D_TIFF.zip'</span>,</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C50_3D_TIFF.zip'</span>,</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C75_3D_TIFF.zip'</span>]</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># download_files(urls, output_dirs, extract=True, extract_dir='.')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>output_dirs <span class="op">=</span> [<span class="st">'HighNoise_C00'</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">'HighNoise_C25'</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">'HighNoise_C50'</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">'HighNoise_C75'</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>output_dirs <span class="op">=</span> [Path(output_directory)<span class="op">/</span>d <span class="cf">for</span> d <span class="kw">in</span> output_dirs]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the URLs for the dataset</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>urls <span class="op">=</span> [<span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C00_3D_TIFF.zip'</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C25_3D_TIFF.zip'</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C50_3D_TIFF.zip'</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C75_3D_TIFF.zip'</span>]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>download_files(urls, output_dirs, extract<span class="op">=</span><span class="va">True</span>, extract_dir<span class="op">=</span><span class="st">'.'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Downloading file 1/4: https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C00_3D_TIFF.zip
+The file has been downloaded and saved to: /home/bm/Documents/bioMONAI/nbs/_data/HL60/HighNoise_C00
+Downloading file 2/4: https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C25_3D_TIFF.zip
+The file has been downloaded and saved to: /home/bm/Documents/bioMONAI/nbs/_data/HL60/HighNoise_C25
+Downloading file 3/4: https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C50_3D_TIFF.zip
+The file has been downloaded and saved to: /home/bm/Documents/bioMONAI/nbs/_data/HL60/HighNoise_C50
+Downloading file 4/4: https://datasets.gryf.fi.muni.cz/cytometry2009/HL60_HighNoise_C75_3D_TIFF.zip
+The file has been downloaded and saved to: /home/bm/Documents/bioMONAI/nbs/_data/HL60/HighNoise_C75</code></pre>
+</div>
 </div>
 </section>
 <section id="prepare-data-for-training" class="level3">
@@ -459,72 +517,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p>After defining these parameters and transformations, we will create a <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders"><code>BioDataLoaders</code></a> object to load the training and validation datasets.</p>
 <div id="f4c33800" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the paths of the images in the HighNoise folders, filtering for files that contain 'final' in their name</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>img_paths <span class="op">=</span> get_images(output_directory,<span class="st">'HighNoise*'</span>, filename_filter<span class="op">=</span><span class="st">'*final*.tif'</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># create a function to get the target path from the image path, masks are in the same folder and have the same filename but with 'labels' instead of 'final'</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>get_target_fn <span class="op">=</span> get_target(<span class="st">''</span>, same_filename<span class="op">=</span><span class="va">False</span>, same_foldername<span class="op">=</span><span class="va">True</span>, target_file_prefix<span class="op">=</span><span class="st">'labels'</span>, signal_file_prefix<span class="op">=</span><span class="st">'final'</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check that the functions work as expected</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'input:'</span>, img_paths[<span class="dv">0</span>], <span class="st">'</span><span class="ch">\n</span><span class="st">mask:'</span>, get_target_fn(img_paths[<span class="dv">0</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the paths of the images in the HighNoise folders, filtering for files that contain 'final' in their name</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>img_paths <span class="op">=</span> get_images(output_directory,<span class="st">'HighNoise*'</span>, filename_filter<span class="op">=</span><span class="st">'*final*.tif'</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># create a function to get the target path from the image path, masks are in the same folder and have the same filename but with 'labels' instead of 'final'</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>get_target_fn <span class="op">=</span> get_target(<span class="st">''</span>, same_filename<span class="op">=</span><span class="va">False</span>, same_foldername<span class="op">=</span><span class="va">True</span>, target_file_prefix<span class="op">=</span><span class="st">'labels'</span>, signal_file_prefix<span class="op">=</span><span class="st">'final'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check that the functions work as expected</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'input:'</span>, img_paths[<span class="dv">0</span>], <span class="st">'</span><span class="ch">\n</span><span class="st">mask:'</span>, get_target_fn(img_paths[<span class="dv">0</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>input: ../_data/HL60/HighNoise_C25/image-final_0004.tif 
-mask: ../_data/HL60/HighNoise_C25/image-labels_0004.tif</code></pre>
+<pre><code>input: ../_data/HL60/HighNoise_C00/image-final_0026.tif 
+mask: ../_data/HL60/HighNoise_C00/image-labels_0026.tif</code></pre>
 </div>
+</div>
+<div id="7aeeef8b" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.filters <span class="im">import</span> threshold_otsu</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> otsu_threshold(im):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    th <span class="op">=</span> threshold_otsu(im)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> im<span class="op">*</span>(im<span class="op">&gt;</span>th)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>otsu <span class="op">=</span> FunctionTransform(otsu_threshold)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="953468f7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tfms_before_patching <span class="op">=</span> [Resample(<span class="dv">4</span>, mode<span class="op">=</span><span class="st">'nearest'</span>),  </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                        TargetedTransform(ScaleIntensityVariance(),targets<span class="op">=</span>(<span class="st">'X'</span>,)),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                        <span class="co"># TargetedTransform(otsu,targets=('X',)),</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                        ]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>tfms_after_patching <span class="op">=</span> [TargetedTransform(RelabelInstances(), targets<span class="op">=</span>(<span class="st">'y'</span>,))]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="a802f521" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> [get_target_fn(img_paths[i]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(img_paths))]</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">16</span>, <span class="dv">90</span>, <span class="dv">90</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="fl">0.75</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># save_patches_grid(img_paths, gt_paths, output_directory, patch_size, overlap, </span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                   tfms_before=[TargetedTransform(ScaleIntensityPercentiles(),targets='X'), Resample(4, mode='nearest')], </span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                   tfms_after=[TargetedTransform(RelabelInstances(), targets='y')], use_parent_folder=True)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>gt_paths <span class="op">=</span> [get_target_fn(img_paths[i]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(img_paths))]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>patch_size <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">33</span>, <span class="dv">90</span>, <span class="dv">90</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>overlap <span class="op">=</span> <span class="fl">0.75</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>save_patches_grid(img_paths, gt_paths, output_directory, patch_size, overlap, squeeze_input<span class="op">=</span><span class="va">False</span>, squeeze_patches<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                  tfms_before<span class="op">=</span>tfms_before_patching, tfms_after<span class="op">=</span>tfms_after_patching, use_parent_folder<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Processing files: 100%|██████████| 120/120 [02:23&lt;00:00,  1.20s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Train set saved to '../_data/HL60/patches_train.csv'.
+Test set saved to '../_data/HL60/patches_test.csv'.
+'is_valid' column added to '../_data/HL60/patches_train.csv' for validation samples.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
 </div>
 <div id="47a7dcc6" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> show_images_grid</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> output_directory <span class="op">+</span> <span class="st">'/HighNoise_C75/image-final_0000.h5/X/60'</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(im.shape)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> output_directory <span class="op">+</span> <span class="st">'/HighNoise_C75/image-final_0000.h5/y/60'</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>im2 , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(im2.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.io <span class="im">import</span> hdf5_reader</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> show_images_grid</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> output_directory <span class="op">+</span> <span class="st">'/HighNoise_C00/image-final_0026.h5/X/1'</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>im , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(im.shape)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> output_directory <span class="op">+</span> <span class="st">'/HighNoise_C00/image-final_0026.h5/y/1'</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>im2 , _ <span class="op">=</span> hdf5_reader()(file_path)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(im2.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>(16, 90, 90)
-(16, 90, 90)</code></pre>
-</div>
-</div>
-<div id="e2dc2400" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.torch_core <span class="im">import</span> TensorMask</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>TensorMask(im2).unique()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<pre><code>TensorMask([0, 1, 2, 3, 4, 5, 6], dtype=torch.int32)</code></pre>
+<pre><code>(33, 90, 90)
+(33, 90, 90)</code></pre>
 </div>
 </div>
 <div id="b15188c3" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>show_images_grid(im, cmap<span class="op">=</span><span class="st">'cividis'</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>), ncols<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>show_images_grid(im2, cmap<span class="op">=</span><span class="st">'cividis'</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>), ncols<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="61a3d4e4" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_intensity_histogram</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plot_intensity_histogram(im2[<span class="op">-</span><span class="dv">1</span>], threshold<span class="op">=</span><span class="dv">0</span>, mode<span class="op">=</span><span class="st">"greater"</span>, bins<span class="op">=</span><span class="dv">20</span>, density<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plot_intensity_histogram(im[<span class="op">-</span><span class="dv">1</span>], threshold<span class="op">=</span><span class="dv">0</span>, mode<span class="op">=</span><span class="st">"greater"</span>, bins<span class="op">=</span><span class="dv">20</span>, density<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>show_images_grid(im, cmap<span class="op">=</span><span class="st">'cividis'</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>), ncols<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>show_images_grid(im2, cmap<span class="op">=</span><span class="st">'cividis'</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>), ncols<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -540,30 +599,287 @@ mask: ../_data/HL60/HighNoise_C25/image-labels_0004.tif</code></pre>
 </div>
 </div>
 </div>
+<div id="b2bf8111" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> plot_intensity_histogram</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>plot_intensity_histogram(im[<span class="dv">0</span>], bins<span class="op">=</span><span class="dv">20</span>)<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>plot_intensity_histogram(im[<span class="dv">15</span>], bins<span class="op">=</span><span class="dv">20</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-12-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 <div id="b30019c5" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>n_channels <span class="op">=</span> patch_size[<span class="dv">0</span>]</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>data_ops <span class="op">=</span> {</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'fn_col'</span>: [<span class="st">'path_signal'</span>],</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'target_col'</span>: [<span class="st">'path_target'</span>],</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'valid_col'</span>: [<span class="st">'is_valid'</span>],</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'seed'</span>: <span class="dv">42</span>, </span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'bs'</span>: <span class="dv">16</span>,</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'img_cls'</span>: BioImageMulti,</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'target_img_cls'</span>: BioImageMulti,   <span class="co"># class for target images</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'item_tfms'</span>: [RandRot90(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axes<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">1</span>)), </span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                  RandFlip(prob<span class="op">=</span><span class="fl">0.75</span>, ndim<span class="op">=</span><span class="dv">2</span>)],</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'batch_tfms'</span>: [ScaleIntensity()],   <span class="co"># batch transformations </span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_csv(</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span>,</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    output_directory <span class="op">+</span> <span class="st">'/patches_train.csv'</span>,</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>data_ops <span class="op">=</span> {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'fn_col'</span>: [<span class="st">'path_signal'</span>],</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'target_col'</span>: [<span class="st">'path_target'</span>],</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'valid_col'</span>: [<span class="st">'is_valid'</span>],</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'seed'</span>: <span class="dv">42</span>, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'bs'</span>: <span class="dv">16</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'img_cls'</span>: BioImageMulti,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'target_img_cls'</span>: BioImageMulti,   <span class="co"># class for target images</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'item_tfms'</span>: [RandRot90(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axes<span class="op">=</span>(<span class="op">-</span><span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>)), </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                  RandFlip(prob<span class="op">=</span><span class="fl">0.75</span>, ndim<span class="op">=</span><span class="dv">2</span>)],</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'batch_tfms'</span>: [],   <span class="co"># batch transformations </span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.from_csv(</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    output_directory <span class="op">+</span> <span class="st">'/patches_train.csv'</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    show_summary<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of training and validation datasets</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train images:'</span>, <span class="bu">len</span>(data.train_ds.items), <span class="st">'</span><span class="ch">\n</span><span class="st">validation images:'</span>, <span class="bu">len</span>(data.valid_ds.items))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Setting-up type transforms pipelines
+Collecting items from                                                path_signal  \
+0     ../_data/HL60/HighNoise_C75/image-final_0009.h5/X/16   
+1      ../_data/HL60/HighNoise_C25/image-final_0026.h5/X/3   
+2      ../_data/HL60/HighNoise_C25/image-final_0017.h5/X/5   
+3     ../_data/HL60/HighNoise_C50/image-final_0005.h5/X/17   
+4      ../_data/HL60/HighNoise_C00/image-final_0010.h5/X/8   
+...                                                    ...   
+1722   ../_data/HL60/HighNoise_C50/image-final_0006.h5/X/3   
+1723   ../_data/HL60/HighNoise_C50/image-final_0020.h5/X/5   
+1724  ../_data/HL60/HighNoise_C75/image-final_0027.h5/X/10   
+1725   ../_data/HL60/HighNoise_C75/image-final_0027.h5/X/7   
+1726  ../_data/HL60/HighNoise_C75/image-final_0004.h5/X/15   
+
+                                               path_target  is_valid  
+0     ../_data/HL60/HighNoise_C75/image-final_0009.h5/y/16         0  
+1      ../_data/HL60/HighNoise_C25/image-final_0026.h5/y/3         0  
+2      ../_data/HL60/HighNoise_C25/image-final_0017.h5/y/5         0  
+3     ../_data/HL60/HighNoise_C50/image-final_0005.h5/y/17         0  
+4      ../_data/HL60/HighNoise_C00/image-final_0010.h5/y/8         0  
+...                                                    ...       ...  
+1722   ../_data/HL60/HighNoise_C50/image-final_0006.h5/y/3         1  
+1723   ../_data/HL60/HighNoise_C50/image-final_0020.h5/y/5         1  
+1724  ../_data/HL60/HighNoise_C75/image-final_0027.h5/y/10         0  
+1725   ../_data/HL60/HighNoise_C75/image-final_0027.h5/y/7         0  
+1726  ../_data/HL60/HighNoise_C75/image-final_0004.h5/y/15         0  
+
+[1727 rows x 3 columns]
+Found 1727 items
+2 datasets of sizes 1511,216
+Setting up Pipeline: ColReader -- {'cols': ['path_signal'], 'pref': './', 'suff': '', 'label_delim': None}
+ -&gt; BioImageMulti.create -&gt; Tensor2BioImage -- {}
+
+Setting up Pipeline: ColReader -- {'cols': ['path_target'], 'pref': './', 'suff': '', 'label_delim': None}
+ -&gt; BioImageMulti.create -&gt; Tensor2BioImage -- {}
+
+
+Building one sample
+  Pipeline: ColReader -- {'cols': ['path_signal'], 'pref': './', 'suff': '', 'label_delim': None}
+ -&gt; BioImageMulti.create -&gt; Tensor2BioImage -- {}
+
+    starting from
+      path_signal    ../_data/HL60/HighNoise_C75/image-final_0009.h5/X/16
+path_target    ../_data/HL60/HighNoise_C75/image-final_0009.h5/y/16
+is_valid                                                          0
+Name: 0, dtype: object
+    applying ColReader -- {'cols': ['path_signal'], 'pref': './', 'suff': '', 'label_delim': None}
+ gives
+      ./../_data/HL60/HighNoise_C75/image-final_0009.h5/X/16
+    applying BioImageMulti.create gives
+      BioImageMulti of size 33x90x90
+    applying Tensor2BioImage -- {}
+ gives
+      BioImageMulti of size 33x90x90
+  Pipeline: ColReader -- {'cols': ['path_target'], 'pref': './', 'suff': '', 'label_delim': None}
+ -&gt; BioImageMulti.create -&gt; Tensor2BioImage -- {}
+
+    starting from
+      path_signal    ../_data/HL60/HighNoise_C75/image-final_0009.h5/X/16
+path_target    ../_data/HL60/HighNoise_C75/image-final_0009.h5/y/16
+is_valid                                                          0
+Name: 0, dtype: object
+    applying ColReader -- {'cols': ['path_target'], 'pref': './', 'suff': '', 'label_delim': None}
+ gives
+      ./../_data/HL60/HighNoise_C75/image-final_0009.h5/y/16
+    applying BioImageMulti.create gives
+      BioImageMulti of size 33x90x90
+    applying Tensor2BioImage -- {}
+ gives
+      BioImageMulti of size 33x90x90
+
+Final sample: (BioImageMulti([[[-0.4833,  0.0012, -0.4833,  ..., -0.6045, -0.3016, -0.4833],
+         [-0.6650, -0.5439, -0.4833,  ..., -0.1200, -0.9073, -0.8467],
+         [-0.5439, -0.3622, -0.9679,  ..., -0.2411, -0.5439, -0.4228],
+         ...,
+         [-0.7256,  0.1829, -0.3016,  ..., -0.4833, -0.3622,  0.1223],
+         [-0.6650, -0.5439, -0.2411,  ..., -0.3016,  0.0617, -0.2411],
+         [-0.4228,  0.3040, -0.4228,  ..., -0.3622, -0.2411, -0.2411]],
+
+        [[-0.4228, -0.4833, -0.3622,  ..., -0.1200, -0.7256, -0.1805],
+         [-0.3016,  0.0012, -0.4833,  ...,  0.0617, -0.3016, -0.5439],
+         [-0.1200, -0.1805, -0.4228,  ..., -0.5439, -0.1805, -0.3622],
+         ...,
+         [ 0.3040, -0.6650,  0.0617,  ..., -0.4833, -0.3016,  0.2434],
+         [-0.1200,  0.1223, -0.3016,  ...,  0.0012, -0.8467, -0.3016],
+         [-0.6650, -0.0594, -0.3016,  ..., -0.3622, -0.1200, -0.3622]],
+
+        [[-0.3622,  0.0012, -0.2411,  ..., -0.1805, -0.0594, -0.3016],
+         [-0.2411, -0.4228,  0.1223,  ..., -0.1805, -0.7256, -0.1200],
+         [-0.4833, -0.4228, -0.3622,  ..., -0.3016,  0.1829,  0.0617],
+         ...,
+         [-0.6045, -0.1200, -0.4228,  ..., -0.1200, -0.5439, -0.3016],
+         [ 0.1829, -0.2411, -0.4228,  ..., -0.2411, -0.3016, -0.3016],
+         [-0.1805, -0.1200, -0.4228,  ..., -0.1805, -0.2411, -0.7256]],
+
+        ...,
+
+        [[-0.3016, -0.6045, -0.6650,  ..., -0.3016,  0.1829, -0.1200],
+         [-0.7862, -0.3622, -0.0594,  ..., -0.4228, -0.0594, -0.2411],
+         [-0.1200, -0.4833, -0.3016,  ...,  0.2434, -0.4833, -0.5439],
+         ...,
+         [-0.3016,  0.0617, -0.0594,  ...,  0.1223, -0.1200, -0.4833],
+         [-0.7862, -0.3016, -0.4833,  ..., -0.6650,  0.1223, -0.4228],
+         [-0.1805, -0.3016, -0.3016,  ..., -0.3016, -0.6650, -0.3622]],
+
+        [[-0.4833, -0.3016,  0.0012,  ..., -0.2411, -0.1200, -0.4833],
+         [-0.3622, -0.4833,  0.1829,  ..., -0.5439,  0.1829, -0.1805],
+         [ 0.0617, -0.1200, -0.9073,  ..., -0.2411, -0.1805, -0.1200],
+         ...,
+         [-0.7256, -0.1200, -0.3622,  ..., -0.9679, -0.1805,  0.1223],
+         [-0.3622, -0.2411, -0.3016,  ..., -0.3622, -0.2411, -0.4833],
+         [-0.3016, -0.5439, -0.5439,  ..., -0.7256, -0.3622, -0.4228]],
+
+        [[ 0.0617, -0.2411, -0.4833,  ..., -0.6650, -0.6045,  0.0012],
+         [-0.6650,  0.0617,  0.0617,  ..., -0.2411, -0.7256, -0.4833],
+         [-0.5439,  0.0617, -0.4833,  ..., -0.5439, -0.6650,  0.0617],
+         ...,
+         [-0.2411,  0.1223, -0.0594,  ..., -0.2411, -0.3622, -0.1200],
+         [ 0.0617, -0.4228, -0.3622,  ...,  0.0617, -0.4228, -0.2411],
+         [-0.5439, -0.1805, -0.1805,  ...,  0.0012, -0.3016, -0.3622]]]), BioImageMulti([[[0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.]],
+
+        [[0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.]],
+
+        [[0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.]],
+
+        ...,
+
+        [[0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.]],
+
+        [[0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.]],
+
+        [[0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         ...,
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.],
+         [0., 0., 0.,  ..., 0., 0., 0.]]]))
+
+
+Collecting items from                                                path_signal  \
+0     ../_data/HL60/HighNoise_C75/image-final_0009.h5/X/16   
+1      ../_data/HL60/HighNoise_C25/image-final_0026.h5/X/3   
+2      ../_data/HL60/HighNoise_C25/image-final_0017.h5/X/5   
+3     ../_data/HL60/HighNoise_C50/image-final_0005.h5/X/17   
+4      ../_data/HL60/HighNoise_C00/image-final_0010.h5/X/8   
+...                                                    ...   
+1722   ../_data/HL60/HighNoise_C50/image-final_0006.h5/X/3   
+1723   ../_data/HL60/HighNoise_C50/image-final_0020.h5/X/5   
+1724  ../_data/HL60/HighNoise_C75/image-final_0027.h5/X/10   
+1725   ../_data/HL60/HighNoise_C75/image-final_0027.h5/X/7   
+1726  ../_data/HL60/HighNoise_C75/image-final_0004.h5/X/15   
+
+                                               path_target  is_valid  
+0     ../_data/HL60/HighNoise_C75/image-final_0009.h5/y/16         0  
+1      ../_data/HL60/HighNoise_C25/image-final_0026.h5/y/3         0  
+2      ../_data/HL60/HighNoise_C25/image-final_0017.h5/y/5         0  
+3     ../_data/HL60/HighNoise_C50/image-final_0005.h5/y/17         0  
+4      ../_data/HL60/HighNoise_C00/image-final_0010.h5/y/8         0  
+...                                                    ...       ...  
+1722   ../_data/HL60/HighNoise_C50/image-final_0006.h5/y/3         1  
+1723   ../_data/HL60/HighNoise_C50/image-final_0020.h5/y/5         1  
+1724  ../_data/HL60/HighNoise_C75/image-final_0027.h5/y/10         0  
+1725   ../_data/HL60/HighNoise_C75/image-final_0027.h5/y/7         0  
+1726  ../_data/HL60/HighNoise_C75/image-final_0004.h5/y/15         0  
+
+[1727 rows x 3 columns]
+Found 1727 items
+2 datasets of sizes 1511,216
+Setting up Pipeline: ColReader -- {'cols': ['path_signal'], 'pref': './', 'suff': '', 'label_delim': None}
+ -&gt; BioImageMulti.create -&gt; Tensor2BioImage -- {}
+
+Setting up Pipeline: ColReader -- {'cols': ['path_target'], 'pref': './', 'suff': '', 'label_delim': None}
+ -&gt; BioImageMulti.create -&gt; Tensor2BioImage -- {}
+
+Setting up after_item: Pipeline: RandRot90 -- {'prob': 0.75, 'k': 1, 'max_k': 3, 'spatial_axes': (-2, -1), 'ndim': 2, 'lazy': False, 'p': 1.0}
+ -&gt; RandFlip -- {'prob': 0.75, 'spatial_axis': None, 'ndim': 2, 'lazy': False}
+ -&gt; ToTensor
+Setting up before_batch: Pipeline: 
+Setting up after_batch: Pipeline: 
+
+Building one batch
+Applying item_tfms to the first sample:
+  Pipeline: RandRot90 -- {'prob': 0.75, 'k': 1, 'max_k': 3, 'spatial_axes': (-2, -1), 'ndim': 2, 'lazy': False, 'p': 1.0}
+ -&gt; RandFlip -- {'prob': 0.75, 'spatial_axis': None, 'ndim': 2, 'lazy': False}
+ -&gt; ToTensor
+    starting from
+      (BioImageMulti of size 33x90x90, BioImageMulti of size 33x90x90)
+    applying RandRot90 -- {'prob': 0.75, 'k': 1, 'max_k': 3, 'spatial_axes': (-2, -1), 'ndim': 2, 'lazy': False, 'p': 1.0}
+ gives
+      (BioImageMulti of size 33x90x90, BioImageMulti of size 33x90x90)
+    applying RandFlip -- {'prob': 0.75, 'spatial_axis': None, 'ndim': 2, 'lazy': False}
+ gives
+      (BioImageMulti of size 33x90x90, BioImageMulti of size 33x90x90)
+    applying ToTensor gives
+      (BioImageMulti of size 33x90x90, BioImageMulti of size 33x90x90)
+
+Adding the next 15 samples
+
+No before_batch transform to apply
+
+Collating items in a batch
+
+No batch_tfms to apply
+None
+train images: 1511 
+validation images: 216</code></pre>
+</div>
 </div>
 </section>
 <section id="visualize-a-batch-of-training-data" class="level3">
@@ -577,29 +893,588 @@ mask: ../_data/HL60/HighNoise_C25/image-labels_0004.tif</code></pre>
 </blockquote>
 <p>Visualizing the data helps in understanding the dataset better and ensures that the transformations are applied correctly.</p>
 <div id="7fdbed1b" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(cmap<span class="op">=</span><span class="st">'cividis'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(cmap<span class="op">=</span><span class="st">'cividis'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
 <section id="define-and-train-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="define-and-train-the-model">Define and Train the Model</h3>
 <div id="96553f18" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.nets <span class="im">import</span> create_unet_model, resnet34</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> create_unet_model(resnet34, n_channels, patch_size[<span class="dv">1</span>:], <span class="va">True</span>, n_in<span class="op">=</span>n_channels, cut<span class="op">=</span><span class="va">None</span>, blur_final<span class="op">=</span><span class="va">False</span>, self_attention<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.nets <span class="im">import</span> create_unet_model, resnet34</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>n_channels <span class="op">=</span> patch_size[<span class="dv">1</span>]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> create_unet_model(resnet34, n_channels, patch_size[<span class="dv">2</span>:], <span class="va">True</span>, n_in<span class="op">=</span>n_channels, cut<span class="op">=</span><span class="va">None</span>, blur_final<span class="op">=</span><span class="va">False</span>, self_attention<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="c55cb0fd" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from fastai.vision.all import BCEWithLogitsLossFlat</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.losses <span class="im">import</span> <span class="op">*</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.metrics <span class="im">import</span> <span class="op">*</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> InstanceSegLoss(ssim_weight<span class="op">=</span><span class="fl">2.0</span>) <span class="co">#SSIMLoss(2) #BCEWithLogitsLossFlat() </span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [DiceMetric(include_background<span class="op">=</span><span class="va">False</span>, instance<span class="op">=</span><span class="va">True</span>), SSIMMetric(<span class="dv">2</span>), MSEMetric()]</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.losses <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.metrics <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> CombinedLoss(mae_weight<span class="op">=</span><span class="fl">0.</span>) </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [DiceMetric(include_background<span class="op">=</span><span class="va">False</span>, instance<span class="op">=</span><span class="va">True</span>), SSIMMetric(<span class="dv">2</span>), MSEMetric()]</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="e1fe535f" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.fit_one_cycle(50, 1e-3)</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">5</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>trainer.fine_tune(<span class="dv">50</span>, freeze_epochs<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">Dice</th>
+<th data-quarto-table-cell-role="th">SSIM</th>
+<th data-quarto-table-cell-role="th">MSE</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.811546</td>
+<td>0.607067</td>
+<td>0.713121</td>
+<td>0.640630</td>
+<td>1.109968</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.608141</td>
+<td>0.602802</td>
+<td>0.805892</td>
+<td>0.683143</td>
+<td>1.183358</td>
+<td>00:08</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-17-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">Dice</th>
+<th data-quarto-table-cell-role="th">SSIM</th>
+<th data-quarto-table-cell-role="th">MSE</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.516219</td>
+<td>0.506274</td>
+<td>0.776129</td>
+<td>0.712599</td>
+<td>0.950653</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.490976</td>
+<td>0.489013</td>
+<td>0.783030</td>
+<td>0.724298</td>
+<td>0.922100</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>0.471562</td>
+<td>0.463291</td>
+<td>0.794013</td>
+<td>0.740367</td>
+<td>0.876778</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0.453522</td>
+<td>0.478723</td>
+<td>0.823908</td>
+<td>0.751707</td>
+<td>0.946567</td>
+<td>00:08</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.433029</td>
+<td>0.437026</td>
+<td>0.810949</td>
+<td>0.759414</td>
+<td>0.835859</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>0.415127</td>
+<td>0.434696</td>
+<td>0.808489</td>
+<td>0.757824</td>
+<td>0.825568</td>
+<td>00:08</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.403240</td>
+<td>0.414707</td>
+<td>0.828446</td>
+<td>0.765930</td>
+<td>0.781455</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.385172</td>
+<td>0.426572</td>
+<td>0.834985</td>
+<td>0.771460</td>
+<td>0.828636</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.370368</td>
+<td>0.463653</td>
+<td>0.848284</td>
+<td>0.770469</td>
+<td>0.938991</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.361350</td>
+<td>0.374823</td>
+<td>0.825207</td>
+<td>0.771281</td>
+<td>0.671459</td>
+<td>00:08</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.345890</td>
+<td>0.439119</td>
+<td>0.842696</td>
+<td>0.767259</td>
+<td>0.858127</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>0.334833</td>
+<td>0.372234</td>
+<td>0.844231</td>
+<td>0.780909</td>
+<td>0.683160</td>
+<td>00:08</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>0.327524</td>
+<td>0.526825</td>
+<td>0.823308</td>
+<td>0.759539</td>
+<td>1.108231</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>0.318918</td>
+<td>0.411107</td>
+<td>0.866024</td>
+<td>0.789357</td>
+<td>0.818110</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td>0.294800</td>
+<td>0.352042</td>
+<td>0.852052</td>
+<td>0.784482</td>
+<td>0.629226</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td>0.284839</td>
+<td>0.349837</td>
+<td>0.859363</td>
+<td>0.809991</td>
+<td>0.674335</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td>0.267825</td>
+<td>0.306873</td>
+<td>0.848616</td>
+<td>0.820233</td>
+<td>0.564938</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>17</td>
+<td>0.248724</td>
+<td>0.323201</td>
+<td>0.863107</td>
+<td>0.828485</td>
+<td>0.631170</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td>0.241533</td>
+<td>0.304638</td>
+<td>0.862664</td>
+<td>0.833130</td>
+<td>0.584351</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td>0.234249</td>
+<td>0.351952</td>
+<td>0.863644</td>
+<td>0.821691</td>
+<td>0.704500</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td>0.212417</td>
+<td>0.270758</td>
+<td>0.869480</td>
+<td>0.853008</td>
+<td>0.522040</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>21</td>
+<td>0.202391</td>
+<td>0.260705</td>
+<td>0.872287</td>
+<td>0.856645</td>
+<td>0.498960</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>22</td>
+<td>0.191303</td>
+<td>0.229654</td>
+<td>0.872181</td>
+<td>0.870967</td>
+<td>0.433945</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>23</td>
+<td>0.181730</td>
+<td>0.291077</td>
+<td>0.865196</td>
+<td>0.859840</td>
+<td>0.597482</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>24</td>
+<td>0.173218</td>
+<td>0.213912</td>
+<td>0.873976</td>
+<td>0.877203</td>
+<td>0.398901</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>25</td>
+<td>0.165491</td>
+<td>0.206696</td>
+<td>0.874586</td>
+<td>0.887638</td>
+<td>0.398224</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>26</td>
+<td>0.154142</td>
+<td>0.211768</td>
+<td>0.883967</td>
+<td>0.888713</td>
+<td>0.415776</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>27</td>
+<td>0.147875</td>
+<td>0.195550</td>
+<td>0.880540</td>
+<td>0.899664</td>
+<td>0.388863</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>28</td>
+<td>0.142774</td>
+<td>0.210530</td>
+<td>0.876144</td>
+<td>0.891953</td>
+<td>0.418601</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>29</td>
+<td>0.137481</td>
+<td>0.189002</td>
+<td>0.883888</td>
+<td>0.902892</td>
+<td>0.375575</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>30</td>
+<td>0.133169</td>
+<td>0.193823</td>
+<td>0.875621</td>
+<td>0.902665</td>
+<td>0.389724</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>31</td>
+<td>0.128731</td>
+<td>0.189152</td>
+<td>0.881724</td>
+<td>0.907770</td>
+<td>0.385932</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>32</td>
+<td>0.124381</td>
+<td>0.176614</td>
+<td>0.884985</td>
+<td>0.910300</td>
+<td>0.353075</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>33</td>
+<td>0.119923</td>
+<td>0.169921</td>
+<td>0.886829</td>
+<td>0.912693</td>
+<td>0.337652</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>34</td>
+<td>0.117236</td>
+<td>0.184199</td>
+<td>0.889109</td>
+<td>0.907322</td>
+<td>0.370013</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>35</td>
+<td>0.114079</td>
+<td>0.166607</td>
+<td>0.890280</td>
+<td>0.917249</td>
+<td>0.336860</td>
+<td>00:08</td>
+</tr>
+<tr class="odd">
+<td>36</td>
+<td>0.110882</td>
+<td>0.165492</td>
+<td>0.894460</td>
+<td>0.917251</td>
+<td>0.333487</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>37</td>
+<td>0.109331</td>
+<td>0.158600</td>
+<td>0.889042</td>
+<td>0.919934</td>
+<td>0.318047</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>38</td>
+<td>0.106516</td>
+<td>0.162379</td>
+<td>0.890184</td>
+<td>0.920133</td>
+<td>0.329905</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>39</td>
+<td>0.106057</td>
+<td>0.161155</td>
+<td>0.890777</td>
+<td>0.920162</td>
+<td>0.326254</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>40</td>
+<td>0.103774</td>
+<td>0.157447</td>
+<td>0.893741</td>
+<td>0.921695</td>
+<td>0.318128</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>41</td>
+<td>0.104562</td>
+<td>0.156143</td>
+<td>0.892660</td>
+<td>0.922146</td>
+<td>0.315094</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>42</td>
+<td>0.102328</td>
+<td>0.154972</td>
+<td>0.894194</td>
+<td>0.922680</td>
+<td>0.312629</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>43</td>
+<td>0.101798</td>
+<td>0.151960</td>
+<td>0.891383</td>
+<td>0.922955</td>
+<td>0.304061</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>44</td>
+<td>0.101685</td>
+<td>0.153547</td>
+<td>0.894828</td>
+<td>0.923244</td>
+<td>0.309456</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>45</td>
+<td>0.101021</td>
+<td>0.154230</td>
+<td>0.892181</td>
+<td>0.923182</td>
+<td>0.311400</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>46</td>
+<td>0.100030</td>
+<td>0.154725</td>
+<td>0.893415</td>
+<td>0.923368</td>
+<td>0.313278</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>47</td>
+<td>0.100400</td>
+<td>0.153919</td>
+<td>0.893036</td>
+<td>0.923350</td>
+<td>0.310799</td>
+<td>00:08</td>
+</tr>
+<tr class="odd">
+<td>48</td>
+<td>0.098787</td>
+<td>0.153974</td>
+<td>0.893915</td>
+<td>0.923534</td>
+<td>0.311338</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>49</td>
+<td>0.099182</td>
+<td>0.151619</td>
+<td>0.893199</td>
+<td>0.923862</td>
+<td>0.304869</td>
+<td>00:08</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-17-output-6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
 <section id="show-results" class="level3">
@@ -610,7 +1485,35 @@ mask: ../_data/HL60/HighNoise_C25/image-labels_0004.tif</code></pre>
 </ul>
 <p>Visualizing the results helps in assessing the performance of the model and identifying any areas that may need further improvement.</p>
 <div id="0ba91187" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results(cmap<span class="op">=</span><span class="st">'cividis'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results(cmap<span class="op">=</span><span class="st">'cividis'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-18-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
 <section id="save-the-trained-model" class="level3">
@@ -624,7 +1527,7 @@ mask: ../_data/HL60/HighNoise_C25/image-labels_0004.tif</code></pre>
 </blockquote>
 <p>Saving the model ensures that you can easily share it with others or deploy it in a production environment without needing to retrain it.</p>
 <div id="0905f855" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('tmp-model')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('3dseg-model')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="evaluate-the-model-on-test-data" class="level3">
@@ -640,11 +1543,337 @@ mask: ../_data/HL60/HighNoise_C25/image-labels_0004.tif</code></pre>
 </blockquote>
 <p>Evaluating the model on test data helps in understanding its performance in real-world scenarios and identifying any areas that may need further improvement.</p>
 <div id="08b18d25" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># test_data = test_biodataloader(data, output_directory + '/patches_test.csv')</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># # print length of test dataset</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print('test images:', len(test_data.items))</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co"># evaluate_model(trainer, test_data, metrics=[SSIMMetric(2)]);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> test_biodataloader(data, output_directory <span class="op">+</span> <span class="st">'/patches_test.csv'</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print length of test dataset</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'test images:'</span>, <span class="bu">len</span>(test_data.items))</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>evaluate_model(trainer, test_data, metrics<span class="op">=</span>metrics, cmap<span class="op">=</span><span class="st">'cividis'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>test images: 433</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-20-output-6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-20-output-7.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">CombinedLoss</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Mean</th>
+<td>0.155318</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Median</th>
+<td>0.137646</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Standard Deviation</th>
+<td>0.104736</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Min</th>
+<td>0.000245</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Max</th>
+<td>1.409755</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Q1</th>
+<td>0.104679</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Q3</th>
+<td>0.188011</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-20-output-9.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Dice</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Mean</th>
+<td>0.892396</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Median</th>
+<td>0.895303</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Standard Deviation</th>
+<td>0.019884</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Min</th>
+<td>0.797854</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Max</th>
+<td>0.940397</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Q1</th>
+<td>0.879513</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Q3</th>
+<td>0.907261</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-20-output-11.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">SSIM</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Mean</th>
+<td>0.922939</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Median</th>
+<td>0.923668</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Standard Deviation</th>
+<td>0.021461</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Min</th>
+<td>0.803995</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Max</th>
+<td>0.999956</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Q1</th>
+<td>0.910203</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Q3</th>
+<td>0.934420</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-20-output-13.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">MSE</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Mean</th>
+<td>0.314204</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Median</th>
+<td>0.260658</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Standard Deviation</th>
+<td>0.285008</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Min</th>
+<td>0.000354</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Max</th>
+<td>3.874035</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Q1</th>
+<td>0.178327</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Q3</th>
+<td>0.389348</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="0b06e13e" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>p, t <span class="op">=</span> trainer.get_preds(dl<span class="op">=</span>test_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+</div>
+<div id="0f11953b" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> mosaic_image_3d, plot_volume, visualize_slices</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>mosaic_image_3d(t[n], cmap<span class="op">=</span><span class="st">'cividis'</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>), nrow<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>mosaic_image_3d(p[n], cmap<span class="op">=</span><span class="st">'cividis'</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>), nrow<span class="op">=</span><span class="dv">8</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="906_tutorial_Segmentation3D_files/figure-html/cell-22-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="1c8019bf" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>plot_volume(p[n].numpy(), <span class="bu">min</span><span class="op">=</span><span class="fl">0.5</span>, <span class="bu">max</span><span class="op">=</span><span class="dv">11</span>, opacity<span class="op">=</span><span class="fl">.4</span>, colorscale<span class="op">=</span><span class="st">'cividis'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
 </div>
 
 

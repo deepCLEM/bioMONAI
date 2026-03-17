@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -315,16 +315,69 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_histopathology_2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Histopathology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_segmentation3d.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">3D Segmentation</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Comparison</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/unet_segmentation_3d_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Segmentation with UNet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/unetr_btcv_segmentation_3d_lightning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Multi-organ Segmentation with UNETR (BTCV Challenge)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -349,9 +402,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#aics_pipeline" id="toc-aics_pipeline" class="nav-link" data-scroll-target="#aics_pipeline">aics_pipeline</a></li>
   <li><a href="#dataset-manifest" id="toc-dataset-manifest" class="nav-link" data-scroll-target="#dataset-manifest">Dataset Manifest</a></li>
   <li><a href="#manifest2csv" id="toc-manifest2csv" class="nav-link" data-scroll-target="#manifest2csv">manifest2csv</a></li>
-  <li><a href="#split_dataframe" id="toc-split_dataframe" class="nav-link" data-scroll-target="#split_dataframe">split_dataframe</a></li>
-  <li><a href="#add_columns_to_csv" id="toc-add_columns_to_csv" class="nav-link" data-scroll-target="#add_columns_to_csv">add_columns_to_csv</a></li>
-  <li><a href="#build_csv" id="toc-build_csv" class="nav-link" data-scroll-target="#build_csv">build_csv</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -386,7 +436,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="medmnist-datasets" class="level3">
 <h3 class="anchored" data-anchor-id="medmnist-datasets">MedMNIST Datasets</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L28" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L42" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="download_medmnist" class="level3">
 <h3 class="anchored" data-anchor-id="download_medmnist">download_medmnist</h3>
@@ -401,7 +451,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><em>Downloads the specified MedMNIST dataset and saves the training, validation, and test datasets </em> into the specified output directory. Images are saved as .png for 2D data and multi-page .tiff for 3D data, organized into folders named after their labels.</p>
 <p>Returns: None, saves images in the specified output directory if save_images is True.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L128" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L142" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="medmnist2df" class="level3">
 <h3 class="anchored" data-anchor-id="medmnist2df">medmnist2df</h3>
@@ -419,7 +469,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="download-data-via-pooch" class="level3">
 <h3 class="anchored" data-anchor-id="download-data-via-pooch">Download data via Pooch</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L156" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L170" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="download_file" class="level3">
 <h3 class="anchored" data-anchor-id="download_file">download_file</h3>
@@ -434,7 +484,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Download and optionally decompress a single file using Pooch.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L190" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L204" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="download_files" class="level3">
 <h3 class="anchored" data-anchor-id="download_files">download_files</h3>
@@ -449,7 +499,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Download and optionally decompress multiple files using Pooch.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L209" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L223" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="download_dataset" class="level3">
 <h3 class="anchored" data-anchor-id="download_dataset">download_dataset</h3>
@@ -464,7 +514,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Download a dataset using Pooch and save it to the specified output directory.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L237" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L251" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="download_dataset_from_csv" class="level3">
 <h3 class="anchored" data-anchor-id="download_dataset_from_csv">download_dataset_from_csv</h3>
@@ -495,7 +545,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="download-data-via-quiltt4">Download data via Quilt/T4</h3>
 <p>Allen Institute Cell Science (AICS)</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L280" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L294" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="aics_pipeline" class="level3">
 <h3 class="anchored" data-anchor-id="aics_pipeline">aics_pipeline</h3>
@@ -530,7 +580,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="dataset-manifest">Dataset Manifest</h3>
 <p>Utilities to make a list of all of the files of the train and test dataset in csv form.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L326" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L340" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="manifest2csv" class="level3">
 <h3 class="anchored" data-anchor-id="manifest2csv">manifest2csv</h3>
@@ -549,56 +599,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="25ad67be" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>manifest2csv(data_manifest[<span class="st">"ChannelNumberBrightfield"</span>],data_manifest[<span class="st">"ChannelNumber405"</span>], image_target_paths, data_save_path<span class="op">=</span><span class="st">'./data_examples/'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L364" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="split_dataframe" class="level3">
-<h3 class="anchored" data-anchor-id="split_dataframe">split_dataframe</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_dataframe(</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    input_data, <span class="co"># Path to CSV file or DataFrame</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    train_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.7</span>, <span class="co"># Proportion of data to use for the training set</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>, <span class="co"># Proportion of data to use for the validation set</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    split_column:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Column name that indicates pre-defined split</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    stratify:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, stratify by split_column during random split</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    add_is_valid:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, adds 'is_valid' column in the train set to mark validation samples</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    train_path:<span class="bu">str</span><span class="op">=</span><span class="st">'train.csv'</span>, <span class="co"># Path to save the training CSV file</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    test_path:<span class="bu">str</span><span class="op">=</span><span class="st">'test.csv'</span>, <span class="co"># Path to save the test CSV file</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    valid_path:<span class="bu">str</span><span class="op">=</span><span class="st">'valid.csv'</span>, <span class="co"># Path to save the validation CSV file</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    data_save_path:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Path to save the data files</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    random_seed:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Random state for reproducibility</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Splits a DataFrame or CSV file into train, test, and optional validation sets.</em></p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L457" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="add_columns_to_csv" class="level3">
-<h3 class="anchored" data-anchor-id="add_columns_to_csv">add_columns_to_csv</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_columns_to_csv(</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    csv_path, <span class="co"># Path to the input CSV file</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    column_data, <span class="co"># Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    output_path:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Path to save the updated CSV file. If None, it overwrites the input CSV file.</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Adds one or more new columns to an existing CSV file.</em></p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/datasets.py#L484" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="build_csv" class="level3">
-<h3 class="anchored" data-anchor-id="build_csv">build_csv</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_csv(</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    filenames:Union, <span class="co"># List of file names to process</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    functions:Callable, <span class="co"># One or more functions that take a filename and return a string (e.g., for generating target paths).</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    function_names:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional column names for the function outputs. If None, function.__name__ is used.</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    output_csv:Union<span class="op">=</span><span class="va">None</span>, <span class="co"># If provided, saves the full dataframe to this CSV path.</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    split:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, applies split_dataframe to the generated dataframe.</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    split_kwargs:Optional<span class="op">=</span><span class="va">None</span>, <span class="co"># Keyword arguments passed to split_dataframe.</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Optional: <span class="co"># Returns the dataframe if split=False. If split=True, returns None (files are saved by split_dataframe).</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Create a DataFrame from filenames and one or more transformation functions.</em></p>
 
 
 </section>

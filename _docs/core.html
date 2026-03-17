@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -324,16 +324,69 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_histopathology_2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Histopathology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_segmentation3d.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">3D Segmentation</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Comparison</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/unet_segmentation_3d_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Segmentation with UNet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/Comparison/unetr_btcv_segmentation_3d_lightning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Multi-organ Segmentation with UNETR (BTCV Challenge)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -378,6 +431,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#utils" id="toc-utils" class="nav-link" data-scroll-target="#utils">Utils</a>
   <ul>
+  <li><a href="#add_method" id="toc-add_method" class="nav-link" data-scroll-target="#add_method">add_method</a></li>
   <li><a href="#attributesfromdict" id="toc-attributesfromdict" class="nav-link" data-scroll-target="#attributesfromdict">attributesFromDict</a></li>
   <li><a href="#get_device" id="toc-get_device" class="nav-link" data-scroll-target="#get_device">get_device</a></li>
   <li><a href="#img2float" id="toc-img2float" class="nav-link" data-scroll-target="#img2float">img2float</a></li>
@@ -527,7 +581,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="engine">Engine</h2>
 <p>The engine module provides advanced functionalities for model training, including configurable training loops and evaluation functions tailored for bioinformatics applications. This module is significantly valuable when there is a need for specific workflows and pipelines that meet specific requirements. For this reason, the classes fastTrainer and visionTrainer have been created, providing tailored implementations inheriting from the Learner class.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L58" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L104" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="read_yaml" class="level3">
 <h3 class="anchored" data-anchor-id="read_yaml">read_yaml</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -537,7 +591,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Reads a YAML file and returns its contents as a dictionary</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L65" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L111" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dictlist_to_funclist" class="level3">
 <h3 class="anchored" data-anchor-id="dictlist_to_funclist">dictlist_to_funclist</h3>
@@ -548,7 +602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>FastTrainer is used for training models in bioinformatics applications, where specific loss functions and optimizers oriented to biological data can be used.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L79" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L125" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="fasttrainer" class="level3">
 <h3 class="anchored" data-anchor-id="fasttrainer">fastTrainer</h3>
@@ -579,9 +633,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="example-train-a-model-with-configuration-from-a-yaml-file.">Example: train a model with configuration from a YAML file.</h4>
 <div id="3caedb7a" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> SEResNet50</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.data <span class="im">import</span> BioDataLoaders</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.data <span class="im">import</span> BioDataLoaders</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="ce8e8341" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the data</span></span>
@@ -615,14 +667,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"./data_examples/sample_config.yml"</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># from fastai.callback.progress import ProgressCallback</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># # Remove notebook progress bar</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.remove_cbs(ProgressCallback)</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.remove_cb(ShowGraphCallback)</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -680,7 +726,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>VisionTrainer is used for computer vision applications, where image normalization or other computer vision related settings are needed.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L224" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L270" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 </section>
 <section id="visiontrainer" class="level3">
@@ -719,7 +765,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
 <p>The evaluation module provides functionalities for model evaluation, with several customizations available.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L365" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L411" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="display_statistics_table" class="level3">
 <h3 class="anchored" data-anchor-id="display_statistics_table">display_statistics_table</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -729,7 +775,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Display a table of the key statistics.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L331" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L377" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="plot_histogram_and_kde" class="level3">
 <h3 class="anchored" data-anchor-id="plot_histogram_and_kde">plot_histogram_and_kde</h3>
@@ -740,7 +786,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Plot the histogram and KDE of the data with key statistics marked.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L319" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L365" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="format_sig" class="level3">
 <h3 class="anchored" data-anchor-id="format_sig">format_sig</h3>
@@ -751,7 +797,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Format numbers with two significant digits.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L304" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L350" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="calculate_statistics" class="level3">
 <h3 class="anchored" data-anchor-id="calculate_statistics">calculate_statistics</h3>
@@ -762,7 +808,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Calculate key statistics for the data.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L293" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L339" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="compute_metric" class="level3">
 <h3 class="anchored" data-anchor-id="compute_metric">compute_metric</h3>
@@ -773,7 +819,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Compute the metric for each prediction-target pair.</em> Handles cases where metric_fn has or does not have a ‘func’ attribute.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L286" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L332" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="compute_losses" class="level3">
 <h3 class="anchored" data-anchor-id="compute_losses">compute_losses</h3>
@@ -802,7 +848,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Evaluate_model and evaluate_classification_model are two classes created in order to integrate the evaluation process in a single computation. Evaluate_model can be used on any type of task, whereas evaluate_classification_model is specifically designed for classification tasks.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L400" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L446" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="evaluate_model" class="level3">
 <h3 class="anchored" data-anchor-id="evaluate_model">evaluate_model</h3>
@@ -822,7 +868,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Calculate and optionally plot the distribution of loss values from predictions</em> made by the trainer on test data, with an optional table of key statistics.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L461" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L507" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="evaluate_classification_model" class="level3">
 <h3 class="anchored" data-anchor-id="evaluate_classification_model">evaluate_classification_model</h3>
@@ -833,15 +879,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    loss_fn:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.</span></span>
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    most_confused_n:<span class="bu">int</span><span class="op">=</span><span class="dv">1</span>, <span class="co"># Number of most confused class pairs to display.</span></span>
 <span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    normalize:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether to normalize the confusion matrix.</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    metrics:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Single metric or a list of metrics to evaluate.</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    bw_method:<span class="bu">float</span><span class="op">=</span><span class="fl">0.3</span>, <span class="co"># Bandwidth method for KDE.</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    show_graph:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show the histogram and KDE plot.</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    show_table:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show the statistics table.</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    show_results:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show model results on test data.</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    as_dataframe:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to display table as a DataFrame.</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    cmap:LinearSegmentedColormap<span class="op">=&lt;</span>matplotlib.colors.LinearSegmentedColormap <span class="bu">object</span> at <span class="bn">0x7ec8e91b8710</span><span class="op">&gt;</span>, <span class="co"># Color map for the confusion matrix plot.</span></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    act:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Apply activation to predictions, defaults to `self.loss_func`'s activation</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    metrics:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Single metric or a list of metrics to evaluate.</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    bw_method:<span class="bu">float</span><span class="op">=</span><span class="fl">0.3</span>, <span class="co"># Bandwidth method for KDE.</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    show_graph:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show the histogram and KDE plot.</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    show_table:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show the statistics table.</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    show_results:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show model results on test data.</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    as_dataframe:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to display table as a DataFrame.</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    cmap:LinearSegmentedColormap<span class="op">=&lt;</span>matplotlib.colors.LinearSegmentedColormap <span class="bu">object</span> at <span class="bn">0x7b2aec2b32d0</span><span class="op">&gt;</span>, <span class="co"># Color map for the confusion matrix plot.</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</em></p>
 </section>
 </section>
@@ -849,75 +896,85 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="utils">Utils</h2>
 <p>The utils module contains helper functions and classes to facilitate data manipulation, model setup, and training. These utilities add flexibility and convenience, supporting rapid experimentation and efficient data handling.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L536" target="_blank" style="float:right; font-size:smaller">source</a></p>
-<section id="attributesfromdict" class="level3">
-<h3 class="anchored" data-anchor-id="attributesfromdict">attributesFromDict</h3>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L585" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="add_method" class="level3">
+<h3 class="anchored" data-anchor-id="add_method">add_method</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> attributesFromDict(</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    d</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_method(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    cls</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L592" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="attributesfromdict" class="level3">
+<h3 class="anchored" data-anchor-id="attributesfromdict">attributesFromDict</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> attributesFromDict(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    d</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#attributesfromdict"><code>attributesFromDict</code></a> function simplifies the conversion of dictionary keys and values into object attributes, allowing dynamic attribute creation for configuration objects. This utility is handy for initializing model or dataset configurations directly from dictionaries, improving code readability and maintainability.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L545" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L601" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_device" class="level3">
 <h3 class="anchored" data-anchor-id="get_device">get_device</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_device(</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_device(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#get_device"><code>get_device</code></a> function is used to detect if the device the code is executed in has got a CUDA-enabled GPU available. </em> If it doesn’t, it returns CPU.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L553" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L609" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2float" class="level3">
 <h3 class="anchored" data-anchor-id="img2float">img2float</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> img2float(</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    image, force_copy:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> img2float(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    image, force_copy:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#img2float"><code>img2float</code></a> function turns an image into float representation.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L560" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L616" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2tensor" class="level3">
 <h3 class="anchored" data-anchor-id="img2tensor">img2Tensor</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> img2Tensor(</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    image</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> img2Tensor(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    image</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/core.html#img2tensor"><code>img2Tensor</code></a> function turns an image into tensor representation after turning it first into float representation.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L568" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L624" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="targetedtransform" class="level3">
 <h3 class="anchored" data-anchor-id="targetedtransform">TargetedTransform</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> TargetedTransform(</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    transform:<span class="bu">callable</span>, targets:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'both'</span>,)</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> TargetedTransform(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    transform:<span class="bu">callable</span>, targets:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'both'</span>,)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Wrapper for a transform that specifies which input(s) it should be applied to.</em></p>
 <p>This allows fine-grained control when working with paired data such as (X, y), stereo images, or multi-modal inputs.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L607" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/core.py#L663" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="apply_transforms" class="level3">
 <h3 class="anchored" data-anchor-id="apply_transforms">apply_transforms</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_transforms(</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    image, transforms</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_transforms(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    image, transforms</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Apply a list of transformations, ensuring at least one is applied.</em></p>
 <p>Supports: - plain transforms (applied to both images if tuple) - TargetedTransform(transform, targets=…)</p>
 <div id="fbf499c0" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
 
