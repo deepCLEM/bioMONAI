@@ -5,16 +5,16 @@
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
            'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'register_source',
-           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'ReadDictDataset', 'detect_source',
-           'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource', 'ListSource', 'CallableSource',
-           'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder',
-           'CacheDatasetBuilder', 'FastaiLoader', 'BioDataLoaders', 'BioImageBlock', 'BioDataBlock', 'from_source',
-           'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
-           'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
-           'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
-           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches',
-           'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims',
-           'extract_substacks']
+           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'split_prefixed_kwargs',
+           'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource',
+           'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
+           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders',
+           'BioImageBlock', 'BioDataBlock', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
+           'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
+           'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
+           'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
+           'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
+           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -436,6 +436,44 @@ def route_kwargs(func, kwargs):
         # Otherwise, filter to matching parameters only
         return {k: v for k, v in kwargs.items() if k in sig.parameters}
 
+# %% ../nbs/01_data.ipynb #51c03148
+def split_prefixed_kwargs(kwargs, prefixes=("train_", "val_")):
+    """
+    Split a dictionary of kwargs into multiple groups based on prefixes.
+
+    Example:
+        kwargs = {
+            "batch_size": 32,
+            "train_cache_rate": 1.0,
+            "val_cache_rate": 0.5
+        }
+
+        split_prefixed_kwargs(kwargs)
+        -> {
+             "train": {"cache_rate": 1.0, "batch_size": 32},
+             "val": {"cache_rate": 0.5, "batch_size": 32}
+           }
+
+    Rules:
+    - Keys starting with prefix go to that group (prefix removed)
+    - All keys also appear in each group as defaults if no prefix exists
+    """
+    groups = {p.rstrip("_"): {} for p in prefixes}
+
+    for k, v in kwargs.items():
+        matched = False
+        for p in prefixes:
+            if k.startswith(p):
+                groups[p.rstrip("_")][k[len(p):]] = v
+                matched = True
+                break
+        if not matched:
+            # No prefix → default to all groups
+            for g in groups:
+                groups[g][k] = v
+
+    return groups
+
 # %% ../nbs/01_data.ipynb #fdcce7d8
 class ReadDictDataset(torchDataset):
     def __init__(self, ds, x_keys="image", y_keys="label"):
@@ -692,11 +730,6 @@ def _show_summary(train_dl, val_dl=None):
     if val_dl is not None:
         _describe_dl(val_dl, "Valid")
 
-# %% ../nbs/01_data.ipynb #2aad264a
-import pandas as pd
-from pathlib import Path
-
-
 # %% ../nbs/01_data.ipynb #d8e838b9
 def detect_source(data):
 
@@ -805,6 +838,7 @@ class DataFrameSource:
 @register_source("csv")
 class CSVSource:
 
+    @delegates(DataFrameSource.__init__)
     def __init__(self, path, **kwargs):
         self.path = path
         self.kwargs = kwargs
@@ -890,17 +924,20 @@ class ListSource:
 @register_source("callable")
 class CallableSource:
 
+    @delegates(DataFrameSource.__init__)
     def __init__(
         self,
         items_fn,
         target_fn=None,
-        input_key="image",
-        target_key="label",
+        x_key="image",
+        y_key="label",
+        **kwargs,
     ):
         self.items_fn = items_fn
         self.target_fn = target_fn
-        self.input_key = input_key
-        self.target_key = target_key
+        self.x_key = x_key
+        self.y_key = y_key
+        self.kwargs = kwargs
 
     def load(self):
 
@@ -915,12 +952,12 @@ class CallableSource:
         # Case 2: items are inputs only (paths, ids, etc.)
         else:
 
-            data = {self.input_key: items}
+            data = {self.x_key: items}
 
             if self.target_fn:
-                data[self.target_key] = [self.target_fn(x) for x in items]
+                data[self.y_key] = [self.target_fn(x) for x in items]
 
-            df = pd.DataFrame(data)
+            df = pd.DataFrame(data, **self.kwargs)
 
         return df
 
@@ -1044,6 +1081,7 @@ class DataBlockBuilder(DataFrameSplitMixin):
         valid_col="is_valid",
         x_keys=None,
         y_keys=None,
+        **kwargs,
     ):
         store_attr()
 
@@ -1119,7 +1157,7 @@ class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
     def __init__(self, transforms=None, val_transforms=None,
                  splitter=None, valid_pct=0.2, seed=None,
                  stratify=None, train_size=None,
-                 shuffle=True, valid_col="is_valid"):
+                 shuffle=True, valid_col="is_valid", **kwargs):
         store_attr()
 
     # --------------------------------------------------
@@ -1150,10 +1188,11 @@ class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
 @register_dataset("cache", backend="monai")
 class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
 
+    @delegates(CacheDataset.__init__, but=['transform'])
     def __init__(self, splitter=None, valid_pct=0.2, seed=None,
                  stratify=None, train_size=None, shuffle=True,
                  valid_col="is_valid", transforms=None,
-                 val_transforms=None, **dataset_kwargs):
+                 val_transforms=None, **kwargs):
 
         self.splitter = splitter
         self.valid_pct = valid_pct
@@ -1165,44 +1204,35 @@ class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
 
         self.transforms = transforms
         self.val_transforms = val_transforms
-        self.dataset_kwargs = dataset_kwargs
-
-    # --------------------------------------------------
-    def _split_kwargs(self):
-        train_kwargs, valid_kwargs = {}, {}
-
-        for k, v in self.dataset_kwargs.items():
-            if k.startswith("val_"):
-                valid_kwargs[k[4:]] = v
-            else:
-                train_kwargs[k] = v
-                valid_kwargs.setdefault(k, v)
-
-        return train_kwargs, valid_kwargs
+        
+        split = split_prefixed_kwargs(kwargs, prefixes=("train_", "val_"))
+        self.train_kwargs = split["train"]
+        self.valid_kwargs = split["val"] if "val" in split else split["train"]
 
     # --------------------------------------------------
     def build(self, df):
 
         datalist_train, datalist_valid = self._split_dataframe(df)
 
-        train_transform = self._prepare_transform(self.transforms)
+        self.train_transform = self._prepare_transform(self.transforms)
 
         if self.val_transforms is None:
-            valid_transform = self._make_deterministic_transforms(train_transform)
+            self.valid_transform = self._make_deterministic_transforms(self.train_transform)
         else:
-            valid_transform = self._prepare_transform(self.val_transforms)
+            self.valid_transform = self._prepare_transform(self.val_transforms)
 
-        train_kwargs, valid_kwargs = self._split_kwargs()
+        train_kwargs = route_kwargs(CacheDataset.__init__, self.train_kwargs)
+        valid_kwargs = route_kwargs(CacheDataset.__init__, self.valid_kwargs)
 
         train_ds = CacheDataset(
             datalist_train,
-            transform=train_transform,
+            transform=self.train_transform,
             **train_kwargs
         )
 
         valid_ds = CacheDataset(
             datalist_valid,
-            transform=valid_transform,
+            transform=self.valid_transform,
             **valid_kwargs
         )
 
@@ -1277,6 +1307,120 @@ class FastaiLoader:
 
         return dls
 
+# %% ../nbs/01_data.ipynb #0ee0e27e
+@register_loader("monai")
+class MonaiLoader:
+
+    def __init__(self, 
+                 batch_size=4, 
+                 val_batch_size=None, 
+                 num_workers=4, 
+                 val_num_workers=None, 
+                 shuffle=True, 
+                 val_shuffle=False,
+                 x_keys="image", 
+                 y_keys="label",
+                 show_summary=False,
+                 vocab=None,
+                 **kwargs):
+        """
+        MONAI DataLoader wrapper for train/valid datasets.
+
+        Parameters
+        ----------
+        batch_size : int
+            Training batch size
+        val_batch_size : int, optional
+            Validation batch size (defaults to batch_size)
+        num_workers : int
+            Number of workers for train DataLoader
+        val_num_workers : int, optional
+            Number of workers for valid DataLoader (defaults to num_workers)
+        shuffle : bool
+            Whether to shuffle train DataLoader
+        val_shuffle : bool
+            Whether to shuffle valid DataLoader
+        **kwargs :
+            Additional DataLoader kwargs (train + val), e.g. pin_memory, prefetch_factor
+            Validation-specific args can be prefixed with `val_`
+        """
+        self.batch_size = batch_size
+        self.val_batch_size = val_batch_size or batch_size
+        self.num_workers = num_workers
+        self.val_num_workers = val_num_workers or num_workers
+        self.shuffle = shuffle
+        self.val_shuffle = val_shuffle
+        self.x_keys = x_keys
+        self.y_keys = y_keys
+        self.show_summary = show_summary
+        self.vocab = vocab
+
+        split = split_prefixed_kwargs(kwargs, prefixes=("train_", "val_"))
+        self.train_kwargs = split["train"]
+        self.valid_kwargs = split["val"] if "val" in split else split["train"]
+
+    def build(self, train_ds, valid_ds=None):
+        """
+        Build PyTorch DataLoaders for MONAI datasets.
+
+        Parameters
+        ----------
+        train_ds : MONAI Dataset
+        valid_ds : MONAI Dataset, optional
+        x_keys : str or list
+            Keys used as model inputs
+        y_keys : str or list
+            Keys used as targets
+        vocab : optional
+            For classification tasks
+        """
+        # ---- wrap datasets ----
+        train_ds = ReadDictDataset(train_ds, x_keys=self.x_keys, y_keys=self.y_keys)
+        if valid_ds:
+            valid_ds = ReadDictDataset(valid_ds, x_keys=self.x_keys, y_keys=self.y_keys)
+
+        # ---- optional vocab patch ----
+        if self.vocab:
+            train_ds = _patch_dataset(train_ds, vocab=self.vocab)
+            if valid_ds:
+                valid_ds = _patch_dataset(valid_ds, vocab=self.vocab)
+
+        # ---- kwargs routing ----
+        train_kwargs = route_kwargs(torchDataLoader.__init__, self.train_kwargs)
+        valid_kwargs = route_kwargs(torchDataLoader.__init__, self.valid_kwargs)
+
+        # ---- train DataLoader ----
+        train_dl = torchDataLoader(
+            train_ds,
+            batch_size=self.batch_size,
+            shuffle=self.shuffle,
+            num_workers=self.num_workers,
+            **train_kwargs
+        )
+
+        # ---- valid DataLoader ----
+        valid_dl = None
+        if valid_ds:
+            valid_dl = torchDataLoader(
+                valid_ds,
+                batch_size=self.val_batch_size,
+                shuffle=self.val_shuffle,
+                num_workers=self.val_num_workers,
+                **valid_kwargs
+            )
+        
+        # ---- patch fastai compatibility ----
+        train_dl = _patch_dataloader(train_dl)
+        if valid_dl is not None:
+            valid_dl = _patch_dataloader(valid_dl)
+
+        dls = DataLoaders(train_dl, valid_dl)
+
+        if self.show_summary:
+            _show_summary(train_dl, valid_dl)
+
+        return dls
+
 # %% ../nbs/01_data.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
     """
@@ -1293,24 +1437,7 @@ class BioDataLoaders(DataLoaders):
                **kwargs):
         """
         Create a complete DataLoader pipeline from raw data.
-
-        Parameters
-        ----------
-        data : Any
-            Raw training data input (folder, dataframe, CSV, list, callable)
-        val_data : Any, optional
-            Raw validation data. If provided, is combined with `data` and
-            `is_valid` column is added automatically.
-        task : str, optional
-            Name of a registered task to provide defaults (transforms, dataset defaults)
-        dataset : str, optional
-            Name of a registered dataset type; default comes from task if provided
-        backend : str, optional
-            Backend to select loader ("fastai" or "monai"); inferred from dataset if not provided
-        **kwargs : dict
-            Additional kwargs passed to source, dataset builder, and loader
         """
-
         # ------------------------
         # Task defaults
         # ------------------------
@@ -1332,28 +1459,30 @@ class BioDataLoaders(DataLoaders):
             kwargs = {**task_conf, **kwargs}
 
         # ------------------------
-        # Source detection
+        # Source detection & kwargs split
         # ------------------------
         source_name = detect_source(data)
         SourceClass = SOURCE_REGISTRY[source_name]
-        source_kwargs = route_kwargs(SourceClass.__init__, kwargs)
+
+        # Split kwargs for train/val sources
+        source_splits = split_prefixed_kwargs(kwargs)
+        train_source_kwargs = route_kwargs(SourceClass.__init__, source_splits["train"])
 
         # Load train dataframe
-        train_source = SourceClass(data, **source_kwargs)
-        train_df = train_source.load().copy()
+        train_source = SourceClass(data, **train_source_kwargs)
+        df = train_source.load().copy()
 
         # Load validation dataframe if provided
         if val_data is not None:
-            val_source = SourceClass(val_data, **source_kwargs)
+            val_source_kwargs = route_kwargs(SourceClass.__init__, source_splits.get("val", source_splits["train"]))
+            val_source = SourceClass(val_data, **val_source_kwargs)
             val_df = val_source.load().copy()
 
             valid_col = kwargs.get("valid_col", "is_valid")
-            train_df[valid_col] = False
+            df[valid_col] = False
             val_df[valid_col] = True
 
-            df = pd.concat([train_df, val_df], ignore_index=True)
-        else:
-            df = train_df
+            df = pd.concat([df, val_df], ignore_index=True)
 
         # ------------------------
         # Dataset builder
@@ -1361,19 +1490,16 @@ class BioDataLoaders(DataLoaders):
         DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
         backend = backend or inferred_backend
 
-        dataset_kwargs = route_kwargs(DatasetBuilderClass.__init__, kwargs)
-        builder = DatasetBuilderClass(**dataset_kwargs)
+        builder = DatasetBuilderClass(**kwargs)
         ds_train, ds_valid = builder.build(df)
 
         # ------------------------
         # Loader builder
         # ------------------------
         LoaderClass = LOADER_REGISTRY[backend]
-        loader_kwargs = route_kwargs(LoaderClass.__init__, kwargs)
-        loader = LoaderClass(**loader_kwargs)
+        loader = LoaderClass(**kwargs)
 
         return loader.build(ds_train, ds_valid)
-
 
 # %% ../nbs/01_data.ipynb #68b31c0c
 def BioImageBlock(cls:BioImageBase=BioImage):
