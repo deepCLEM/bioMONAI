@@ -981,17 +981,19 @@ class DataFrameSplitMixin:
         )
 
     # --------------------------------------------------
-    def _split_dataframe(self, df):
+    def _split_dataframe(self, df, mode="train"):
+
+        # TEST MODE → no split
+        if mode == "test":
+            return None, df.to_dict("records")
+
         splitter = self._resolve_splitter(df)
         train_idx, valid_idx = splitter(df)
 
         df_train = df.iloc[train_idx].copy()
         df_valid = df.iloc[valid_idx].copy()
 
-        datalist_train = df_train.to_dict("records")
-        datalist_valid = df_valid.to_dict("records")
-
-        return datalist_train, datalist_valid
+        return df_train.to_dict("records"), df_valid.to_dict("records")
 
 # %% ../nbs/01_data.ipynb #84fb0210
 class MonaiTransformMixin:
@@ -1107,27 +1109,23 @@ class DataBlockBuilder(DataFrameSplitMixin):
         return train_pipeline, valid_pipeline
 
     # --------------------------------------------------
-    def build(self, df):
-        """
-        Build a FastAI DataBlock from a DataFrame.
-        """
+    def build(self, df, mode="train"):
+
         x_col, y_col = self._infer_columns(df)
+
         get_x = self.get_x or ColReader(x_col)
         get_y = self.get_y or (ColReader(y_col) if y_col else None)
 
         blocks = self.blocks
         if blocks is None:
-            if y_col:
-                blocks = (
-                    BioImageBlock(cls=BioImage),
-                    BioImageBlock(cls=BioImage),
-                )
-            else:
-                blocks = (BioImageBlock(cls=BioImage),)
+            blocks = (
+                (BioImageBlock(cls=BioImage), BioImageBlock(cls=BioImage))
+                if y_col else
+                (BioImageBlock(cls=BioImage),)
+            )
 
-        splitter = self._resolve_splitter(df)
+        splitter = None if mode == "test" else self._resolve_splitter(df)
 
-        # Wrap train/valid transforms
         item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
         batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
 
@@ -1144,7 +1142,6 @@ class DataBlockBuilder(DataFrameSplitMixin):
             splitter=splitter,
         )
 
-        # Attach validation transforms for DataLoader use
         datablock._val_item_tfms = val_item_tfms
         datablock._val_batch_tfms = val_batch_tfms
 
@@ -1161,9 +1158,9 @@ class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
         store_attr()
 
     # --------------------------------------------------
-    def build(self, df):
+    def build(self, df, mode="train"):
 
-        datalist_train, datalist_valid = self._split_dataframe(df)
+        datalist_train, datalist_valid = self._split_dataframe(df, mode=mode)
 
         train_transform = self._prepare_transform(self.transforms)
 
@@ -1172,6 +1169,10 @@ class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
         else:
             valid_transform = self._prepare_transform(self.val_transforms)
 
+        if mode == "test":
+            test_ds = MonaiDataset(datalist_valid, valid_transform)
+            return test_ds, None
+    
         train_ds = MonaiDataset(
             datalist_train,
             transform=train_transform
@@ -1210,9 +1211,9 @@ class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
         self.valid_kwargs = split["val"] if "val" in split else split["train"]
 
     # --------------------------------------------------
-    def build(self, df):
+    def build(self, df, mode="train"):
 
-        datalist_train, datalist_valid = self._split_dataframe(df)
+        datalist_train, datalist_valid = self._split_dataframe(df, mode=mode)
 
         self.train_transform = self._prepare_transform(self.transforms)
 
@@ -1224,6 +1225,10 @@ class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
         train_kwargs = route_kwargs(CacheDataset.__init__, self.train_kwargs)
         valid_kwargs = route_kwargs(CacheDataset.__init__, self.valid_kwargs)
 
+        if mode == "test":
+            test_ds = CacheDataset(datalist_valid, transform=self.valid_transform, **valid_kwargs)
+            return test_ds, None
+        
         train_ds = CacheDataset(
             datalist_train,
             transform=self.train_transform,
@@ -1424,9 +1429,201 @@ class MonaiLoader:
 # %% ../nbs/01_data.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
     """
-    Basic wrapper around several `DataLoader`s with factory methods for biomedical imaging problems.
-    Managing multiple `DataLoader` instances, `BioDataLoaders` handles data loading for different phases of model training, such as training, validation, and testing. It ensures efficient data handling and supports various batch processing strategies.
+    Unified factory for building training, validation, and test DataLoaders.
+
+    This class orchestrates the full pipeline:
+        data → source → dataframe → dataset builder → loader
+
+    It supports:
+    - Task-based defaults (transforms, configs)
+    - Multiple backends (fastai, MONAI, etc.)
+    - Optional external validation datasets
+    - Mode-based dataset construction (train / test)
     """
+
+    # --------------------------------------------------
+    @classmethod
+    def _apply_task_defaults(cls, task, dataset, kwargs):
+        """
+        Apply task-specific defaults (transforms, configs).
+
+        | Parameter | Type | Default | Description |
+        |----------|------|--------|-------------|
+        | task | str | None | Registered task name |
+        | dataset | str | None | Dataset builder name |
+        | kwargs | dict | {} | User-provided arguments |
+
+        Returns
+        -------
+        dataset : str
+            Resolved dataset name
+        kwargs : dict
+            Updated kwargs with task defaults applied
+        """
+        if task is None:
+            return dataset, kwargs
+
+        TaskClass = TASK_REGISTRY[task]
+        task_obj = TaskClass()
+
+        if dataset is None:
+            dataset = task_obj.default_dataset
+
+        # Inject default transforms only if not provided
+        kwargs.setdefault("transforms", task_obj.transforms())
+        kwargs.setdefault("batch_transforms", task_obj.batch_transforms())
+        kwargs.setdefault("val_transforms", task_obj.val_transforms())
+        kwargs.setdefault("val_batch_transforms", task_obj.val_batch_transforms())
+
+        # Merge configs (user kwargs take precedence)
+        task_conf = {**task_obj.dataset_config(), **task_obj.loader_config()}
+        kwargs = {**task_conf, **kwargs}
+
+        return dataset, kwargs
+
+    # --------------------------------------------------
+    @classmethod
+    def _load_dataframe(cls, data, kwargs, val_data=None):
+        """
+        Load data into a unified DataFrame.
+
+        | Parameter | Type | Default | Description |
+        |----------|------|--------|-------------|
+        | data | Any | — | Input data (df, csv, folder, etc.) |
+        | kwargs | dict | {} | Source-related kwargs |
+        | val_data | Any | None | Optional validation data |
+
+        Returns
+        -------
+        df : pd.DataFrame
+            Combined dataframe with optional validation column
+        """
+        source_name = detect_source(data)
+        SourceClass = SOURCE_REGISTRY[source_name]
+
+        # Split kwargs into train / val groups
+        source_splits = split_prefixed_kwargs(kwargs)
+
+        # ---- load training data ----
+        train_kwargs = route_kwargs(SourceClass.__init__, source_splits["train"])
+        df = SourceClass(data, **train_kwargs).load().copy()
+
+        # ---- optional validation data ----
+        if val_data is not None:
+            val_kwargs = route_kwargs(
+                SourceClass.__init__,
+                source_splits.get("val", source_splits["train"])
+            )
+
+            val_df = SourceClass(val_data, **val_kwargs).load().copy()
+
+            # Mark train vs validation rows
+            valid_col = kwargs.get("valid_col", "is_valid")
+            df[valid_col] = False
+            val_df[valid_col] = True
+
+            # Merge datasets
+            df = pd.concat([df, val_df], ignore_index=True)
+
+        return df
+
+    # --------------------------------------------------
+    @classmethod
+    def _build_dataset(cls, df, dataset, backend, kwargs, mode):
+        """
+        Build dataset(s) using the registered dataset builder.
+
+        | Parameter | Type | Default | Description |
+        |----------|------|--------|-------------|
+        | df | pd.DataFrame | — | Input dataframe |
+        | dataset | str | — | Dataset builder name |
+        | backend | str | None | Backend (fastai, monai, etc.) |
+        | kwargs | dict | {} | Dataset builder kwargs |
+        | mode | str | "train" | Mode: train / test |
+
+        Returns
+        -------
+        (train_ds, valid_ds), backend
+        """
+        DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
+        backend = backend or inferred_backend
+
+        builder_kwargs = route_kwargs(DatasetBuilderClass.__init__, kwargs)
+        builder = DatasetBuilderClass(**builder_kwargs)
+
+        return builder.build(df, mode=mode), backend
+
+    # --------------------------------------------------
+    @classmethod
+    def _build_loader(cls, train_ds, valid_ds, backend, kwargs):
+        """
+        Build DataLoaders from datasets.
+
+        | Parameter | Type | Default | Description |
+        |----------|------|--------|-------------|
+        | train_ds | Any | — | Training dataset |
+        | valid_ds | Any | None | Validation dataset |
+        | backend | str | — | Loader backend |
+        | kwargs | dict | {} | Loader kwargs |
+
+        Returns
+        -------
+        DataLoaders
+        """
+        LoaderClass = LOADER_REGISTRY[backend]
+        loader_kwargs = route_kwargs(LoaderClass.__init__, kwargs)
+
+        loader = LoaderClass(**loader_kwargs)
+        return loader.build(train_ds, valid_ds)
+
+    # --------------------------------------------------
+    @classmethod
+    def _run_pipeline(cls,
+                      data,
+                      val_data=None,
+                      task=None,
+                      dataset=None,
+                      backend=None,
+                      mode="train",
+                      **kwargs):
+        """
+        Core pipeline orchestrator.
+
+        | Parameter | Type | Default | Description |
+        |----------|------|--------|-------------|
+        | data | Any | — | Input data |
+        | val_data | Any | None | Optional validation data |
+        | task | str | None | Task name |
+        | dataset | str | None | Dataset builder |
+        | backend | str | None | Loader backend |
+        | mode | str | "train" | train or test |
+        | kwargs | dict | {} | Additional parameters |
+
+        Returns
+        -------
+        DataLoaders or DataLoader
+        """
+        # ---- apply task defaults ----
+        dataset, kwargs = cls._apply_task_defaults(task, dataset, kwargs)
+
+        # ---- load dataframe ----
+        df = cls._load_dataframe(data, kwargs, val_data)
+
+        # ---- build dataset ----
+        (ds_train, ds_valid), backend = cls._build_dataset(
+            df, dataset, backend, kwargs, mode
+        )
+
+        # ---- test mode ----
+        if mode == "test":
+            ds = ds_valid if ds_valid is not None else ds_train
+            dls = cls._build_loader(ds, None, backend, kwargs)
+            return dls.valid if hasattr(dls, "valid") else dls.train
+
+        # ---- train mode ----
+        return cls._build_loader(ds_train, ds_valid, backend, kwargs)
+
+    # --------------------------------------------------
     @classmethod
     def create(cls,
                data,
@@ -1436,70 +1633,64 @@ class BioDataLoaders(DataLoaders):
                backend=None,
                **kwargs):
         """
-        Create a complete DataLoader pipeline from raw data.
+        Build training + validation DataLoaders.
+
+        | Parameter | Type | Default | Description |
+        |----------|------|--------|-------------|
+        | data | Any | — | Training data |
+        | val_data | Any | None | Optional validation data |
+        | task | str | None | Task name |
+        | dataset | str | None | Dataset builder |
+        | backend | str | None | Loader backend |
+        | kwargs | dict | {} | Additional parameters |
+
+        Returns
+        -------
+        DataLoaders
         """
-        # ------------------------
-        # Task defaults
-        # ------------------------
-        if task is not None:
-            TaskClass = TASK_REGISTRY[task]
-            task_obj = TaskClass()
+        return cls._run_pipeline(
+            data,
+            val_data=val_data,
+            task=task,
+            dataset=dataset,
+            backend=backend,
+            mode="train",
+            **kwargs
+        )
 
-            if dataset is None:
-                dataset = task_obj.default_dataset
+    # --------------------------------------------------
+    @classmethod
+    def test_dl(cls,
+                data,
+                task=None,
+                dataset=None,
+                backend=None,
+                **kwargs):
+        """
+        Build a test DataLoader.
 
-            # Inject default transforms if missing
-            kwargs.setdefault("transforms", task_obj.transforms())
-            kwargs.setdefault("batch_transforms", task_obj.batch_transforms())
-            kwargs.setdefault("val_transforms", task_obj.val_transforms())
-            kwargs.setdefault("val_batch_transforms", task_obj.val_batch_transforms())
+        Uses validation transforms and disables splitting.
 
-            # Merge task configs with user kwargs (user kwargs take precedence)
-            task_conf = {**task_obj.dataset_config(), **task_obj.loader_config()}
-            kwargs = {**task_conf, **kwargs}
+        | Parameter | Type | Default | Description |
+        |----------|------|--------|-------------|
+        | data | Any | — | Test data |
+        | task | str | None | Task name |
+        | dataset | str | None | Dataset builder |
+        | backend | str | None | Loader backend |
+        | kwargs | dict | {} | Additional parameters |
 
-        # ------------------------
-        # Source detection & kwargs split
-        # ------------------------
-        source_name = detect_source(data)
-        SourceClass = SOURCE_REGISTRY[source_name]
-
-        # Split kwargs for train/val sources
-        source_splits = split_prefixed_kwargs(kwargs)
-        train_source_kwargs = route_kwargs(SourceClass.__init__, source_splits["train"])
-
-        # Load train dataframe
-        train_source = SourceClass(data, **train_source_kwargs)
-        df = train_source.load().copy()
-
-        # Load validation dataframe if provided
-        if val_data is not None:
-            val_source_kwargs = route_kwargs(SourceClass.__init__, source_splits.get("val", source_splits["train"]))
-            val_source = SourceClass(val_data, **val_source_kwargs)
-            val_df = val_source.load().copy()
-
-            valid_col = kwargs.get("valid_col", "is_valid")
-            df[valid_col] = False
-            val_df[valid_col] = True
-
-            df = pd.concat([df, val_df], ignore_index=True)
-
-        # ------------------------
-        # Dataset builder
-        # ------------------------
-        DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
-        backend = backend or inferred_backend
-
-        builder = DatasetBuilderClass(**kwargs)
-        ds_train, ds_valid = builder.build(df)
-
-        # ------------------------
-        # Loader builder
-        # ------------------------
-        LoaderClass = LOADER_REGISTRY[backend]
-        loader = LoaderClass(**kwargs)
-
-        return loader.build(ds_train, ds_valid)
+        Returns
+        -------
+        DataLoader
+        """
+        return cls._run_pipeline(
+            data,
+            task=task,
+            dataset=dataset,
+            backend=backend,
+            mode="test",
+            **kwargs
+        )
 
 # %% ../nbs/01_data.ipynb #68b31c0c
 def BioImageBlock(cls:BioImageBase=BioImage):
