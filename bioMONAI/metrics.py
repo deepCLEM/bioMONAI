@@ -55,6 +55,7 @@ from monai.metrics import (
     MetricsReloadedCategorical as _MetricsReloadedCategorical,
     MultiScaleSSIMMetric as _MS_SSIM,
     PanopticQualityMetric as _PanopticQualityMetric,
+    ROCAUCMetric as _ROCAUCMetric,
     PSNRMetric as _PSNR,
     RMSEMetric as _RMSE,
     SSIMMetric as _SSIM,
