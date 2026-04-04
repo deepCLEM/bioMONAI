@@ -1,5 +1,7 @@
 _data/
 nbs/_test*
+nbs/Tutorials/models/
+nbs/Tutorials/Comparison/models
 *._fuse_hidden*
 *.fuse_hidden*
 *.code-workspace
