@@ -764,12 +764,15 @@ def build_source(data, **kwargs):
 # %% ../nbs/01_data.ipynb #f998bcd6
 @register_source("dataframe")
 class DataFrameSource:
+    """
+    A source class for handling data from pandas DataFrames, providing path resolution and column mapping for file-based datasets.
+    """
 
     def __init__(
         self,
         df,
         colmap=None,
-        base_path=".",
+        base_path=None,
         folders=None,
         suffixes=None,
         keep_original=False,
@@ -782,6 +785,7 @@ class DataFrameSource:
 
         colmap : dict
             Mapping {"new_column": "existing_column"}.
+            Only columns in colmap will be treated as paths.
 
         base_path : str | Path
             Base path prepended to files.
@@ -798,7 +802,7 @@ class DataFrameSource:
 
         self.df = df
         self.colmap = colmap or {}
-        self.base_path = Path(base_path)
+        self.base_path = base_path or ""
         self.folders = folders or {}
         self.suffixes = suffixes or {}
         self.keep_original = keep_original
@@ -812,7 +816,7 @@ class DataFrameSource:
             folder = self.folders.get(new_col)
             suffix = self.suffixes.get(new_col, "")
 
-            base = self.base_path
+            base = Path(self.base_path)
             if folder:
                 base = base / folder
 
@@ -830,7 +834,8 @@ class DataFrameSource:
         df = self._resolve_paths()
 
         if not self.keep_original and self.colmap:
-            df = df[list(self.colmap.keys())]
+            # Keep mapped columns + any columns not in colmap
+            df = df[[c for c in df.columns if c in self.colmap.keys() or c not in self.colmap.values()]]
 
         return df
 
@@ -2934,6 +2939,7 @@ def build_df(
     filenames: Union[list[str|Path], L],                 # List of file names to process
     *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
     function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
+    filename_col: str = "filename",                            # Column name for the input filenames.
     output_csv: Optional[str|Path] = None,               # If provided, saves the full dataframe to this CSV path.
     split: bool = False,                            # If True, applies split_dataframe to the generated dataframe.
     split_kwargs: Optional[dict] = None,            # Keyword arguments passed to split_dataframe.
@@ -2959,7 +2965,7 @@ def build_df(
         column_names = function_names
 
     # Build dataframe
-    data = {"filename": filenames}
+    data = {filename_col: filenames}
 
     for col_name, func in zip(column_names, functions):
         data[col_name] = [func(fname) for fname in filenames]
