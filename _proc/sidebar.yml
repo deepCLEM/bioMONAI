@@ -28,5 +28,3 @@ website:
               - Tutorials/Comparison/802_monai_101_ignite.ipynb
               - Tutorials/Comparison/803_image_restoration_biomonai.ipynb
               - Tutorials/Comparison/803_image_restoration_pytorch.ipynb
-              - Tutorials/Comparison/unet_segmentation_3d_ignite.ipynb
-              - Tutorials/Comparison/unetr_btcv_segmentation_3d_lightning.ipynb
