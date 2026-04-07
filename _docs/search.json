@@ -179,445 +179,445 @@
   {
     "objectID": "Benchmarks/monai_101_biomonai.html",
     "href": "Benchmarks/monai_101_biomonai.html",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "",
     "text": "import os\nimport tempfile\n\nfrom bioMONAI.data import *\nfrom bioMONAI.core import *\nfrom bioMONAI.metrics import accuracy\nfrom bioMONAI.losses import CrossEntropyLossFlat\n\nfrom monai.networks.nets import DenseNet121\nfrom monai.apps import MedNISTDataset",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_biomonai.html#setup-imports",
     "href": "Benchmarks/monai_101_biomonai.html#setup-imports",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "",
     "text": "import os\nimport tempfile\n\nfrom bioMONAI.data import *\nfrom bioMONAI.core import *\nfrom bioMONAI.metrics import accuracy\nfrom bioMONAI.losses import CrossEntropyLossFlat\n\nfrom monai.networks.nets import DenseNet121\nfrom monai.apps import MedNISTDataset",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_biomonai.html#setup-data-directory",
     "href": "Benchmarks/monai_101_biomonai.html#setup-data-directory",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "Setup data directory",
     "text": "Setup data directory\nYou can specify a directory.\nThis allows you to save results and reuse downloads.\nIf not specified a temporary directory will be used.\n\nbase_directory = '../_data/'\nif base_directory is not None:\n    os.makedirs(base_directory, exist_ok=True)\nroot_dir = tempfile.mkdtemp() if base_directory is None else base_directory\nprint(root_dir)\n\n../../_data/",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_biomonai.html#use-monai-transforms-to-preprocess-data",
     "href": "Benchmarks/monai_101_biomonai.html#use-monai-transforms-to-preprocess-data",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "Use MONAI transforms to preprocess data",
     "text": "Use MONAI transforms to preprocess data\nMedical images require specialized methods for I/O, preprocessing, and augmentation. They often follow specific formats, are handled with specific protocols, and the data arrays are often high-dimensional.\nIn this example, we will perform image loading, data format verification, and intensity scaling with three monai.transforms listed below, and compose a pipeline ready to be used in next steps.",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_biomonai.html#prepare-datasets-using-monai-apps",
     "href": "Benchmarks/monai_101_biomonai.html#prepare-datasets-using-monai-apps",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "Prepare datasets using MONAI Apps",
     "text": "Prepare datasets using MONAI Apps\nWe use MedNISTDataset in MONAI Apps to download a dataset to the specified directory and perform the pre-processing steps in the monai.transforms compose.\nThe MedNIST dataset was gathered from several sets from TCIA, the RSNA Bone Age Challenge, and the NIH Chest X-ray dataset.\nThe dataset is kindly made available by Dr. Bradley J. Erickson M.D., Ph.D. (Department of Radiology, Mayo Clinic) under the Creative Commons CC BY-SA 4.0 license.\nIf you use the MedNIST dataset, please acknowledge the source.\n\nfrom monai.transforms import LoadImageD, EnsureChannelFirstD, ScaleIntensityD, Compose\n\ntransform = Compose(\n    [\n        LoadImageD(keys=\"image\", image_only=True),\n        EnsureChannelFirstD(keys=\"image\"),\n        ScaleIntensityD(keys=\"image\"),\n    ]\n)\n\n\ntrain_ds = MedNISTDataset(root_dir=root_dir, transform=transform, section=\"training\", download=False)\nval_ds = MedNISTDataset(root_dir=root_dir, transform=transform, section=\"validation\", download=False)\ntest_ds = MedNISTDataset(root_dir=root_dir, transform=transform, section=\"test\", download=False)\n\nLoading dataset: 100%|██████████| 47164/47164 [00:22&lt;00:00, 2110.05it/s]\nLoading dataset: 100%|██████████| 5895/5895 [00:03&lt;00:00, 1957.31it/s]\nLoading dataset: 100%|██████████| 5895/5895 [00:02&lt;00:00, 2164.60it/s]\n\n\n\ndata_ops = {\n    'x_keys': 'image',\n    'y_keys': 'label', \n    'bs': 512,\n    'shuffle': True,\n    'vocab': ['AbdomenCT','BreastMRI','ChestCT','CXR','Hand','HeadCT'],\n    'show_summary': True,\n}\n\ndata = BioDataLoaders.from_monai(train_ds, val_ds, **data_ops)\n\n\nTrain DataLoader\n----------------\nDataset size : 47164\nBatch size   : 512\nBatches      : 93\nClasses      : ['AbdomenCT', 'BreastMRI', 'ChestCT', 'CXR', 'Hand', 'HeadCT']\n\nBatch structure:\n  [0] shape=(512, 1, 64, 64) dtype=torch.float32 ~8.00 MB\n  [1] shape=(512,) dtype=torch.int64 ~0.00 MB\nApprox batch memory: 8.00 MB\n\nValid DataLoader\n----------------\nDataset size : 5895\nBatch size   : 1024\nBatches      : 6\nClasses      : ['AbdomenCT', 'BreastMRI', 'ChestCT', 'CXR', 'Hand', 'HeadCT']\n\nBatch structure:\n  [0] shape=(1024, 1, 64, 64) dtype=torch.float32 ~16.00 MB\n  [1] shape=(1024,) dtype=torch.int64 ~0.01 MB\nApprox batch memory: 16.01 MB\n\n\n\ndata.show_batch()",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_biomonai.html#define-a-network-and-a-supervised-trainer",
     "href": "Benchmarks/monai_101_biomonai.html#define-a-network-and-a-supervised-trainer",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "Define a network and a supervised trainer",
     "text": "Define a network and a supervised trainer\nTo train a model that can perform the classification task, we will use the DenseNet-121 which is known for its performance on the ImageNet dataset.\nFor a typical supervised training workflow, MONAI provides SupervisedTrainer to define the hyper-parameters.\n\nmax_epochs = 5\nmodel = DenseNet121(spatial_dims=2, in_channels=1, out_channels=6)\nloss_function = CrossEntropyLossFlat()\nmetrics = [accuracy]\n\ntrainer = fastTrainer(data, model, loss_fn=loss_function, metrics=metrics, show_summary=False, lr=1e-5)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_biomonai.html#run-the-training",
     "href": "Benchmarks/monai_101_biomonai.html#run-the-training",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "Run the training",
     "text": "Run the training\n\ntrainer.fit(max_epochs)\n\n\n\n\n\n\n\n\nepoch\ntrain_loss\nvalid_loss\naccuracy\ntime\n\n\n\n\n0\n0.742293\n0.385844\n0.965394\n00:14\n\n\n1\n0.272581\n0.133415\n0.983715\n00:11\n\n\n2\n0.116980\n0.067816\n0.989652\n00:11\n\n\n3\n0.060946\n0.040167\n0.993724\n00:11\n\n\n4\n0.034605\n0.026329\n0.995250\n00:12\n\n\n\n\n\n\n\n\n\n\n\n\n\ntrainer.show_results()",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_biomonai.html#check-the-prediction-on-the-test-dataset",
     "href": "Benchmarks/monai_101_biomonai.html#check-the-prediction-on-the-test-dataset",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - bioMONAI",
     "section": "Check the prediction on the test dataset",
     "text": "Check the prediction on the test dataset\n\ntest_dl = test_biodataloader(data, test_ds) # type:ignore\n\n\nevaluate_classification_model(trainer, test_data=test_dl, metrics=accuracy, show_graph=True, show_results=True); # type:ignore\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              precision    recall  f1-score   support\n\n   AbdomenCT       0.99      1.00      1.00       993\n   BreastMRI       1.00      0.99      1.00       903\n         CXR       1.00      1.00      1.00       968\n     ChestCT       1.00      1.00      1.00       998\n        Hand       1.00      1.00      1.00       996\n      HeadCT       1.00      1.00      1.00      1037\n\n    accuracy                           1.00      5895\n   macro avg       1.00      1.00      1.00      5895\nweighted avg       1.00      1.00      1.00      5895\n\n\n\n\n\n\n\n\n\n\n\nMost Confused Classes:\n\n\n\n\n\n\n\n\n\nActual Class\nPredicted Class\nCount\n\n\n\n\n0\nBreastMRI\nAbdomenCT\n5\n\n\n1\nHeadCT\nAbdomenCT\n3\n\n\n2\nCXR\nHand\n2\n\n\n3\nHand\nBreastMRI\n2\n\n\n4\nAbdomenCT\nHeadCT\n1\n\n\n5\nBreastMRI\nChestCT\n1\n\n\n6\nHand\nCXR\n1\n\n\n7\nHand\nHeadCT\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue\n\n\nCrossEntropyLossFlat\n\n\n\n\n\nMean\n1.059131\n\n\nMedian\n1.049874\n\n\nStandard Deviation\n0.047636\n\n\nMin\n1.044432\n\n\nMax\n1.870728\n\n\nQ1\n1.047687\n\n\nQ3\n1.054943\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue\n\n\naccuracy\n\n\n\n\n\nMean\n0.997286\n\n\nMedian\n1.000000\n\n\nStandard Deviation\n0.052027\n\n\nMin\n0.000000\n\n\nMax\n1.000000\n\n\nQ1\n1.000000\n\n\nQ3\n1.000000",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html",
     "href": "Benchmarks/mednist_tutorial_biomonai.html",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "",
     "text": "import os\nimport shutil\nimport tempfile\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nfrom bioMONAI.data import *\nfrom bioMONAI.core import *\nfrom bioMONAI.metrics import ROCAUCMetric, accuracy\nfrom bioMONAI.datasets import download_file\nfrom bioMONAI.core import Path\nfrom bioMONAI.io import image_reader\nfrom bioMONAI.losses import CrossEntropyLossFlat\nfrom bioMONAI.data import CategoryBlock, parent_label\nfrom bioMONAI.callbacks import SaveModelCallback\nfrom bioMONAI.visualize import plot_metrics\n\nfrom monai.config import print_config\nfrom monai.networks.nets import DenseNet121\nfrom monai.transforms import (\n    EnsureChannelFirstd,\n    LoadImaged,\n    RandFlipd,\n    RandRotated,\n    RandZoomd,\n    ScaleIntensityd,\n)\nfrom monai.utils import set_determinism\n\nprint_config()\n\nMONAI version: 1.5.2\nNumpy version: 2.4.2\nPytorch version: 2.9.1+cu128\nMONAI flags: HAS_EXT = False, USE_COMPILED = False, USE_META_DICT = False\nMONAI rev id: d18565fb3e4fd8c556707f91ac280a2dc3f681c1\nMONAI __file__: /home/&lt;username&gt;/miniforge3/envs/biomonai_latest/lib/python3.11/site-packages/monai/__init__.py\n\nOptional dependencies:\nPytorch Ignite version: NOT INSTALLED or UNKNOWN VERSION.\nITK version: NOT INSTALLED or UNKNOWN VERSION.\nNibabel version: 5.3.3\nscikit-image version: 0.26.0\nscipy version: 1.17.0\nPillow version: 12.1.1\nTensorboard version: NOT INSTALLED or UNKNOWN VERSION.\ngdown version: NOT INSTALLED or UNKNOWN VERSION.\nTorchVision version: 0.24.1+cu128\ntqdm version: 4.67.3\nlmdb version: NOT INSTALLED or UNKNOWN VERSION.\npsutil version: 7.2.2\npandas version: 3.0.0\neinops version: 0.8.2\ntransformers version: NOT INSTALLED or UNKNOWN VERSION.\nmlflow version: NOT INSTALLED or UNKNOWN VERSION.\npynrrd version: NOT INSTALLED or UNKNOWN VERSION.\nclearml version: NOT INSTALLED or UNKNOWN VERSION.\n\nFor details about installing the optional dependencies, please visit:\n    https://docs.monai.io/en/latest/installation.html#installing-the-recommended-dependencies",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#setup-imports",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#setup-imports",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "",
     "text": "import os\nimport shutil\nimport tempfile\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nfrom bioMONAI.data import *\nfrom bioMONAI.core import *\nfrom bioMONAI.metrics import ROCAUCMetric, accuracy\nfrom bioMONAI.datasets import download_file\nfrom bioMONAI.core import Path\nfrom bioMONAI.io import image_reader\nfrom bioMONAI.losses import CrossEntropyLossFlat\nfrom bioMONAI.data import CategoryBlock, parent_label\nfrom bioMONAI.callbacks import SaveModelCallback\nfrom bioMONAI.visualize import plot_metrics\n\nfrom monai.config import print_config\nfrom monai.networks.nets import DenseNet121\nfrom monai.transforms import (\n    EnsureChannelFirstd,\n    LoadImaged,\n    RandFlipd,\n    RandRotated,\n    RandZoomd,\n    ScaleIntensityd,\n)\nfrom monai.utils import set_determinism\n\nprint_config()\n\nMONAI version: 1.5.2\nNumpy version: 2.4.2\nPytorch version: 2.9.1+cu128\nMONAI flags: HAS_EXT = False, USE_COMPILED = False, USE_META_DICT = False\nMONAI rev id: d18565fb3e4fd8c556707f91ac280a2dc3f681c1\nMONAI __file__: /home/&lt;username&gt;/miniforge3/envs/biomonai_latest/lib/python3.11/site-packages/monai/__init__.py\n\nOptional dependencies:\nPytorch Ignite version: NOT INSTALLED or UNKNOWN VERSION.\nITK version: NOT INSTALLED or UNKNOWN VERSION.\nNibabel version: 5.3.3\nscikit-image version: 0.26.0\nscipy version: 1.17.0\nPillow version: 12.1.1\nTensorboard version: NOT INSTALLED or UNKNOWN VERSION.\ngdown version: NOT INSTALLED or UNKNOWN VERSION.\nTorchVision version: 0.24.1+cu128\ntqdm version: 4.67.3\nlmdb version: NOT INSTALLED or UNKNOWN VERSION.\npsutil version: 7.2.2\npandas version: 3.0.0\neinops version: 0.8.2\ntransformers version: NOT INSTALLED or UNKNOWN VERSION.\nmlflow version: NOT INSTALLED or UNKNOWN VERSION.\npynrrd version: NOT INSTALLED or UNKNOWN VERSION.\nclearml version: NOT INSTALLED or UNKNOWN VERSION.\n\nFor details about installing the optional dependencies, please visit:\n    https://docs.monai.io/en/latest/installation.html#installing-the-recommended-dependencies",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#setup-data-directory",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#setup-data-directory",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Setup data directory",
     "text": "Setup data directory\nYou can specify a directory.\nThis allows you to save results and reuse downloads.\nIf not specified a temporary directory will be used.\n\nbase_directory = '../_data/'\nif base_directory is not None:\n    os.makedirs(base_directory, exist_ok=True)\nroot_dir = tempfile.mkdtemp() if base_directory is None else base_directory\nprint(root_dir)\n\n../../_data/",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#download-dataset",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#download-dataset",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Download dataset",
     "text": "Download dataset\nThe MedNIST dataset was gathered from several sets from TCIA, the RSNA Bone Age Challenge, and the NIH Chest X-ray dataset.\nThe dataset is kindly made available by Dr. Bradley J. Erickson M.D., Ph.D. (Department of Radiology, Mayo Clinic) under the Creative Commons CC BY-SA 4.0 license.\nIf you use the MedNIST dataset, please acknowledge the source.\n\nresource = \"https://github.com/Project-MONAI/MONAI-extra-test-data/releases/download/0.8.1/MedNIST.tar.gz\"\nhash = \"f2f4881ff8799a170b10a403495f0ce0ad7486491901cde67a647e6627e7f916\"\ndownload_file(resource, output_dir=root_dir, hash=hash, extract_dir='.')\n\nUntarring contents of '/home/bm/Documents/bioMONAI/nbs/_data/f8b235cefbf0effb29acd992b838db5a-MedNIST.tar.gz' to '/home/bm/Documents/bioMONAI/nbs/_data/.'\n\n\nThe file has been downloaded and saved to: /home/bm/Documents/bioMONAI/nbs/_data\n\n\nChange suffix from .jpeg to .jpg (bioio package only accepts .jpg)\n\ndirectory = root_dir + 'MedNIST/'\nfor p in Path(directory).rglob(\"*.jpeg\"):\n    p.rename(p.with_suffix(\".jpg\"))",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#set-deterministic-training-for-reproducibility",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#set-deterministic-training-for-reproducibility",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Set deterministic training for reproducibility",
     "text": "Set deterministic training for reproducibility\n\nset_determinism(seed=0)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#read-image-filenames-from-the-dataset-folders",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#read-image-filenames-from-the-dataset-folders",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Read image filenames from the dataset folders",
     "text": "Read image filenames from the dataset folders\nFirst of all, check the dataset files and show some statistics.\nThere are 6 folders in the dataset: Hand, AbdomenCT, CXR, ChestCT, BreastMRI, HeadCT,\nwhich should be used as the labels to train our classification model.\n\nimg_paths = get_images(directory)\nclass_names = sorted(x for x in os.listdir(directory) if os.path.isdir(os.path.join(directory, x)))\nclass_map = {c: idx for idx, c in enumerate(class_names)}\nnum_class = len(class_names)\nnum_total = len(img_paths)\nimage_width, image_height = image_reader(img_paths[0]).squeeze().shape\nnum_each = [len(get_images(directory+class_name)) for class_name in class_names]\n\nprint(f\"Total image count: {num_total}\")\nprint(f\"Image dimensions: {image_width} x {image_height}\")\nprint(f\"Label names: {class_names}\")\nprint(f\"Label counts: {num_each}\")\n\nTotal image count: 58954\nImage dimensions: 64 x 64\nLabel names: ['AbdomenCT', 'BreastMRI', 'CXR', 'ChestCT', 'Hand', 'HeadCT']\nLabel counts: [10000, 8954, 10000, 10000, 10000, 10000]",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#prepare-training-validation-and-test-data-lists",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#prepare-training-validation-and-test-data-lists",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Prepare training, validation and test data lists",
     "text": "Prepare training, validation and test data lists\nRandomly select 10% of the dataset as validation and 10% as test.\n\ntrain_frac = 0.8\nval_frac = 0.1\nbuild_df(img_paths,\n          lambda x: class_map[parent_label(x)],\n          function_names = ['label'], \n          split=True,\n          split_kwargs={ 'train_fraction': train_frac, \n                         'valid_fraction': val_frac,\n                         'add_is_valid': True,\n                         'data_save_path': directory,\n                         'random_seed': 42}\n         )\n\n'is_valid' column added to train dataframe for validation samples.\nDatasets saved to %s ../../_data/MedNIST/\n\n\n(                                       filename  label  is_valid\n 58881       ../../_data/MedNIST/Hand/009148.jpg      4         0\n 17480     ../../_data/MedNIST/HeadCT/004089.jpg      5         0\n 33808    ../../_data/MedNIST/ChestCT/008127.jpg      3         0\n 15311     ../../_data/MedNIST/HeadCT/002113.jpg      5         0\n 47106        ../../_data/MedNIST/CXR/004845.jpg      2         1\n ...                                         ...    ...       ...\n 54343       ../../_data/MedNIST/Hand/005306.jpg      4         0\n 38158    ../../_data/MedNIST/ChestCT/000772.jpg      3         0\n 860    ../../_data/MedNIST/AbdomenCT/005637.jpg      0         0\n 15795     ../../_data/MedNIST/HeadCT/006436.jpg      5         0\n 56422       ../../_data/MedNIST/Hand/009069.jpg      4         0\n \n [53058 rows x 3 columns],\n                                        filename  label\n 1246   ../../_data/MedNIST/AbdomenCT/001141.jpg      0\n 8331   ../../_data/MedNIST/AbdomenCT/003496.jpg      0\n 39949        ../../_data/MedNIST/CXR/006403.jpg      2\n 36611    ../../_data/MedNIST/ChestCT/007454.jpg      3\n 24825  ../../_data/MedNIST/BreastMRI/000793.jpg      1\n ...                                         ...    ...\n 57051       ../../_data/MedNIST/Hand/007769.jpg      4\n 47495        ../../_data/MedNIST/CXR/003356.jpg      2\n 34953    ../../_data/MedNIST/ChestCT/006105.jpg      3\n 10134     ../../_data/MedNIST/HeadCT/003586.jpg      5\n 675    ../../_data/MedNIST/AbdomenCT/003159.jpg      0\n \n [5896 rows x 2 columns],\n None)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#define-monai-transforms-dataset-and-dataloader-to-pre-process-data",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#define-monai-transforms-dataset-and-dataloader-to-pre-process-data",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Define MONAI transforms, Dataset and Dataloader to pre-process data",
     "text": "Define MONAI transforms, Dataset and Dataloader to pre-process data\n\nitem_transforms = [\n    LoadImaged(keys=[\"image\"], image_only=True),\n    EnsureChannelFirstd(keys=[\"image\"], ),\n    ScaleIntensityd(keys=[\"image\"], ),\n    RandRotated(keys=[\"image\"], range_x=np.pi / 12, prob=0.5, keep_size=True),\n    RandFlipd(keys=[\"image\"], spatial_axis=0, prob=0.5),\n    RandZoomd(keys=[\"image\"], min_zoom=0.9, max_zoom=1.1, prob=0.5),\n]\n\n\ndata_ops = {\n    'x_keys': \"image\",\n    'y_keys': \"label\",\n    'colmap': {'image':'filename'},\n    'vocab': class_names,\n    'valid_col': 'is_valid',\n    'transforms': item_transforms,\n    'num_workers': 10,\n    'seed': 0, \n    'batch_size': 300,\n    'show_summary': True,\n}\n\ndata = BioDataLoaders.create(\n    directory+'/train.csv',\n    dataset='monaidataset',\n    **data_ops,\n    )\n\ntest_data = BioDataLoaders.test_dl(\n    directory + '/test.csv',\n    dataset='monaidataset',\n    **data_ops,\n    )\n\n\nTrain DataLoader\n----------------\nDataset size : 47163\nBatch size   : 300\nBatches      : 158\nClasses      : ['AbdomenCT', 'BreastMRI', 'CXR', 'ChestCT', 'Hand', 'HeadCT']\n\nBatch structure:\n  [0] shape=(300, 1, 64, 64) dtype=torch.float32 ~4.69 MB\n  [1] shape=(300,) dtype=torch.int64 ~0.00 MB\nApprox batch memory: 4.69 MB\n\nValid DataLoader\n----------------\nDataset size : 5895\nBatch size   : 300\nBatches      : 20\nClasses      : ['AbdomenCT', 'BreastMRI', 'CXR', 'ChestCT', 'Hand', 'HeadCT']\n\nBatch structure:\n  [0] shape=(300, 1, 64, 64) dtype=torch.float32 ~4.69 MB\n  [1] shape=(300,) dtype=torch.int64 ~0.00 MB\nApprox batch memory: 4.69 MB\n\nTrain DataLoader\n----------------\nDataset size : 5896\nBatch size   : 300\nBatches      : 20\nClasses      : ['AbdomenCT', 'BreastMRI', 'CXR', 'ChestCT', 'Hand', 'HeadCT']\n\nBatch structure:\n  [0] shape=(300, 1, 64, 64) dtype=torch.float32 ~4.69 MB\n  [1] shape=(300,) dtype=torch.int64 ~0.00 MB\nApprox batch memory: 4.69 MB",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#randomly-pick-images-from-the-dataset-to-visualize-and-check",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#randomly-pick-images-from-the-dataset-to-visualize-and-check",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Randomly pick images from the dataset to visualize and check",
     "text": "Randomly pick images from the dataset to visualize and check\n\ndata.show_batch()",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#define-network-and-optimizer",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#define-network-and-optimizer",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Define network and optimizer",
     "text": "Define network and optimizer\n\nSet learning rate for how much the model is updated per batch.\nSet total epoch number, as we have shuffle and random transforms, so the training data of every epoch is different.\nAnd as this is just a get start tutorial, let’s just train 4 epochs.\nIf train 10 epochs, the model can achieve 100% accuracy on test dataset.\nUse DenseNet from MONAI and move to GPU device, this DenseNet can support both 2D and 3D classification tasks.\nUse Adam optimizer.\n\n\ndevice = get_device()\nmodel = DenseNet121(spatial_dims=2, in_channels=1, out_channels=num_class)\nloss_function = CrossEntropyLossFlat()\nmax_epochs = 4\nmetrics = [accuracy, ROCAUCMetric(num_classes=num_class)]\nsave_model_callback = SaveModelCallback(monitor='ROCAUC', fname='best_model.pt')",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#model-training",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#model-training",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Model training",
     "text": "Model training\nExecute a typical training that run epoch loop and step loop, and do validation after every epoch.\nWill save the model weights to file if got best validation accuracy.\n\nimport torch \ntorch.cuda.empty_cache()\ntorch.cuda.reset_peak_memory_stats()\n\n\ntrainer = fastTrainer(data, model, loss_fn=loss_function, metrics=metrics, show_summary=False, callbacks=[save_model_callback])\n\n\ntrainer.fit(max_epochs)\n\n\n\n\n\n\n\n\nepoch\ntrain_loss\nvalid_loss\naccuracy\nROCAUC\ntime\n\n\n\n\n0\n0.013576\n0.005503\n0.998473\n0.999990\n00:18\n\n\n1\n0.019909\n0.002903\n0.999152\n0.999999\n00:17\n\n\n2\n0.005460\n0.003272\n0.998643\n0.999997\n00:17\n\n\n3\n0.004147\n0.001790\n0.999321\n0.999999\n00:17\n\n\n\n\n\nBetter model found at epoch 0 with ROCAUC value: 0.9999903617105075.\n\n\n\n\n\n\n\n\n\nBetter model found at epoch 1 with ROCAUC value: 0.9999986207392134.\nBetter model found at epoch 3 with ROCAUC value: 0.999999425198956.",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#plot-the-loss-and-metric",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#plot-the-loss-and-metric",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Plot the loss and metric",
     "text": "Plot the loss and metric\n\nplot_metrics(trainer)\n\n\n\n\n\n\n\n\n\ntorch.cuda.max_memory_allocated() / 1024**2\n\n3254.9599609375",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#evaluate-the-model-on-test-dataset",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#evaluate-the-model-on-test-dataset",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Evaluate the model on test dataset",
     "text": "Evaluate the model on test dataset\nAfter training and validation, we already got the best model on validation test.\nWe need to evaluate the model on test dataset to check whether it’s robust and not over-fitting.\nWe’ll use these predictions to generate a classification report.\n\nevaluate_classification_model(trainer, test_data, metrics=accuracy, show_graph=True);\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              precision    recall  f1-score   support\n\n   AbdomenCT       1.00      1.00      1.00       948\n   BreastMRI       1.00      1.00      1.00       918\n         CXR       1.00      1.00      1.00       932\n     ChestCT       1.00      1.00      1.00      1021\n        Hand       1.00      1.00      1.00      1017\n      HeadCT       1.00      1.00      1.00      1059\n\n    accuracy                           1.00      5895\n   macro avg       1.00      1.00      1.00      5895\nweighted avg       1.00      1.00      1.00      5895\n\n\n\n\n\n\n\n\n\n\n\nMost Confused Classes:\n\n\n\n\n\n\n\n\n\nActual Class\nPredicted Class\nCount\n\n\n\n\n0\nCXR\nHand\n2\n\n\n1\nHand\nHeadCT\n1\n\n\n2\nHeadCT\nAbdomenCT\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue\n\n\nCrossEntropyLossFlat\n\n\n\n\n\nMean\n1.044299\n\n\nMedian\n1.043595\n\n\nStandard Deviation\n0.020908\n\n\nMin\n1.043592\n\n\nMax\n2.032166\n\n\nQ1\n1.043593\n\n\nQ3\n1.043603\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue\n\n\naccuracy\n\n\n\n\n\nMean\n0.999321\n\n\nMedian\n1.000000\n\n\nStandard Deviation\n0.026040\n\n\nMin\n0.000000\n\n\nMax\n1.000000\n\n\nQ1\n1.000000\n\n\nQ3\n1.000000",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_biomonai.html#cleanup-data-directory",
     "href": "Benchmarks/mednist_tutorial_biomonai.html#cleanup-data-directory",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - bioMONAI",
     "section": "Cleanup data directory",
     "text": "Cleanup data directory\nRemove directory if a temporary was used.\n\nif base_directory is None:\n    shutil.rmtree(root_dir)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html",
     "href": "Benchmarks/mednist_tutorial_pytorch.html",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "",
     "text": "!python -c \"import monai\" || pip install -q \"monai-weekly[pillow, tqdm]\"\n!python -c \"import matplotlib\" || pip install -q matplotlib",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#setup-environment",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#setup-environment",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "",
     "text": "!python -c \"import monai\" || pip install -q \"monai-weekly[pillow, tqdm]\"\n!python -c \"import matplotlib\" || pip install -q matplotlib",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#setup-imports",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#setup-imports",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Setup imports",
     "text": "Setup imports\n\nimport os\nimport shutil\nimport tempfile\nimport matplotlib.pyplot as plt\nimport PIL\nimport torch\n# from torch.utils.tensorboard import SummaryWriter\nimport numpy as np\nfrom sklearn.metrics import classification_report\n\nfrom monai.apps import download_and_extract\nfrom monai.config import print_config\nfrom monai.data import decollate_batch, DataLoader\nfrom monai.metrics import ROCAUCMetric\nfrom monai.networks.nets import DenseNet121\nfrom monai.transforms import (\n    Activations,\n    EnsureChannelFirst,\n    AsDiscrete,\n    Compose,\n    LoadImage,\n    RandFlip,\n    RandRotate,\n    RandZoom,\n    ScaleIntensity,\n)\nfrom monai.utils import set_determinism\n\nprint_config()\n\nMONAI version: 1.5.2\nNumpy version: 2.4.2\nPytorch version: 2.9.1+cu128\nMONAI flags: HAS_EXT = False, USE_COMPILED = False, USE_META_DICT = False\nMONAI rev id: d18565fb3e4fd8c556707f91ac280a2dc3f681c1\nMONAI __file__: /home/&lt;username&gt;/miniforge3/envs/biomonai_latest/lib/python3.11/site-packages/monai/__init__.py\n\nOptional dependencies:\nPytorch Ignite version: NOT INSTALLED or UNKNOWN VERSION.\nITK version: NOT INSTALLED or UNKNOWN VERSION.\nNibabel version: 5.3.3\nscikit-image version: 0.26.0\nscipy version: 1.17.0\nPillow version: 12.1.1\nTensorboard version: NOT INSTALLED or UNKNOWN VERSION.\ngdown version: NOT INSTALLED or UNKNOWN VERSION.\nTorchVision version: 0.24.1+cu128\ntqdm version: 4.67.3\nlmdb version: NOT INSTALLED or UNKNOWN VERSION.\npsutil version: 7.2.2\npandas version: 3.0.0\neinops version: 0.8.2\ntransformers version: NOT INSTALLED or UNKNOWN VERSION.\nmlflow version: NOT INSTALLED or UNKNOWN VERSION.\npynrrd version: NOT INSTALLED or UNKNOWN VERSION.\nclearml version: NOT INSTALLED or UNKNOWN VERSION.\n\nFor details about installing the optional dependencies, please visit:\n    https://docs.monai.io/en/latest/installation.html#installing-the-recommended-dependencies",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#setup-data-directory",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#setup-data-directory",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Setup data directory",
     "text": "Setup data directory\nYou can specify a directory with the MONAI_DATA_DIRECTORY environment variable.\nThis allows you to save results and reuse downloads.\nIf not specified a temporary directory will be used.\n\ndirectory = os.environ.get(\"MONAI_DATA_DIRECTORY\")\nif directory is not None:\n    os.makedirs(directory, exist_ok=True)\nroot_dir = tempfile.mkdtemp() if directory is None else directory\nprint(root_dir)\n\n/tmp/tmpat69a9a9",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#download-dataset",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#download-dataset",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Download dataset",
     "text": "Download dataset\nThe MedNIST dataset was gathered from several sets from TCIA, the RSNA Bone Age Challenge, and the NIH Chest X-ray dataset.\nThe dataset is kindly made available by Dr. Bradley J. Erickson M.D., Ph.D. (Department of Radiology, Mayo Clinic) under the Creative Commons CC BY-SA 4.0 license.\nIf you use the MedNIST dataset, please acknowledge the source.\n\nresource = \"https://github.com/Project-MONAI/MONAI-extra-test-data/releases/download/0.8.1/MedNIST.tar.gz\"\nmd5 = \"0bc7306e7427e00ad1c5526a6677552d\"\n\ncompressed_file = os.path.join(root_dir, \"MedNIST.tar.gz\")\ndata_dir = os.path.join(root_dir, \"MedNIST\")\nif not os.path.exists(data_dir):\n    download_and_extract(resource, compressed_file, root_dir, md5)\n\nMedNIST.tar.gz: 59.0MB [00:05, 10.6MB/s]                            \n\n\n2026-04-04 19:18:31,280 - INFO - Downloaded: /tmp/tmpat69a9a9/MedNIST.tar.gz\n\n\n\n\n\n2026-04-04 19:18:31,338 - INFO - Verified 'MedNIST.tar.gz', md5: 0bc7306e7427e00ad1c5526a6677552d.\n2026-04-04 19:18:31,339 - INFO - Writing into directory: /tmp/tmpat69a9a9.",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#set-deterministic-training-for-reproducibility",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#set-deterministic-training-for-reproducibility",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Set deterministic training for reproducibility",
     "text": "Set deterministic training for reproducibility\n\nset_determinism(seed=0)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#read-image-filenames-from-the-dataset-folders",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#read-image-filenames-from-the-dataset-folders",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Read image filenames from the dataset folders",
     "text": "Read image filenames from the dataset folders\nFirst of all, check the dataset files and show some statistics.\nThere are 6 folders in the dataset: Hand, AbdomenCT, CXR, ChestCT, BreastMRI, HeadCT,\nwhich should be used as the labels to train our classification model.\n\nclass_names = sorted(x for x in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, x)))\nnum_class = len(class_names)\nimage_files = [\n    [os.path.join(data_dir, class_names[i], x) for x in os.listdir(os.path.join(data_dir, class_names[i]))]\n    for i in range(num_class)\n]\nnum_each = [len(image_files[i]) for i in range(num_class)]\nimage_files_list = []\nimage_class = []\nfor i in range(num_class):\n    image_files_list.extend(image_files[i])\n    image_class.extend([i] * num_each[i])\nnum_total = len(image_class)\nimage_width, image_height = PIL.Image.open(image_files_list[0]).size\n\nprint(f\"Total image count: {num_total}\")\nprint(f\"Image dimensions: {image_width} x {image_height}\")\nprint(f\"Label names: {class_names}\")\nprint(f\"Label counts: {num_each}\")\n\nTotal image count: 58954\nImage dimensions: 64 x 64\nLabel names: ['AbdomenCT', 'BreastMRI', 'CXR', 'ChestCT', 'Hand', 'HeadCT']\nLabel counts: [10000, 8954, 10000, 10000, 10000, 10000]",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#randomly-pick-images-from-the-dataset-to-visualize-and-check",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#randomly-pick-images-from-the-dataset-to-visualize-and-check",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Randomly pick images from the dataset to visualize and check",
     "text": "Randomly pick images from the dataset to visualize and check\n\nplt.subplots(3, 3, figsize=(8, 8))\nfor i, k in enumerate(np.random.randint(num_total, size=9)):\n    im = PIL.Image.open(image_files_list[k])\n    arr = np.array(im)\n    plt.subplot(3, 3, i + 1)\n    plt.xlabel(class_names[image_class[k]])\n    plt.imshow(arr, cmap=\"gray\", vmin=0, vmax=255)\nplt.tight_layout()\nplt.show()",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#prepare-training-validation-and-test-data-lists",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#prepare-training-validation-and-test-data-lists",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Prepare training, validation and test data lists",
     "text": "Prepare training, validation and test data lists\nRandomly select 10% of the dataset as validation and 10% as test.\n\nval_frac = 0.1\ntest_frac = 0.1\nlength = len(image_files_list)\nindices = np.arange(length)\nnp.random.shuffle(indices)\n\ntest_split = int(test_frac * length)\nval_split = int(val_frac * length) + test_split\ntest_indices = indices[:test_split]\nval_indices = indices[test_split:val_split]\ntrain_indices = indices[val_split:]\n\ntrain_x = [image_files_list[i] for i in train_indices]\ntrain_y = [image_class[i] for i in train_indices]\nval_x = [image_files_list[i] for i in val_indices]\nval_y = [image_class[i] for i in val_indices]\ntest_x = [image_files_list[i] for i in test_indices]\ntest_y = [image_class[i] for i in test_indices]\n\nprint(f\"Training count: {len(train_x)}, Validation count: \" f\"{len(val_x)}, Test count: {len(test_x)}\")\n\nTraining count: 47164, Validation count: 5895, Test count: 5895",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#define-monai-transforms-dataset-and-dataloader-to-pre-process-data",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#define-monai-transforms-dataset-and-dataloader-to-pre-process-data",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Define MONAI transforms, Dataset and Dataloader to pre-process data",
     "text": "Define MONAI transforms, Dataset and Dataloader to pre-process data\n\ntrain_transforms = Compose(\n    [\n        LoadImage(image_only=True),\n        EnsureChannelFirst(),\n        ScaleIntensity(),\n        RandRotate(range_x=np.pi / 12, prob=0.5, keep_size=True),\n        RandFlip(spatial_axis=0, prob=0.5),\n        RandZoom(min_zoom=0.9, max_zoom=1.1, prob=0.5),\n    ]\n)\n\nval_transforms = Compose([LoadImage(image_only=True), EnsureChannelFirst(), ScaleIntensity()])\n\ny_pred_trans = Compose([Activations(softmax=True)])\ny_trans = Compose([AsDiscrete(to_onehot=num_class)])\n\n\nclass MedNISTDataset(torch.utils.data.Dataset):\n    def __init__(self, image_files, labels, transforms):\n        self.image_files = image_files\n        self.labels = labels\n        self.transforms = transforms\n\n    def __len__(self):\n        return len(self.image_files)\n\n    def __getitem__(self, index):\n        return self.transforms(self.image_files[index]), self.labels[index]\n\n\ntrain_ds = MedNISTDataset(train_x, train_y, train_transforms)\ntrain_loader = DataLoader(train_ds, batch_size=300, shuffle=True, num_workers=10)\n\nval_ds = MedNISTDataset(val_x, val_y, val_transforms)\nval_loader = DataLoader(val_ds, batch_size=300, num_workers=10)\n\ntest_ds = MedNISTDataset(test_x, test_y, val_transforms)\ntest_loader = DataLoader(test_ds, batch_size=300, num_workers=10)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#define-network-and-optimizer",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#define-network-and-optimizer",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Define network and optimizer",
     "text": "Define network and optimizer\n\nSet learning rate for how much the model is updated per batch.\nSet total epoch number, as we have shuffle and random transforms, so the training data of every epoch is different.\nAnd as this is just a get start tutorial, let’s just train 4 epochs.\nIf train 10 epochs, the model can achieve 100% accuracy on test dataset.\nUse DenseNet from MONAI and move to GPU device, this DenseNet can support both 2D and 3D classification tasks.\nUse Adam optimizer.\n\n\ndevice = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")\nmodel = DenseNet121(spatial_dims=2, in_channels=1, out_channels=num_class).to(device)\nloss_function = torch.nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), 1e-5)\nmax_epochs = 4\nval_interval = 1\nauc_metric = ROCAUCMetric()",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#model-training",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#model-training",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Model training",
     "text": "Model training\nExecute a typical PyTorch training that run epoch loop and step loop, and do validation after every epoch.\nWill save the model weights to file if got best validation accuracy.\n\nimport torch \ntorch.cuda.empty_cache()\ntorch.cuda.reset_peak_memory_stats()\n\n\nbest_metric = -1\nbest_metric_epoch = -1\nepoch_loss_values = []\nmetric_values = []\n# writer = SummaryWriter()\n\nfor epoch in range(max_epochs):\n    print(\"-\" * 10)\n    print(f\"epoch {epoch + 1}/{max_epochs}\")\n    model.train()\n    epoch_loss = 0\n    step = 0\n    for batch_data in train_loader:\n        step += 1\n        inputs, labels = batch_data[0].to(device), batch_data[1].to(device)\n        optimizer.zero_grad()\n        outputs = model(inputs)\n        loss = loss_function(outputs, labels)\n        loss.backward()\n        optimizer.step()\n        epoch_loss += loss.item()\n        print(f\"{step}/{len(train_ds) // train_loader.batch_size}, \" f\"train_loss: {loss.item():.4f}\")\n        epoch_len = len(train_ds) // train_loader.batch_size\n        # writer.add_scalar(\"train_loss\", loss.item(), epoch_len * epoch + step)\n    epoch_loss /= step\n    epoch_loss_values.append(epoch_loss)\n    print(f\"epoch {epoch + 1} average loss: {epoch_loss:.4f}\")\n\n    if (epoch + 1) % val_interval == 0:\n        model.eval()\n        with torch.no_grad():\n            y_pred = torch.tensor([], dtype=torch.float32, device=device)\n            y = torch.tensor([], dtype=torch.long, device=device)\n            for val_data in val_loader:\n                val_images, val_labels = (\n                    val_data[0].to(device),\n                    val_data[1].to(device),\n                )\n                y_pred = torch.cat([y_pred, model(val_images)], dim=0)\n                y = torch.cat([y, val_labels], dim=0)\n            y_onehot = [y_trans(i) for i in decollate_batch(y, detach=False)]\n            y_pred_act = [y_pred_trans(i) for i in decollate_batch(y_pred)]\n            auc_metric(y_pred_act, y_onehot)\n            result = auc_metric.aggregate()\n            auc_metric.reset()\n            del y_pred_act, y_onehot\n            metric_values.append(result)\n            acc_value = torch.eq(y_pred.argmax(dim=1), y)\n            acc_metric = acc_value.sum().item() / len(acc_value)\n            if result &gt; best_metric:\n                best_metric = result\n                best_metric_epoch = epoch + 1\n                torch.save(model.state_dict(), os.path.join(root_dir, \"best_metric_model.pth\"))\n                print(\"saved new best metric model\")\n            print(\n                f\"current epoch: {epoch + 1} current AUC: {result:.4f}\"\n                f\" current accuracy: {acc_metric:.4f}\"\n                f\" best AUC: {best_metric:.4f}\"\n                f\" at epoch: {best_metric_epoch}\"\n            )\n            # writer.add_scalar(\"val_accuracy\", acc_metric, epoch + 1)\n\nprint(f\"train completed, best_metric: {best_metric:.4f} \" f\"at epoch: {best_metric_epoch}\")\n# writer.close()\n\n----------\nepoch 1/4\n1/157, train_loss: 1.7902\n2/157, train_loss: 1.7524\n3/157, train_loss: 1.7412\n4/157, train_loss: 1.7145\n5/157, train_loss: 1.6806\n6/157, train_loss: 1.6528\n7/157, train_loss: 1.6395\n8/157, train_loss: 1.5903\n9/157, train_loss: 1.5837\n10/157, train_loss: 1.5634\n11/157, train_loss: 1.5221\n12/157, train_loss: 1.4980\n13/157, train_loss: 1.4803\n14/157, train_loss: 1.4641\n15/157, train_loss: 1.4306\n16/157, train_loss: 1.4149\n17/157, train_loss: 1.3990\n18/157, train_loss: 1.3784\n19/157, train_loss: 1.3450\n20/157, train_loss: 1.3611\n21/157, train_loss: 1.3147\n22/157, train_loss: 1.2992\n23/157, train_loss: 1.2765\n24/157, train_loss: 1.2667\n25/157, train_loss: 1.2627\n26/157, train_loss: 1.2852\n27/157, train_loss: 1.2033\n28/157, train_loss: 1.2259\n29/157, train_loss: 1.1679\n30/157, train_loss: 1.1337\n31/157, train_loss: 1.1356\n32/157, train_loss: 1.1128\n33/157, train_loss: 1.1217\n34/157, train_loss: 1.0980\n35/157, train_loss: 1.1004\n36/157, train_loss: 1.0667\n37/157, train_loss: 1.0618\n38/157, train_loss: 1.0380\n39/157, train_loss: 1.0113\n40/157, train_loss: 1.0004\n41/157, train_loss: 1.0321\n42/157, train_loss: 0.9845\n43/157, train_loss: 0.9613\n44/157, train_loss: 0.9846\n45/157, train_loss: 0.9392\n46/157, train_loss: 0.9230\n47/157, train_loss: 0.9263\n48/157, train_loss: 0.9219\n49/157, train_loss: 0.9024\n50/157, train_loss: 0.8811\n51/157, train_loss: 0.8343\n52/157, train_loss: 0.8874\n53/157, train_loss: 0.8459\n54/157, train_loss: 0.8415\n55/157, train_loss: 0.8291\n56/157, train_loss: 0.8233\n57/157, train_loss: 0.8090\n58/157, train_loss: 0.7527\n59/157, train_loss: 0.7996\n60/157, train_loss: 0.7875\n61/157, train_loss: 0.7673\n62/157, train_loss: 0.7518\n63/157, train_loss: 0.7661\n64/157, train_loss: 0.6997\n65/157, train_loss: 0.7272\n66/157, train_loss: 0.7655\n67/157, train_loss: 0.6831\n68/157, train_loss: 0.6700\n69/157, train_loss: 0.7077\n70/157, train_loss: 0.6753\n71/157, train_loss: 0.6329\n72/157, train_loss: 0.6807\n73/157, train_loss: 0.6587\n74/157, train_loss: 0.6321\n75/157, train_loss: 0.6207\n76/157, train_loss: 0.6228\n77/157, train_loss: 0.6181\n78/157, train_loss: 0.6079\n79/157, train_loss: 0.6107\n80/157, train_loss: 0.6035\n81/157, train_loss: 0.5773\n82/157, train_loss: 0.5947\n83/157, train_loss: 0.5572\n84/157, train_loss: 0.5551\n85/157, train_loss: 0.5252\n86/157, train_loss: 0.5385\n87/157, train_loss: 0.5345\n88/157, train_loss: 0.5403\n89/157, train_loss: 0.5070\n90/157, train_loss: 0.5126\n91/157, train_loss: 0.5388\n92/157, train_loss: 0.4958\n93/157, train_loss: 0.4999\n94/157, train_loss: 0.4833\n95/157, train_loss: 0.4807\n96/157, train_loss: 0.4909\n97/157, train_loss: 0.4586\n98/157, train_loss: 0.4697\n99/157, train_loss: 0.4534\n100/157, train_loss: 0.4689\n101/157, train_loss: 0.4666\n102/157, train_loss: 0.4566\n103/157, train_loss: 0.4628\n104/157, train_loss: 0.4247\n105/157, train_loss: 0.4351\n106/157, train_loss: 0.4075\n107/157, train_loss: 0.4107\n108/157, train_loss: 0.4409\n109/157, train_loss: 0.4132\n110/157, train_loss: 0.3919\n111/157, train_loss: 0.3472\n112/157, train_loss: 0.3882\n113/157, train_loss: 0.3944\n114/157, train_loss: 0.3942\n115/157, train_loss: 0.3959\n116/157, train_loss: 0.3462\n117/157, train_loss: 0.3771\n118/157, train_loss: 0.3783\n119/157, train_loss: 0.3641\n120/157, train_loss: 0.3415\n121/157, train_loss: 0.3450\n122/157, train_loss: 0.3530\n123/157, train_loss: 0.3329\n124/157, train_loss: 0.3111\n125/157, train_loss: 0.3156\n126/157, train_loss: 0.3292\n127/157, train_loss: 0.3232\n128/157, train_loss: 0.3474\n129/157, train_loss: 0.3439\n130/157, train_loss: 0.3453\n131/157, train_loss: 0.3290\n132/157, train_loss: 0.3095\n133/157, train_loss: 0.3429\n134/157, train_loss: 0.2998\n135/157, train_loss: 0.3405\n136/157, train_loss: 0.3353\n137/157, train_loss: 0.3324\n138/157, train_loss: 0.2961\n139/157, train_loss: 0.2782\n140/157, train_loss: 0.2745\n141/157, train_loss: 0.2824\n142/157, train_loss: 0.2576\n143/157, train_loss: 0.2800\n144/157, train_loss: 0.2661\n145/157, train_loss: 0.2732\n146/157, train_loss: 0.2479\n147/157, train_loss: 0.2888\n148/157, train_loss: 0.2860\n149/157, train_loss: 0.2554\n150/157, train_loss: 0.2765\n151/157, train_loss: 0.2509\n152/157, train_loss: 0.2730\n153/157, train_loss: 0.2463\n154/157, train_loss: 0.2274\n155/157, train_loss: 0.2781\n156/157, train_loss: 0.2752\n157/157, train_loss: 0.2133\n158/157, train_loss: 0.2740\nepoch 1 average loss: 0.7273\nsaved new best metric model\ncurrent epoch: 1 current AUC: 0.9980 current accuracy: 0.9673 best AUC: 0.9980 at epoch: 1\n----------\nepoch 2/4\n1/157, train_loss: 0.2496\n2/157, train_loss: 0.2313\n3/157, train_loss: 0.2370\n4/157, train_loss: 0.2380\n5/157, train_loss: 0.2121\n6/157, train_loss: 0.2262\n7/157, train_loss: 0.2204\n8/157, train_loss: 0.2137\n9/157, train_loss: 0.1955\n10/157, train_loss: 0.2428\n11/157, train_loss: 0.2428\n12/157, train_loss: 0.2327\n13/157, train_loss: 0.2196\n14/157, train_loss: 0.2101\n15/157, train_loss: 0.2044\n16/157, train_loss: 0.1890\n17/157, train_loss: 0.2141\n18/157, train_loss: 0.1919\n19/157, train_loss: 0.2373\n20/157, train_loss: 0.2266\n21/157, train_loss: 0.2044\n22/157, train_loss: 0.2545\n23/157, train_loss: 0.2169\n24/157, train_loss: 0.1956\n25/157, train_loss: 0.2334\n26/157, train_loss: 0.2184\n27/157, train_loss: 0.2217\n28/157, train_loss: 0.2002\n29/157, train_loss: 0.1843\n30/157, train_loss: 0.1634\n31/157, train_loss: 0.1773\n32/157, train_loss: 0.1591\n33/157, train_loss: 0.1732\n34/157, train_loss: 0.1618\n35/157, train_loss: 0.1611\n36/157, train_loss: 0.1954\n37/157, train_loss: 0.2002\n38/157, train_loss: 0.1643\n39/157, train_loss: 0.1907\n40/157, train_loss: 0.1930\n41/157, train_loss: 0.1844\n42/157, train_loss: 0.1534\n43/157, train_loss: 0.2311\n44/157, train_loss: 0.1687\n45/157, train_loss: 0.1872\n46/157, train_loss: 0.1917\n47/157, train_loss: 0.1691\n48/157, train_loss: 0.1644\n49/157, train_loss: 0.1668\n50/157, train_loss: 0.1744\n51/157, train_loss: 0.1598\n52/157, train_loss: 0.1683\n53/157, train_loss: 0.1690\n54/157, train_loss: 0.1566\n55/157, train_loss: 0.1696\n56/157, train_loss: 0.1439\n57/157, train_loss: 0.1243\n58/157, train_loss: 0.1443\n59/157, train_loss: 0.1432\n60/157, train_loss: 0.1932\n61/157, train_loss: 0.1405\n62/157, train_loss: 0.1513\n63/157, train_loss: 0.1362\n64/157, train_loss: 0.1441\n65/157, train_loss: 0.1097\n66/157, train_loss: 0.1764\n67/157, train_loss: 0.1276\n68/157, train_loss: 0.1480\n69/157, train_loss: 0.1526\n70/157, train_loss: 0.1474\n71/157, train_loss: 0.1511\n72/157, train_loss: 0.1249\n73/157, train_loss: 0.1616\n74/157, train_loss: 0.1402\n75/157, train_loss: 0.1131\n76/157, train_loss: 0.1194\n77/157, train_loss: 0.1139\n78/157, train_loss: 0.1494\n79/157, train_loss: 0.1259\n80/157, train_loss: 0.1212\n81/157, train_loss: 0.1577\n82/157, train_loss: 0.1255\n83/157, train_loss: 0.1033\n84/157, train_loss: 0.1249\n85/157, train_loss: 0.1088\n86/157, train_loss: 0.1670\n87/157, train_loss: 0.1070\n88/157, train_loss: 0.1063\n89/157, train_loss: 0.1321\n90/157, train_loss: 0.1413\n91/157, train_loss: 0.1432\n92/157, train_loss: 0.1462\n93/157, train_loss: 0.1308\n94/157, train_loss: 0.1212\n95/157, train_loss: 0.1151\n96/157, train_loss: 0.1029\n97/157, train_loss: 0.1083\n98/157, train_loss: 0.1071\n99/157, train_loss: 0.0995\n100/157, train_loss: 0.0990\n101/157, train_loss: 0.1101\n102/157, train_loss: 0.1245\n103/157, train_loss: 0.1163\n104/157, train_loss: 0.1218\n105/157, train_loss: 0.1303\n106/157, train_loss: 0.1339\n107/157, train_loss: 0.1085\n108/157, train_loss: 0.0968\n109/157, train_loss: 0.0997\n110/157, train_loss: 0.1070\n111/157, train_loss: 0.0998\n112/157, train_loss: 0.1077\n113/157, train_loss: 0.1168\n114/157, train_loss: 0.1004\n115/157, train_loss: 0.1150\n116/157, train_loss: 0.0962\n117/157, train_loss: 0.1163\n118/157, train_loss: 0.1080\n119/157, train_loss: 0.1043\n120/157, train_loss: 0.1075\n121/157, train_loss: 0.1213\n122/157, train_loss: 0.1230\n123/157, train_loss: 0.0947\n124/157, train_loss: 0.0866\n125/157, train_loss: 0.0900\n126/157, train_loss: 0.1063\n127/157, train_loss: 0.1353\n128/157, train_loss: 0.1066\n129/157, train_loss: 0.1156\n130/157, train_loss: 0.1100\n131/157, train_loss: 0.0973\n132/157, train_loss: 0.0867\n133/157, train_loss: 0.1037\n134/157, train_loss: 0.1108\n135/157, train_loss: 0.0939\n136/157, train_loss: 0.0974\n137/157, train_loss: 0.1042\n138/157, train_loss: 0.1013\n139/157, train_loss: 0.0943\n140/157, train_loss: 0.1167\n141/157, train_loss: 0.0870\n142/157, train_loss: 0.0919\n143/157, train_loss: 0.0829\n144/157, train_loss: 0.0900\n145/157, train_loss: 0.0976\n146/157, train_loss: 0.0936\n147/157, train_loss: 0.0919\n148/157, train_loss: 0.0838\n149/157, train_loss: 0.0882\n150/157, train_loss: 0.1072\n151/157, train_loss: 0.1000\n152/157, train_loss: 0.0949\n153/157, train_loss: 0.0933\n154/157, train_loss: 0.0860\n155/157, train_loss: 0.0902\n156/157, train_loss: 0.0949\n157/157, train_loss: 0.0782\n158/157, train_loss: 0.1105\nepoch 2 average loss: 0.1446\nsaved new best metric model\ncurrent epoch: 2 current AUC: 0.9998 current accuracy: 0.9869 best AUC: 0.9998 at epoch: 2\n----------\nepoch 3/4\n1/157, train_loss: 0.0822\n2/157, train_loss: 0.0649\n3/157, train_loss: 0.0867\n4/157, train_loss: 0.0708\n5/157, train_loss: 0.0669\n6/157, train_loss: 0.0803\n7/157, train_loss: 0.0815\n8/157, train_loss: 0.0915\n9/157, train_loss: 0.0690\n10/157, train_loss: 0.0987\n11/157, train_loss: 0.0976\n12/157, train_loss: 0.1164\n13/157, train_loss: 0.0758\n14/157, train_loss: 0.0668\n15/157, train_loss: 0.1040\n16/157, train_loss: 0.0616\n17/157, train_loss: 0.0699\n18/157, train_loss: 0.0826\n19/157, train_loss: 0.0686\n20/157, train_loss: 0.0631\n21/157, train_loss: 0.0812\n22/157, train_loss: 0.0932\n23/157, train_loss: 0.0781\n24/157, train_loss: 0.0726\n25/157, train_loss: 0.1380\n26/157, train_loss: 0.0704\n27/157, train_loss: 0.0857\n28/157, train_loss: 0.0644\n29/157, train_loss: 0.0675\n30/157, train_loss: 0.0876\n31/157, train_loss: 0.0686\n32/157, train_loss: 0.0860\n33/157, train_loss: 0.0809\n34/157, train_loss: 0.0551\n35/157, train_loss: 0.0841\n36/157, train_loss: 0.0635\n37/157, train_loss: 0.0825\n38/157, train_loss: 0.0793\n39/157, train_loss: 0.0635\n40/157, train_loss: 0.0700\n41/157, train_loss: 0.0701\n42/157, train_loss: 0.0918\n43/157, train_loss: 0.0654\n44/157, train_loss: 0.0657\n45/157, train_loss: 0.0685\n46/157, train_loss: 0.0931\n47/157, train_loss: 0.0689\n48/157, train_loss: 0.1014\n49/157, train_loss: 0.0795\n50/157, train_loss: 0.0657\n51/157, train_loss: 0.0637\n52/157, train_loss: 0.0599\n53/157, train_loss: 0.0694\n54/157, train_loss: 0.0904\n55/157, train_loss: 0.1027\n56/157, train_loss: 0.0674\n57/157, train_loss: 0.0713\n58/157, train_loss: 0.1082\n59/157, train_loss: 0.0768\n60/157, train_loss: 0.0728\n61/157, train_loss: 0.0708\n62/157, train_loss: 0.0567\n63/157, train_loss: 0.0513\n64/157, train_loss: 0.0550\n65/157, train_loss: 0.0495\n66/157, train_loss: 0.0684\n67/157, train_loss: 0.0566\n68/157, train_loss: 0.0748\n69/157, train_loss: 0.0603\n70/157, train_loss: 0.0606\n71/157, train_loss: 0.0774\n72/157, train_loss: 0.0689\n73/157, train_loss: 0.0758\n74/157, train_loss: 0.0555\n75/157, train_loss: 0.0622\n76/157, train_loss: 0.0647\n77/157, train_loss: 0.0454\n78/157, train_loss: 0.0624\n79/157, train_loss: 0.0519\n80/157, train_loss: 0.0757\n81/157, train_loss: 0.0558\n82/157, train_loss: 0.0594\n83/157, train_loss: 0.0783\n84/157, train_loss: 0.0749\n85/157, train_loss: 0.0773\n86/157, train_loss: 0.0901\n87/157, train_loss: 0.0553\n88/157, train_loss: 0.0490\n89/157, train_loss: 0.0524\n90/157, train_loss: 0.0535\n91/157, train_loss: 0.0534\n92/157, train_loss: 0.0564\n93/157, train_loss: 0.0468\n94/157, train_loss: 0.0534\n95/157, train_loss: 0.0700\n96/157, train_loss: 0.0718\n97/157, train_loss: 0.0887\n98/157, train_loss: 0.0404\n99/157, train_loss: 0.0508\n100/157, train_loss: 0.0525\n101/157, train_loss: 0.0427\n102/157, train_loss: 0.0514\n103/157, train_loss: 0.0492\n104/157, train_loss: 0.0508\n105/157, train_loss: 0.0857\n106/157, train_loss: 0.0623\n107/157, train_loss: 0.0545\n108/157, train_loss: 0.0618\n109/157, train_loss: 0.0705\n110/157, train_loss: 0.0460\n111/157, train_loss: 0.0633\n112/157, train_loss: 0.0698\n113/157, train_loss: 0.0492\n114/157, train_loss: 0.0577\n115/157, train_loss: 0.0497\n116/157, train_loss: 0.0462\n117/157, train_loss: 0.0451\n118/157, train_loss: 0.0369\n119/157, train_loss: 0.0748\n120/157, train_loss: 0.0518\n121/157, train_loss: 0.0437\n122/157, train_loss: 0.0587\n123/157, train_loss: 0.0398\n124/157, train_loss: 0.0457\n125/157, train_loss: 0.0450\n126/157, train_loss: 0.0593\n127/157, train_loss: 0.0655\n128/157, train_loss: 0.0593\n129/157, train_loss: 0.0395\n130/157, train_loss: 0.0479\n131/157, train_loss: 0.0553\n132/157, train_loss: 0.0747\n133/157, train_loss: 0.0413\n134/157, train_loss: 0.0451\n135/157, train_loss: 0.0450\n136/157, train_loss: 0.0429\n137/157, train_loss: 0.0535\n138/157, train_loss: 0.0510\n139/157, train_loss: 0.0523\n140/157, train_loss: 0.0470\n141/157, train_loss: 0.0499\n142/157, train_loss: 0.0336\n143/157, train_loss: 0.0482\n144/157, train_loss: 0.0316\n145/157, train_loss: 0.0911\n146/157, train_loss: 0.0678\n147/157, train_loss: 0.0402\n148/157, train_loss: 0.0565\n149/157, train_loss: 0.0532\n150/157, train_loss: 0.0435\n151/157, train_loss: 0.0510\n152/157, train_loss: 0.0387\n153/157, train_loss: 0.0474\n154/157, train_loss: 0.0765\n155/157, train_loss: 0.0375\n156/157, train_loss: 0.0666\n157/157, train_loss: 0.0440\n158/157, train_loss: 0.0804\nepoch 3 average loss: 0.0651\nsaved new best metric model\ncurrent epoch: 3 current AUC: 0.9999 current accuracy: 0.9927 best AUC: 0.9999 at epoch: 3\n----------\nepoch 4/4\n1/157, train_loss: 0.0454\n2/157, train_loss: 0.0454\n3/157, train_loss: 0.0559\n4/157, train_loss: 0.0456\n5/157, train_loss: 0.0439\n6/157, train_loss: 0.0529\n7/157, train_loss: 0.0480\n8/157, train_loss: 0.0379\n9/157, train_loss: 0.0246\n10/157, train_loss: 0.0325\n11/157, train_loss: 0.0616\n12/157, train_loss: 0.0348\n13/157, train_loss: 0.0542\n14/157, train_loss: 0.0485\n15/157, train_loss: 0.0403\n16/157, train_loss: 0.0465\n17/157, train_loss: 0.0330\n18/157, train_loss: 0.0419\n19/157, train_loss: 0.0366\n20/157, train_loss: 0.0435\n21/157, train_loss: 0.0289\n22/157, train_loss: 0.0535\n23/157, train_loss: 0.0562\n24/157, train_loss: 0.0327\n25/157, train_loss: 0.0398\n26/157, train_loss: 0.0378\n27/157, train_loss: 0.0511\n28/157, train_loss: 0.0331\n29/157, train_loss: 0.0472\n30/157, train_loss: 0.0372\n31/157, train_loss: 0.0334\n32/157, train_loss: 0.0392\n33/157, train_loss: 0.0567\n34/157, train_loss: 0.0436\n35/157, train_loss: 0.0503\n36/157, train_loss: 0.0481\n37/157, train_loss: 0.0543\n38/157, train_loss: 0.0638\n39/157, train_loss: 0.0420\n40/157, train_loss: 0.0402\n41/157, train_loss: 0.0436\n42/157, train_loss: 0.0297\n43/157, train_loss: 0.0730\n44/157, train_loss: 0.0304\n45/157, train_loss: 0.0446\n46/157, train_loss: 0.0358\n47/157, train_loss: 0.0497\n48/157, train_loss: 0.0323\n49/157, train_loss: 0.0411\n50/157, train_loss: 0.0315\n51/157, train_loss: 0.0497\n52/157, train_loss: 0.0398\n53/157, train_loss: 0.0279\n54/157, train_loss: 0.0289\n55/157, train_loss: 0.0504\n56/157, train_loss: 0.0376\n57/157, train_loss: 0.0362\n58/157, train_loss: 0.0334\n59/157, train_loss: 0.0349\n60/157, train_loss: 0.0239\n61/157, train_loss: 0.0419\n62/157, train_loss: 0.0480\n63/157, train_loss: 0.0410\n64/157, train_loss: 0.0292\n65/157, train_loss: 0.0487\n66/157, train_loss: 0.0314\n67/157, train_loss: 0.0299\n68/157, train_loss: 0.0476\n69/157, train_loss: 0.0389\n70/157, train_loss: 0.0348\n71/157, train_loss: 0.0281\n72/157, train_loss: 0.0412\n73/157, train_loss: 0.0305\n74/157, train_loss: 0.0282\n75/157, train_loss: 0.0397\n76/157, train_loss: 0.0334\n77/157, train_loss: 0.0479\n78/157, train_loss: 0.0264\n79/157, train_loss: 0.0430\n80/157, train_loss: 0.0339\n81/157, train_loss: 0.0481\n82/157, train_loss: 0.0466\n83/157, train_loss: 0.0483\n84/157, train_loss: 0.0475\n85/157, train_loss: 0.0233\n86/157, train_loss: 0.0278\n87/157, train_loss: 0.0367\n88/157, train_loss: 0.0347\n89/157, train_loss: 0.0519\n90/157, train_loss: 0.0346\n91/157, train_loss: 0.0459\n92/157, train_loss: 0.0456\n93/157, train_loss: 0.0357\n94/157, train_loss: 0.0531\n95/157, train_loss: 0.0551\n96/157, train_loss: 0.0567\n97/157, train_loss: 0.0393\n98/157, train_loss: 0.0394\n99/157, train_loss: 0.0458\n100/157, train_loss: 0.0297\n101/157, train_loss: 0.0323\n102/157, train_loss: 0.0518\n103/157, train_loss: 0.0211\n104/157, train_loss: 0.0274\n105/157, train_loss: 0.0415\n106/157, train_loss: 0.0266\n107/157, train_loss: 0.0281\n108/157, train_loss: 0.0547\n109/157, train_loss: 0.0316\n110/157, train_loss: 0.0310\n111/157, train_loss: 0.0317\n112/157, train_loss: 0.0412\n113/157, train_loss: 0.0376\n114/157, train_loss: 0.0330\n115/157, train_loss: 0.0293\n116/157, train_loss: 0.0378\n117/157, train_loss: 0.0265\n118/157, train_loss: 0.0232\n119/157, train_loss: 0.0208\n120/157, train_loss: 0.0590\n121/157, train_loss: 0.0271\n122/157, train_loss: 0.0279\n123/157, train_loss: 0.0334\n124/157, train_loss: 0.0298\n125/157, train_loss: 0.0200\n126/157, train_loss: 0.0269\n127/157, train_loss: 0.0377\n128/157, train_loss: 0.0390\n129/157, train_loss: 0.0241\n130/157, train_loss: 0.0330\n131/157, train_loss: 0.0261\n132/157, train_loss: 0.0278\n133/157, train_loss: 0.0378\n134/157, train_loss: 0.0240\n135/157, train_loss: 0.0289\n136/157, train_loss: 0.0416\n137/157, train_loss: 0.0349\n138/157, train_loss: 0.0340\n139/157, train_loss: 0.0192\n140/157, train_loss: 0.0377\n141/157, train_loss: 0.0264\n142/157, train_loss: 0.0309\n143/157, train_loss: 0.0453\n144/157, train_loss: 0.0354\n145/157, train_loss: 0.0221\n146/157, train_loss: 0.0449\n147/157, train_loss: 0.0324\n148/157, train_loss: 0.0380\n149/157, train_loss: 0.0314\n150/157, train_loss: 0.0271\n151/157, train_loss: 0.0270\n152/157, train_loss: 0.0213\n153/157, train_loss: 0.0277\n154/157, train_loss: 0.0307\n155/157, train_loss: 0.0367\n156/157, train_loss: 0.0260\n157/157, train_loss: 0.0213\n158/157, train_loss: 0.0281\nepoch 4 average loss: 0.0378\nsaved new best metric model\ncurrent epoch: 4 current AUC: 1.0000 current accuracy: 0.9959 best AUC: 1.0000 at epoch: 4\ntrain completed, best_metric: 1.0000 at epoch: 4\nCPU times: user 52.8 s, sys: 6.93 s, total: 59.8 s\nWall time: 1min 3s",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#plot-the-loss-and-metric",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#plot-the-loss-and-metric",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Plot the loss and metric",
     "text": "Plot the loss and metric\n\nplt.figure(\"train\", (12, 6))\nplt.subplot(1, 2, 1)\nplt.title(\"Epoch Average Loss\")\nx = [i + 1 for i in range(len(epoch_loss_values))]\ny = epoch_loss_values\nplt.xlabel(\"epoch\")\nplt.plot(x, y)\nplt.subplot(1, 2, 2)\nplt.title(\"Val AUC\")\nx = [val_interval * (i + 1) for i in range(len(metric_values))]\ny = metric_values\nplt.xlabel(\"epoch\")\nplt.plot(x, y)\nplt.show()\n\n\n\n\n\n\n\n\n\ntorch.cuda.max_memory_allocated() / 1024**2\n\n3232.2939453125",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#evaluate-the-model-on-test-dataset",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#evaluate-the-model-on-test-dataset",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Evaluate the model on test dataset",
     "text": "Evaluate the model on test dataset\nAfter training and validation, we already got the best model on validation test.\nWe need to evaluate the model on test dataset to check whether it’s robust and not over-fitting.\nWe’ll use these predictions to generate a classification report.\n\nmodel.load_state_dict(torch.load(os.path.join(root_dir, \"best_metric_model.pth\"), weights_only=True))\nmodel.eval()\ny_true = []\ny_pred = []\nwith torch.no_grad():\n    for test_data in test_loader:\n        test_images, test_labels = (\n            test_data[0].to(device),\n            test_data[1].to(device),\n        )\n        pred = model(test_images).argmax(dim=1)\n        for i in range(len(pred)):\n            y_true.append(test_labels[i].item())\n            y_pred.append(pred[i].item())\n\n\nprint(classification_report(y_true, y_pred, target_names=class_names, digits=4))\n\n              precision    recall  f1-score   support\n\n   AbdomenCT     0.9900    0.9910    0.9905       995\n   BreastMRI     0.9954    0.9875    0.9914       880\n         CXR     1.0000    0.9939    0.9969       982\n     ChestCT     0.9912    1.0000    0.9956      1014\n        Hand     0.9952    0.9952    0.9952      1048\n      HeadCT     0.9959    0.9990    0.9974       976\n\n    accuracy                         0.9946      5895\n   macro avg     0.9946    0.9944    0.9945      5895\nweighted avg     0.9946    0.9946    0.9946      5895",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
     "objectID": "Benchmarks/mednist_tutorial_pytorch.html#cleanup-data-directory",
     "href": "Benchmarks/mednist_tutorial_pytorch.html#cleanup-data-directory",
-    "title": "Medical Image Classification Tutorial with the MedNIST Dataset",
+    "title": "Medical Image Classification - MONAI/Pytorch",
     "section": "Cleanup data directory",
     "text": "Cleanup data directory\nRemove directory if a temporary was used.\n\nif directory is None:\n    shutil.rmtree(root_dir)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Medical Image Classification Tutorial with the MedNIST Dataset"
+      "Medical Image Classification - MONAI/Pytorch"
     ]
   },
   {
@@ -658,7 +658,7 @@
     "href": "core.html#evaluation",
     "title": "Core",
     "section": "Evaluation",
-    "text": "Evaluation\nThe evaluation module provides functionalities for model evaluation, with several customizations available.\n\nsource\n\ndisplay_statistics_table\n\ndef display_statistics_table(\n    stats, fn_name:str='', as_dataframe:bool=True\n):\n\nDisplay a table of the key statistics.\n\nsource\n\n\nplot_histogram_and_kde\n\ndef plot_histogram_and_kde(\n    data, stats, bw_method:float=0.3, fn_name:str=''\n):\n\nPlot the histogram and KDE of the data with key statistics marked.\n\nsource\n\n\nformat_sig\n\ndef format_sig(\n    value\n):\n\nFormat numbers with two significant digits.\n\nsource\n\n\ncalculate_statistics\n\ndef calculate_statistics(\n    data\n):\n\nCalculate key statistics for the data.\n\nsource\n\n\ncompute_metric\n\ndef compute_metric(\n    predictions, targets, metric_fn\n):\n\nCompute the metric for each prediction-target pair. Handles cases where metric_fn has or does not have a ‘func’ attribute.\n\nsource\n\n\ncompute_losses\n\ndef compute_losses(\n    predictions, targets, loss_fn\n):\n\nCompute the loss for each prediction-target pair.\n\nfrom numpy.random import standard_normal\n\n\na = standard_normal(1000)\n\nstats = calculate_statistics(a)\n\nplot_histogram_and_kde(a, stats)\n\n\n\n\n\n\n\n\nEvaluate_model and evaluate_classification_model are two classes created in order to integrate the evaluation process in a single computation. Evaluate_model can be used on any type of task, whereas evaluate_classification_model is specifically designed for classification tasks.\n\nsource\n\n\nevaluate_model\n\ndef evaluate_model(\n    trainer:Learner, # The model trainer object with a get_preds method.\n    test_data:DataLoaders=None, # DataLoader containing test data.\n    loss:NoneType=None, # Loss function to evaluate prediction-target pairs.\n    metrics:NoneType=None, # Single metric or a list of metrics to evaluate.\n    bw_method:float=0.3, # Bandwidth method for KDE.\n    show_graph:bool=True, # Boolean flag to show the histogram and KDE plot.\n    show_table:bool=True, # Boolean flag to show the statistics table.\n    show_results:bool=True, # Boolean flag to show model results on test data.\n    as_dataframe:bool=True, # Boolean flag to display table as a DataFrame.\n    cmap:str='magma', # Colormap for visualization.\n):\n\nCalculate and optionally plot the distribution of loss values from predictions made by the trainer on test data, with an optional table of key statistics.\n\nsource\n\n\nevaluate_classification_model\n\ndef evaluate_classification_model(\n    trainer:Learner, # The trained model (learner) to evaluate.\n    test_data:DataLoaders=None, # DataLoader with test data for evaluation. If None, the validation dataset is used.\n    loss_fn:NoneType=None, # Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.\n    most_confused_n:int=1, # Number of most confused class pairs to display.\n    normalize:bool=True, # Whether to normalize the confusion matrix.\n    act:NoneType=None, # Apply activation to predictions, defaults to `self.loss_func`'s activation\n    metrics:NoneType=None, # Single metric or a list of metrics to evaluate.\n    bw_method:float=0.3, # Bandwidth method for KDE.\n    show_graph:bool=True, # Boolean flag to show the histogram and KDE plot.\n    show_table:bool=True, # Boolean flag to show the statistics table.\n    show_results:bool=True, # Boolean flag to show model results on test data.\n    as_dataframe:bool=True, # Boolean flag to display table as a DataFrame.\n    cmap:LinearSegmentedColormap=&lt;matplotlib.colors.LinearSegmentedColormap object at 0x736d72924150&gt;, # Color map for the confusion matrix plot.\n):\n\nEvaluates a classification model by displaying results, confusion matrix, and most confused classes.",
+    "text": "Evaluation\nThe evaluation module provides functionalities for model evaluation, with several customizations available.\n\nsource\n\ndisplay_statistics_table\n\ndef display_statistics_table(\n    stats, fn_name:str='', as_dataframe:bool=True\n):\n\nDisplay a table of the key statistics.\n\nsource\n\n\nplot_histogram_and_kde\n\ndef plot_histogram_and_kde(\n    data, stats, bw_method:float=0.3, fn_name:str=''\n):\n\nPlot the histogram and KDE of the data with key statistics marked.\n\nsource\n\n\nformat_sig\n\ndef format_sig(\n    value\n):\n\nFormat numbers with two significant digits.\n\nsource\n\n\ncalculate_statistics\n\ndef calculate_statistics(\n    data\n):\n\nCalculate key statistics for the data.\n\nsource\n\n\ncompute_metric\n\ndef compute_metric(\n    predictions, targets, metric_fn\n):\n\nCompute the metric for each prediction-target pair. Handles cases where metric_fn has or does not have a ‘func’ attribute.\n\nsource\n\n\ncompute_losses\n\ndef compute_losses(\n    predictions, targets, loss_fn\n):\n\nCompute the loss for each prediction-target pair.\n\nfrom numpy.random import standard_normal\n\n\na = standard_normal(1000)\n\nstats = calculate_statistics(a)\n\nplot_histogram_and_kde(a, stats)\n\n\n\n\n\n\n\n\nEvaluate_model and evaluate_classification_model are two classes created in order to integrate the evaluation process in a single computation. Evaluate_model can be used on any type of task, whereas evaluate_classification_model is specifically designed for classification tasks.\n\nsource\n\n\nevaluate_model\n\ndef evaluate_model(\n    trainer:Learner, # The model trainer object with a get_preds method.\n    test_data:DataLoaders=None, # DataLoader containing test data.\n    loss:NoneType=None, # Loss function to evaluate prediction-target pairs.\n    metrics:NoneType=None, # Single metric or a list of metrics to evaluate.\n    bw_method:float=0.3, # Bandwidth method for KDE.\n    show_graph:bool=True, # Boolean flag to show the histogram and KDE plot.\n    show_table:bool=True, # Boolean flag to show the statistics table.\n    show_results:bool=True, # Boolean flag to show model results on test data.\n    as_dataframe:bool=True, # Boolean flag to display table as a DataFrame.\n    cmap:str='magma', # Colormap for visualization.\n):\n\nCalculate and optionally plot the distribution of loss values from predictions made by the trainer on test data, with an optional table of key statistics.\n\nsource\n\n\nevaluate_classification_model\n\ndef evaluate_classification_model(\n    trainer:Learner, # The trained model (learner) to evaluate.\n    test_data:DataLoaders=None, # DataLoader with test data for evaluation. If None, the validation dataset is used.\n    loss_fn:NoneType=None, # Loss function used in the model for ClassificationInterpretation. If None, the loss function is loaded from trainer.\n    most_confused_n:int=1, # Number of most confused class pairs to display.\n    normalize:bool=True, # Whether to normalize the confusion matrix.\n    act:NoneType=None, # Apply activation to predictions, defaults to `self.loss_func`'s activation\n    metrics:NoneType=None, # Single metric or a list of metrics to evaluate.\n    bw_method:float=0.3, # Bandwidth method for KDE.\n    show_graph:bool=True, # Boolean flag to show the histogram and KDE plot.\n    show_table:bool=True, # Boolean flag to show the statistics table.\n    show_results:bool=True, # Boolean flag to show model results on test data.\n    as_dataframe:bool=True, # Boolean flag to display table as a DataFrame.\n    cmap:LinearSegmentedColormap=&lt;matplotlib.colors.LinearSegmentedColormap object at 0x7f7188e61410&gt;, # Color map for the confusion matrix plot.\n):\n\nEvaluates a classification model by displaying results, confusion matrix, and most confused classes.",
     "crumbs": [
       "Blog",
       "Core"
@@ -1096,193 +1096,169 @@
   {
     "objectID": "Benchmarks/monai_101_ignite.html",
     "href": "Benchmarks/monai_101_ignite.html",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "",
     "text": "!python -c \"import monai\" || pip install -q \"monai-weekly[ignite, tqdm]\"",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#setup-environment",
     "href": "Benchmarks/monai_101_ignite.html#setup-environment",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "",
     "text": "!python -c \"import monai\" || pip install -q \"monai-weekly[ignite, tqdm]\"",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#setup-imports",
     "href": "Benchmarks/monai_101_ignite.html#setup-imports",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "Setup imports",
     "text": "Setup imports\n\nimport logging\nimport numpy as np\nimport os\nfrom pathlib import Path\nimport sys\nimport tempfile\nimport torch\n\nfrom monai.apps import MedNISTDataset\nfrom monai.config import print_config\nfrom monai.data import DataLoader\nfrom monai.engines import SupervisedTrainer\nfrom monai.handlers import StatsHandler\nfrom monai.inferers import SimpleInferer\nfrom monai.networks import eval_mode\nfrom monai.networks.nets import densenet121\nfrom monai.transforms import LoadImageD, EnsureChannelFirstD, ScaleIntensityD, Compose\n\nprint_config()\n\nMONAI version: 1.5.2\nNumpy version: 2.4.2\nPytorch version: 2.6.0\nMONAI flags: HAS_EXT = False, USE_COMPILED = False, USE_META_DICT = False\nMONAI rev id: d18565fb3e4fd8c556707f91ac280a2dc3f681c1\nMONAI __file__: /home/&lt;username&gt;/miniforge3/envs/biomonai_ignite/lib/python3.11/site-packages/monai/__init__.py\n\nOptional dependencies:\nPytorch Ignite version: 0.5.3\nITK version: NOT INSTALLED or UNKNOWN VERSION.\nNibabel version: 5.3.3\nscikit-image version: 0.26.0\nscipy version: 1.17.0\nPillow version: 12.1.1\nTensorboard version: NOT INSTALLED or UNKNOWN VERSION.\ngdown version: NOT INSTALLED or UNKNOWN VERSION.\nTorchVision version: NOT INSTALLED or UNKNOWN VERSION.\ntqdm version: 4.67.3\nlmdb version: NOT INSTALLED or UNKNOWN VERSION.\npsutil version: 7.2.2\npandas version: 3.0.0\neinops version: 0.8.2\ntransformers version: NOT INSTALLED or UNKNOWN VERSION.\nmlflow version: NOT INSTALLED or UNKNOWN VERSION.\npynrrd version: NOT INSTALLED or UNKNOWN VERSION.\nclearml version: NOT INSTALLED or UNKNOWN VERSION.\n\nFor details about installing the optional dependencies, please visit:\n    https://docs.monai.io/en/latest/installation.html#installing-the-recommended-dependencies",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#setup-data-directory",
     "href": "Benchmarks/monai_101_ignite.html#setup-data-directory",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "Setup data directory",
     "text": "Setup data directory\nYou can specify a directory with the MONAI_DATA_DIRECTORY environment variable.\nThis allows you to save results and reuse downloads.\nIf not specified a temporary directory will be used.\n\ndirectory = os.environ.get(\"MONAI_DATA_DIRECTORY\")\nif directory is not None:\n    os.makedirs(directory, exist_ok=True)\nroot_dir = tempfile.mkdtemp() if directory is None else directory\nprint(root_dir)\n\n/tmp/tmpkiexv1ap",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#use-monai-transforms-to-preprocess-data",
     "href": "Benchmarks/monai_101_ignite.html#use-monai-transforms-to-preprocess-data",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "Use MONAI transforms to preprocess data",
     "text": "Use MONAI transforms to preprocess data\nMedical images require specialized methods for I/O, preprocessing, and augmentation. They often follow specific formats, are handled with specific protocols, and the data arrays are often high-dimensional.\nIn this example, we will perform image loading, data format verification, and intensity scaling with three monai.transforms listed below, and compose a pipeline ready to be used in next steps.\n\ntransform = Compose(\n    [\n        LoadImageD(keys=\"image\", image_only=True),\n        EnsureChannelFirstD(keys=\"image\"),\n        ScaleIntensityD(keys=\"image\"),\n    ]\n)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#prepare-datasets-using-monai-apps",
     "href": "Benchmarks/monai_101_ignite.html#prepare-datasets-using-monai-apps",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "Prepare datasets using MONAI Apps",
     "text": "Prepare datasets using MONAI Apps\nWe use MedNISTDataset in MONAI Apps to download a dataset to the specified directory and perform the pre-processing steps in the monai.transforms compose.\nThe MedNIST dataset was gathered from several sets from TCIA, the RSNA Bone Age Challenge, and the NIH Chest X-ray dataset.\nThe dataset is kindly made available by Dr. Bradley J. Erickson M.D., Ph.D. (Department of Radiology, Mayo Clinic) under the Creative Commons CC BY-SA 4.0 license.\nIf you use the MedNIST dataset, please acknowledge the source.\n\ndataset = MedNISTDataset(root_dir=root_dir, transform=transform, section=\"training\", download=True)\n\nMedNIST.tar.gz: 59.0MB [00:05, 10.5MB/s]                            \n\n\n2026-03-06 22:18:13,187 - INFO - Downloaded: /tmp/tmpkiexv1ap/MedNIST.tar.gz\n\n\n\n\n\n2026-03-06 22:18:13,245 - INFO - Verified 'MedNIST.tar.gz', md5: 0bc7306e7427e00ad1c5526a6677552d.\n2026-03-06 22:18:13,246 - INFO - Writing into directory: /tmp/tmpkiexv1ap.\n\n\nLoading dataset: 100%|██████████| 47164/47164 [00:21&lt;00:00, 2151.52it/s]",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#define-a-network-and-a-supervised-trainer",
     "href": "Benchmarks/monai_101_ignite.html#define-a-network-and-a-supervised-trainer",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "Define a network and a supervised trainer",
     "text": "Define a network and a supervised trainer\nTo train a model that can perform the classification task, we will use the DenseNet-121 which is known for its performance on the ImageNet dataset.\nFor a typical supervised training workflow, MONAI provides SupervisedTrainer to define the hyper-parameters.\n\nmax_epochs = 5\ndevice = torch.device(\"cuda:0\" if torch.cuda.device_count() &gt; 0 else \"cpu\")\nmodel = densenet121(spatial_dims=2, in_channels=1, out_channels=6).to(device)\n\nlogging.basicConfig(stream=sys.stdout, level=logging.INFO)\ntrainer = SupervisedTrainer(\n    device=device,\n    max_epochs=max_epochs,\n    train_data_loader=DataLoader(dataset, batch_size=512, shuffle=True, num_workers=4),\n    network=model,\n    optimizer=torch.optim.Adam(model.parameters(), lr=1e-5),\n    loss_function=torch.nn.CrossEntropyLoss(),\n    inferer=SimpleInferer(),\n    train_handlers=StatsHandler(),\n)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#run-the-training",
     "href": "Benchmarks/monai_101_ignite.html#run-the-training",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "Run the training",
     "text": "Run the training\n\ntrainer.run()\n\nINFO:ignite.engine.engine.SupervisedTrainer:Engine run resuming from iteration 0, epoch 0 until 5 epochs\n2026-03-06 22:18:45,724 - INFO - Epoch: 1/5, Iter: 1/93 -- label: 4.0000 loss: 1.7780 \n2026-03-06 22:18:45,844 - INFO - Epoch: 1/5, Iter: 2/93 -- label: 2.0000 loss: 1.7548 \n\n\n/home/bm/miniforge3/envs/biomonai_ignite/lib/python3.11/site-packages/monai/handlers/stats_handler.py:259: UserWarning: ignoring non-scalar output in StatsHandler, make sure `output_transform(engine.state.output)` returns a scalar or dictionary of key and scalar pairs to avoid this warning. image:&lt;class 'monai.data.meta_tensor.MetaTensor'&gt;\n  warnings.warn(\n/home/bm/miniforge3/envs/biomonai_ignite/lib/python3.11/site-packages/monai/handlers/stats_handler.py:259: UserWarning: ignoring non-scalar output in StatsHandler, make sure `output_transform(engine.state.output)` returns a scalar or dictionary of key and scalar pairs to avoid this warning. pred:&lt;class 'monai.data.meta_tensor.MetaTensor'&gt;\n  warnings.warn(\n\n\n2026-03-06 22:18:45,963 - INFO - Epoch: 1/5, Iter: 3/93 -- label: 2.0000 loss: 1.7228 \n2026-03-06 22:18:46,081 - INFO - Epoch: 1/5, Iter: 4/93 -- label: 5.0000 loss: 1.6851 \n2026-03-06 22:18:46,204 - INFO - Epoch: 1/5, Iter: 5/93 -- label: 3.0000 loss: 1.6490 \n2026-03-06 22:18:46,321 - INFO - Epoch: 1/5, Iter: 6/93 -- label: 0.0000 loss: 1.6358 \n2026-03-06 22:18:46,442 - INFO - Epoch: 1/5, Iter: 7/93 -- label: 4.0000 loss: 1.5998 \n2026-03-06 22:18:46,560 - INFO - Epoch: 1/5, Iter: 8/93 -- label: 1.0000 loss: 1.5685 \n2026-03-06 22:18:46,683 - INFO - Epoch: 1/5, Iter: 9/93 -- label: 5.0000 loss: 1.5269 \n2026-03-06 22:18:46,800 - INFO - Epoch: 1/5, Iter: 10/93 -- label: 5.0000 loss: 1.5053 \n2026-03-06 22:18:46,920 - INFO - Epoch: 1/5, Iter: 11/93 -- label: 3.0000 loss: 1.4820 \n2026-03-06 22:18:47,037 - INFO - Epoch: 1/5, Iter: 12/93 -- label: 0.0000 loss: 1.4539 \n2026-03-06 22:18:47,162 - INFO - Epoch: 1/5, Iter: 13/93 -- label: 2.0000 loss: 1.4263 \n2026-03-06 22:18:47,280 - INFO - Epoch: 1/5, Iter: 14/93 -- label: 0.0000 loss: 1.4199 \n2026-03-06 22:18:47,401 - INFO - Epoch: 1/5, Iter: 15/93 -- label: 2.0000 loss: 1.3788 \n2026-03-06 22:18:47,518 - INFO - Epoch: 1/5, Iter: 16/93 -- label: 3.0000 loss: 1.3588 \n2026-03-06 22:18:47,642 - INFO - Epoch: 1/5, Iter: 17/93 -- label: 5.0000 loss: 1.3306 \n2026-03-06 22:18:47,759 - INFO - Epoch: 1/5, Iter: 18/93 -- label: 5.0000 loss: 1.3140 \n2026-03-06 22:18:47,879 - INFO - Epoch: 1/5, Iter: 19/93 -- label: 2.0000 loss: 1.2714 \n2026-03-06 22:18:47,996 - INFO - Epoch: 1/5, Iter: 20/93 -- label: 0.0000 loss: 1.2530 \n2026-03-06 22:18:48,118 - INFO - Epoch: 1/5, Iter: 21/93 -- label: 5.0000 loss: 1.2262 \n2026-03-06 22:18:48,236 - INFO - Epoch: 1/5, Iter: 22/93 -- label: 3.0000 loss: 1.2309 \n2026-03-06 22:18:48,666 - INFO - Epoch: 1/5, Iter: 23/93 -- label: 1.0000 loss: 1.1930 \n2026-03-06 22:18:48,788 - INFO - Epoch: 1/5, Iter: 24/93 -- label: 5.0000 loss: 1.1656 \n2026-03-06 22:18:48,932 - INFO - Epoch: 1/5, Iter: 25/93 -- label: 3.0000 loss: 1.1584 \n2026-03-06 22:18:49,050 - INFO - Epoch: 1/5, Iter: 26/93 -- label: 3.0000 loss: 1.1420 \n2026-03-06 22:18:49,169 - INFO - Epoch: 1/5, Iter: 27/93 -- label: 3.0000 loss: 1.0951 \n2026-03-06 22:18:49,288 - INFO - Epoch: 1/5, Iter: 28/93 -- label: 0.0000 loss: 1.0858 \n2026-03-06 22:18:49,414 - INFO - Epoch: 1/5, Iter: 29/93 -- label: 5.0000 loss: 1.0929 \n2026-03-06 22:18:49,532 - INFO - Epoch: 1/5, Iter: 30/93 -- label: 0.0000 loss: 1.0394 \n2026-03-06 22:18:49,651 - INFO - Epoch: 1/5, Iter: 31/93 -- label: 4.0000 loss: 1.0476 \n2026-03-06 22:18:49,769 - INFO - Epoch: 1/5, Iter: 32/93 -- label: 0.0000 loss: 0.9838 \n2026-03-06 22:18:49,892 - INFO - Epoch: 1/5, Iter: 33/93 -- label: 1.0000 loss: 0.9942 \n2026-03-06 22:18:50,009 - INFO - Epoch: 1/5, Iter: 34/93 -- label: 3.0000 loss: 0.9866 \n2026-03-06 22:18:50,130 - INFO - Epoch: 1/5, Iter: 35/93 -- label: 1.0000 loss: 0.9394 \n2026-03-06 22:18:50,247 - INFO - Epoch: 1/5, Iter: 36/93 -- label: 5.0000 loss: 0.9287 \n2026-03-06 22:18:50,370 - INFO - Epoch: 1/5, Iter: 37/93 -- label: 0.0000 loss: 0.9162 \n2026-03-06 22:18:50,487 - INFO - Epoch: 1/5, Iter: 38/93 -- label: 3.0000 loss: 0.8812 \n2026-03-06 22:18:50,606 - INFO - Epoch: 1/5, Iter: 39/93 -- label: 5.0000 loss: 0.8938 \n2026-03-06 22:18:50,723 - INFO - Epoch: 1/5, Iter: 40/93 -- label: 0.0000 loss: 0.8856 \n2026-03-06 22:18:50,846 - INFO - Epoch: 1/5, Iter: 41/93 -- label: 5.0000 loss: 0.8568 \n2026-03-06 22:18:50,963 - INFO - Epoch: 1/5, Iter: 42/93 -- label: 1.0000 loss: 0.8637 \n2026-03-06 22:18:51,082 - INFO - Epoch: 1/5, Iter: 43/93 -- label: 0.0000 loss: 0.8391 \n2026-03-06 22:18:51,199 - INFO - Epoch: 1/5, Iter: 44/93 -- label: 5.0000 loss: 0.8288 \n2026-03-06 22:18:51,323 - INFO - Epoch: 1/5, Iter: 45/93 -- label: 2.0000 loss: 0.7880 \n2026-03-06 22:18:51,440 - INFO - Epoch: 1/5, Iter: 46/93 -- label: 4.0000 loss: 0.7861 \n2026-03-06 22:18:51,560 - INFO - Epoch: 1/5, Iter: 47/93 -- label: 3.0000 loss: 0.7724 \n2026-03-06 22:18:51,676 - INFO - Epoch: 1/5, Iter: 48/93 -- label: 5.0000 loss: 0.7522 \n2026-03-06 22:18:51,799 - INFO - Epoch: 1/5, Iter: 49/93 -- label: 2.0000 loss: 0.7507 \n2026-03-06 22:18:51,917 - INFO - Epoch: 1/5, Iter: 50/93 -- label: 3.0000 loss: 0.7299 \n2026-03-06 22:18:52,036 - INFO - Epoch: 1/5, Iter: 51/93 -- label: 0.0000 loss: 0.7193 \n2026-03-06 22:18:52,151 - INFO - Epoch: 1/5, Iter: 52/93 -- label: 0.0000 loss: 0.6909 \n2026-03-06 22:18:52,275 - INFO - Epoch: 1/5, Iter: 53/93 -- label: 0.0000 loss: 0.6824 \n2026-03-06 22:18:52,393 - INFO - Epoch: 1/5, Iter: 54/93 -- label: 5.0000 loss: 0.6840 \n2026-03-06 22:18:52,513 - INFO - Epoch: 1/5, Iter: 55/93 -- label: 5.0000 loss: 0.6705 \n2026-03-06 22:18:52,629 - INFO - Epoch: 1/5, Iter: 56/93 -- label: 0.0000 loss: 0.6668 \n2026-03-06 22:18:52,948 - INFO - Epoch: 1/5, Iter: 57/93 -- label: 4.0000 loss: 0.6644 \n2026-03-06 22:18:53,070 - INFO - Epoch: 1/5, Iter: 58/93 -- label: 5.0000 loss: 0.6648 \n2026-03-06 22:18:53,188 - INFO - Epoch: 1/5, Iter: 59/93 -- label: 1.0000 loss: 0.6412 \n2026-03-06 22:18:53,303 - INFO - Epoch: 1/5, Iter: 60/93 -- label: 4.0000 loss: 0.6393 \n2026-03-06 22:18:53,426 - INFO - Epoch: 1/5, Iter: 61/93 -- label: 5.0000 loss: 0.5903 \n2026-03-06 22:18:53,545 - INFO - Epoch: 1/5, Iter: 62/93 -- label: 4.0000 loss: 0.6155 \n2026-03-06 22:18:53,663 - INFO - Epoch: 1/5, Iter: 63/93 -- label: 3.0000 loss: 0.5678 \n2026-03-06 22:18:53,780 - INFO - Epoch: 1/5, Iter: 64/93 -- label: 2.0000 loss: 0.5642 \n2026-03-06 22:18:53,905 - INFO - Epoch: 1/5, Iter: 65/93 -- label: 3.0000 loss: 0.5635 \n2026-03-06 22:18:54,020 - INFO - Epoch: 1/5, Iter: 66/93 -- label: 5.0000 loss: 0.5521 \n2026-03-06 22:18:54,140 - INFO - Epoch: 1/5, Iter: 67/93 -- label: 5.0000 loss: 0.5242 \n2026-03-06 22:18:54,257 - INFO - Epoch: 1/5, Iter: 68/93 -- label: 4.0000 loss: 0.5377 \n2026-03-06 22:18:54,380 - INFO - Epoch: 1/5, Iter: 69/93 -- label: 3.0000 loss: 0.5253 \n2026-03-06 22:18:54,496 - INFO - Epoch: 1/5, Iter: 70/93 -- label: 4.0000 loss: 0.5368 \n2026-03-06 22:18:54,616 - INFO - Epoch: 1/5, Iter: 71/93 -- label: 4.0000 loss: 0.5114 \n2026-03-06 22:18:54,734 - INFO - Epoch: 1/5, Iter: 72/93 -- label: 1.0000 loss: 0.5285 \n2026-03-06 22:18:54,860 - INFO - Epoch: 1/5, Iter: 73/93 -- label: 1.0000 loss: 0.4828 \n2026-03-06 22:18:54,978 - INFO - Epoch: 1/5, Iter: 74/93 -- label: 2.0000 loss: 0.5080 \n2026-03-06 22:18:55,099 - INFO - Epoch: 1/5, Iter: 75/93 -- label: 2.0000 loss: 0.4711 \n2026-03-06 22:18:55,217 - INFO - Epoch: 1/5, Iter: 76/93 -- label: 0.0000 loss: 0.4853 \n2026-03-06 22:18:55,340 - INFO - Epoch: 1/5, Iter: 77/93 -- label: 1.0000 loss: 0.4934 \n2026-03-06 22:18:55,457 - INFO - Epoch: 1/5, Iter: 78/93 -- label: 0.0000 loss: 0.4730 \n2026-03-06 22:18:55,576 - INFO - Epoch: 1/5, Iter: 79/93 -- label: 3.0000 loss: 0.4759 \n2026-03-06 22:18:55,694 - INFO - Epoch: 1/5, Iter: 80/93 -- label: 2.0000 loss: 0.4588 \n2026-03-06 22:18:55,818 - INFO - Epoch: 1/5, Iter: 81/93 -- label: 2.0000 loss: 0.4329 \n2026-03-06 22:18:55,937 - INFO - Epoch: 1/5, Iter: 82/93 -- label: 5.0000 loss: 0.4175 \n2026-03-06 22:18:56,056 - INFO - Epoch: 1/5, Iter: 83/93 -- label: 4.0000 loss: 0.4294 \n2026-03-06 22:18:56,172 - INFO - Epoch: 1/5, Iter: 84/93 -- label: 3.0000 loss: 0.4024 \n2026-03-06 22:18:56,301 - INFO - Epoch: 1/5, Iter: 85/93 -- label: 4.0000 loss: 0.3944 \n2026-03-06 22:18:56,417 - INFO - Epoch: 1/5, Iter: 86/93 -- label: 2.0000 loss: 0.3941 \n2026-03-06 22:18:56,535 - INFO - Epoch: 1/5, Iter: 87/93 -- label: 2.0000 loss: 0.4437 \n2026-03-06 22:18:56,655 - INFO - Epoch: 1/5, Iter: 88/93 -- label: 3.0000 loss: 0.3929 \n2026-03-06 22:18:56,787 - INFO - Epoch: 1/5, Iter: 89/93 -- label: 0.0000 loss: 0.3587 \n2026-03-06 22:18:56,904 - INFO - Epoch: 1/5, Iter: 90/93 -- label: 3.0000 loss: 0.3904 \n2026-03-06 22:18:57,023 - INFO - Epoch: 1/5, Iter: 91/93 -- label: 5.0000 loss: 0.3699 \n2026-03-06 22:18:57,139 - INFO - Epoch: 1/5, Iter: 92/93 -- label: 0.0000 loss: 0.3595 \n2026-03-06 22:18:57,309 - INFO - Epoch: 1/5, Iter: 93/93 -- label: 4.0000 loss: 0.3200 \nINFO:ignite.engine.engine.SupervisedTrainer:Epoch[1] Complete. Time taken: 00:00:12.484\n2026-03-06 22:18:57,574 - INFO - Epoch: 2/5, Iter: 1/93 -- label: 5.0000 loss: 0.3278 \n2026-03-06 22:18:57,716 - INFO - Epoch: 2/5, Iter: 2/93 -- label: 3.0000 loss: 0.3832 \n2026-03-06 22:18:58,130 - INFO - Epoch: 2/5, Iter: 3/93 -- label: 3.0000 loss: 0.3446 \n2026-03-06 22:18:58,248 - INFO - Epoch: 2/5, Iter: 4/93 -- label: 5.0000 loss: 0.3351 \n2026-03-06 22:18:58,366 - INFO - Epoch: 2/5, Iter: 5/93 -- label: 2.0000 loss: 0.3369 \n2026-03-06 22:18:58,491 - INFO - Epoch: 2/5, Iter: 6/93 -- label: 5.0000 loss: 0.3362 \n2026-03-06 22:18:58,609 - INFO - Epoch: 2/5, Iter: 7/93 -- label: 2.0000 loss: 0.3343 \n2026-03-06 22:18:58,727 - INFO - Epoch: 2/5, Iter: 8/93 -- label: 5.0000 loss: 0.3014 \n2026-03-06 22:18:58,845 - INFO - Epoch: 2/5, Iter: 9/93 -- label: 1.0000 loss: 0.3139 \n2026-03-06 22:18:58,970 - INFO - Epoch: 2/5, Iter: 10/93 -- label: 5.0000 loss: 0.3178 \n2026-03-06 22:18:59,088 - INFO - Epoch: 2/5, Iter: 11/93 -- label: 4.0000 loss: 0.3302 \n2026-03-06 22:18:59,205 - INFO - Epoch: 2/5, Iter: 12/93 -- label: 5.0000 loss: 0.3071 \n2026-03-06 22:18:59,322 - INFO - Epoch: 2/5, Iter: 13/93 -- label: 3.0000 loss: 0.3076 \n2026-03-06 22:18:59,446 - INFO - Epoch: 2/5, Iter: 14/93 -- label: 3.0000 loss: 0.3038 \n2026-03-06 22:18:59,563 - INFO - Epoch: 2/5, Iter: 15/93 -- label: 0.0000 loss: 0.2996 \n2026-03-06 22:18:59,681 - INFO - Epoch: 2/5, Iter: 16/93 -- label: 3.0000 loss: 0.2908 \n2026-03-06 22:18:59,798 - INFO - Epoch: 2/5, Iter: 17/93 -- label: 5.0000 loss: 0.2788 \n2026-03-06 22:18:59,924 - INFO - Epoch: 2/5, Iter: 18/93 -- label: 0.0000 loss: 0.3282 \n2026-03-06 22:19:00,041 - INFO - Epoch: 2/5, Iter: 19/93 -- label: 3.0000 loss: 0.2936 \n2026-03-06 22:19:00,161 - INFO - Epoch: 2/5, Iter: 20/93 -- label: 4.0000 loss: 0.2846 \n2026-03-06 22:19:00,282 - INFO - Epoch: 2/5, Iter: 21/93 -- label: 3.0000 loss: 0.2643 \n2026-03-06 22:19:00,406 - INFO - Epoch: 2/5, Iter: 22/93 -- label: 1.0000 loss: 0.2612 \n2026-03-06 22:19:00,522 - INFO - Epoch: 2/5, Iter: 23/93 -- label: 2.0000 loss: 0.2790 \n2026-03-06 22:19:00,638 - INFO - Epoch: 2/5, Iter: 24/93 -- label: 3.0000 loss: 0.2601 \n2026-03-06 22:19:00,755 - INFO - Epoch: 2/5, Iter: 25/93 -- label: 4.0000 loss: 0.2576 \n2026-03-06 22:19:00,881 - INFO - Epoch: 2/5, Iter: 26/93 -- label: 0.0000 loss: 0.2430 \n2026-03-06 22:19:01,000 - INFO - Epoch: 2/5, Iter: 27/93 -- label: 0.0000 loss: 0.2580 \n2026-03-06 22:19:01,118 - INFO - Epoch: 2/5, Iter: 28/93 -- label: 1.0000 loss: 0.2520 \n2026-03-06 22:19:01,235 - INFO - Epoch: 2/5, Iter: 29/93 -- label: 3.0000 loss: 0.2520 \n2026-03-06 22:19:01,362 - INFO - Epoch: 2/5, Iter: 30/93 -- label: 0.0000 loss: 0.2529 \n2026-03-06 22:19:01,479 - INFO - Epoch: 2/5, Iter: 31/93 -- label: 1.0000 loss: 0.2405 \n2026-03-06 22:19:01,597 - INFO - Epoch: 2/5, Iter: 32/93 -- label: 5.0000 loss: 0.2400 \n2026-03-06 22:19:01,714 - INFO - Epoch: 2/5, Iter: 33/93 -- label: 0.0000 loss: 0.2337 \n2026-03-06 22:19:01,842 - INFO - Epoch: 2/5, Iter: 34/93 -- label: 2.0000 loss: 0.2264 \n2026-03-06 22:19:01,969 - INFO - Epoch: 2/5, Iter: 35/93 -- label: 0.0000 loss: 0.2025 \n2026-03-06 22:19:02,086 - INFO - Epoch: 2/5, Iter: 36/93 -- label: 0.0000 loss: 0.2150 \n2026-03-06 22:19:02,387 - INFO - Epoch: 2/5, Iter: 37/93 -- label: 3.0000 loss: 0.2049 \n2026-03-06 22:19:02,512 - INFO - Epoch: 2/5, Iter: 38/93 -- label: 4.0000 loss: 0.2038 \n2026-03-06 22:19:02,629 - INFO - Epoch: 2/5, Iter: 39/93 -- label: 5.0000 loss: 0.1971 \n2026-03-06 22:19:02,746 - INFO - Epoch: 2/5, Iter: 40/93 -- label: 5.0000 loss: 0.2083 \n2026-03-06 22:19:02,863 - INFO - Epoch: 2/5, Iter: 41/93 -- label: 1.0000 loss: 0.2278 \n2026-03-06 22:19:02,987 - INFO - Epoch: 2/5, Iter: 42/93 -- label: 1.0000 loss: 0.2004 \n2026-03-06 22:19:03,103 - INFO - Epoch: 2/5, Iter: 43/93 -- label: 1.0000 loss: 0.1985 \n2026-03-06 22:19:03,219 - INFO - Epoch: 2/5, Iter: 44/93 -- label: 4.0000 loss: 0.2000 \n2026-03-06 22:19:03,335 - INFO - Epoch: 2/5, Iter: 45/93 -- label: 5.0000 loss: 0.2194 \n2026-03-06 22:19:03,461 - INFO - Epoch: 2/5, Iter: 46/93 -- label: 0.0000 loss: 0.1961 \n2026-03-06 22:19:03,580 - INFO - Epoch: 2/5, Iter: 47/93 -- label: 4.0000 loss: 0.2086 \n2026-03-06 22:19:03,697 - INFO - Epoch: 2/5, Iter: 48/93 -- label: 4.0000 loss: 0.1817 \n2026-03-06 22:19:03,815 - INFO - Epoch: 2/5, Iter: 49/93 -- label: 5.0000 loss: 0.1859 \n2026-03-06 22:19:03,939 - INFO - Epoch: 2/5, Iter: 50/93 -- label: 1.0000 loss: 0.1892 \n2026-03-06 22:19:04,056 - INFO - Epoch: 2/5, Iter: 51/93 -- label: 0.0000 loss: 0.1873 \n2026-03-06 22:19:04,171 - INFO - Epoch: 2/5, Iter: 52/93 -- label: 2.0000 loss: 0.1739 \n2026-03-06 22:19:04,289 - INFO - Epoch: 2/5, Iter: 53/93 -- label: 4.0000 loss: 0.2012 \n2026-03-06 22:19:04,414 - INFO - Epoch: 2/5, Iter: 54/93 -- label: 2.0000 loss: 0.1734 \n2026-03-06 22:19:04,532 - INFO - Epoch: 2/5, Iter: 55/93 -- label: 0.0000 loss: 0.1836 \n2026-03-06 22:19:04,649 - INFO - Epoch: 2/5, Iter: 56/93 -- label: 5.0000 loss: 0.1990 \n2026-03-06 22:19:04,766 - INFO - Epoch: 2/5, Iter: 57/93 -- label: 2.0000 loss: 0.1900 \n2026-03-06 22:19:04,889 - INFO - Epoch: 2/5, Iter: 58/93 -- label: 2.0000 loss: 0.1954 \n2026-03-06 22:19:05,007 - INFO - Epoch: 2/5, Iter: 59/93 -- label: 2.0000 loss: 0.2070 \n2026-03-06 22:19:05,124 - INFO - Epoch: 2/5, Iter: 60/93 -- label: 1.0000 loss: 0.1646 \n2026-03-06 22:19:05,241 - INFO - Epoch: 2/5, Iter: 61/93 -- label: 2.0000 loss: 0.1964 \n2026-03-06 22:19:05,366 - INFO - Epoch: 2/5, Iter: 62/93 -- label: 4.0000 loss: 0.1670 \n2026-03-06 22:19:05,483 - INFO - Epoch: 2/5, Iter: 63/93 -- label: 3.0000 loss: 0.1717 \n2026-03-06 22:19:05,600 - INFO - Epoch: 2/5, Iter: 64/93 -- label: 4.0000 loss: 0.1782 \n2026-03-06 22:19:05,717 - INFO - Epoch: 2/5, Iter: 65/93 -- label: 1.0000 loss: 0.1707 \n2026-03-06 22:19:05,841 - INFO - Epoch: 2/5, Iter: 66/93 -- label: 5.0000 loss: 0.1850 \n2026-03-06 22:19:05,957 - INFO - Epoch: 2/5, Iter: 67/93 -- label: 3.0000 loss: 0.1584 \n2026-03-06 22:19:06,074 - INFO - Epoch: 2/5, Iter: 68/93 -- label: 1.0000 loss: 0.1606 \n2026-03-06 22:19:06,191 - INFO - Epoch: 2/5, Iter: 69/93 -- label: 2.0000 loss: 0.1538 \n2026-03-06 22:19:06,315 - INFO - Epoch: 2/5, Iter: 70/93 -- label: 5.0000 loss: 0.1740 \n2026-03-06 22:19:06,431 - INFO - Epoch: 2/5, Iter: 71/93 -- label: 0.0000 loss: 0.1681 \n2026-03-06 22:19:06,550 - INFO - Epoch: 2/5, Iter: 72/93 -- label: 0.0000 loss: 0.1878 \n2026-03-06 22:19:06,679 - INFO - Epoch: 2/5, Iter: 73/93 -- label: 5.0000 loss: 0.1829 \n2026-03-06 22:19:06,805 - INFO - Epoch: 2/5, Iter: 74/93 -- label: 3.0000 loss: 0.1573 \n2026-03-06 22:19:06,921 - INFO - Epoch: 2/5, Iter: 75/93 -- label: 4.0000 loss: 0.1565 \n2026-03-06 22:19:07,190 - INFO - Epoch: 2/5, Iter: 76/93 -- label: 3.0000 loss: 0.1668 \n2026-03-06 22:19:07,306 - INFO - Epoch: 2/5, Iter: 77/93 -- label: 4.0000 loss: 0.1475 \n2026-03-06 22:19:07,430 - INFO - Epoch: 2/5, Iter: 78/93 -- label: 5.0000 loss: 0.1541 \n2026-03-06 22:19:07,547 - INFO - Epoch: 2/5, Iter: 79/93 -- label: 3.0000 loss: 0.1490 \n2026-03-06 22:19:07,664 - INFO - Epoch: 2/5, Iter: 80/93 -- label: 1.0000 loss: 0.1405 \n2026-03-06 22:19:07,782 - INFO - Epoch: 2/5, Iter: 81/93 -- label: 2.0000 loss: 0.1289 \n2026-03-06 22:19:07,908 - INFO - Epoch: 2/5, Iter: 82/93 -- label: 4.0000 loss: 0.1368 \n2026-03-06 22:19:08,026 - INFO - Epoch: 2/5, Iter: 83/93 -- label: 3.0000 loss: 0.1470 \n2026-03-06 22:19:08,145 - INFO - Epoch: 2/5, Iter: 84/93 -- label: 1.0000 loss: 0.1552 \n2026-03-06 22:19:08,266 - INFO - Epoch: 2/5, Iter: 85/93 -- label: 3.0000 loss: 0.1419 \n2026-03-06 22:19:08,392 - INFO - Epoch: 2/5, Iter: 86/93 -- label: 1.0000 loss: 0.1317 \n2026-03-06 22:19:08,512 - INFO - Epoch: 2/5, Iter: 87/93 -- label: 0.0000 loss: 0.1396 \n2026-03-06 22:19:08,630 - INFO - Epoch: 2/5, Iter: 88/93 -- label: 1.0000 loss: 0.1352 \n2026-03-06 22:19:08,749 - INFO - Epoch: 2/5, Iter: 89/93 -- label: 5.0000 loss: 0.1453 \n2026-03-06 22:19:08,875 - INFO - Epoch: 2/5, Iter: 90/93 -- label: 2.0000 loss: 0.1413 \n2026-03-06 22:19:08,991 - INFO - Epoch: 2/5, Iter: 91/93 -- label: 5.0000 loss: 0.1409 \n2026-03-06 22:19:09,107 - INFO - Epoch: 2/5, Iter: 92/93 -- label: 5.0000 loss: 0.1274 \n2026-03-06 22:19:09,165 - INFO - Epoch: 2/5, Iter: 93/93 -- label: 2.0000 loss: 0.1576 \nINFO:ignite.engine.engine.SupervisedTrainer:Epoch[2] Complete. Time taken: 00:00:11.856\n2026-03-06 22:19:09,450 - INFO - Epoch: 3/5, Iter: 1/93 -- label: 3.0000 loss: 0.1444 \n2026-03-06 22:19:09,570 - INFO - Epoch: 3/5, Iter: 2/93 -- label: 5.0000 loss: 0.1583 \n2026-03-06 22:19:09,688 - INFO - Epoch: 3/5, Iter: 3/93 -- label: 5.0000 loss: 0.1318 \n2026-03-06 22:19:09,807 - INFO - Epoch: 3/5, Iter: 4/93 -- label: 3.0000 loss: 0.1235 \n2026-03-06 22:19:09,931 - INFO - Epoch: 3/5, Iter: 5/93 -- label: 5.0000 loss: 0.1219 \n2026-03-06 22:19:10,075 - INFO - Epoch: 3/5, Iter: 6/93 -- label: 0.0000 loss: 0.1247 \n2026-03-06 22:19:10,202 - INFO - Epoch: 3/5, Iter: 7/93 -- label: 0.0000 loss: 0.1251 \n2026-03-06 22:19:10,331 - INFO - Epoch: 3/5, Iter: 8/93 -- label: 4.0000 loss: 0.1079 \n2026-03-06 22:19:10,475 - INFO - Epoch: 3/5, Iter: 9/93 -- label: 1.0000 loss: 0.1191 \n2026-03-06 22:19:10,614 - INFO - Epoch: 3/5, Iter: 10/93 -- label: 1.0000 loss: 0.1124 \n2026-03-06 22:19:10,756 - INFO - Epoch: 3/5, Iter: 11/93 -- label: 4.0000 loss: 0.1362 \n2026-03-06 22:19:10,882 - INFO - Epoch: 3/5, Iter: 12/93 -- label: 4.0000 loss: 0.1554 \n2026-03-06 22:19:11,013 - INFO - Epoch: 3/5, Iter: 13/93 -- label: 3.0000 loss: 0.1157 \n2026-03-06 22:19:11,144 - INFO - Epoch: 3/5, Iter: 14/93 -- label: 4.0000 loss: 0.1104 \n2026-03-06 22:19:11,268 - INFO - Epoch: 3/5, Iter: 15/93 -- label: 2.0000 loss: 0.1099 \n2026-03-06 22:19:11,389 - INFO - Epoch: 3/5, Iter: 16/93 -- label: 1.0000 loss: 0.1125 \n2026-03-06 22:19:11,527 - INFO - Epoch: 3/5, Iter: 17/93 -- label: 5.0000 loss: 0.1136 \n2026-03-06 22:19:12,000 - INFO - Epoch: 3/5, Iter: 18/93 -- label: 0.0000 loss: 0.1138 \n2026-03-06 22:19:12,124 - INFO - Epoch: 3/5, Iter: 19/93 -- label: 0.0000 loss: 0.1136 \n2026-03-06 22:19:12,254 - INFO - Epoch: 3/5, Iter: 20/93 -- label: 4.0000 loss: 0.1088 \n2026-03-06 22:19:12,381 - INFO - Epoch: 3/5, Iter: 21/93 -- label: 5.0000 loss: 0.1067 \n2026-03-06 22:19:12,502 - INFO - Epoch: 3/5, Iter: 22/93 -- label: 5.0000 loss: 0.1194 \n2026-03-06 22:19:12,623 - INFO - Epoch: 3/5, Iter: 23/93 -- label: 4.0000 loss: 0.1087 \n2026-03-06 22:19:12,740 - INFO - Epoch: 3/5, Iter: 24/93 -- label: 5.0000 loss: 0.1049 \n2026-03-06 22:19:12,866 - INFO - Epoch: 3/5, Iter: 25/93 -- label: 3.0000 loss: 0.1151 \n2026-03-06 22:19:12,993 - INFO - Epoch: 3/5, Iter: 26/93 -- label: 1.0000 loss: 0.1218 \n2026-03-06 22:19:13,116 - INFO - Epoch: 3/5, Iter: 27/93 -- label: 5.0000 loss: 0.1063 \n2026-03-06 22:19:13,235 - INFO - Epoch: 3/5, Iter: 28/93 -- label: 2.0000 loss: 0.1071 \n2026-03-06 22:19:13,362 - INFO - Epoch: 3/5, Iter: 29/93 -- label: 0.0000 loss: 0.1136 \n2026-03-06 22:19:13,490 - INFO - Epoch: 3/5, Iter: 30/93 -- label: 3.0000 loss: 0.1012 \n2026-03-06 22:19:13,614 - INFO - Epoch: 3/5, Iter: 31/93 -- label: 1.0000 loss: 0.1097 \n2026-03-06 22:19:13,736 - INFO - Epoch: 3/5, Iter: 32/93 -- label: 0.0000 loss: 0.1032 \n2026-03-06 22:19:13,861 - INFO - Epoch: 3/5, Iter: 33/93 -- label: 5.0000 loss: 0.0974 \n2026-03-06 22:19:13,984 - INFO - Epoch: 3/5, Iter: 34/93 -- label: 0.0000 loss: 0.1162 \n2026-03-06 22:19:14,103 - INFO - Epoch: 3/5, Iter: 35/93 -- label: 5.0000 loss: 0.1226 \n2026-03-06 22:19:14,222 - INFO - Epoch: 3/5, Iter: 36/93 -- label: 0.0000 loss: 0.0959 \n2026-03-06 22:19:14,346 - INFO - Epoch: 3/5, Iter: 37/93 -- label: 4.0000 loss: 0.0951 \n2026-03-06 22:19:14,465 - INFO - Epoch: 3/5, Iter: 38/93 -- label: 5.0000 loss: 0.1205 \n2026-03-06 22:19:14,585 - INFO - Epoch: 3/5, Iter: 39/93 -- label: 2.0000 loss: 0.0998 \n2026-03-06 22:19:14,704 - INFO - Epoch: 3/5, Iter: 40/93 -- label: 4.0000 loss: 0.1076 \n2026-03-06 22:19:14,824 - INFO - Epoch: 3/5, Iter: 41/93 -- label: 2.0000 loss: 0.1109 \n2026-03-06 22:19:14,942 - INFO - Epoch: 3/5, Iter: 42/93 -- label: 1.0000 loss: 0.0918 \n2026-03-06 22:19:15,061 - INFO - Epoch: 3/5, Iter: 43/93 -- label: 5.0000 loss: 0.0955 \n2026-03-06 22:19:15,178 - INFO - Epoch: 3/5, Iter: 44/93 -- label: 3.0000 loss: 0.0962 \n2026-03-06 22:19:15,300 - INFO - Epoch: 3/5, Iter: 45/93 -- label: 4.0000 loss: 0.1201 \n2026-03-06 22:19:15,418 - INFO - Epoch: 3/5, Iter: 46/93 -- label: 3.0000 loss: 0.0896 \n2026-03-06 22:19:15,536 - INFO - Epoch: 3/5, Iter: 47/93 -- label: 5.0000 loss: 0.0882 \n2026-03-06 22:19:15,652 - INFO - Epoch: 3/5, Iter: 48/93 -- label: 1.0000 loss: 0.0970 \n2026-03-06 22:19:15,774 - INFO - Epoch: 3/5, Iter: 49/93 -- label: 4.0000 loss: 0.0958 \n2026-03-06 22:19:15,893 - INFO - Epoch: 3/5, Iter: 50/93 -- label: 0.0000 loss: 0.0922 \n2026-03-06 22:19:16,014 - INFO - Epoch: 3/5, Iter: 51/93 -- label: 5.0000 loss: 0.1084 \n2026-03-06 22:19:16,129 - INFO - Epoch: 3/5, Iter: 52/93 -- label: 1.0000 loss: 0.0995 \n2026-03-06 22:19:16,249 - INFO - Epoch: 3/5, Iter: 53/93 -- label: 3.0000 loss: 0.0939 \n2026-03-06 22:19:16,369 - INFO - Epoch: 3/5, Iter: 54/93 -- label: 3.0000 loss: 0.0873 \n2026-03-06 22:19:16,488 - INFO - Epoch: 3/5, Iter: 55/93 -- label: 4.0000 loss: 0.0902 \n2026-03-06 22:19:16,603 - INFO - Epoch: 3/5, Iter: 56/93 -- label: 3.0000 loss: 0.0888 \n2026-03-06 22:19:16,723 - INFO - Epoch: 3/5, Iter: 57/93 -- label: 1.0000 loss: 0.0992 \n2026-03-06 22:19:16,987 - INFO - Epoch: 3/5, Iter: 58/93 -- label: 0.0000 loss: 0.0913 \n2026-03-06 22:19:17,116 - INFO - Epoch: 3/5, Iter: 59/93 -- label: 4.0000 loss: 0.1029 \n2026-03-06 22:19:17,232 - INFO - Epoch: 3/5, Iter: 60/93 -- label: 2.0000 loss: 0.0868 \n2026-03-06 22:19:17,352 - INFO - Epoch: 3/5, Iter: 61/93 -- label: 5.0000 loss: 0.0889 \n2026-03-06 22:19:17,469 - INFO - Epoch: 3/5, Iter: 62/93 -- label: 4.0000 loss: 0.0799 \n2026-03-06 22:19:17,587 - INFO - Epoch: 3/5, Iter: 63/93 -- label: 4.0000 loss: 0.0862 \n2026-03-06 22:19:17,704 - INFO - Epoch: 3/5, Iter: 64/93 -- label: 3.0000 loss: 0.0838 \n2026-03-06 22:19:17,824 - INFO - Epoch: 3/5, Iter: 65/93 -- label: 4.0000 loss: 0.0869 \n2026-03-06 22:19:17,945 - INFO - Epoch: 3/5, Iter: 66/93 -- label: 2.0000 loss: 0.0796 \n2026-03-06 22:19:18,067 - INFO - Epoch: 3/5, Iter: 67/93 -- label: 4.0000 loss: 0.0821 \n2026-03-06 22:19:18,182 - INFO - Epoch: 3/5, Iter: 68/93 -- label: 4.0000 loss: 0.0832 \n2026-03-06 22:19:18,303 - INFO - Epoch: 3/5, Iter: 69/93 -- label: 1.0000 loss: 0.0719 \n2026-03-06 22:19:18,421 - INFO - Epoch: 3/5, Iter: 70/93 -- label: 1.0000 loss: 0.0836 \n2026-03-06 22:19:18,539 - INFO - Epoch: 3/5, Iter: 71/93 -- label: 3.0000 loss: 0.0834 \n2026-03-06 22:19:18,656 - INFO - Epoch: 3/5, Iter: 72/93 -- label: 0.0000 loss: 0.0783 \n2026-03-06 22:19:18,776 - INFO - Epoch: 3/5, Iter: 73/93 -- label: 2.0000 loss: 0.0854 \n2026-03-06 22:19:18,895 - INFO - Epoch: 3/5, Iter: 74/93 -- label: 2.0000 loss: 0.0741 \n2026-03-06 22:19:19,013 - INFO - Epoch: 3/5, Iter: 75/93 -- label: 4.0000 loss: 0.0804 \n2026-03-06 22:19:19,127 - INFO - Epoch: 3/5, Iter: 76/93 -- label: 1.0000 loss: 0.0752 \n2026-03-06 22:19:19,247 - INFO - Epoch: 3/5, Iter: 77/93 -- label: 4.0000 loss: 0.0765 \n2026-03-06 22:19:19,365 - INFO - Epoch: 3/5, Iter: 78/93 -- label: 5.0000 loss: 0.1011 \n2026-03-06 22:19:19,484 - INFO - Epoch: 3/5, Iter: 79/93 -- label: 3.0000 loss: 0.0824 \n2026-03-06 22:19:19,599 - INFO - Epoch: 3/5, Iter: 80/93 -- label: 1.0000 loss: 0.0649 \n2026-03-06 22:19:19,720 - INFO - Epoch: 3/5, Iter: 81/93 -- label: 4.0000 loss: 0.0890 \n2026-03-06 22:19:19,837 - INFO - Epoch: 3/5, Iter: 82/93 -- label: 2.0000 loss: 0.0779 \n2026-03-06 22:19:19,956 - INFO - Epoch: 3/5, Iter: 83/93 -- label: 5.0000 loss: 0.0793 \n2026-03-06 22:19:20,071 - INFO - Epoch: 3/5, Iter: 84/93 -- label: 3.0000 loss: 0.0798 \n2026-03-06 22:19:20,204 - INFO - Epoch: 3/5, Iter: 85/93 -- label: 3.0000 loss: 0.0663 \n2026-03-06 22:19:20,333 - INFO - Epoch: 3/5, Iter: 86/93 -- label: 0.0000 loss: 0.0685 \n2026-03-06 22:19:20,454 - INFO - Epoch: 3/5, Iter: 87/93 -- label: 1.0000 loss: 0.0730 \n2026-03-06 22:19:20,570 - INFO - Epoch: 3/5, Iter: 88/93 -- label: 1.0000 loss: 0.0692 \n2026-03-06 22:19:20,694 - INFO - Epoch: 3/5, Iter: 89/93 -- label: 4.0000 loss: 0.0765 \n2026-03-06 22:19:20,828 - INFO - Epoch: 3/5, Iter: 90/93 -- label: 3.0000 loss: 0.0744 \n2026-03-06 22:19:20,947 - INFO - Epoch: 3/5, Iter: 91/93 -- label: 1.0000 loss: 0.0691 \n2026-03-06 22:19:21,067 - INFO - Epoch: 3/5, Iter: 92/93 -- label: 0.0000 loss: 0.0767 \n2026-03-06 22:19:21,124 - INFO - Epoch: 3/5, Iter: 93/93 -- label: 4.0000 loss: 0.0846 \nINFO:ignite.engine.engine.SupervisedTrainer:Epoch[3] Complete. Time taken: 00:00:11.959\n2026-03-06 22:19:21,392 - INFO - Epoch: 4/5, Iter: 1/93 -- label: 1.0000 loss: 0.0840 \n2026-03-06 22:19:21,517 - INFO - Epoch: 4/5, Iter: 2/93 -- label: 3.0000 loss: 0.0806 \n2026-03-06 22:19:21,889 - INFO - Epoch: 4/5, Iter: 3/93 -- label: 3.0000 loss: 0.0680 \n2026-03-06 22:19:22,025 - INFO - Epoch: 4/5, Iter: 4/93 -- label: 3.0000 loss: 0.0674 \n2026-03-06 22:19:22,153 - INFO - Epoch: 4/5, Iter: 5/93 -- label: 4.0000 loss: 0.0689 \n2026-03-06 22:19:22,288 - INFO - Epoch: 4/5, Iter: 6/93 -- label: 2.0000 loss: 0.0749 \n2026-03-06 22:19:22,407 - INFO - Epoch: 4/5, Iter: 7/93 -- label: 1.0000 loss: 0.0748 \n2026-03-06 22:19:22,526 - INFO - Epoch: 4/5, Iter: 8/93 -- label: 4.0000 loss: 0.0684 \n2026-03-06 22:19:22,643 - INFO - Epoch: 4/5, Iter: 9/93 -- label: 2.0000 loss: 0.0583 \n2026-03-06 22:19:22,764 - INFO - Epoch: 4/5, Iter: 10/93 -- label: 0.0000 loss: 0.0640 \n2026-03-06 22:19:22,884 - INFO - Epoch: 4/5, Iter: 11/93 -- label: 0.0000 loss: 0.0782 \n2026-03-06 22:19:23,003 - INFO - Epoch: 4/5, Iter: 12/93 -- label: 2.0000 loss: 0.0690 \n2026-03-06 22:19:23,120 - INFO - Epoch: 4/5, Iter: 13/93 -- label: 3.0000 loss: 0.0590 \n2026-03-06 22:19:23,241 - INFO - Epoch: 4/5, Iter: 14/93 -- label: 2.0000 loss: 0.0616 \n2026-03-06 22:19:23,359 - INFO - Epoch: 4/5, Iter: 15/93 -- label: 4.0000 loss: 0.0621 \n2026-03-06 22:19:23,479 - INFO - Epoch: 4/5, Iter: 16/93 -- label: 3.0000 loss: 0.0677 \n2026-03-06 22:19:23,594 - INFO - Epoch: 4/5, Iter: 17/93 -- label: 3.0000 loss: 0.0639 \n2026-03-06 22:19:23,714 - INFO - Epoch: 4/5, Iter: 18/93 -- label: 0.0000 loss: 0.0684 \n2026-03-06 22:19:23,831 - INFO - Epoch: 4/5, Iter: 19/93 -- label: 4.0000 loss: 0.0875 \n2026-03-06 22:19:23,949 - INFO - Epoch: 4/5, Iter: 20/93 -- label: 5.0000 loss: 0.0535 \n2026-03-06 22:19:24,064 - INFO - Epoch: 4/5, Iter: 21/93 -- label: 5.0000 loss: 0.0712 \n2026-03-06 22:19:24,185 - INFO - Epoch: 4/5, Iter: 22/93 -- label: 1.0000 loss: 0.0637 \n2026-03-06 22:19:24,305 - INFO - Epoch: 4/5, Iter: 23/93 -- label: 4.0000 loss: 0.0607 \n2026-03-06 22:19:24,424 - INFO - Epoch: 4/5, Iter: 24/93 -- label: 1.0000 loss: 0.0649 \n2026-03-06 22:19:24,541 - INFO - Epoch: 4/5, Iter: 25/93 -- label: 3.0000 loss: 0.0638 \n2026-03-06 22:19:24,661 - INFO - Epoch: 4/5, Iter: 26/93 -- label: 1.0000 loss: 0.0591 \n2026-03-06 22:19:24,779 - INFO - Epoch: 4/5, Iter: 27/93 -- label: 3.0000 loss: 0.0693 \n2026-03-06 22:19:24,898 - INFO - Epoch: 4/5, Iter: 28/93 -- label: 3.0000 loss: 0.0595 \n2026-03-06 22:19:25,012 - INFO - Epoch: 4/5, Iter: 29/93 -- label: 2.0000 loss: 0.0656 \n2026-03-06 22:19:25,132 - INFO - Epoch: 4/5, Iter: 30/93 -- label: 0.0000 loss: 0.0623 \n2026-03-06 22:19:25,250 - INFO - Epoch: 4/5, Iter: 31/93 -- label: 2.0000 loss: 0.0781 \n2026-03-06 22:19:25,367 - INFO - Epoch: 4/5, Iter: 32/93 -- label: 3.0000 loss: 0.0614 \n2026-03-06 22:19:25,481 - INFO - Epoch: 4/5, Iter: 33/93 -- label: 1.0000 loss: 0.0627 \n2026-03-06 22:19:25,600 - INFO - Epoch: 4/5, Iter: 34/93 -- label: 2.0000 loss: 0.0650 \n2026-03-06 22:19:25,721 - INFO - Epoch: 4/5, Iter: 35/93 -- label: 5.0000 loss: 0.0623 \n2026-03-06 22:19:25,839 - INFO - Epoch: 4/5, Iter: 36/93 -- label: 5.0000 loss: 0.0607 \n2026-03-06 22:19:25,955 - INFO - Epoch: 4/5, Iter: 37/93 -- label: 1.0000 loss: 0.0635 \n2026-03-06 22:19:26,076 - INFO - Epoch: 4/5, Iter: 38/93 -- label: 4.0000 loss: 0.0642 \n2026-03-06 22:19:26,196 - INFO - Epoch: 4/5, Iter: 39/93 -- label: 0.0000 loss: 0.0723 \n2026-03-06 22:19:26,315 - INFO - Epoch: 4/5, Iter: 40/93 -- label: 5.0000 loss: 0.0711 \n2026-03-06 22:19:26,431 - INFO - Epoch: 4/5, Iter: 41/93 -- label: 3.0000 loss: 0.0609 \n2026-03-06 22:19:26,553 - INFO - Epoch: 4/5, Iter: 42/93 -- label: 2.0000 loss: 0.0634 \n2026-03-06 22:19:26,832 - INFO - Epoch: 4/5, Iter: 43/93 -- label: 2.0000 loss: 0.0580 \n2026-03-06 22:19:26,954 - INFO - Epoch: 4/5, Iter: 44/93 -- label: 5.0000 loss: 0.0614 \n2026-03-06 22:19:27,071 - INFO - Epoch: 4/5, Iter: 45/93 -- label: 3.0000 loss: 0.0482 \n2026-03-06 22:19:27,195 - INFO - Epoch: 4/5, Iter: 46/93 -- label: 4.0000 loss: 0.0583 \n2026-03-06 22:19:27,312 - INFO - Epoch: 4/5, Iter: 47/93 -- label: 5.0000 loss: 0.0790 \n2026-03-06 22:19:27,431 - INFO - Epoch: 4/5, Iter: 48/93 -- label: 3.0000 loss: 0.0569 \n2026-03-06 22:19:27,553 - INFO - Epoch: 4/5, Iter: 49/93 -- label: 3.0000 loss: 0.0514 \n2026-03-06 22:19:27,677 - INFO - Epoch: 4/5, Iter: 50/93 -- label: 3.0000 loss: 0.0522 \n2026-03-06 22:19:27,799 - INFO - Epoch: 4/5, Iter: 51/93 -- label: 2.0000 loss: 0.0609 \n2026-03-06 22:19:27,918 - INFO - Epoch: 4/5, Iter: 52/93 -- label: 0.0000 loss: 0.0682 \n2026-03-06 22:19:28,033 - INFO - Epoch: 4/5, Iter: 53/93 -- label: 3.0000 loss: 0.0521 \n2026-03-06 22:19:28,153 - INFO - Epoch: 4/5, Iter: 54/93 -- label: 5.0000 loss: 0.0723 \n2026-03-06 22:19:28,272 - INFO - Epoch: 4/5, Iter: 55/93 -- label: 0.0000 loss: 0.0608 \n2026-03-06 22:19:28,393 - INFO - Epoch: 4/5, Iter: 56/93 -- label: 0.0000 loss: 0.0560 \n2026-03-06 22:19:28,513 - INFO - Epoch: 4/5, Iter: 57/93 -- label: 2.0000 loss: 0.0576 \n2026-03-06 22:19:28,636 - INFO - Epoch: 4/5, Iter: 58/93 -- label: 3.0000 loss: 0.0534 \n2026-03-06 22:19:28,753 - INFO - Epoch: 4/5, Iter: 59/93 -- label: 0.0000 loss: 0.0700 \n2026-03-06 22:19:28,871 - INFO - Epoch: 4/5, Iter: 60/93 -- label: 4.0000 loss: 0.0502 \n2026-03-06 22:19:28,989 - INFO - Epoch: 4/5, Iter: 61/93 -- label: 2.0000 loss: 0.0519 \n2026-03-06 22:19:29,109 - INFO - Epoch: 4/5, Iter: 62/93 -- label: 2.0000 loss: 0.0469 \n2026-03-06 22:19:29,228 - INFO - Epoch: 4/5, Iter: 63/93 -- label: 2.0000 loss: 0.0602 \n2026-03-06 22:19:29,348 - INFO - Epoch: 4/5, Iter: 64/93 -- label: 2.0000 loss: 0.0623 \n2026-03-06 22:19:29,465 - INFO - Epoch: 4/5, Iter: 65/93 -- label: 4.0000 loss: 0.0489 \n2026-03-06 22:19:29,587 - INFO - Epoch: 4/5, Iter: 66/93 -- label: 2.0000 loss: 0.0651 \n2026-03-06 22:19:29,710 - INFO - Epoch: 4/5, Iter: 67/93 -- label: 0.0000 loss: 0.0571 \n2026-03-06 22:19:29,828 - INFO - Epoch: 4/5, Iter: 68/93 -- label: 0.0000 loss: 0.0526 \n2026-03-06 22:19:29,944 - INFO - Epoch: 4/5, Iter: 69/93 -- label: 1.0000 loss: 0.0469 \n2026-03-06 22:19:30,065 - INFO - Epoch: 4/5, Iter: 70/93 -- label: 0.0000 loss: 0.0512 \n2026-03-06 22:19:30,184 - INFO - Epoch: 4/5, Iter: 71/93 -- label: 0.0000 loss: 0.0654 \n2026-03-06 22:19:30,305 - INFO - Epoch: 4/5, Iter: 72/93 -- label: 3.0000 loss: 0.0567 \n2026-03-06 22:19:30,423 - INFO - Epoch: 4/5, Iter: 73/93 -- label: 5.0000 loss: 0.0433 \n2026-03-06 22:19:30,544 - INFO - Epoch: 4/5, Iter: 74/93 -- label: 0.0000 loss: 0.0568 \n2026-03-06 22:19:30,662 - INFO - Epoch: 4/5, Iter: 75/93 -- label: 5.0000 loss: 0.0748 \n2026-03-06 22:19:30,781 - INFO - Epoch: 4/5, Iter: 76/93 -- label: 5.0000 loss: 0.0455 \n2026-03-06 22:19:30,898 - INFO - Epoch: 4/5, Iter: 77/93 -- label: 4.0000 loss: 0.0512 \n2026-03-06 22:19:31,018 - INFO - Epoch: 4/5, Iter: 78/93 -- label: 3.0000 loss: 0.0563 \n2026-03-06 22:19:31,327 - INFO - Epoch: 4/5, Iter: 79/93 -- label: 5.0000 loss: 0.0392 \n2026-03-06 22:19:31,447 - INFO - Epoch: 4/5, Iter: 80/93 -- label: 2.0000 loss: 0.0517 \n2026-03-06 22:19:31,566 - INFO - Epoch: 4/5, Iter: 81/93 -- label: 1.0000 loss: 0.0517 \n2026-03-06 22:19:31,687 - INFO - Epoch: 4/5, Iter: 82/93 -- label: 3.0000 loss: 0.0378 \n2026-03-06 22:19:31,804 - INFO - Epoch: 4/5, Iter: 83/93 -- label: 2.0000 loss: 0.0423 \n2026-03-06 22:19:31,923 - INFO - Epoch: 4/5, Iter: 84/93 -- label: 4.0000 loss: 0.0478 \n2026-03-06 22:19:32,047 - INFO - Epoch: 4/5, Iter: 85/93 -- label: 3.0000 loss: 0.0432 \n2026-03-06 22:19:32,167 - INFO - Epoch: 4/5, Iter: 86/93 -- label: 0.0000 loss: 0.0562 \n2026-03-06 22:19:32,288 - INFO - Epoch: 4/5, Iter: 87/93 -- label: 4.0000 loss: 0.0490 \n2026-03-06 22:19:32,406 - INFO - Epoch: 4/5, Iter: 88/93 -- label: 4.0000 loss: 0.0442 \n2026-03-06 22:19:32,522 - INFO - Epoch: 4/5, Iter: 89/93 -- label: 4.0000 loss: 0.0576 \n2026-03-06 22:19:32,642 - INFO - Epoch: 4/5, Iter: 90/93 -- label: 1.0000 loss: 0.0473 \n2026-03-06 22:19:32,760 - INFO - Epoch: 4/5, Iter: 91/93 -- label: 3.0000 loss: 0.0486 \n2026-03-06 22:19:32,878 - INFO - Epoch: 4/5, Iter: 92/93 -- label: 1.0000 loss: 0.0387 \n2026-03-06 22:19:32,933 - INFO - Epoch: 4/5, Iter: 93/93 -- label: 3.0000 loss: 0.0830 \nINFO:ignite.engine.engine.SupervisedTrainer:Epoch[4] Complete. Time taken: 00:00:11.809\n2026-03-06 22:19:33,210 - INFO - Epoch: 5/5, Iter: 1/93 -- label: 0.0000 loss: 0.0481 \n2026-03-06 22:19:33,339 - INFO - Epoch: 5/5, Iter: 2/93 -- label: 4.0000 loss: 0.0428 \n2026-03-06 22:19:33,456 - INFO - Epoch: 5/5, Iter: 3/93 -- label: 3.0000 loss: 0.0394 \n2026-03-06 22:19:33,573 - INFO - Epoch: 5/5, Iter: 4/93 -- label: 3.0000 loss: 0.0392 \n2026-03-06 22:19:33,688 - INFO - Epoch: 5/5, Iter: 5/93 -- label: 1.0000 loss: 0.0426 \n2026-03-06 22:19:33,814 - INFO - Epoch: 5/5, Iter: 6/93 -- label: 0.0000 loss: 0.0513 \n2026-03-06 22:19:33,929 - INFO - Epoch: 5/5, Iter: 7/93 -- label: 4.0000 loss: 0.0540 \n2026-03-06 22:19:34,044 - INFO - Epoch: 5/5, Iter: 8/93 -- label: 5.0000 loss: 0.0438 \n2026-03-06 22:19:34,159 - INFO - Epoch: 5/5, Iter: 9/93 -- label: 0.0000 loss: 0.0609 \n2026-03-06 22:19:34,284 - INFO - Epoch: 5/5, Iter: 10/93 -- label: 5.0000 loss: 0.0412 \n2026-03-06 22:19:34,399 - INFO - Epoch: 5/5, Iter: 11/93 -- label: 2.0000 loss: 0.0462 \n2026-03-06 22:19:34,515 - INFO - Epoch: 5/5, Iter: 12/93 -- label: 4.0000 loss: 0.0477 \n2026-03-06 22:19:34,631 - INFO - Epoch: 5/5, Iter: 13/93 -- label: 4.0000 loss: 0.0489 \n2026-03-06 22:19:34,756 - INFO - Epoch: 5/5, Iter: 14/93 -- label: 5.0000 loss: 0.0393 \n2026-03-06 22:19:34,872 - INFO - Epoch: 5/5, Iter: 15/93 -- label: 2.0000 loss: 0.0571 \n2026-03-06 22:19:34,988 - INFO - Epoch: 5/5, Iter: 16/93 -- label: 0.0000 loss: 0.0465 \n2026-03-06 22:19:35,104 - INFO - Epoch: 5/5, Iter: 17/93 -- label: 4.0000 loss: 0.0336 \n2026-03-06 22:19:35,228 - INFO - Epoch: 5/5, Iter: 18/93 -- label: 0.0000 loss: 0.0523 \n2026-03-06 22:19:35,345 - INFO - Epoch: 5/5, Iter: 19/93 -- label: 2.0000 loss: 0.0428 \n2026-03-06 22:19:35,462 - INFO - Epoch: 5/5, Iter: 20/93 -- label: 4.0000 loss: 0.0498 \n2026-03-06 22:19:35,579 - INFO - Epoch: 5/5, Iter: 21/93 -- label: 4.0000 loss: 0.0396 \n2026-03-06 22:19:35,705 - INFO - Epoch: 5/5, Iter: 22/93 -- label: 3.0000 loss: 0.0379 \n2026-03-06 22:19:35,821 - INFO - Epoch: 5/5, Iter: 23/93 -- label: 3.0000 loss: 0.0414 \n2026-03-06 22:19:35,936 - INFO - Epoch: 5/5, Iter: 24/93 -- label: 1.0000 loss: 0.0449 \n2026-03-06 22:19:36,302 - INFO - Epoch: 5/5, Iter: 25/93 -- label: 5.0000 loss: 0.0441 \n2026-03-06 22:19:36,428 - INFO - Epoch: 5/5, Iter: 26/93 -- label: 1.0000 loss: 0.0332 \n2026-03-06 22:19:36,545 - INFO - Epoch: 5/5, Iter: 27/93 -- label: 4.0000 loss: 0.0478 \n2026-03-06 22:19:36,661 - INFO - Epoch: 5/5, Iter: 28/93 -- label: 1.0000 loss: 0.0551 \n2026-03-06 22:19:36,778 - INFO - Epoch: 5/5, Iter: 29/93 -- label: 1.0000 loss: 0.0465 \n2026-03-06 22:19:36,903 - INFO - Epoch: 5/5, Iter: 30/93 -- label: 0.0000 loss: 0.0473 \n2026-03-06 22:19:37,019 - INFO - Epoch: 5/5, Iter: 31/93 -- label: 2.0000 loss: 0.0472 \n2026-03-06 22:19:37,136 - INFO - Epoch: 5/5, Iter: 32/93 -- label: 2.0000 loss: 0.0409 \n2026-03-06 22:19:37,253 - INFO - Epoch: 5/5, Iter: 33/93 -- label: 3.0000 loss: 0.0463 \n2026-03-06 22:19:37,379 - INFO - Epoch: 5/5, Iter: 34/93 -- label: 0.0000 loss: 0.0382 \n2026-03-06 22:19:37,495 - INFO - Epoch: 5/5, Iter: 35/93 -- label: 0.0000 loss: 0.0332 \n2026-03-06 22:19:37,611 - INFO - Epoch: 5/5, Iter: 36/93 -- label: 0.0000 loss: 0.0559 \n2026-03-06 22:19:37,726 - INFO - Epoch: 5/5, Iter: 37/93 -- label: 1.0000 loss: 0.0403 \n2026-03-06 22:19:37,850 - INFO - Epoch: 5/5, Iter: 38/93 -- label: 4.0000 loss: 0.0353 \n2026-03-06 22:19:37,969 - INFO - Epoch: 5/5, Iter: 39/93 -- label: 4.0000 loss: 0.0396 \n2026-03-06 22:19:38,087 - INFO - Epoch: 5/5, Iter: 40/93 -- label: 2.0000 loss: 0.0319 \n2026-03-06 22:19:38,204 - INFO - Epoch: 5/5, Iter: 41/93 -- label: 5.0000 loss: 0.0357 \n2026-03-06 22:19:38,331 - INFO - Epoch: 5/5, Iter: 42/93 -- label: 5.0000 loss: 0.0345 \n2026-03-06 22:19:38,448 - INFO - Epoch: 5/5, Iter: 43/93 -- label: 2.0000 loss: 0.0452 \n2026-03-06 22:19:38,565 - INFO - Epoch: 5/5, Iter: 44/93 -- label: 5.0000 loss: 0.0398 \n2026-03-06 22:19:38,684 - INFO - Epoch: 5/5, Iter: 45/93 -- label: 4.0000 loss: 0.0349 \n2026-03-06 22:19:38,824 - INFO - Epoch: 5/5, Iter: 46/93 -- label: 5.0000 loss: 0.0497 \n2026-03-06 22:19:38,942 - INFO - Epoch: 5/5, Iter: 47/93 -- label: 3.0000 loss: 0.0375 \n2026-03-06 22:19:39,061 - INFO - Epoch: 5/5, Iter: 48/93 -- label: 5.0000 loss: 0.0369 \n2026-03-06 22:19:39,179 - INFO - Epoch: 5/5, Iter: 49/93 -- label: 3.0000 loss: 0.0537 \n2026-03-06 22:19:39,307 - INFO - Epoch: 5/5, Iter: 50/93 -- label: 4.0000 loss: 0.0403 \n2026-03-06 22:19:39,426 - INFO - Epoch: 5/5, Iter: 51/93 -- label: 0.0000 loss: 0.0391 \n2026-03-06 22:19:39,543 - INFO - Epoch: 5/5, Iter: 52/93 -- label: 2.0000 loss: 0.0481 \n2026-03-06 22:19:39,660 - INFO - Epoch: 5/5, Iter: 53/93 -- label: 3.0000 loss: 0.0452 \n2026-03-06 22:19:39,785 - INFO - Epoch: 5/5, Iter: 54/93 -- label: 1.0000 loss: 0.0466 \n2026-03-06 22:19:39,902 - INFO - Epoch: 5/5, Iter: 55/93 -- label: 4.0000 loss: 0.0328 \n2026-03-06 22:19:40,021 - INFO - Epoch: 5/5, Iter: 56/93 -- label: 0.0000 loss: 0.0358 \n2026-03-06 22:19:40,139 - INFO - Epoch: 5/5, Iter: 57/93 -- label: 0.0000 loss: 0.0296 \n2026-03-06 22:19:40,265 - INFO - Epoch: 5/5, Iter: 58/93 -- label: 5.0000 loss: 0.0417 \n2026-03-06 22:19:40,385 - INFO - Epoch: 5/5, Iter: 59/93 -- label: 4.0000 loss: 0.0375 \n2026-03-06 22:19:40,502 - INFO - Epoch: 5/5, Iter: 60/93 -- label: 5.0000 loss: 0.0382 \n2026-03-06 22:19:40,620 - INFO - Epoch: 5/5, Iter: 61/93 -- label: 2.0000 loss: 0.0392 \n2026-03-06 22:19:40,939 - INFO - Epoch: 5/5, Iter: 62/93 -- label: 3.0000 loss: 0.0360 \n2026-03-06 22:19:41,057 - INFO - Epoch: 5/5, Iter: 63/93 -- label: 3.0000 loss: 0.0344 \n2026-03-06 22:19:41,176 - INFO - Epoch: 5/5, Iter: 64/93 -- label: 4.0000 loss: 0.0332 \n2026-03-06 22:19:41,298 - INFO - Epoch: 5/5, Iter: 65/93 -- label: 1.0000 loss: 0.0558 \n2026-03-06 22:19:41,423 - INFO - Epoch: 5/5, Iter: 66/93 -- label: 4.0000 loss: 0.0302 \n2026-03-06 22:19:41,540 - INFO - Epoch: 5/5, Iter: 67/93 -- label: 4.0000 loss: 0.0413 \n2026-03-06 22:19:41,659 - INFO - Epoch: 5/5, Iter: 68/93 -- label: 3.0000 loss: 0.0387 \n2026-03-06 22:19:41,779 - INFO - Epoch: 5/5, Iter: 69/93 -- label: 1.0000 loss: 0.0310 \n2026-03-06 22:19:41,906 - INFO - Epoch: 5/5, Iter: 70/93 -- label: 4.0000 loss: 0.0277 \n2026-03-06 22:19:42,023 - INFO - Epoch: 5/5, Iter: 71/93 -- label: 3.0000 loss: 0.0273 \n2026-03-06 22:19:42,140 - INFO - Epoch: 5/5, Iter: 72/93 -- label: 4.0000 loss: 0.0297 \n2026-03-06 22:19:42,256 - INFO - Epoch: 5/5, Iter: 73/93 -- label: 3.0000 loss: 0.0268 \n2026-03-06 22:19:42,382 - INFO - Epoch: 5/5, Iter: 74/93 -- label: 4.0000 loss: 0.0410 \n2026-03-06 22:19:42,499 - INFO - Epoch: 5/5, Iter: 75/93 -- label: 1.0000 loss: 0.0399 \n2026-03-06 22:19:42,616 - INFO - Epoch: 5/5, Iter: 76/93 -- label: 0.0000 loss: 0.0321 \n2026-03-06 22:19:42,735 - INFO - Epoch: 5/5, Iter: 77/93 -- label: 5.0000 loss: 0.0374 \n2026-03-06 22:19:42,862 - INFO - Epoch: 5/5, Iter: 78/93 -- label: 3.0000 loss: 0.0333 \n2026-03-06 22:19:42,979 - INFO - Epoch: 5/5, Iter: 79/93 -- label: 1.0000 loss: 0.0321 \n2026-03-06 22:19:43,094 - INFO - Epoch: 5/5, Iter: 80/93 -- label: 1.0000 loss: 0.0355 \n2026-03-06 22:19:43,212 - INFO - Epoch: 5/5, Iter: 81/93 -- label: 1.0000 loss: 0.0325 \n2026-03-06 22:19:43,339 - INFO - Epoch: 5/5, Iter: 82/93 -- label: 0.0000 loss: 0.0473 \n2026-03-06 22:19:43,456 - INFO - Epoch: 5/5, Iter: 83/93 -- label: 0.0000 loss: 0.0362 \n2026-03-06 22:19:43,572 - INFO - Epoch: 5/5, Iter: 84/93 -- label: 0.0000 loss: 0.0442 \n2026-03-06 22:19:43,698 - INFO - Epoch: 5/5, Iter: 85/93 -- label: 0.0000 loss: 0.0335 \n2026-03-06 22:19:43,825 - INFO - Epoch: 5/5, Iter: 86/93 -- label: 2.0000 loss: 0.0406 \n2026-03-06 22:19:43,941 - INFO - Epoch: 5/5, Iter: 87/93 -- label: 1.0000 loss: 0.0366 \n2026-03-06 22:19:44,058 - INFO - Epoch: 5/5, Iter: 88/93 -- label: 2.0000 loss: 0.0430 \n2026-03-06 22:19:44,175 - INFO - Epoch: 5/5, Iter: 89/93 -- label: 4.0000 loss: 0.0396 \n2026-03-06 22:19:44,300 - INFO - Epoch: 5/5, Iter: 90/93 -- label: 2.0000 loss: 0.0272 \n2026-03-06 22:19:44,418 - INFO - Epoch: 5/5, Iter: 91/93 -- label: 4.0000 loss: 0.0391 \n2026-03-06 22:19:44,534 - INFO - Epoch: 5/5, Iter: 92/93 -- label: 3.0000 loss: 0.0346 \n2026-03-06 22:19:44,590 - INFO - Epoch: 5/5, Iter: 93/93 -- label: 2.0000 loss: 0.0576 \nINFO:ignite.engine.engine.SupervisedTrainer:Epoch[5] Complete. Time taken: 00:00:11.656\nINFO:ignite.engine.engine.SupervisedTrainer:Engine run finished. Time taken: 00:00:59.854",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/monai_101_ignite.html#check-the-prediction-on-the-test-dataset",
     "href": "Benchmarks/monai_101_ignite.html#check-the-prediction-on-the-test-dataset",
-    "title": "MONAI 101 tutorial",
+    "title": "MONAI 101 tutorial - MONAI/Ignite",
     "section": "Check the prediction on the test dataset",
     "text": "Check the prediction on the test dataset\n\ndataset_dir = Path(root_dir, \"MedNIST\")\nclass_names = sorted(f\"{x.name}\" for x in dataset_dir.iterdir() if x.is_dir())\ntestdata = MedNISTDataset(root_dir=root_dir, transform=transform, section=\"test\", download=False, runtime_cache=True)\n\nmax_items_to_print = 10\nwith eval_mode(model):\n    for item in DataLoader(testdata, batch_size=1, num_workers=0):\n        prob = np.array(model(item[\"image\"].to(device)).detach().to(\"cpu\"))[0]\n        pred = class_names[prob.argmax()]\n        gt = item[\"class_name\"][0]\n        print(f\"Class prediction is {pred}. Ground-truth: {gt}\")\n        max_items_to_print -= 1\n        if max_items_to_print == 0:\n            break\n\nClass prediction is AbdomenCT. Ground-truth: AbdomenCT\nClass prediction is BreastMRI. Ground-truth: BreastMRI\nClass prediction is ChestCT. Ground-truth: ChestCT\nClass prediction is CXR. Ground-truth: CXR\nClass prediction is Hand. Ground-truth: Hand\nClass prediction is HeadCT. Ground-truth: HeadCT\nClass prediction is HeadCT. Ground-truth: HeadCT\nClass prediction is CXR. Ground-truth: CXR\nClass prediction is ChestCT. Ground-truth: ChestCT\nClass prediction is BreastMRI. Ground-truth: BreastMRI\n\n\n/tmp/ipykernel_142843/3379698368.py:8: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword\n  prob = np.array(model(item[\"image\"].to(device)).detach().to(\"cpu\"))[0]",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "MONAI 101 tutorial"
-    ]
-  },
-  {
-    "objectID": "Benchmarks/image_restoration_biomonai.html",
-    "href": "Benchmarks/image_restoration_biomonai.html",
-    "title": "Image Restoration with Restormer in MONAI",
-    "section": "",
-    "text": "We will install the latest dev branch of MONAI where the Restormer is available. Also, we use pip install with the BUILD_MONAI=1 flag. This will fetch the most recent source code from the MONAI repository’s development branch, build MONAI’s C++/CUDA extensions, and install the package.\nSetting env BUILD_MONAI=1 ensures that when calling the relevant Python modules, MONAI will prefer those extensions instead of the PyTorch/Python native implementations.\n(The compilation may take a few to 10+ minutes.)",
-    "crumbs": [
-      "Blog",
-      "Benchmarks",
-      "Image Restoration with Restormer in MONAI"
-    ]
-  },
-  {
-    "objectID": "Benchmarks/image_restoration_biomonai.html#setup-environment",
-    "href": "Benchmarks/image_restoration_biomonai.html#setup-environment",
-    "title": "Image Restoration with Restormer in MONAI",
-    "section": "",
-    "text": "We will install the latest dev branch of MONAI where the Restormer is available. Also, we use pip install with the BUILD_MONAI=1 flag. This will fetch the most recent source code from the MONAI repository’s development branch, build MONAI’s C++/CUDA extensions, and install the package.\nSetting env BUILD_MONAI=1 ensures that when calling the relevant Python modules, MONAI will prefer those extensions instead of the PyTorch/Python native implementations.\n(The compilation may take a few to 10+ minutes.)",
-    "crumbs": [
-      "Blog",
-      "Benchmarks",
-      "Image Restoration with Restormer in MONAI"
+      "MONAI 101 tutorial - MONAI/Ignite"
     ]
   },
   {
     "objectID": "Benchmarks/image_restoration_biomonai.html#setup-imports",
     "href": "Benchmarks/image_restoration_biomonai.html#setup-imports",
-    "title": "Image Restoration with Restormer in MONAI",
+    "title": "Image Restoration with Restormer in bioMONAI",
     "section": "Setup imports",
     "text": "Setup imports\n\nfrom monai.utils import set_determinism\n\nfrom monai.config import print_config\nfrom monai.networks.nets.restormer import Restormer\nfrom monai.apps import MedNISTDataset\n\nimport os\nimport torch\nimport matplotlib.pyplot as plt\nimport tempfile\nimport pandas as pd\nfrom fastai.vision.all import OptimWrapper\n\nfrom bioMONAI.data import *\nfrom bioMONAI.core import *\nfrom bioMONAI.losses import SSIMLoss\nfrom bioMONAI.transforms import ScaleIntensity, RandGaussianSmooth, RandGaussianNoise, ApplyTo\n\nprint_config()\nset_determinism(42)\n\nMONAI version: 1.5.2\nNumpy version: 2.4.2\nPytorch version: 2.9.1+cu128\nMONAI flags: HAS_EXT = False, USE_COMPILED = False, USE_META_DICT = False\nMONAI rev id: d18565fb3e4fd8c556707f91ac280a2dc3f681c1\nMONAI __file__: /home/&lt;username&gt;/miniforge3/envs/biomonai_latest/lib/python3.11/site-packages/monai/__init__.py\n\nOptional dependencies:\nPytorch Ignite version: NOT INSTALLED or UNKNOWN VERSION.\nITK version: NOT INSTALLED or UNKNOWN VERSION.\nNibabel version: 5.3.3\nscikit-image version: 0.26.0\nscipy version: 1.17.0\nPillow version: 12.1.1\nTensorboard version: NOT INSTALLED or UNKNOWN VERSION.\ngdown version: NOT INSTALLED or UNKNOWN VERSION.\nTorchVision version: 0.24.1+cu128\ntqdm version: 4.67.3\nlmdb version: NOT INSTALLED or UNKNOWN VERSION.\npsutil version: 7.2.2\npandas version: 3.0.0\neinops version: 0.8.2\ntransformers version: NOT INSTALLED or UNKNOWN VERSION.\nmlflow version: NOT INSTALLED or UNKNOWN VERSION.\npynrrd version: NOT INSTALLED or UNKNOWN VERSION.\nclearml version: NOT INSTALLED or UNKNOWN VERSION.\n\nFor details about installing the optional dependencies, please visit:\n    https://docs.monai.io/en/latest/installation.html#installing-the-recommended-dependencies",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Image Restoration with Restormer in MONAI"
+      "Image Restoration with Restormer in bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/image_restoration_biomonai.html#visualisation-of-the-training-pairs",
     "href": "Benchmarks/image_restoration_biomonai.html#visualisation-of-the-training-pairs",
-    "title": "Image Restoration with Restormer in MONAI",
+    "title": "Image Restoration with Restormer in bioMONAI",
     "section": "Visualisation of the training pairs",
     "text": "Visualisation of the training pairs\n\ndata_ops = {\n    'fn_col': ['noisy_hand'],\n    'target_col': ['original_hand'],\n    'valid_col': ['is_valid'],\n    'bs': 16,\n    'item_tfms': train_transforms, \n    'shuffle': True,\n}\n\ndata = BioDataLoaders.from_df(training_df, **data_ops)\n\n# print length of training, validation, and test datasets\nprint('train images:', len(data.train_ds.items), '\\nvalidation images:', len(data.valid_ds.items))\n\ntrain images: 1000 \nvalidation images: 500\n\n\n\ndata.show_batch(figsize=(12, 6))",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Image Restoration with Restormer in MONAI"
+      "Image Restoration with Restormer in bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/image_restoration_biomonai.html#create-the-training-pipelines",
     "href": "Benchmarks/image_restoration_biomonai.html#create-the-training-pipelines",
-    "title": "Image Restoration with Restormer in MONAI",
+    "title": "Image Restoration with Restormer in bioMONAI",
     "section": "Create the training pipelines",
     "text": "Create the training pipelines\nWe use a CacheDataset to capture the training pairs and accelerate the training process. The MedNISTDataset provides pairs of “noisy” and “original” images. For demonstration purposes, we treat this as an image restoration problem: the “noisy” image is a degraded version of the “original” reference image (e.g., due to simulated movement or noise). The goal is to restore the noisy image to match the original image.",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Image Restoration with Restormer in MONAI"
+      "Image Restoration with Restormer in bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/image_restoration_biomonai.html#model-and-training",
     "href": "Benchmarks/image_restoration_biomonai.html#model-and-training",
-    "title": "Image Restoration with Restormer in MONAI",
+    "title": "Image Restoration with Restormer in bioMONAI",
     "section": "Model and Training",
     "text": "Model and Training\nNow, let’s initialize the Restormer model and train it to restore the noisy images. Since this is just a tutorial, we will initialize a small Restormer model with a small size configuration for quick experimentation:\n\ndim=32: the embedding dimension (feature width) at the first stage.\nnum_blocks=[2, 2]: 2 encoder and 2 decoder blocks.\nnum_heads=[2, 2]: 2 attention heads at each stage.\nrefinement=1: 1 refinement block at the bottleneck.\n\nWhen training image restoration models, common regression losses include MSELoss, PSNRLoss, and SSIMLoss. Here, we use SSIMLoss because it encourages the model to focus on matching the structural similarity (shape and details) of the hands, rather than just restoring absolute pixel values.\n\nmodel = Restormer(\n    spatial_dims=2,\n    in_channels=1,\n    out_channels=1,\n    dim=32,\n    num_blocks=[2, 2],\n    heads=[2, 2],\n    num_refinement_blocks=1,\n)\nimage_loss = SSIMLoss(spatial_dims=2)\noptimizer = OptimWrapper(opt=torch.optim.Adam(model.parameters(), 1e-5))\n\ntrainer = fastTrainer(data, model, loss_fn=image_loss, metrics=[], show_summary=False, lr=1e-5, show_graph=True, optimizer=optimizer)",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Image Restoration with Restormer in MONAI"
+      "Image Restoration with Restormer in bioMONAI"
     ]
   },
   {
     "objectID": "Benchmarks/image_restoration_biomonai.html#the-training-loops",
     "href": "Benchmarks/image_restoration_biomonai.html#the-training-loops",
-    "title": "Image Restoration with Restormer in MONAI",
+    "title": "Image Restoration with Restormer in bioMONAI",
     "section": "The training loops",
     "text": "The training loops\n\nmax_epochs = 50\n\ntrainer.fit(max_epochs)\n\n\n\n\n\n\n\n\nepoch\ntrain_loss\nvalid_loss\ntime\n\n\n\n\n0\n0.540924\n0.402517\n00:05\n\n\n1\n0.347592\n0.243856\n00:04\n\n\n2\n0.245168\n0.184494\n00:04\n\n\n3\n0.187564\n0.154350\n00:04\n\n\n4\n0.155783\n0.134314\n00:04\n\n\n5\n0.136213\n0.120692\n00:04\n\n\n6\n0.121420\n0.112226\n00:04\n\n\n7\n0.110966\n0.103617\n00:04\n\n\n8\n0.103200\n0.097754\n00:04\n\n\n9\n0.096716\n0.093013\n00:04\n\n\n10\n0.091520\n0.085968\n00:04\n\n\n11\n0.086470\n0.082864\n00:04\n\n\n12\n0.082578\n0.078642\n00:04\n\n\n13\n0.079393\n0.075465\n00:04\n\n\n14\n0.076035\n0.073530\n00:04\n\n\n15\n0.073113\n0.071982\n00:04\n\n\n16\n0.071441\n0.069273\n00:04\n\n\n17\n0.069574\n0.068436\n00:04\n\n\n18\n0.067519\n0.065916\n00:04\n\n\n19\n0.065269\n0.063996\n00:04\n\n\n20\n0.064589\n0.063007\n00:04\n\n\n21\n0.062425\n0.061521\n00:04\n\n\n22\n0.060241\n0.060471\n00:04\n\n\n23\n0.060077\n0.059470\n00:04\n\n\n24\n0.058804\n0.058881\n00:04\n\n\n25\n0.057260\n0.057225\n00:04\n\n\n26\n0.056934\n0.056505\n00:04\n\n\n27\n0.057057\n0.054845\n00:04\n\n\n28\n0.055682\n0.054183\n00:04\n\n\n29\n0.054211\n0.052429\n00:04\n\n\n30\n0.053502\n0.053429\n00:04\n\n\n31\n0.052779\n0.053422\n00:04\n\n\n32\n0.051588\n0.052135\n00:04\n\n\n33\n0.050920\n0.050995\n00:04\n\n\n34\n0.050493\n0.051630\n00:04\n\n\n35\n0.050280\n0.049948\n00:04\n\n\n36\n0.049430\n0.050326\n00:04\n\n\n37\n0.049120\n0.048960\n00:04\n\n\n38\n0.048622\n0.048836\n00:04\n\n\n39\n0.048164\n0.048458\n00:04\n\n\n40\n0.047654\n0.047344\n00:04\n\n\n41\n0.046593\n0.047098\n00:04\n\n\n42\n0.047069\n0.045572\n00:04\n\n\n43\n0.046450\n0.046114\n00:04\n\n\n44\n0.045141\n0.045152\n00:04\n\n\n45\n0.044938\n0.045827\n00:04\n\n\n46\n0.044786\n0.045394\n00:04\n\n\n47\n0.044298\n0.044790\n00:04\n\n\n48\n0.043873\n0.044756\n00:05\n\n\n49\n0.044296\n0.044023\n00:05",
     "crumbs": [
       "Blog",
       "Benchmarks",
-      "Image Restoration with Restormer in MONAI"
+      "Image Restoration with Restormer in bioMONAI"
     ]
   },
   {
@@ -1455,7 +1431,7 @@
     "href": "data.html#biodatablocks",
     "title": "Data",
     "section": "BioDataBlocks",
-    "text": "BioDataBlocks\nBioImageBlock Creates a new type of TransformBlock specifically for bioimaging data aside from other types like ImageBlock, CategoryBlock and TextBlock.\n\nsource\n\nBioImageBlock\n\ndef BioImageBlock(\n    cls:BioImageBase=BioImage\n):\n\nA TransformBlock tailored for bioimaging data, BioImageBlock facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging.\nThe BioDataBlock class is built on top of the DataBlock’s class which is provided by the fastai library and is used to build datasets and dataloaders from blocks specifically for biomedical data, offering additionally the option to use BioImageBlock as TransformBlock.\n\nsource\n\n\nBioDataBlock\n\ndef BioDataBlock(\n    blocks:list=(&lt;fastai.data.block.TransformBlock object at 0x7daadb2fca10&gt;, &lt;fastai.data.block.TransformBlock object at 0x7daadb2ede90&gt;), # One or more `TransformBlock`s\n    dl_type:TfmdDL=None, # Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`\n    get_items:function=get_image_files, get_y:NoneType=None, get_x:NoneType=None,\n    getters:list=None, # Getter functions applied to results of `get_items`\n    n_inp:int=None, # Number of inputs\n    item_tfms:list=None, # `ItemTransform`s, applied on an item\n    batch_tfms:list=None, # `Transform`s or `RandTransform`s, applied by batch\n    splitter:NoneType=None\n):\n\nThe BioDataBlock class serves as a generic container to build Datasets and DataLoaders efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.",
+    "text": "BioDataBlocks\nBioImageBlock Creates a new type of TransformBlock specifically for bioimaging data aside from other types like ImageBlock, CategoryBlock and TextBlock.\n\nsource\n\nBioImageBlock\n\ndef BioImageBlock(\n    cls:BioImageBase=BioImage\n):\n\nA TransformBlock tailored for bioimaging data, BioImageBlock facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging.\nThe BioDataBlock class is built on top of the DataBlock’s class which is provided by the fastai library and is used to build datasets and dataloaders from blocks specifically for biomedical data, offering additionally the option to use BioImageBlock as TransformBlock.\n\nsource\n\n\nBioDataBlock\n\ndef BioDataBlock(\n    blocks:list=(&lt;fastai.data.block.TransformBlock object at 0x7fc434fefe10&gt;, &lt;fastai.data.block.TransformBlock object at 0x7fc6d726c5d0&gt;), # One or more `TransformBlock`s\n    dl_type:TfmdDL=None, # Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`\n    get_items:function=get_image_files, get_y:NoneType=None, get_x:NoneType=None,\n    getters:list=None, # Getter functions applied to results of `get_items`\n    n_inp:int=None, # Number of inputs\n    item_tfms:list=None, # `ItemTransform`s, applied on an item\n    batch_tfms:list=None, # `Transform`s or `RandTransform`s, applied by batch\n    splitter:NoneType=None\n):\n\nThe BioDataBlock class serves as a generic container to build Datasets and DataLoaders efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.",
     "crumbs": [
       "Blog",
       "Data"
