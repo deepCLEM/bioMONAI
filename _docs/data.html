@@ -292,31 +292,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+ <span class="menu-text">Medical Image Classification - bioMONAI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+ <span class="menu-text">Medical Image Classification - MONAI/Pytorch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">MONAI 101 tutorial</span></a>
+ <span class="menu-text">MONAI 101 tutorial - bioMONAI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">MONAI 101 tutorial</span></a>
+ <span class="menu-text">MONAI 101 tutorial - MONAI/Ignite</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+ <span class="menu-text">Image Restoration with Restormer in bioMONAI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -653,7 +653,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioDataBlock(</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    blocks:<span class="bu">list</span><span class="op">=</span>(<span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x7daadb2fca10</span><span class="op">&gt;</span>, <span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x7daadb2ede90</span><span class="op">&gt;</span>), <span class="co"># One or more `TransformBlock`s</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    blocks:<span class="bu">list</span><span class="op">=</span>(<span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x7fc434fefe10</span><span class="op">&gt;</span>, <span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x7fc6d726c5d0</span><span class="op">&gt;</span>), <span class="co"># One or more `TransformBlock`s</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    dl_type:TfmdDL<span class="op">=</span><span class="va">None</span>, <span class="co"># Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`</span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    get_items:function<span class="op">=</span>get_image_files, get_y:NoneType<span class="op">=</span><span class="va">None</span>, get_x:NoneType<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    getters:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Getter functions applied to results of `get_items`</span></span>
