@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -277,12 +277,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Tutorials</span></a>
+ <span class="menu-text">Benchmarks</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification Tutorial with the MedNIST Dataset</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_classification.html" class="sidebar-item-text sidebar-link">
@@ -310,12 +357,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_histopathology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Histopathology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_histopathology_2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Histopathology</span></a>
   </div>
 </li>
@@ -401,7 +442,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="unet" class="level2">
 <h2 class="anchored" data-anchor-id="unet">UNet</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L34" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L69" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="create_custom_unet" class="level3">
 <h3 class="anchored" data-anchor-id="create_custom_unet">create_custom_unet</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -421,7 +462,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="denoising-cnn" class="level2">
 <h2 class="anchored" data-anchor-id="denoising-cnn">Denoising CNN</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L70" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L105" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="dncnn" class="level3">
 <h3 class="anchored" data-anchor-id="dncnn">DnCNN</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -450,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="config">Config</h3>
 <p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#deeplabconfig"><code>DeeplabConfig</code></a> class has been created to centralize all settings and hyperparameters in one place. It uses two main functions: Get_padding and interpolate. Get_padding is a function that calculates the amount of padding needed for a convolution operation to get the desired output size. Interpolate is a function that allows the resizing of a tensor using interpolation.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L149" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L184" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="interpolate" class="level3">
 <h3 class="anchored" data-anchor-id="interpolate">interpolate</h3>
@@ -462,7 +503,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Tensor: <span class="co"># Output tensor</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L144" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L179" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_padding" class="level3">
 <h3 class="anchored" data-anchor-id="get_padding">get_padding</h3>
@@ -473,7 +514,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="bu">int</span>: <span class="co"># Padding size</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L132" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L167" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="deeplabconfig" class="level3">
 <h3 class="anchored" data-anchor-id="deeplabconfig">DeeplabConfig</h3>
@@ -489,7 +530,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="blocks">Blocks</h3>
 <p><a href="https://deepCLEM.github.io/bioMONAI/nets.html#separableconv"><code>SeparableConv</code></a> is a class that carries out a type of convolution operation that splits the traditional convolution into two parts: depthwise convolution (a convolution filter for each channel independently), and pointwise convolution (combines the outputs of the depthwise convolution).</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L161" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L196" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="separableconv" class="level3">
 <h3 class="anchored" data-anchor-id="separableconv">SeparableConv</h3>
@@ -585,7 +626,7 @@ class Model(nn.Module):
 <h3 class="anchored" data-anchor-id="aligned-xception">Aligned Xception</h3>
 <p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#xception"><code>Xception</code></a> class defines the Xception Neural Network used in DeepLab.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L202" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L237" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="xception" class="level3">
 <h3 class="anchored" data-anchor-id="xception">Xception</h3>
@@ -617,7 +658,7 @@ class Model(nn.Module):
 <h3 class="anchored" data-anchor-id="aspp">ASPP</h3>
 <p>The class <a href="https://deepCLEM.github.io/bioMONAI/nets.html#aspp_module"><code>ASPP_module</code></a> to compute the Atroys Spatial Pyramid Pooling method and create the convolution that uses it.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L261" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L296" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="aspp_module" class="level3">
 <h3 class="anchored" data-anchor-id="aspp_module">ASPP_module</h3>
@@ -652,7 +693,7 @@ class Model(nn.Module):
 <h3 class="anchored" data-anchor-id="deeplab-v3-1">DeepLab V3</h3>
 <p>The <a href="https://deepCLEM.github.io/bioMONAI/nets.html#deeplab"><code>Deeplab</code></a> class combines the different modules to make the DeepLab V3 architecture.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L280" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/nets.py#L315" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="deeplab" class="level3">
 <h3 class="anchored" data-anchor-id="deeplab">Deeplab</h3>
