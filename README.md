@@ -10,6 +10,7 @@
 ![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![Jupyter
 Notebook](https://img.shields.io/badge/jupyter-%23f37626.svg?style=flat&logo=jupyter&logoColor=white)
+[![CI](https://github.com/deepCLEM/bioMONAI/actions/workflows/ci.yml/badge.svg)](https://github.com/deepCLEM/bioMONAI/actions/workflows/ci.yml)
 
 ## Overview
 
