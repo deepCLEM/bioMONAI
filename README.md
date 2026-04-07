@@ -21,7 +21,7 @@ deploying deep learning models in biomedical imaging built on top of the
 facilitate interoperability, reproducibility, and community
 collaboration in biomedical research.
 
-![](./data_examples/Fig_bioMONAI.png)
+![](nbs/data_examples/Fig_bioMONAI.png)
 
 ## Table of Contents
 

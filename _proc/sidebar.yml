@@ -12,6 +12,14 @@ website:
       - 07_callbacks.ipynb
       - 08_datasets.ipynb
       - 09_visualize.ipynb
+      - section: Benchmarks
+        contents:
+          - Benchmarks/801_mednist_tutorial_biomonai.ipynb
+          - Benchmarks/801_mednist_tutorial_pytorch.ipynb
+          - Benchmarks/802_monai_101_biomonai.ipynb
+          - Benchmarks/802_monai_101_ignite.ipynb
+          - Benchmarks/803_image_restoration_biomonai.ipynb
+          - Benchmarks/803_image_restoration_pytorch.ipynb
       - section: Tutorials
         contents:
           - Tutorials/901_tutorial_classification.ipynb
@@ -20,11 +28,3 @@ website:
           - Tutorials/904_tutorial_multispectral_classification.ipynb
           - Tutorials/905_tutorial_histopathology.ipynb
           - Tutorials/906_tutorial_Segmentation3D.ipynb
-          - section: Comparison
-            contents:
-              - Tutorials/Comparison/801_mednist_tutorial_biomonai.ipynb
-              - Tutorials/Comparison/801_mednist_tutorial_pytorch.ipynb
-              - Tutorials/Comparison/802_monai_101_biomonai.ipynb
-              - Tutorials/Comparison/802_monai_101_ignite.ipynb
-              - Tutorials/Comparison/803_image_restoration_biomonai.ipynb
-              - Tutorials/Comparison/803_image_restoration_pytorch.ipynb
