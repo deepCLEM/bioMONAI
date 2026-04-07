@@ -4,12 +4,12 @@
 
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
-           'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'register_source',
-           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'split_prefixed_kwargs',
-           'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource',
-           'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
-           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders',
-           'BioImageBlock', 'BioDataBlock', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
+           'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock',
+           'register_source', 'register_dataset', 'register_loader', 'register_task', 'route_kwargs',
+           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource',
+           'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
+           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader',
+           'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
            'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
            'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
            'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
@@ -382,6 +382,42 @@ class Tensor2BioImage(DisplayedTransform):
             except:
                 dec = 0
         return f'{self.name}(enc:{enc},dec:{dec})'
+
+# %% ../nbs/01_data.ipynb #30497999
+def BioImageBlock(cls:BioImageBase=BioImage):
+    "A `TransformBlock` tailored for bioimaging data, `BioImageBlock` facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging."
+    return TransformBlock(type_tfms=[cls.create, Tensor2BioImage(cls)]) # IntToFloatTensor
+
+# %% ../nbs/01_data.ipynb #714b74d2
+class BioDataBlock(DataBlock):
+    """ 
+    The `BioDataBlock` class serves as a generic container to build `Datasets` and `DataLoaders` efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.
+    """
+    def __init__(self, 
+            blocks:list=(BioImageBlock(cls=BioImage), BioImageBlock(cls=BioImage)), # One or more `TransformBlock`s
+            dl_type:TfmdDL=None,                                                    # Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`
+            get_items=get_image_files,
+            get_y=None,
+            get_x=None,
+            getters:list=None,                                                      # Getter functions applied to results of `get_items`
+            n_inp:int=None,                                                         # Number of inputs
+            item_tfms:list=None,                                                    # `ItemTransform`s, applied on an item 
+            batch_tfms:list=None,                                                   # `Transform`s or `RandTransform`s, applied by batch
+            splitter=None, 
+        ):
+        super().__init__(
+            blocks=blocks, 
+            dl_type=dl_type, 
+            get_items=get_items,
+            get_y=get_y,
+            get_x=get_x,
+            getters=getters, 
+            n_inp=n_inp, 
+            item_tfms=item_tfms, 
+            batch_tfms=batch_tfms,
+            splitter=splitter,
+            )
+        
 
 # %% ../nbs/01_data.ipynb #b7a23d94
 SOURCE_REGISTRY = {}
@@ -1696,42 +1732,6 @@ class BioDataLoaders(DataLoaders):
             mode="test",
             **kwargs
         )
-
-# %% ../nbs/01_data.ipynb #68b31c0c
-def BioImageBlock(cls:BioImageBase=BioImage):
-    "A `TransformBlock` tailored for bioimaging data, `BioImageBlock` facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging."
-    return TransformBlock(type_tfms=[cls.create, Tensor2BioImage(cls)]) # IntToFloatTensor
-
-# %% ../nbs/01_data.ipynb #1e8d4d98
-class BioDataBlock(DataBlock):
-    """ 
-    The `BioDataBlock` class serves as a generic container to build `Datasets` and `DataLoaders` efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.
-    """
-    def __init__(self, 
-            blocks:list=(BioImageBlock(cls=BioImage), BioImageBlock(cls=BioImage)), # One or more `TransformBlock`s
-            dl_type:TfmdDL=None,                                                    # Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`
-            get_items=get_image_files,
-            get_y=None,
-            get_x=None,
-            getters:list=None,                                                      # Getter functions applied to results of `get_items`
-            n_inp:int=None,                                                         # Number of inputs
-            item_tfms:list=None,                                                    # `ItemTransform`s, applied on an item 
-            batch_tfms:list=None,                                                   # `Transform`s or `RandTransform`s, applied by batch
-            splitter=None, 
-        ):
-        super().__init__(
-            blocks=blocks, 
-            dl_type=dl_type, 
-            get_items=get_items,
-            get_y=get_y,
-            get_x=get_x,
-            getters=getters, 
-            n_inp=n_inp, 
-            item_tfms=item_tfms, 
-            batch_tfms=batch_tfms,
-            splitter=splitter,
-            )
-        
 
 # %% ../nbs/01_data.ipynb #5bec1991
 def from_source(cls, 

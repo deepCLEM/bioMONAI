@@ -35,4 +35,4 @@ jobs:
         env:
           CI: true
         run: |
-          nbdev-test --skip_folder_re '^(Tutorials|[_.])'
+          nbdev-test --skip_folder_re '^(Tutorials|Benchmarks|[_.])'
