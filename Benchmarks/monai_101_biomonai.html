@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -115,11 +115,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:site_name" content="bioMONAI">
 <meta property="og:image:height" content="963">
 <meta property="og:image:width" content="948">
-<meta name="twitter:title" content="MONAI 101 tutorial - bioMONAI – bioMONAI">
+<meta name="twitter:title" content="MONAI 101 tutorial – bioMONAI">
 <meta name="twitter:description" content="Deep learning library biomedical data built on top of MONAI and fastai">
 <meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/Benchmarks/802_monai_101_biomonai_files/figure-html/cell-7-output-1.png">
-<meta name="twitter:image-height" content="963">
-<meta name="twitter:image-width" content="948">
+<meta name="twitter:image-height" content="732">
+<meta name="twitter:image-width" content="716">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -327,6 +327,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -446,7 +452,7 @@ If not specified a temporary directory will be used.</p>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>root_dir <span class="op">=</span> tempfile.mkdtemp() <span class="cf">if</span> base_directory <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> base_directory</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(root_dir)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>../../_data/</code></pre>
+<pre><code>../_data/</code></pre>
 </div>
 </div>
 </section>
@@ -454,13 +460,6 @@ If not specified a temporary directory will be used.</p>
 <h2 class="anchored" data-anchor-id="use-monai-transforms-to-preprocess-data">Use MONAI transforms to preprocess data</h2>
 <p>Medical images require specialized methods for I/O, preprocessing, and augmentation. They often follow specific formats, are handled with specific protocols, and the data arrays are often high-dimensional.</p>
 <p>In this example, we will perform image loading, data format verification, and intensity scaling with three <code>monai.transforms</code> listed below, and compose a pipeline ready to be used in next steps.</p>
-</section>
-<section id="prepare-datasets-using-monai-apps" class="level2">
-<h2 class="anchored" data-anchor-id="prepare-datasets-using-monai-apps">Prepare datasets using MONAI Apps</h2>
-<p>We use <code>MedNISTDataset</code> in MONAI Apps to download a dataset to the specified directory and perform the pre-processing steps in the <code>monai.transforms</code> compose.</p>
-<p>The MedNIST dataset was gathered from several sets from <a href="https://wiki.cancerimagingarchive.net/display/Public/Data+Usage+Policies+and+Restrictions">TCIA</a>, <a href="http://rsnachallenges.cloudapp.net/competitions/4">the RSNA Bone Age Challenge</a>, and <a href="https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest">the NIH Chest X-ray dataset</a>.</p>
-<p>The dataset is kindly made available by <a href="https://www.mayo.edu/research/labs/radiology-informatics/overview">Dr.&nbsp;Bradley J. Erickson M.D., Ph.D.</a> (Department of Radiology, Mayo Clinic) under the Creative Commons <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0 license</a>.</p>
-<p>If you use the MedNIST dataset, please acknowledge the source.</p>
 <div id="54a4fb65" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.transforms <span class="im">import</span> LoadImageD, EnsureChannelFirstD, ScaleIntensityD, Compose</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -472,14 +471,21 @@ If not specified a temporary directory will be used.</p>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    ]</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+</section>
+<section id="prepare-datasets-using-monai-apps" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-datasets-using-monai-apps">Prepare datasets using MONAI Apps</h2>
+<p>We use <code>MedNISTDataset</code> in MONAI Apps to download a dataset to the specified directory and perform the pre-processing steps in the <code>monai.transforms</code> compose.</p>
+<p>The MedNIST dataset was gathered from several sets from <a href="https://wiki.cancerimagingarchive.net/display/Public/Data+Usage+Policies+and+Restrictions">TCIA</a>, <a href="http://rsnachallenges.cloudapp.net/competitions/4">the RSNA Bone Age Challenge</a>, and <a href="https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest">the NIH Chest X-ray dataset</a>.</p>
+<p>The dataset is kindly made available by <a href="https://www.mayo.edu/research/labs/radiology-informatics/overview">Dr.&nbsp;Bradley J. Erickson M.D., Ph.D.</a> (Department of Radiology, Mayo Clinic) under the Creative Commons <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0 license</a>.</p>
+<p>If you use the MedNIST dataset, please acknowledge the source.</p>
 <div id="251413b4" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>train_ds <span class="op">=</span> MedNISTDataset(root_dir<span class="op">=</span>root_dir, transform<span class="op">=</span>transform, section<span class="op">=</span><span class="st">"training"</span>, download<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>val_ds <span class="op">=</span> MedNISTDataset(root_dir<span class="op">=</span>root_dir, transform<span class="op">=</span>transform, section<span class="op">=</span><span class="st">"validation"</span>, download<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>test_ds <span class="op">=</span> MedNISTDataset(root_dir<span class="op">=</span>root_dir, transform<span class="op">=</span>transform, section<span class="op">=</span><span class="st">"test"</span>, download<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset: 100%|██████████| 47164/47164 [00:22&lt;00:00, 2110.05it/s]
-Loading dataset: 100%|██████████| 5895/5895 [00:03&lt;00:00, 1957.31it/s]
-Loading dataset: 100%|██████████| 5895/5895 [00:02&lt;00:00, 2164.60it/s]</code></pre>
+<pre><code>Loading dataset: 100%|██████████| 47164/47164 [00:28&lt;00:00, 1632.66it/s]
+Loading dataset: 100%|██████████| 5895/5895 [00:03&lt;00:00, 1545.11it/s]
+Loading dataset: 100%|██████████| 5895/5895 [00:03&lt;00:00, 1692.22it/s]</code></pre>
 </div>
 </div>
 <div id="182a0db8" class="cell">
@@ -535,19 +541,24 @@ Approx batch memory: 16.01 MB</code></pre>
 <h2 class="anchored" data-anchor-id="define-a-network-and-a-supervised-trainer">Define a network and a supervised trainer</h2>
 <p>To train a model that can perform the classification task, we will use the DenseNet-121 which is known for its performance on the ImageNet dataset.</p>
 <p>For a typical supervised training workflow, MONAI provides <code>SupervisedTrainer</code> to define the hyper-parameters.</p>
+<div id="23ce65c3" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>torch.cuda.empty_cache()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>torch.cuda.reset_peak_memory_stats()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <div id="045f20a3" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>max_epochs <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> DenseNet121(spatial_dims<span class="op">=</span><span class="dv">2</span>, in_channels<span class="op">=</span><span class="dv">1</span>, out_channels<span class="op">=</span><span class="dv">6</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLossFlat()</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [accuracy]</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss_function, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>, lr<span class="op">=</span><span class="fl">1e-5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>max_epochs <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> DenseNet121(spatial_dims<span class="op">=</span><span class="dv">2</span>, in_channels<span class="op">=</span><span class="dv">1</span>, out_channels<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLossFlat()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [accuracy]</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss_function, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>, lr<span class="op">=</span><span class="fl">1e-5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="run-the-training" class="level2">
 <h2 class="anchored" data-anchor-id="run-the-training">Run the training</h2>
 <div id="e375d881" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>trainer.fit(max_epochs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trainer.fit(max_epochs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -580,38 +591,38 @@ Approx batch memory: 16.01 MB</code></pre>
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>0.742293</td>
-<td>0.385844</td>
-<td>0.965394</td>
-<td>00:14</td>
+<td>0.697999</td>
+<td>0.348656</td>
+<td>0.969126</td>
+<td>00:12</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>0.272581</td>
-<td>0.133415</td>
-<td>0.983715</td>
-<td>00:11</td>
+<td>0.252962</td>
+<td>0.123788</td>
+<td>0.986768</td>
+<td>00:12</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>0.116980</td>
-<td>0.067816</td>
-<td>0.989652</td>
-<td>00:11</td>
+<td>0.109565</td>
+<td>0.064564</td>
+<td>0.990331</td>
+<td>00:12</td>
 </tr>
 <tr class="even">
 <td>3</td>
-<td>0.060946</td>
-<td>0.040167</td>
-<td>0.993724</td>
+<td>0.055369</td>
+<td>0.037543</td>
+<td>0.994402</td>
 <td>00:11</td>
 </tr>
 <tr class="odd">
 <td>4</td>
-<td>0.034605</td>
-<td>0.026329</td>
-<td>0.995250</td>
-<td>00:12</td>
+<td>0.032297</td>
+<td>0.023173</td>
+<td>0.997286</td>
+<td>00:11</td>
 </tr>
 </tbody>
 </table>
@@ -619,13 +630,19 @@ Approx batch memory: 16.01 MB</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="802_monai_101_biomonai_files/figure-html/cell-9-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="802_monai_101_biomonai_files/figure-html/cell-10-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
+<div id="86f075eb" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>torch.cuda.max_memory_allocated() <span class="op">/</span> <span class="dv">1024</span><span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>5405.203125</code></pre>
+</div>
+</div>
 <div id="013cbe04" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -650,7 +667,7 @@ Approx batch memory: 16.01 MB</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="802_monai_101_biomonai_files/figure-html/cell-10-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="802_monai_101_biomonai_files/figure-html/cell-12-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -659,10 +676,10 @@ Approx batch memory: 16.01 MB</code></pre>
 <section id="check-the-prediction-on-the-test-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="check-the-prediction-on-the-test-dataset">Check the prediction on the test dataset</h2>
 <div id="cadadb86" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>test_dl <span class="op">=</span> test_biodataloader(data, test_ds) <span class="co"># type:ignore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>test_dl <span class="op">=</span> test_biodataloader(data, test_ds) <span class="co"># type:ignore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="7d0d4931" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data<span class="op">=</span>test_dl, metrics<span class="op">=</span>accuracy, show_graph<span class="op">=</span><span class="va">True</span>, show_results<span class="op">=</span><span class="va">True</span>)<span class="op">;</span> <span class="co"># type:ignore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data<span class="op">=</span>test_dl, metrics<span class="op">=</span>accuracy, show_graph<span class="op">=</span><span class="va">True</span>, show_results<span class="op">=</span><span class="va">True</span>)<span class="op">;</span> <span class="co"># type:ignore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -751,10 +768,10 @@ Approx batch memory: 16.01 MB</code></pre>
 <pre><code>              precision    recall  f1-score   support
 
    AbdomenCT       0.99      1.00      1.00       993
-   BreastMRI       1.00      0.99      1.00       903
-         CXR       1.00      1.00      1.00       968
+   BreastMRI       1.00      1.00      1.00       903
+         CXR       1.00      0.99      1.00       968
      ChestCT       1.00      1.00      1.00       998
-        Hand       1.00      1.00      1.00       996
+        Hand       0.99      1.00      1.00       996
       HeadCT       1.00      1.00      1.00      1037
 
     accuracy                           1.00      5895
@@ -803,8 +820,8 @@ Most Confused Classes:</code></pre>
 <tbody>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">0</th>
-<td>BreastMRI</td>
-<td>AbdomenCT</td>
+<td>CXR</td>
+<td>Hand</td>
 <td>5</td>
 </tr>
 <tr class="even">
@@ -815,36 +832,24 @@ Most Confused Classes:</code></pre>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">2</th>
-<td>CXR</td>
-<td>Hand</td>
+<td>BreastMRI</td>
+<td>AbdomenCT</td>
 <td>2</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">3</th>
-<td>Hand</td>
-<td>BreastMRI</td>
-<td>2</td>
+<td>ChestCT</td>
+<td>AbdomenCT</td>
+<td>1</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">4</th>
-<td>AbdomenCT</td>
-<td>HeadCT</td>
-<td>1</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">5</th>
-<td>BreastMRI</td>
-<td>ChestCT</td>
-<td>1</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">6</th>
 <td>Hand</td>
 <td>CXR</td>
 <td>1</td>
 </tr>
 <tr class="even">
-<th data-quarto-table-cell-role="th">7</th>
+<th data-quarto-table-cell-role="th">5</th>
 <td>Hand</td>
 <td>HeadCT</td>
 <td>1</td>
@@ -857,21 +862,21 @@ Most Confused Classes:</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="802_monai_101_biomonai_files/figure-html/cell-12-output-14.png" class="img-fluid figure-img"></p>
+<p><img src="802_monai_101_biomonai_files/figure-html/cell-14-output-14.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="802_monai_101_biomonai_files/figure-html/cell-12-output-15.png" class="img-fluid figure-img"></p>
+<p><img src="802_monai_101_biomonai_files/figure-html/cell-14-output-15.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="802_monai_101_biomonai_files/figure-html/cell-12-output-16.png" class="img-fluid figure-img"></p>
+<p><img src="802_monai_101_biomonai_files/figure-html/cell-14-output-16.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -893,31 +898,31 @@ Most Confused Classes:</code></pre>
 <tbody>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">Mean</th>
-<td>1.059131</td>
+<td>1.057990</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">Median</th>
-<td>1.049874</td>
+<td>1.049570</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">Standard Deviation</th>
-<td>0.047636</td>
+<td>0.044332</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">Min</th>
-<td>1.044432</td>
+<td>1.044239</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">Max</th>
-<td>1.870728</td>
+<td>1.902058</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">Q1</th>
-<td>1.047687</td>
+<td>1.047402</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">Q3</th>
-<td>1.054943</td>
+<td>1.054644</td>
 </tr>
 </tbody>
 </table>
@@ -927,7 +932,7 @@ Most Confused Classes:</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="802_monai_101_biomonai_files/figure-html/cell-12-output-18.png" class="img-fluid figure-img"></p>
+<p><img src="802_monai_101_biomonai_files/figure-html/cell-14-output-18.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -949,7 +954,7 @@ Most Confused Classes:</code></pre>
 <tbody>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">Mean</th>
-<td>0.997286</td>
+<td>0.997795</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">Median</th>
@@ -957,7 +962,7 @@ Most Confused Classes:</code></pre>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">Standard Deviation</th>
-<td>0.052027</td>
+<td>0.046908</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">Min</th>

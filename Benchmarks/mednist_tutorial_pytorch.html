@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -108,13 +108,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../styles.css">
 <meta property="og:title" content="Medical Image Classification - MONAI/Pytorch – bioMONAI">
 <meta property="og:description" content="Deep learning library biomedical data built on top of MONAI and fastai">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/Benchmarks/801_mednist_tutorial_pytorch_files/figure-html/cell-8-output-1.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/Benchmarks/801_mednist_tutorial_pytorch_files/figure-html/cell-11-output-1.png">
 <meta property="og:site_name" content="bioMONAI">
 <meta property="og:image:height" content="789">
 <meta property="og:image:width" content="769">
 <meta name="twitter:title" content="Medical Image Classification - MONAI/Pytorch – bioMONAI">
 <meta name="twitter:description" content="Deep learning library biomedical data built on top of MONAI and fastai">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/Benchmarks/801_mednist_tutorial_pytorch_files/figure-html/cell-8-output-1.png">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/Benchmarks/801_mednist_tutorial_pytorch_files/figure-html/cell-11-output-1.png">
 <meta name="twitter:image-height" content="789">
 <meta name="twitter:image-width" content="769">
 <meta name="twitter:card" content="summary_large_image">
@@ -324,6 +324,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -389,9 +395,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#download-dataset" id="toc-download-dataset" class="nav-link" data-scroll-target="#download-dataset">Download dataset</a></li>
   <li><a href="#set-deterministic-training-for-reproducibility" id="toc-set-deterministic-training-for-reproducibility" class="nav-link" data-scroll-target="#set-deterministic-training-for-reproducibility">Set deterministic training for reproducibility</a></li>
   <li><a href="#read-image-filenames-from-the-dataset-folders" id="toc-read-image-filenames-from-the-dataset-folders" class="nav-link" data-scroll-target="#read-image-filenames-from-the-dataset-folders">Read image filenames from the dataset folders</a></li>
-  <li><a href="#randomly-pick-images-from-the-dataset-to-visualize-and-check" id="toc-randomly-pick-images-from-the-dataset-to-visualize-and-check" class="nav-link" data-scroll-target="#randomly-pick-images-from-the-dataset-to-visualize-and-check">Randomly pick images from the dataset to visualize and check</a></li>
   <li><a href="#prepare-training-validation-and-test-data-lists" id="toc-prepare-training-validation-and-test-data-lists" class="nav-link" data-scroll-target="#prepare-training-validation-and-test-data-lists">Prepare training, validation and test data lists</a></li>
   <li><a href="#define-monai-transforms-dataset-and-dataloader-to-pre-process-data" id="toc-define-monai-transforms-dataset-and-dataloader-to-pre-process-data" class="nav-link" data-scroll-target="#define-monai-transforms-dataset-and-dataloader-to-pre-process-data">Define MONAI transforms, Dataset and Dataloader to pre-process data</a></li>
+  <li><a href="#randomly-pick-images-from-the-dataset-to-visualize-and-check" id="toc-randomly-pick-images-from-the-dataset-to-visualize-and-check" class="nav-link" data-scroll-target="#randomly-pick-images-from-the-dataset-to-visualize-and-check">Randomly pick images from the dataset to visualize and check</a></li>
   <li><a href="#define-network-and-optimizer" id="toc-define-network-and-optimizer" class="nav-link" data-scroll-target="#define-network-and-optimizer">Define network and optimizer</a></li>
   <li><a href="#model-training" id="toc-model-training" class="nav-link" data-scroll-target="#model-training">Model training</a></li>
   <li><a href="#plot-the-loss-and-metric" id="toc-plot-the-loss-and-metric" class="nav-link" data-scroll-target="#plot-the-loss-and-metric">Plot the loss and metric</a></li>
@@ -579,51 +585,30 @@ Label counts: [10000, 8954, 10000, 10000, 10000, 10000]</code></pre>
 </div>
 </div>
 </section>
-<section id="randomly-pick-images-from-the-dataset-to-visualize-and-check" class="level2">
-<h2 class="anchored" data-anchor-id="randomly-pick-images-from-the-dataset-to-visualize-and-check">Randomly pick images from the dataset to visualize and check</h2>
-<div id="a5328cef" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plt.subplots(<span class="dv">3</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, k <span class="kw">in</span> <span class="bu">enumerate</span>(np.random.randint(num_total, size<span class="op">=</span><span class="dv">9</span>)):</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    im <span class="op">=</span> PIL.Image.<span class="bu">open</span>(image_files_list[k])</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> np.array(im)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    plt.subplot(<span class="dv">3</span>, <span class="dv">3</span>, i <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(class_names[image_class[k]])</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    plt.imshow(arr, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">255</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="801_mednist_tutorial_pytorch_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
 <section id="prepare-training-validation-and-test-data-lists" class="level2">
 <h2 class="anchored" data-anchor-id="prepare-training-validation-and-test-data-lists">Prepare training, validation and test data lists</h2>
 <p>Randomly select 10% of the dataset as validation and 10% as test.</p>
 <div id="f3ca44c0" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>val_frac <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>test_frac <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>length <span class="op">=</span> <span class="bu">len</span>(image_files_list)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>indices <span class="op">=</span> np.arange(length)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>np.random.shuffle(indices)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>test_split <span class="op">=</span> <span class="bu">int</span>(test_frac <span class="op">*</span> length)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>val_split <span class="op">=</span> <span class="bu">int</span>(val_frac <span class="op">*</span> length) <span class="op">+</span> test_split</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>test_indices <span class="op">=</span> indices[:test_split]</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>val_indices <span class="op">=</span> indices[test_split:val_split]</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>train_indices <span class="op">=</span> indices[val_split:]</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>train_x <span class="op">=</span> [image_files_list[i] <span class="cf">for</span> i <span class="kw">in</span> train_indices]</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>train_y <span class="op">=</span> [image_class[i] <span class="cf">for</span> i <span class="kw">in</span> train_indices]</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>val_x <span class="op">=</span> [image_files_list[i] <span class="cf">for</span> i <span class="kw">in</span> val_indices]</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>val_y <span class="op">=</span> [image_class[i] <span class="cf">for</span> i <span class="kw">in</span> val_indices]</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>test_x <span class="op">=</span> [image_files_list[i] <span class="cf">for</span> i <span class="kw">in</span> test_indices]</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>test_y <span class="op">=</span> [image_class[i] <span class="cf">for</span> i <span class="kw">in</span> test_indices]</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training count: </span><span class="sc">{</span><span class="bu">len</span>(train_x)<span class="sc">}</span><span class="ss">, Validation count: "</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(val_x)<span class="sc">}</span><span class="ss">, Test count: </span><span class="sc">{</span><span class="bu">len</span>(test_x)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>val_frac <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>test_frac <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>length <span class="op">=</span> <span class="bu">len</span>(image_files_list)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>indices <span class="op">=</span> np.arange(length)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>np.random.shuffle(indices)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>test_split <span class="op">=</span> <span class="bu">int</span>(test_frac <span class="op">*</span> length)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>val_split <span class="op">=</span> <span class="bu">int</span>(val_frac <span class="op">*</span> length) <span class="op">+</span> test_split</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>test_indices <span class="op">=</span> indices[:test_split]</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>val_indices <span class="op">=</span> indices[test_split:val_split]</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>train_indices <span class="op">=</span> indices[val_split:]</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>train_x <span class="op">=</span> [image_files_list[i] <span class="cf">for</span> i <span class="kw">in</span> train_indices]</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>train_y <span class="op">=</span> [image_class[i] <span class="cf">for</span> i <span class="kw">in</span> train_indices]</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>val_x <span class="op">=</span> [image_files_list[i] <span class="cf">for</span> i <span class="kw">in</span> val_indices]</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>val_y <span class="op">=</span> [image_class[i] <span class="cf">for</span> i <span class="kw">in</span> val_indices]</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>test_x <span class="op">=</span> [image_files_list[i] <span class="cf">for</span> i <span class="kw">in</span> test_indices]</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>test_y <span class="op">=</span> [image_class[i] <span class="cf">for</span> i <span class="kw">in</span> test_indices]</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training count: </span><span class="sc">{</span><span class="bu">len</span>(train_x)<span class="sc">}</span><span class="ss">, Validation count: "</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(val_x)<span class="sc">}</span><span class="ss">, Test count: </span><span class="sc">{</span><span class="bu">len</span>(test_x)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Training count: 47164, Validation count: 5895, Test count: 5895</code></pre>
 </div>
@@ -632,44 +617,65 @@ Label counts: [10000, 8954, 10000, 10000, 10000, 10000]</code></pre>
 <section id="define-monai-transforms-dataset-and-dataloader-to-pre-process-data" class="level2">
 <h2 class="anchored" data-anchor-id="define-monai-transforms-dataset-and-dataloader-to-pre-process-data">Define MONAI transforms, Dataset and Dataloader to pre-process data</h2>
 <div id="c0a7455b" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>train_transforms <span class="op">=</span> Compose(</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        LoadImage(image_only<span class="op">=</span><span class="va">True</span>),</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        EnsureChannelFirst(),</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        ScaleIntensity(),</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        RandRotate(range_x<span class="op">=</span>np.pi <span class="op">/</span> <span class="dv">12</span>, prob<span class="op">=</span><span class="fl">0.5</span>, keep_size<span class="op">=</span><span class="va">True</span>),</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        RandFlip(spatial_axis<span class="op">=</span><span class="dv">0</span>, prob<span class="op">=</span><span class="fl">0.5</span>),</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        RandZoom(min_zoom<span class="op">=</span><span class="fl">0.9</span>, max_zoom<span class="op">=</span><span class="fl">1.1</span>, prob<span class="op">=</span><span class="fl">0.5</span>),</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>val_transforms <span class="op">=</span> Compose([LoadImage(image_only<span class="op">=</span><span class="va">True</span>), EnsureChannelFirst(), ScaleIntensity()])</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>y_pred_trans <span class="op">=</span> Compose([Activations(softmax<span class="op">=</span><span class="va">True</span>)])</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>y_trans <span class="op">=</span> Compose([AsDiscrete(to_onehot<span class="op">=</span>num_class)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>train_transforms <span class="op">=</span> Compose(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        LoadImage(image_only<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        EnsureChannelFirst(),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        ScaleIntensity(),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        RandRotate(range_x<span class="op">=</span>np.pi <span class="op">/</span> <span class="dv">12</span>, prob<span class="op">=</span><span class="fl">0.5</span>, keep_size<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        RandFlip(spatial_axis<span class="op">=</span><span class="dv">0</span>, prob<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>        RandZoom(min_zoom<span class="op">=</span><span class="fl">0.9</span>, max_zoom<span class="op">=</span><span class="fl">1.1</span>, prob<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>val_transforms <span class="op">=</span> Compose([LoadImage(image_only<span class="op">=</span><span class="va">True</span>), EnsureChannelFirst(), ScaleIntensity()])</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>y_pred_trans <span class="op">=</span> Compose([Activations(softmax<span class="op">=</span><span class="va">True</span>)])</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>y_trans <span class="op">=</span> Compose([AsDiscrete(to_onehot<span class="op">=</span>num_class)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="13317134" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MedNISTDataset(torch.utils.data.Dataset):</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, image_files, labels, transforms):</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.image_files <span class="op">=</span> image_files</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.labels <span class="op">=</span> labels</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transforms <span class="op">=</span> transforms</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>):</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.image_files)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, index):</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.transforms(<span class="va">self</span>.image_files[index]), <span class="va">self</span>.labels[index]</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>train_ds <span class="op">=</span> MedNISTDataset(train_x, train_y, train_transforms)</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">300</span>, shuffle<span class="op">=</span><span class="va">True</span>, num_workers<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>val_ds <span class="op">=</span> MedNISTDataset(val_x, val_y, val_transforms)</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>val_loader <span class="op">=</span> DataLoader(val_ds, batch_size<span class="op">=</span><span class="dv">300</span>, num_workers<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>test_ds <span class="op">=</span> MedNISTDataset(test_x, test_y, val_transforms)</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>test_loader <span class="op">=</span> DataLoader(test_ds, batch_size<span class="op">=</span><span class="dv">300</span>, num_workers<span class="op">=</span><span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MedNISTDataset(torch.utils.data.Dataset):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, image_files, labels, transforms):</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.image_files <span class="op">=</span> image_files</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.labels <span class="op">=</span> labels</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transforms <span class="op">=</span> transforms</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__len__</span>(<span class="va">self</span>):</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.image_files)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, index):</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.transforms(<span class="va">self</span>.image_files[index]), <span class="va">self</span>.labels[index]</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>train_ds <span class="op">=</span> MedNISTDataset(train_x, train_y, train_transforms)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">300</span>, shuffle<span class="op">=</span><span class="va">True</span>, num_workers<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>val_ds <span class="op">=</span> MedNISTDataset(val_x, val_y, val_transforms)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>val_loader <span class="op">=</span> DataLoader(val_ds, batch_size<span class="op">=</span><span class="dv">300</span>, num_workers<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>test_ds <span class="op">=</span> MedNISTDataset(test_x, test_y, val_transforms)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>test_loader <span class="op">=</span> DataLoader(test_ds, batch_size<span class="op">=</span><span class="dv">300</span>, num_workers<span class="op">=</span><span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="randomly-pick-images-from-the-dataset-to-visualize-and-check" class="level2">
+<h2 class="anchored" data-anchor-id="randomly-pick-images-from-the-dataset-to-visualize-and-check">Randomly pick images from the dataset to visualize and check</h2>
+<div id="5571a715" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>plt.subplots(<span class="dv">3</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, k <span class="kw">in</span> <span class="bu">enumerate</span>(np.random.randint(num_total, size<span class="op">=</span><span class="dv">9</span>)):</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    im <span class="op">=</span> PIL.Image.<span class="bu">open</span>(image_files_list[k])</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> np.array(im)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    plt.subplot(<span class="dv">3</span>, <span class="dv">3</span>, i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(class_names[image_class[k]])</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    plt.imshow(arr, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">255</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="801_mednist_tutorial_pytorch_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
 <section id="define-network-and-optimizer" class="level2">

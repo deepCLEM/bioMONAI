@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -327,6 +327,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -503,21 +509,21 @@ For details about installing the optional dependencies, please visit:
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>training_df <span class="op">=</span> pd.concat([hand_df[:<span class="dv">1000</span>].assign(is_valid<span class="op">=</span><span class="dv">0</span>), hand_df[<span class="dv">2000</span>:<span class="dv">2500</span>].assign(is_valid<span class="op">=</span><span class="dv">1</span>)], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">first training items: </span><span class="ch">\n</span><span class="st">"</span>, training_df[:<span class="dv">3</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>../../_data/
-2026-03-09 23:50:48,322 - INFO - Verified 'MedNIST.tar.gz', md5: 0bc7306e7427e00ad1c5526a6677552d.
-2026-03-09 23:50:48,323 - INFO - File exists: ../../_data/MedNIST.tar.gz, skipped downloading.
-2026-03-09 23:50:48,323 - INFO - Non-empty folder exists in ../../_data/MedNIST, skipped extracting.</code></pre>
+<pre><code>../_data/
+2026-04-07 23:45:23,708 - INFO - Verified 'MedNIST.tar.gz', md5: 0bc7306e7427e00ad1c5526a6677552d.
+2026-04-07 23:45:23,709 - INFO - File exists: ../_data/MedNIST.tar.gz, skipped downloading.
+2026-04-07 23:45:23,709 - INFO - Non-empty folder exists in ../_data/MedNIST, skipped extracting.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset: 100%|██████████| 47164/47164 [00:00&lt;00:00, 374322.63it/s]</code></pre>
+<pre><code>Loading dataset: 100%|██████████| 47164/47164 [00:00&lt;00:00, 396376.78it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 first training items: 
-                          original_hand                           noisy_hand  \
-0  ../../_data/MedNIST/Hand/000942.jpg  ../../_data/MedNIST/Hand/000942.jpg   
-1  ../../_data/MedNIST/Hand/004200.jpg  ../../_data/MedNIST/Hand/004200.jpg   
-2  ../../_data/MedNIST/Hand/003081.jpg  ../../_data/MedNIST/Hand/003081.jpg   
+                       original_hand                        noisy_hand  \
+0  ../_data/MedNIST/Hand/000942.jpg  ../_data/MedNIST/Hand/000942.jpg   
+1  ../_data/MedNIST/Hand/004200.jpg  ../_data/MedNIST/Hand/004200.jpg   
+2  ../_data/MedNIST/Hand/003081.jpg  ../_data/MedNIST/Hand/003081.jpg   
 
    is_valid  
 0         0  
@@ -582,28 +588,33 @@ validation images: 500</code></pre>
 <li><code>refinement=1</code>: 1 refinement block at the bottleneck.</li>
 </ul>
 <p>When training image restoration models, common regression losses include <a href="https://deepCLEM.github.io/bioMONAI/losses.html#mseloss"><code>MSELoss</code></a>, <code>PSNRLoss</code>, and <code>SSIMLoss</code>. Here, we use <code>SSIMLoss</code> because it encourages the model to focus on matching the structural similarity (shape and details) of the hands, rather than just restoring absolute pixel values.</p>
+<div id="19667198" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>torch.cuda.empty_cache()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>torch.cuda.reset_peak_memory_stats()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <div id="c25aa2e7" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Restormer(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    dim<span class="op">=</span><span class="dv">32</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    num_blocks<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    heads<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    num_refinement_blocks<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>image_loss <span class="op">=</span> SSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> OptimWrapper(opt<span class="op">=</span>torch.optim.Adam(model.parameters(), <span class="fl">1e-5</span>))</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>image_loss, metrics<span class="op">=</span>[], show_summary<span class="op">=</span><span class="va">False</span>, lr<span class="op">=</span><span class="fl">1e-5</span>, show_graph<span class="op">=</span><span class="va">True</span>, optimizer<span class="op">=</span>optimizer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Restormer(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    dim<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    num_blocks<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    heads<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    num_refinement_blocks<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>image_loss <span class="op">=</span> SSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> OptimWrapper(opt<span class="op">=</span>torch.optim.Adam(model.parameters(), <span class="fl">1e-5</span>))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>image_loss, metrics<span class="op">=</span>[], show_summary<span class="op">=</span><span class="va">False</span>, lr<span class="op">=</span><span class="fl">1e-5</span>, show_graph<span class="op">=</span><span class="va">True</span>, optimizer<span class="op">=</span>optimizer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-training-loops" class="level2">
 <h2 class="anchored" data-anchor-id="the-training-loops">The training loops</h2>
 <div id="a4800045" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>max_epochs <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>trainer.fit(max_epochs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>max_epochs <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>trainer.fit(max_epochs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -643,19 +654,19 @@ validation images: 500</code></pre>
 <td>1</td>
 <td>0.347592</td>
 <td>0.243856</td>
-<td>00:04</td>
+<td>00:05</td>
 </tr>
 <tr class="odd">
 <td>2</td>
 <td>0.245168</td>
 <td>0.184494</td>
-<td>00:04</td>
+<td>00:05</td>
 </tr>
 <tr class="even">
 <td>3</td>
 <td>0.187564</td>
 <td>0.154350</td>
-<td>00:04</td>
+<td>00:05</td>
 </tr>
 <tr class="odd">
 <td>4</td>
@@ -913,13 +924,13 @@ validation images: 500</code></pre>
 <td>46</td>
 <td>0.044786</td>
 <td>0.045394</td>
-<td>00:04</td>
+<td>00:05</td>
 </tr>
 <tr class="even">
 <td>47</td>
 <td>0.044298</td>
 <td>0.044790</td>
-<td>00:04</td>
+<td>00:05</td>
 </tr>
 <tr class="odd">
 <td>48</td>
@@ -939,9 +950,15 @@ validation images: 500</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="803_image_restoration_biomonai_files/figure-html/cell-8-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="803_image_restoration_biomonai_files/figure-html/cell-9-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
+</div>
+</div>
+<div id="28ea0bba" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>torch.cuda.max_memory_allocated() <span class="op">/</span> <span class="dv">1024</span><span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>2352.78759765625</code></pre>
 </div>
 </div>
 </section>
@@ -950,7 +967,7 @@ validation images: 500</code></pre>
 <h1>Visualise some validation results</h1>
 <p>This section creates a set of previously unseen pairs of noisy vs original hands, and use the network to predict the transformation between each pair.</p>
 <div id="386e10e0" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>trainer.show_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -975,7 +992,7 @@ validation images: 500</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="803_image_restoration_biomonai_files/figure-html/cell-9-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="803_image_restoration_biomonai_files/figure-html/cell-11-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>

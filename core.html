@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -296,11 +296,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Medical Image Classification - bioMONAI</span></a>
+ <span class="menu-text">Medical Image Classification - bioMONAI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification - MONAI/Pytorch</span></a>
  <span class="menu-text">Medical Image Classification - MONAI/Pytorch</span></a>
   </div>
 </li>
@@ -308,11 +310,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MONAI 101 tutorial - bioMONAI</span></a>
+ <span class="menu-text">MONAI 101 tutorial - bioMONAI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial - MONAI/Ignite</span></a>
  <span class="menu-text">MONAI 101 tutorial - MONAI/Ignite</span></a>
   </div>
 </li>
@@ -320,12 +324,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Image Restoration with Restormer in bioMONAI</span></a>
+ <span class="menu-text">Image Restoration with Restormer in bioMONAI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Benchmarks/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
   </div>
 </li>
       </ul>
@@ -885,7 +896,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    show_table:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show the statistics table.</span></span>
 <span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    show_results:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to show model results on test data.</span></span>
 <span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    as_dataframe:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Boolean flag to display table as a DataFrame.</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    cmap:LinearSegmentedColormap<span class="op">=&lt;</span>matplotlib.colors.LinearSegmentedColormap <span class="bu">object</span> at <span class="bn">0x7f7188e61410</span><span class="op">&gt;</span>, <span class="co"># Color map for the confusion matrix plot.</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    cmap:LinearSegmentedColormap<span class="op">=&lt;</span>matplotlib.colors.LinearSegmentedColormap <span class="bu">object</span> at <span class="bn">0x7660094cf850</span><span class="op">&gt;</span>, <span class="co"># Color map for the confusion matrix plot.</span></span>
 <span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Evaluates a classification model by displaying results, confusion matrix, and most confused classes.</em></p>
