@@ -20,6 +20,7 @@ website:
           - Benchmarks/802_monai_101_ignite.ipynb
           - Benchmarks/803_image_restoration_biomonai.ipynb
           - Benchmarks/803_image_restoration_pytorch.ipynb
+          - Benchmarks/804_multispectral_microscopy_pytorch.ipynb
       - section: Tutorials
         contents:
           - Tutorials/901_tutorial_classification.ipynb

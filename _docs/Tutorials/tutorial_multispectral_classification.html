@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -326,6 +326,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../Benchmarks/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
   </div>
 </li>
       </ul>
@@ -804,11 +810,11 @@ Datasets saved to %s ../_data/rxrx1_subset_monai/</code></pre>
 <h2 class="anchored" data-anchor-id="data-augmentation-and-dataloader-preparation">Data Augmentation and DataLoader Preparation</h2>
 <p>In the next cell, we will define the data augmentation techniques and prepare the data loaders for training and validation. Data augmentation is crucial for improving the generalization of our model by artificially increasing the diversity of the training dataset. We will use a combination of intensity scaling, random cropping, rotation, and flipping transformations.</p>
 <ul>
-<li>The <code>ScaleIntensityPercentiles</code> transformation scales the intensity values of the images based on the specified percentiles.</li>
+<li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#scaleintensityrangepercentiles"><code>ScaleIntensityRangePercentiles</code></a> transformation scales the intensity values of the images based on the specified percentiles.</li>
 <li>The <code>RandomResizedCrop</code> transformation randomly crops the images to the specified size with a random scale.</li>
 <li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#randrot90"><code>RandRot90</code></a> transformation randomly rotates the images by 90 degrees with the specified probability.</li>
 <li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#randflip"><code>RandFlip</code></a> transformation randomly flips the images horizontally or vertically with the specified probability.</li>
-<li>The <code>BioDataLoaders.class_from_csv</code> function is used to create the data loaders from the CSV file containing the image paths and labels.</li>
+<li>The <a href="https://deepCLEM.github.io/bioMONAI/data.html#biodataloaders.create"><code>BioDataLoaders.create</code></a> function is used to create the data loaders from the CSV file containing the image paths and labels.</li>
 </ul>
 <blockquote class="blockquote">
 <ul>
@@ -862,8 +868,8 @@ Datasets saved to %s ../_data/rxrx1_subset_monai/</code></pre>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset: 100%|██████████| 889/889 [00:16&lt;00:00, 53.59it/s]
-Loading dataset: 100%|██████████| 111/111 [00:01&lt;00:00, 57.12it/s]</code></pre>
+<pre><code>Loading dataset: 100%|██████████| 889/889 [00:16&lt;00:00, 53.68it/s]
+Loading dataset: 100%|██████████| 111/111 [00:01&lt;00:00, 56.02it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -953,20 +959,25 @@ Approx batch memory: 192.00 MB</code></pre>
 <li>Adjust the number of epochs and the <code>freeze_epochs</code> parameter to control the training process.</li>
 </ul>
 </blockquote>
+<div id="dbf571c6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>torch.cuda.empty_cache()</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>torch.cuda.reset_peak_memory_stats()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <div id="c3b4096a" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> DenseNet169</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> DenseNet169(spatial_dims<span class="op">=</span><span class="dv">2</span>, in_channels<span class="op">=</span><span class="dv">6</span>, out_channels<span class="op">=</span><span class="bu">len</span>(data.vocab), pretrained<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> DenseNet169</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> DenseNet169(spatial_dims<span class="op">=</span><span class="dv">2</span>, in_channels<span class="op">=</span><span class="dv">6</span>, out_channels<span class="op">=</span><span class="bu">len</span>(data.vocab), pretrained<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="36b9bf63" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [accuracy]</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> OptimWrapper(opt<span class="op">=</span>Adam(model.parameters(), <span class="fl">1e-5</span>))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>loss_fn<span class="op">=</span>CrossEntropyLossFlat()</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss_fn, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>, lr<span class="op">=</span><span class="fl">1e-5</span>, show_graph<span class="op">=</span><span class="va">True</span>, optimizer<span class="op">=</span>optimizer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [accuracy]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> OptimWrapper(opt<span class="op">=</span>Adam(model.parameters(), <span class="fl">1e-5</span>))</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>loss_fn<span class="op">=</span>CrossEntropyLossFlat()</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss_fn, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>, lr<span class="op">=</span><span class="fl">1e-5</span>, show_graph<span class="op">=</span><span class="va">True</span>, optimizer<span class="op">=</span>optimizer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="e2ed66a6" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1002,14 +1013,14 @@ Approx batch memory: 192.00 MB</code></pre>
 <td>0.837345</td>
 <td>0.467119</td>
 <td>0.945946</td>
-<td>00:13</td>
+<td>00:14</td>
 </tr>
 <tr class="even">
 <td>1</td>
 <td>0.437473</td>
 <td>0.215604</td>
 <td>0.972973</td>
-<td>00:12</td>
+<td>00:13</td>
 </tr>
 <tr class="odd">
 <td>2</td>
@@ -1023,7 +1034,7 @@ Approx batch memory: 192.00 MB</code></pre>
 <td>0.238789</td>
 <td>0.070104</td>
 <td>0.981982</td>
-<td>00:12</td>
+<td>00:13</td>
 </tr>
 </tbody>
 </table>
@@ -1031,9 +1042,15 @@ Approx batch memory: 192.00 MB</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-15-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-16-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
+</div>
+</div>
+<div id="21bcceae" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>torch.cuda.max_memory_allocated() <span class="op">/</span> <span class="dv">1024</span><span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>6561.15576171875</code></pre>
 </div>
 </div>
 </section>
@@ -1052,7 +1069,7 @@ Approx batch memory: 192.00 MB</code></pre>
 </ul>
 </blockquote>
 <div id="0e3c4e44" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('multispectral-classification-model')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('multispectral-classification-model')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
 </section>
@@ -1077,13 +1094,13 @@ Approx batch memory: 192.00 MB</code></pre>
 </ul>
 </blockquote>
 <div id="61d8f86c" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>test_dl <span class="op">=</span> BioDataLoaders.test_dl(</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    data_folder <span class="op">+</span> <span class="st">'test.csv'</span>,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    dataset<span class="op">=</span><span class="st">'cache'</span>,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>test_dl <span class="op">=</span> BioDataLoaders.test_dl(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    data_folder <span class="op">+</span> <span class="st">'test.csv'</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    dataset<span class="op">=</span><span class="st">'cache'</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset: 100%|██████████| 200/200 [00:03&lt;00:00, 55.48it/s]</code></pre>
+<pre><code>Loading dataset: 100%|██████████| 200/200 [00:03&lt;00:00, 55.22it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -1106,7 +1123,7 @@ Approx batch memory: 48.00 MB</code></pre>
 </div>
 </div>
 <div id="93103d85" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data<span class="op">=</span>test_dl, metrics<span class="op">=</span>accuracy, show_graph<span class="op">=</span><span class="va">True</span>, show_results<span class="op">=</span><span class="va">True</span>)<span class="op">;</span> <span class="co"># type:ignore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data<span class="op">=</span>test_dl, metrics<span class="op">=</span>accuracy, show_graph<span class="op">=</span><span class="va">True</span>, show_results<span class="op">=</span><span class="va">True</span>)<span class="op">;</span> <span class="co"># type:ignore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -1284,21 +1301,21 @@ Most Confused Classes:</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-18-output-16.png" class="img-fluid figure-img"></p>
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-16.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-18-output-17.png" class="img-fluid figure-img"></p>
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-17.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-18-output-18.png" class="img-fluid figure-img"></p>
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-18.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1354,7 +1371,7 @@ Most Confused Classes:</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-18-output-20.png" class="img-fluid figure-img"></p>
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-20.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
