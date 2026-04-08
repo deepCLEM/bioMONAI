@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fb88c47f646fe7fce85862160b38faea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-480b85e3b53da333cfdcf97b37a9cf62.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -324,6 +324,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -458,32 +464,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>print_config()</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>set_determinism(<span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MONAI version: 1.5.dev2518
-Numpy version: 2.2.5
-Pytorch version: 2.7.0
+<pre><code>MONAI version: 1.5.2
+Numpy version: 2.4.2
+Pytorch version: 2.6.0
 MONAI flags: HAS_EXT = False, USE_COMPILED = False, USE_META_DICT = False
-MONAI rev id: 09b361dbe4c2be5289c7e2d2f6c10c5166eee273
-MONAI __file__: /Users/&lt;username&gt;/miniconda3/envs/monai_dev/lib/python3.10/site-packages/monai/__init__.py
+MONAI rev id: d18565fb3e4fd8c556707f91ac280a2dc3f681c1
+MONAI __file__: /home/&lt;username&gt;/miniforge3/envs/biomonai_ignite/lib/python3.11/site-packages/monai/__init__.py
 
 Optional dependencies:
-Pytorch Ignite version: 0.4.11
-ITK version: 5.4.3
-Nibabel version: 5.3.2
-scikit-image version: 0.25.2
-scipy version: 1.15.2
-Pillow version: 11.2.1
-Tensorboard version: 2.19.0
-gdown version: 5.2.0
-TorchVision version: 0.22.0
-tqdm version: 4.67.1
-lmdb version: 1.6.2
-psutil version: 7.0.0
-pandas version: 2.2.3
-einops version: 0.8.1
-transformers version: 4.40.2
-mlflow version: 2.22.0
-pynrrd version: 1.1.3
-clearml version: 2.0.0rc0
+Pytorch Ignite version: 0.5.3
+ITK version: NOT INSTALLED or UNKNOWN VERSION.
+Nibabel version: 5.3.3
+scikit-image version: 0.26.0
+scipy version: 1.17.0
+Pillow version: 12.1.1
+Tensorboard version: NOT INSTALLED or UNKNOWN VERSION.
+gdown version: NOT INSTALLED or UNKNOWN VERSION.
+TorchVision version: NOT INSTALLED or UNKNOWN VERSION.
+tqdm version: 4.67.3
+lmdb version: NOT INSTALLED or UNKNOWN VERSION.
+psutil version: 7.2.2
+pandas version: 3.0.0
+einops version: 0.8.2
+transformers version: NOT INSTALLED or UNKNOWN VERSION.
+mlflow version: NOT INSTALLED or UNKNOWN VERSION.
+pynrrd version: NOT INSTALLED or UNKNOWN VERSION.
+clearml version: NOT INSTALLED or UNKNOWN VERSION.
 
 For details about installing the optional dependencies, please visit:
     https://docs.monai.io/en/latest/installation.html#installing-the-recommended-dependencies
@@ -511,69 +517,65 @@ For details about installing the optional dependencies, please visit:
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>]</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> first training items: "</span>, training_datadict[:<span class="dv">3</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>/var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu</code></pre>
+<pre><code>/tmp/tmp_ibl8bf1</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>MedNIST.tar.gz: 59.0MB [00:02, 28.6MB/s]                              </code></pre>
+<pre><code>MedNIST.tar.gz: 59.0MB [00:05, 10.4MB/s]                              </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>2025-05-22 08:47:35,940 - INFO - Downloaded: /var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu/MedNIST.tar.gz</code></pre>
+<pre><code>2026-04-07 23:50:46,924 - INFO - Downloaded: /tmp/tmp_ibl8bf1/MedNIST.tar.gz
+2026-04-07 23:50:46,982 - INFO - Verified 'MedNIST.tar.gz', md5: 0bc7306e7427e00ad1c5526a6677552d.
+2026-04-07 23:50:46,982 - INFO - Writing into directory: /tmp/tmp_ibl8bf1.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code></code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2025-05-22 08:47:36,048 - INFO - Verified 'MedNIST.tar.gz', md5: 0bc7306e7427e00ad1c5526a6677552d.
-2025-05-22 08:47:36,049 - INFO - Writing into directory: /var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset: 100%|██████████| 47164/47164 [00:00&lt;00:00, 270330.68it/s]</code></pre>
+<pre><code>
+Loading dataset: 100%|██████████| 47164/47164 [00:00&lt;00:00, 445238.04it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
- first training items:  [{'original_hand': '/var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu/MedNIST/Hand/001727.jpeg', 'noisy_hand': '/var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu/MedNIST/Hand/001727.jpeg'}, {'original_hand': '/var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu/MedNIST/Hand/009015.jpeg', 'noisy_hand': '/var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu/MedNIST/Hand/009015.jpeg'}, {'original_hand': '/var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu/MedNIST/Hand/007610.jpeg', 'noisy_hand': '/var/folders/l9/mzf3xz016nn449t2nlqp0k680000gn/T/tmpyd0u90wu/MedNIST/Hand/007610.jpeg'}]</code></pre>
+ first training items:  [{'original_hand': '/tmp/tmp_ibl8bf1/MedNIST/Hand/009958.jpeg', 'noisy_hand': '/tmp/tmp_ibl8bf1/MedNIST/Hand/009958.jpeg'}, {'original_hand': '/tmp/tmp_ibl8bf1/MedNIST/Hand/004643.jpeg', 'noisy_hand': '/tmp/tmp_ibl8bf1/MedNIST/Hand/004643.jpeg'}, {'original_hand': '/tmp/tmp_ibl8bf1/MedNIST/Hand/002604.jpeg', 'noisy_hand': '/tmp/tmp_ibl8bf1/MedNIST/Hand/002604.jpeg'}]</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
 </div>
 <div id="187c805a" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>img_keys <span class="op">=</span> [<span class="st">"original_hand"</span>, <span class="st">"noisy_hand"</span>]</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>degradation_key <span class="op">=</span> <span class="st">"noisy_hand"</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>train_transforms <span class="op">=</span> Compose(</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        LoadImageD(keys<span class="op">=</span>img_keys),</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        EnsureChannelFirstD(keys<span class="op">=</span>img_keys),</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        ScaleIntensityd(keys<span class="op">=</span>img_keys),</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        RandGaussianNoiseD(keys<span class="op">=</span>[degradation_key], prob<span class="op">=</span><span class="fl">0.5</span>, std<span class="op">=</span><span class="fl">0.1</span>),</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        RandGaussianSmoothD(keys<span class="op">=</span>[degradation_key], prob<span class="op">=</span><span class="fl">0.5</span>, sigma_x<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">1.5</span>), sigma_y<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">1.5</span>)),</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        ScaleIntensityd(keys<span class="op">=</span>img_keys),</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>img_keys <span class="op">=</span> [<span class="st">"original_hand"</span>, <span class="st">"noisy_hand"</span>]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>degradation_key <span class="op">=</span> <span class="st">"noisy_hand"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>train_transforms <span class="op">=</span> Compose(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        LoadImageD(keys<span class="op">=</span>img_keys),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        EnsureChannelFirstD(keys<span class="op">=</span>img_keys),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        ScaleIntensityd(keys<span class="op">=</span>img_keys),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        RandGaussianNoiseD(keys<span class="op">=</span>[degradation_key], prob<span class="op">=</span><span class="fl">0.5</span>, std<span class="op">=</span><span class="fl">0.1</span>),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        RandGaussianSmoothD(keys<span class="op">=</span>[degradation_key], prob<span class="op">=</span><span class="fl">0.5</span>, sigma_x<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">1.5</span>), sigma_y<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">1.5</span>)),</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        ScaleIntensityd(keys<span class="op">=</span>img_keys),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="visualisation-of-the-training-pairs" class="level2">
 <h2 class="anchored" data-anchor-id="visualisation-of-the-training-pairs">Visualisation of the training pairs</h2>
 <div id="87a9afa4" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>check_ds <span class="op">=</span> Dataset(data<span class="op">=</span>training_datadict, transform<span class="op">=</span>train_transforms)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>check_loader <span class="op">=</span> DataLoader(check_ds, batch_size<span class="op">=</span><span class="dv">1</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>check_data <span class="op">=</span> first(check_loader)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>original_image <span class="op">=</span> check_data[<span class="st">"original_hand"</span>][<span class="dv">0</span>][<span class="dv">0</span>]</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>noisy_image <span class="op">=</span> check_data[<span class="st">"noisy_hand"</span>][<span class="dv">0</span>][<span class="dv">0</span>]</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"noisy_image shape: </span><span class="sc">{</span>noisy_image<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"original_image shape: </span><span class="sc">{</span>original_image<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>plt.figure(<span class="st">"check"</span>, (<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"noisy_image"</span>)</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>plt.imshow(noisy_image, cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"original_image"</span>)</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>plt.imshow(original_image, cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>check_ds <span class="op">=</span> Dataset(data<span class="op">=</span>training_datadict, transform<span class="op">=</span>train_transforms)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>check_loader <span class="op">=</span> DataLoader(check_ds, batch_size<span class="op">=</span><span class="dv">1</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>check_data <span class="op">=</span> first(check_loader)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>original_image <span class="op">=</span> check_data[<span class="st">"original_hand"</span>][<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>noisy_image <span class="op">=</span> check_data[<span class="st">"noisy_hand"</span>][<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"noisy_image shape: </span><span class="sc">{</span>noisy_image<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"original_image shape: </span><span class="sc">{</span>original_image<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>plt.figure(<span class="st">"check"</span>, (<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"noisy_image"</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>plt.imshow(noisy_image, cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"original_image"</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>plt.imshow(original_image, cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>noisy_image shape: torch.Size([64, 64])
 original_image shape: torch.Size([64, 64])</code></pre>
@@ -591,10 +593,10 @@ original_image shape: torch.Size([64, 64])</code></pre>
 <h2 class="anchored" data-anchor-id="create-the-training-pipelines">Create the training pipelines</h2>
 <p>We use a <code>CacheDataset</code> to capture the training pairs and accelerate the training process. The MedNISTDataset provides pairs of “noisy” and “original” images. For demonstration purposes, we treat this as an image restoration problem: the “noisy” image is a degraded version of the “original” reference image (e.g., due to simulated movement or noise). The goal is to restore the noisy image to match the original image.</p>
 <div id="e83c13b7" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>train_ds <span class="op">=</span> CacheDataset(data<span class="op">=</span>training_datadict[:<span class="dv">1000</span>], transform<span class="op">=</span>train_transforms, cache_rate<span class="op">=</span><span class="fl">1.0</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">16</span>, shuffle<span class="op">=</span><span class="va">True</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>train_ds <span class="op">=</span> CacheDataset(data<span class="op">=</span>training_datadict[:<span class="dv">1000</span>], transform<span class="op">=</span>train_transforms, cache_rate<span class="op">=</span><span class="fl">1.0</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> DataLoader(train_ds, batch_size<span class="op">=</span><span class="dv">16</span>, shuffle<span class="op">=</span><span class="va">True</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset: 100%|██████████| 1000/1000 [00:00&lt;00:00, 1600.61it/s]</code></pre>
+<pre><code>Loading dataset: 100%|██████████| 1000/1000 [00:00&lt;00:00, 1211.04it/s]</code></pre>
 </div>
 </div>
 </section>
@@ -608,120 +610,133 @@ original_image shape: torch.Size([64, 64])</code></pre>
 <li><code>refinement=1</code>: 1 refinement block at the bottleneck.</li>
 </ul>
 <p>When training image restoration models, common regression losses include <a href="https://deepCLEM.github.io/bioMONAI/losses.html#mseloss"><code>MSELoss</code></a>, <code>PSNRLoss</code>, and <code>SSIMLoss</code>. Here, we use <code>SSIMLoss</code> because it encourages the model to focus on matching the structural similarity (shape and details) of the hands, rather than just restoring absolute pixel values.</p>
+<div id="e1a12fb2" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>torch.cuda.empty_cache()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>torch.cuda.reset_peak_memory_stats()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <div id="c25aa2e7" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">"cuda:0"</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> torch.backends.mps.is_available():</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">"mps"</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">"cpu"</span>)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Restormer(</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    dim<span class="op">=</span><span class="dv">32</span>,</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    num_blocks<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    heads<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    num_refinement_blocks<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>).to(device)</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>image_loss <span class="op">=</span> SSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>, data_range<span class="op">=</span><span class="fl">1.0</span>)</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), <span class="fl">1e-5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">"cuda:0"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> torch.backends.mps.is_available():</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">"mps"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">"cpu"</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Restormer(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    spatial_dims<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    in_channels<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    out_channels<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    dim<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    num_blocks<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    heads<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>],</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    num_refinement_blocks<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>).to(device)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>image_loss <span class="op">=</span> SSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>, data_range<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), <span class="fl">1e-5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-training-loops" class="level2">
 <h2 class="anchored" data-anchor-id="the-training-loops">The training loops</h2>
 <div id="a4800045" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>max_epochs <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>epoch_loss_values <span class="op">=</span> []</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(max_epochs):</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    epoch_loss, step <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># No inner tqdm bar here</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch_data <span class="kw">in</span> train_loader:</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        step <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad()</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>        noisy <span class="op">=</span> batch_data[<span class="st">"noisy_hand"</span>].to(device)</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>        original <span class="op">=</span> batch_data[<span class="st">"original_hand"</span>].to(device)</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> model(noisy)</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> torch.sigmoid(pred_image)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> image_loss(<span class="bu">input</span><span class="op">=</span>pred_image, target<span class="op">=</span>original)</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        optimizer.step()</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>        current_loss <span class="op">=</span> loss.item()</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>        epoch_loss <span class="op">+=</span> current_loss</span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    epoch_loss <span class="op">/=</span> step</span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    epoch_loss_values.append(epoch_loss)</span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the outer bar's postfix with the final average epoch loss</span></span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>({<span class="st">"Epoch"</span>: epoch <span class="op">+</span> <span class="dv">1</span>, <span class="st">"Avg Epoch Loss"</span>: <span class="ss">f"</span><span class="sc">{</span>epoch_loss<span class="sc">:.4f}</span><span class="ss">"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>max_epochs <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>epoch_loss_values <span class="op">=</span> []</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(max_epochs):</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    epoch_loss, step <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># No inner tqdm bar here</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch_data <span class="kw">in</span> train_loader:</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        step <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad()</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>        noisy <span class="op">=</span> batch_data[<span class="st">"noisy_hand"</span>].to(device)</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        original <span class="op">=</span> batch_data[<span class="st">"original_hand"</span>].to(device)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> model(noisy)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> torch.sigmoid(pred_image)</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> image_loss(<span class="bu">input</span><span class="op">=</span>pred_image, target<span class="op">=</span>original)</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>        optimizer.step()</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>        current_loss <span class="op">=</span> loss.item()</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>        epoch_loss <span class="op">+=</span> current_loss</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>    epoch_loss <span class="op">/=</span> step</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>    epoch_loss_values.append(epoch_loss)</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the outer bar's postfix with the final average epoch loss</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>({<span class="st">"Epoch"</span>: epoch <span class="op">+</span> <span class="dv">1</span>, <span class="st">"Avg Epoch Loss"</span>: <span class="ss">f"</span><span class="sc">{</span>epoch_loss<span class="sc">:.4f}</span><span class="ss">"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{'Epoch': 1, 'Avg Epoch Loss': '0.8336'}
-{'Epoch': 2, 'Avg Epoch Loss': '0.7150'}
-{'Epoch': 3, 'Avg Epoch Loss': '0.6269'}
-{'Epoch': 4, 'Avg Epoch Loss': '0.5621'}
-{'Epoch': 5, 'Avg Epoch Loss': '0.5125'}
-{'Epoch': 6, 'Avg Epoch Loss': '0.4738'}
-{'Epoch': 7, 'Avg Epoch Loss': '0.4314'}
-{'Epoch': 8, 'Avg Epoch Loss': '0.3770'}
-{'Epoch': 9, 'Avg Epoch Loss': '0.2988'}
-{'Epoch': 10, 'Avg Epoch Loss': '0.2397'}
-{'Epoch': 11, 'Avg Epoch Loss': '0.2179'}
-{'Epoch': 12, 'Avg Epoch Loss': '0.2028'}
-{'Epoch': 13, 'Avg Epoch Loss': '0.1915'}
-{'Epoch': 14, 'Avg Epoch Loss': '0.1799'}
-{'Epoch': 15, 'Avg Epoch Loss': '0.1732'}
-{'Epoch': 16, 'Avg Epoch Loss': '0.1634'}
-{'Epoch': 17, 'Avg Epoch Loss': '0.1560'}
-{'Epoch': 18, 'Avg Epoch Loss': '0.1492'}
-{'Epoch': 19, 'Avg Epoch Loss': '0.1438'}
-{'Epoch': 20, 'Avg Epoch Loss': '0.1391'}
-{'Epoch': 21, 'Avg Epoch Loss': '0.1323'}
-{'Epoch': 22, 'Avg Epoch Loss': '0.1317'}
-{'Epoch': 23, 'Avg Epoch Loss': '0.1247'}
-{'Epoch': 24, 'Avg Epoch Loss': '0.1218'}
-{'Epoch': 25, 'Avg Epoch Loss': '0.1203'}
-{'Epoch': 26, 'Avg Epoch Loss': '0.1173'}
-{'Epoch': 27, 'Avg Epoch Loss': '0.1134'}
-{'Epoch': 28, 'Avg Epoch Loss': '0.1142'}
-{'Epoch': 29, 'Avg Epoch Loss': '0.1100'}
-{'Epoch': 30, 'Avg Epoch Loss': '0.1080'}
-{'Epoch': 31, 'Avg Epoch Loss': '0.1066'}
-{'Epoch': 32, 'Avg Epoch Loss': '0.1033'}
-{'Epoch': 33, 'Avg Epoch Loss': '0.1009'}
-{'Epoch': 34, 'Avg Epoch Loss': '0.0987'}
-{'Epoch': 35, 'Avg Epoch Loss': '0.0996'}
+<pre><code>{'Epoch': 1, 'Avg Epoch Loss': '0.8368'}
+{'Epoch': 2, 'Avg Epoch Loss': '0.7194'}
+{'Epoch': 3, 'Avg Epoch Loss': '0.6304'}
+{'Epoch': 4, 'Avg Epoch Loss': '0.5654'}
+{'Epoch': 5, 'Avg Epoch Loss': '0.5156'}
+{'Epoch': 6, 'Avg Epoch Loss': '0.4758'}
+{'Epoch': 7, 'Avg Epoch Loss': '0.4337'}
+{'Epoch': 8, 'Avg Epoch Loss': '0.3773'}
+{'Epoch': 9, 'Avg Epoch Loss': '0.2986'}
+{'Epoch': 10, 'Avg Epoch Loss': '0.2418'}
+{'Epoch': 11, 'Avg Epoch Loss': '0.2210'}
+{'Epoch': 12, 'Avg Epoch Loss': '0.2065'}
+{'Epoch': 13, 'Avg Epoch Loss': '0.1962'}
+{'Epoch': 14, 'Avg Epoch Loss': '0.1863'}
+{'Epoch': 15, 'Avg Epoch Loss': '0.1768'}
+{'Epoch': 16, 'Avg Epoch Loss': '0.1694'}
+{'Epoch': 17, 'Avg Epoch Loss': '0.1624'}
+{'Epoch': 18, 'Avg Epoch Loss': '0.1550'}
+{'Epoch': 19, 'Avg Epoch Loss': '0.1488'}
+{'Epoch': 20, 'Avg Epoch Loss': '0.1434'}
+{'Epoch': 21, 'Avg Epoch Loss': '0.1387'}
+{'Epoch': 22, 'Avg Epoch Loss': '0.1341'}
+{'Epoch': 23, 'Avg Epoch Loss': '0.1287'}
+{'Epoch': 24, 'Avg Epoch Loss': '0.1249'}
+{'Epoch': 25, 'Avg Epoch Loss': '0.1228'}
+{'Epoch': 26, 'Avg Epoch Loss': '0.1188'}
+{'Epoch': 27, 'Avg Epoch Loss': '0.1151'}
+{'Epoch': 28, 'Avg Epoch Loss': '0.1153'}
+{'Epoch': 29, 'Avg Epoch Loss': '0.1107'}
+{'Epoch': 30, 'Avg Epoch Loss': '0.1089'}
+{'Epoch': 31, 'Avg Epoch Loss': '0.1078'}
+{'Epoch': 32, 'Avg Epoch Loss': '0.1048'}
+{'Epoch': 33, 'Avg Epoch Loss': '0.1019'}
+{'Epoch': 34, 'Avg Epoch Loss': '0.1001'}
+{'Epoch': 35, 'Avg Epoch Loss': '0.0995'}
 {'Epoch': 36, 'Avg Epoch Loss': '0.0956'}
-{'Epoch': 37, 'Avg Epoch Loss': '0.0948'}
-{'Epoch': 38, 'Avg Epoch Loss': '0.0948'}
+{'Epoch': 37, 'Avg Epoch Loss': '0.0960'}
+{'Epoch': 38, 'Avg Epoch Loss': '0.0960'}
 {'Epoch': 39, 'Avg Epoch Loss': '0.0945'}
-{'Epoch': 40, 'Avg Epoch Loss': '0.0928'}
-{'Epoch': 41, 'Avg Epoch Loss': '0.0891'}
-{'Epoch': 42, 'Avg Epoch Loss': '0.0886'}
-{'Epoch': 43, 'Avg Epoch Loss': '0.0870'}
-{'Epoch': 44, 'Avg Epoch Loss': '0.0905'}
-{'Epoch': 45, 'Avg Epoch Loss': '0.0868'}
-{'Epoch': 46, 'Avg Epoch Loss': '0.0874'}
-{'Epoch': 47, 'Avg Epoch Loss': '0.0844'}
-{'Epoch': 48, 'Avg Epoch Loss': '0.0847'}
-{'Epoch': 49, 'Avg Epoch Loss': '0.0834'}
-{'Epoch': 50, 'Avg Epoch Loss': '0.0821'}</code></pre>
+{'Epoch': 40, 'Avg Epoch Loss': '0.0921'}
+{'Epoch': 41, 'Avg Epoch Loss': '0.0888'}
+{'Epoch': 42, 'Avg Epoch Loss': '0.0881'}
+{'Epoch': 43, 'Avg Epoch Loss': '0.0865'}
+{'Epoch': 44, 'Avg Epoch Loss': '0.0892'}
+{'Epoch': 45, 'Avg Epoch Loss': '0.0853'}
+{'Epoch': 46, 'Avg Epoch Loss': '0.0850'}
+{'Epoch': 47, 'Avg Epoch Loss': '0.0828'}
+{'Epoch': 48, 'Avg Epoch Loss': '0.0828'}
+{'Epoch': 49, 'Avg Epoch Loss': '0.0811'}
+{'Epoch': 50, 'Avg Epoch Loss': '0.0811'}
+CPU times: user 14min 5s, sys: 6.49 s, total: 14min 11s
+Wall time: 2min</code></pre>
 </div>
 </div>
 <div id="1d4a169e" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>plt.plot(epoch_loss_values)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plt.plot(epoch_loss_values)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="803_image_restoration_pytorch_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="803_image_restoration_pytorch_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
+</div>
+</div>
+<div id="814407fb" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>torch.cuda.max_memory_allocated() <span class="op">/</span> <span class="dv">1024</span><span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>2352.287109375</code></pre>
 </div>
 </div>
 </section>
@@ -730,51 +745,51 @@ original_image shape: torch.Size([64, 64])</code></pre>
 <h1>Visualise some validation results</h1>
 <p>This section creates a set of previously unseen pairs of noisy vs original hands, and use the network to predict the transformation between each pair.</p>
 <div id="0461f0f6" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>val_ds <span class="op">=</span> CacheDataset(data<span class="op">=</span>training_datadict[<span class="dv">2000</span>:<span class="dv">2500</span>], transform<span class="op">=</span>train_transforms, cache_rate<span class="op">=</span><span class="fl">1.0</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>val_loader <span class="op">=</span> DataLoader(val_ds, batch_size<span class="op">=</span><span class="dv">16</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">eval</span>()  <span class="co"># Set model to evaluation mode</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():  <span class="co"># Disable gradient calculation for inference</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch_data <span class="kw">in</span> val_loader:</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        noisy <span class="op">=</span> batch_data[<span class="st">"noisy_hand"</span>].to(device)</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>        original <span class="op">=</span> batch_data[<span class="st">"original_hand"</span>].to(device)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Pass only the noisy image, consistent with training</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> model(noisy)</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> torch.sigmoid(pred_image)</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span>  <span class="co"># Process only the first batch for visualization</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>original_image <span class="op">=</span> original.detach().cpu().numpy()[:, <span class="dv">0</span>]</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>noisy_image <span class="op">=</span> noisy.detach().cpu().numpy()[:, <span class="dv">0</span>]</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>pred_image <span class="op">=</span> pred_image.detach().cpu().numpy()[:, <span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>val_ds <span class="op">=</span> CacheDataset(data<span class="op">=</span>training_datadict[<span class="dv">2000</span>:<span class="dv">2500</span>], transform<span class="op">=</span>train_transforms, cache_rate<span class="op">=</span><span class="fl">1.0</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>val_loader <span class="op">=</span> DataLoader(val_ds, batch_size<span class="op">=</span><span class="dv">16</span>, num_workers<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">eval</span>()  <span class="co"># Set model to evaluation mode</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():  <span class="co"># Disable gradient calculation for inference</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch_data <span class="kw">in</span> val_loader:</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        noisy <span class="op">=</span> batch_data[<span class="st">"noisy_hand"</span>].to(device)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>        original <span class="op">=</span> batch_data[<span class="st">"original_hand"</span>].to(device)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Pass only the noisy image, consistent with training</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> model(noisy)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>        pred_image <span class="op">=</span> torch.sigmoid(pred_image)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span>  <span class="co"># Process only the first batch for visualization</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>original_image <span class="op">=</span> original.detach().cpu().numpy()[:, <span class="dv">0</span>]</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>noisy_image <span class="op">=</span> noisy.detach().cpu().numpy()[:, <span class="dv">0</span>]</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>pred_image <span class="op">=</span> pred_image.detach().cpu().numpy()[:, <span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading dataset: 100%|██████████| 500/500 [00:00&lt;00:00, 852.19it/s]</code></pre>
+<pre><code>Loading dataset: 100%|██████████| 500/500 [00:00&lt;00:00, 1463.70it/s]</code></pre>
 </div>
 </div>
 <div id="f3f330ba" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>plt.subplots(batch_size, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">10</span>))</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> <span class="bu">range</span>(batch_size):</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># noisy image</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    plt.subplot(batch_size, <span class="dv">3</span>, b <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"noisy image"</span>)</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    plt.imshow(noisy_image[b], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># original image</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    plt.subplot(batch_size, <span class="dv">3</span>, b <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">2</span>)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"original image"</span>)</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    plt.imshow(original_image[b], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># predicted restored image</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    plt.subplot(batch_size, <span class="dv">3</span>, b <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">3</span>)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"predicted image"</span>)</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    plt.imshow(pred_image[b], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>plt.subplots(batch_size, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">10</span>))</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> <span class="bu">range</span>(batch_size):</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># noisy image</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    plt.subplot(batch_size, <span class="dv">3</span>, b <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"noisy image"</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    plt.imshow(noisy_image[b], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># original image</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    plt.subplot(batch_size, <span class="dv">3</span>, b <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">2</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"original image"</span>)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    plt.imshow(original_image[b], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># predicted restored image</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    plt.subplot(batch_size, <span class="dv">3</span>, b <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">3</span>)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"predicted image"</span>)</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    plt.imshow(pred_image[b], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="803_image_restoration_pytorch_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="803_image_restoration_pytorch_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
