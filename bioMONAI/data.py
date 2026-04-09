@@ -102,7 +102,6 @@ from .visualize import show_images_grid, show_multichannel
 # =================================
 from plum import dispatch as typedispatch
 
-
 # =================================
 # fasttransform patch
 # =================================
