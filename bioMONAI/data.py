@@ -4,17 +4,17 @@
 
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
-           'BioImageStack', 'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock',
-           'register_source', 'register_dataset', 'register_loader', 'register_task', 'route_kwargs',
-           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource',
-           'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
-           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader',
-           'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
-           'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
-           'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
-           'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
-           'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
-           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock', 'register_source',
+           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'split_prefixed_kwargs',
+           'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource',
+           'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
+           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders', 'from_source',
+           'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
+           'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
+           'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
+           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches',
+           'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims',
+           'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -78,23 +78,20 @@ from fastai.vision.all import (
 # =================================
 from monai.data import Dataset as MonaiDataset, CacheDataset, PersistentDataset, SmartCacheDataset
 from monai.data.utils import pickle_hashing
-from monai.transforms import Compose
-from monai import transforms as mt
+from monai.transforms import Compose, CenterSpatialCrop, CenterScaleCrop
 from monai.transforms.transform import Randomizable
-from monai.transforms import Compose
-from monai.transforms import CenterSpatialCrop, CenterScaleCrop
 
 # =================================
 # bioMONAI
 # =================================
 from bioMONAI.core import (
     MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform,
-    fastTrainer, torchsqueeze, Path, List, L,
+    torchsqueeze, Path, List, L, PathLike, Sequence, Callable, Iterable,
     torchmax, randint,
     dictlist_to_funclist, read_yaml, apply_transforms
 )
 
-from .io import image_reader
+from .io import image_reader, BioImageReader, LoadImage, LoadImaged
 from .visualize import show_images_grid, show_multichannel
 
 # =================================
@@ -127,130 +124,112 @@ class MetaResolver(type(torchTensor), metaclass=BypassNewMeta):
     pass
     
 
-# %% ../nbs/01_data.ipynb #105462af
+# %% ../nbs/01_data.ipynb #c04e0a04
 class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     """
-    Serving as the foundational class for bioimaging data, `BioImageBase` provides core functionalities for image handling. It ensures that instances of specified types are appropriately cast to this class, maintaining consistency in data representation.
-    
-    Metaclass casts `x` to this class if it is of type `cls._bypass_type`.
+    Base class for bioimaging data.
+
+    Provides:
+    - MetaTensor integration
+    - visualization utilities
+    - lightweight tensor wrapper
+
+    Does NOT handle file loading.
     """
-    
-    _bypass_type = torchTensor  # The type that bypasses image loading
-    _show_args = {'cmap': 'gray'}  # Default arguments for image display
-    resample, reorder = None, False  # Default resample and reorder settings
-    affine_matrix = None  # Default affine matrix for image transformation
 
+    _bypass_type = torchTensor
+    _show_args = {"cmap": "gray"}
+
+    # --------------------------------------------------
+    # BASIC CONSTRUCTORS
+    # --------------------------------------------------
     @classmethod
-    def create(cls, fn: (Path, str, List, torchTensor), roi=None, **kwargs) -> torchTensor: 
-        """
-        Opens an image and casts it to BioImageBase object.
-        If `fn` is a torchTensor, it's cast to BioImageBase object.
+    def from_tensor(cls, x: torchTensor, meta: dict | None = None):
+        return cls(x=x, meta=meta or {})
 
-        Args:
-            fn : (Path, str, torchTensor)
-                Image path or a 4D torchTensor.
-            kwargs : dict
-                Additional parameters for the medical image reader.
-
-        Returns:
-            torchTensor : A 4D tensor as a BioImageBase object.
-        """
-        if isinstance(fn, torchTensor):
-            return cls(fn)
-
-        if roi is not None:
-            im = image_reader(fn, dtype=cls, resample=cls.resample, reorder=cls.reorder)
-            return im[:,roi[0]:roi[1]]
-        return image_reader(fn, dtype=cls, resample=cls.resample, reorder=cls.reorder)
-
-    @classmethod
-    def item_preprocessing(cls, resample: (List, int, tuple), reorder: bool):
-        """
-        Changes the values for the class variables `resample` and `reorder`.
-
-        Args:
-            resample : (List, int, tuple)
-                A list with voxel spacing.
-            reorder : bool
-                Whether to reorder the data to be closest to canonical (RAS+) orientation.
-        """
-        cls.resample = resample
-        cls.reorder = reorder
-
-    def show(self, ctx=None, figsize: int = None, ncols: int = 10, title=None, **kwargs):
-        """
-        Plots 2D slices of a 3D image alongside a prior specified axis.
-
-        Args:
-            ctx : Context to use for the display. Defaults to None.
-            figsize: Size of the figure. Defaults to None.
-            ncols: Number of columns in the grid. Defaults to 10.
-            **kwargs : Additional keyword arguments passed to plt.imshow.
-
-        Returns:
-            Shown image.
-        """
-        return show_images_grid(self, ctx=ctx, ncols=ncols, title=[title], **merge(self._show_args, kwargs))
-    
     def as_tensor(self) -> torchTensor:
-        """
-        Return the `MetaTensor` as a `torchTensor`.
-        It is OS dependent as to whether this will be a deep copy or not.
-        """
         return self.as_subclass(torchTensor)
+    
+    # --------------------------------------------------
+    # TRANSFORMS CONFIG
+    # --------------------------------------------------
+    @classmethod
+    def item_preprocessing(cls, transforms):
+        cls.transforms = transforms
 
+    # --------------------------------------------------
+    # VISUALIZATION
+    # --------------------------------------------------
+    def show(self, ctx=None, figsize=None, ncols: int = 10, title=None, **kwargs):
+        return show_images_grid(
+            self,
+            ctx=ctx,
+            ncols=ncols,
+            title=[title],
+            **merge(self._show_args, kwargs),
+        )
+
+    # --------------------------------------------------
+    # REPR
+    # --------------------------------------------------
     def __repr__(self) -> str:
-        """Returns the string representation of the ImageBase instance."""
-        return f"BioImageBase{self.as_tensor().__repr__()[6:]}"
+        return f"{self.__class__.__name__}{self.as_tensor().__repr__()[6:]}"
 
 # %% ../nbs/01_data.ipynb #461fb287
 class BioImage(BioImageBase):
     """
-    A subclass of `BioImageBase`, the `BioImage` class is tailored for handling both 2D and 3D image objects. It offers methods to load images from various formats and provides access to image properties such as shape and dimensions.
+    Tensor-backed bioimage loaded from disk.
+
+    This is the class that:
+    - uses image_reader
+    - handles transforms
+    - returns MetaTensor-backed images
     """
-    _show_args = {'cmap':'gray'}
-    
+
+    transforms = None
+
+    # --------------------------------------------------
+    # LOADING
+    # --------------------------------------------------
     @classmethod
-    def create(cls, fn: (Path, str, L, list, torchTensor), **kwargs) -> torchTensor: 
-        """
-        Opens an image and casts it to BioImageBase object.
-        If `fn` is a torchTensor, it's cast to BioImageBase object.
-
-        Args:
-            fn : (Path, str, torchTensor)
-                Image path or a 4D torchTensor.
-            kwargs : dict
-                Additional parameters for the medical image reader.
-
-        Returns:
-            torchTensor : A 2D or 3D tensor as a BioImage object.
-        """
+    def create(
+        cls,
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        **kwargs,
+    ):
         if isinstance(fn, torchTensor):
-            return cls(fn)
+            return cls.from_tensor(fn)
 
-        img = image_reader(fn, dtype=cls, resample=cls.resample, reorder=cls.reorder)
-        dimlist = [i for i in range(1, len(img.shape))]
-        return torchsqueeze(img, dimlist)
-    
-    def show(self, ctx=None, **kwargs):
-        "Show image using `merge(self._show_args, kwargs)`"
-        return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
-    
-    def __repr__(self) -> str:
-        """Returns the string representation of the ImageBase instance."""
-    #     return f'{self.__class__.__name__} shape={"x".join([str(d) for d in self.shape])}'
-        return f"BioImage{self.as_tensor().__repr__()[6:]}"
+        kwargs = {
+            **({"transforms": cls.transforms} if cls.transforms else {}),
+            **kwargs,
+        }
 
-# %% ../nbs/01_data.ipynb #60e515f3
-class BioImageStack(BioImageBase):
-    """
-    Designed for 3D image data, `BioImageStack` extends `BioImageBase` to manage volumetric images effectively. 
-    It includes functionalities for slicing, visualization, and manipulation of 3D data.
-    """
-    
-    def __repr__(self) -> str:
-        """Returns the string representation of the ImageBase instance."""
-        return f"BioImageStack{self.as_tensor().__repr__()[6:]}"
+        tensor, meta = image_reader(
+            fn,
+            output="tensor+meta",
+            **kwargs,
+        )
+
+        channels = kwargs.get("channels")
+        if channels is not None and len(channels) < 4:
+            tensor = torchsqueeze(tensor, dim=0)
+            if len(channels) < 3:
+                tensor = torchsqueeze(tensor, dim=-1)
+            meta['final_size'] = tuple(tensor.shape)
+
+        return cls(x=tensor, meta=meta)
+
+    # --------------------------------------------------
+    # MONAI INTEGRATION
+    # --------------------------------------------------
+    @classmethod
+    def load(cls, **kwargs) -> Callable:
+        return LoadImage(BioImageReader(), **kwargs)
+
+    @classmethod
+    def load_dict(cls, keys, **kwargs) -> Callable:
+        return LoadImaged(keys, reader=BioImageReader(), **kwargs)
 
 # %% ../nbs/01_data.ipynb #a81086d5
 class BioImageProject(BioImageBase):

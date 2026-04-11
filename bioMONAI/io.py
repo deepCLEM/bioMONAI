@@ -5,7 +5,7 @@
 # %% auto #0
 __all__ = ['SaveImage', 'SaveImaged', 'LOADER_REGISTRY', 'LoadImage', 'LoadImaged', 'write_image', 'tiff2torch', 'string2dict',
            'split_path', 'is_ome_tiff', 'extract_formats', 'bioio_loader', 'split_hdf_path', 'hdf5_loader',
-           'TransformMetadata', 'PreprocessMetadata', 'LoaderRegistry', 'image_reader']
+           'TransformMetadata', 'PreprocessMetadata', 'LoaderRegistry', 'image_reader', 'BioImageReader']
 
 # %% ../nbs/02_io.ipynb #58b60095
 # =================================
@@ -15,6 +15,7 @@ from typing import Any
 from pathlib import Path, PurePath
 from dataclasses import dataclass, field
 import time
+import re
 
 
 # =================================
@@ -98,27 +99,53 @@ def tiff2torch(file_path: str):
     return torch_from_numpy(img)
 
 # %% ../nbs/02_io.ipynb #9c768b4a
-def string2dict(input_string:str):
-    # Create an empty dictionary
-    result_dict = {}
+def string2dict(s: str) -> dict[str, int | slice | None]:
+    """
+    Parse layout strings with:
+        - sizes: C2
+        - slices: Y[100:200]
+        - steps:  Y[100:200:2]
 
-    # Iterate over each character in the string
-    for char in input_string:
-        # Check if the character is a letter (assuming ASCII letters)
-        if char.isalpha():
-            # Assign the letter as a key and initialize its value to 0
-            result_dict[char] = None
+    Returns:
+        dict[str, int | slice | None]
+    """
 
-    # Now, iterate over each character again to assign numeric values
-    for i, char in enumerate(input_string):
-        if char.isdigit():
-            # Find the corresponding letter (key) for this number (value)
-            key = next((k for k, v in result_dict.items() if v is None), None)
-            if key is not None:
-                # Assign the numeric value to the found key
-                result_dict[key] = int(char)
-                
-    return result_dict
+    result = {}
+
+    pattern = re.findall(
+        r"([A-Za-z])"               # axis
+        r"(\d+)?"                   # optional size
+        r"(?:\[(\d*):(\d*):?(\d*)\])?",  # optional slice w/ step
+        s
+    )
+
+    for axis, size, start, stop, step in pattern:
+        axis = axis.upper()
+
+        # -------------------------
+        # slice case
+        # -------------------------
+        if start or stop or step:
+            slc = slice(
+                int(start) if start else None,
+                int(stop) if stop else None,
+                int(step) if step else None,
+            )
+            result[axis] = slc
+
+        # -------------------------
+        # size case
+        # -------------------------
+        elif size:
+            result[axis] = int(size)
+
+        # -------------------------
+        # empty axis
+        # -------------------------
+        else:
+            result[axis] = None
+
+    return result
 
 # %% ../nbs/02_io.ipynb #f111048c
 def split_path(file_path, # The path to the file to split
@@ -337,7 +364,7 @@ def _preprocess(obj: ScalarImage, transforms: Callable|Iterable[Callable]|None=N
     elif callable(transforms):
         transforms = [transforms]
 
-    metadata = PreprocessMetadata(original_size=obj.shape[1:])
+    metadata = PreprocessMetadata(original_size=obj.shape)
 
     for t in transforms:
         start = time.time()
@@ -352,7 +379,7 @@ def _preprocess(obj: ScalarImage, transforms: Callable|Iterable[Callable]|None=N
             )
         )
 
-    metadata.final_size = obj.shape[1:] if hasattr(obj, "shape") else None
+    metadata.final_size = obj.shape if hasattr(obj, "shape") else None
 
     return obj, metadata
 
@@ -431,7 +458,8 @@ def _load_png(path, ind_dict=None, channels="CZYX", loader=None, **kwargs):
     """
 
     path_str = str(path)
-    path_str, ind_dict = split_path(path_str)
+    if ind_dict == None:
+        path_str, ind_dict = split_path(path_str)
     channels = channels.replace("C", "S")
     reader = bioio_loader(ind_dict, channels=channels, loader=loader)
 
@@ -448,7 +476,8 @@ def _load_tiff(path, ind_dict=None, channels="CZYX", **kwargs):
     """
 
     path_str = str(path)
-    path_str, ind_dict = split_path(path_str)
+    if ind_dict == None:
+        path_str, ind_dict = split_path(path_str)
     
     # ome.tiff require a separate loader than regular tiff
     if is_ome_tiff(Path(path_str)):
@@ -487,7 +516,7 @@ def _get_loader(path: Path):
 
 # %% ../nbs/02_io.ipynb #d9629282
 def _load_and_preprocess(
-    file_path,
+    file_path: PathLike,
     transforms: Callable|Iterable[Callable]|None =None,
     loader: Callable|None =None,
     channels: str ="CZYX",
@@ -515,7 +544,7 @@ def _load_and_preprocess(
 
 # %% ../nbs/02_io.ipynb #08b998f4
 def _multi_sequence_stream(
-    image_paths,
+    image_paths: Sequence[PathLike],
     transforms=None,
     loader=None,
     channels="CZYX",
@@ -546,7 +575,7 @@ def _multi_sequence_stream(
 
 # %% ../nbs/02_io.ipynb #f4177cc4
 def image_reader(
-    file_path: str | Path | list[str|Path] | Sequence[str|Path],
+    file_path: PathLike | Sequence[PathLike],
     lazy: bool = False,
     output: str = "tensor",
     transforms: Callable|list[Callable]|None = None,
@@ -560,11 +589,11 @@ def image_reader(
 ) -> (
     ScalarImage
     | list[ScalarImage]
-    | tuple[ScalarImage, PreprocessMetadata]
-    | tuple[list[ScalarImage], list[PreprocessMetadata]]
+    | tuple[ScalarImage, dict]
+    | tuple[list[ScalarImage], dict]
     | torch.Tensor
-    | tuple[torch.Tensor, PreprocessMetadata]
-    | tuple[torch.Tensor, list[PreprocessMetadata]]
+    | tuple[torch.Tensor, dict]
+    | tuple[torch.Tensor, dict]
     | MetaTensor
 ):
     """
@@ -624,11 +653,6 @@ def image_reader(
             channels=channels,
             ind_dict=ind_dict,
             npz_key=npz_key,
-        )
-
-    def _is_multi(x):
-        return isinstance(x, (list, tuple)) or (
-            isinstance(x, Iterable) and not isinstance(x, (str, Path))
         )
 
     def _iter_multi():
@@ -693,7 +717,7 @@ def image_reader(
     # -------------------------------------------------
     # detect multi
     # -------------------------------------------------
-    is_multi = _is_multi(file_path)
+    is_multi = isinstance(file_path, Sequence) and not isinstance(file_path, (str, Path))
 
     # =====================================================
     # MULTI CASE
@@ -705,7 +729,7 @@ def image_reader(
             return list(imgs)
 
         if output == "scalar+meta":
-            return list(imgs), list(metas)
+            return list(imgs), {i:asdict(m) for i, m in enumerate(metas)}
 
         tensor = _stack(imgs)
 
@@ -713,7 +737,7 @@ def image_reader(
             return tensor
 
         if output == "tensor+meta":
-            return tensor, list(metas)
+            return tensor, {i:asdict(m) for i, m in enumerate(metas)}
 
         if output == "metatensor":
             return MetaTensor(
@@ -732,7 +756,7 @@ def image_reader(
         return img
 
     if output == "scalar+meta":
-        return img, meta
+        return img, asdict(meta)
 
     tensor = img.data
 
@@ -745,7 +769,7 @@ def image_reader(
         return tensor
 
     if output == "tensor+meta":
-        return tensor, meta
+        return tensor, asdict(meta)
 
     if output == "metatensor":
         return MetaTensor(x=tensor, meta=asdict(meta))
@@ -755,3 +779,122 @@ def image_reader(
 # %% ../nbs/02_io.ipynb #514dacd9
 LoadImage = LoadImage
 LoadImaged = LoadImaged
+
+# %% ../nbs/02_io.ipynb #5a78f57f
+class BioImageReader(ImageReader):
+    def __init__(
+        self,
+        converter: Callable | None = None,
+        reverse_indexing: bool = False,
+        **kwargs,
+    ):
+        super().__init__()
+        self.converter = converter
+        self.reverse_indexing = reverse_indexing
+        self.kwargs = kwargs
+
+        self.channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
+
+    # --------------------------------------------------
+    def verify_suffix(self, filename:Sequence[PathLike] | PathLike) -> bool:
+        suffixes = self._get_supported_suffixes()
+        return is_supported_format(filename, suffixes)
+
+
+    def _get_supported_suffixes(self) -> list[str]:
+        """
+        Collect supported suffixes from loader registry.
+        """
+        suffixes = set()
+
+        for loader in LOADER_REGISTRY.values():
+            exts = getattr(loader, "suffixes", None)
+            if exts:
+                suffixes.update(exts)
+
+        return list(suffixes)
+
+    # --------------------------------------------------
+    def read(self, data: PathLike | Sequence[PathLike] | np.ndarray, **kwargs) -> MetaTensor:
+        kwargs_ = {**self.kwargs, **kwargs}
+
+        mt = image_reader(
+            data,
+            output="metatensor",
+            **kwargs_,
+        )
+
+        if self.converter:
+            mt = MetaTensor(
+                x=self.converter(mt.data),
+                meta=mt.meta,
+            )
+
+        # inject normalized metadata
+        layout = kwargs_.get("channels", "CZYX")
+        mt.meta.update(self._meta_from_layout(mt.shape, layout))
+
+        return mt
+
+    # --------------------------------------------------
+    def get_data(self, img: "MetaTensor") -> tuple[np.ndarray, dict]:
+
+        if self.reverse_indexing and img.ndim >= 2:
+            img = MetaTensor(
+                x=img.swapaxes(-1, -2),
+                meta=img.meta,
+            )
+
+        # extract numpy array
+        array = img.as_tensor().cpu().numpy()
+
+        # ensure plain dict
+        meta = dict(img.meta)
+
+        return array, meta 
+
+
+    # ==================================================
+    # META FROM LAYOUT
+    # ==================================================
+    def _meta_from_layout(self, shape, layout: str):
+        if len(shape) != len(layout):
+            raise ValueError(f"{shape} vs {layout}")
+
+        axis_map = dict(zip(layout, shape))
+
+        meta = {
+            "width": axis_map.get("X"),
+            "height": axis_map.get("Y"),
+            "channels": axis_map.get("C"),
+            "depth": axis_map.get("Z"),
+            "frames": axis_map.get("T"),
+            "sequence": axis_map.get("S"),
+        }
+
+        # mode
+        c = meta["channels"]
+        meta["mode"] = (
+            "L" if c is None else self.channel_modes.get(c, f"{c} channels")
+        )
+
+        # kind
+        if meta["frames"] is not None:
+            meta["kind"] = "video"
+        elif meta["depth"] is not None:
+            meta["kind"] = "volume"
+        else:
+            meta["kind"] = "image"
+
+        if "C" in layout:
+            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = layout.index("C")
+        else:
+            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = float("nan")
+
+        return meta
+    
+    def _get_spatial_shape(self, img: "MetaTensor"):
+        m = img.meta
+        return tuple(
+            v for v in (m.get("width"), m.get("height"), m.get("depth")) if v is not None
+        )

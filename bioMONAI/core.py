@@ -61,6 +61,8 @@ from torch.nn.init import kaiming_normal_
 # =================================
 from monai.data import MetaTensor
 from monai.utils import set_determinism
+from collections.abc import Callable, Iterable, Sequence
+from monai.config import PathLike
 
 # =================================
 # fastai
