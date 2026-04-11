@@ -4,17 +4,17 @@
 
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
-           'BioVolume', 'BioMIP', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock', 'register_source',
-           'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'split_prefixed_kwargs',
-           'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource',
-           'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
-           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders', 'from_source',
-           'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
-           'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
-           'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
-           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches',
-           'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims',
-           'extract_substacks']
+           'BioVolume', 'BioMIP', 'BioVideo', 'BioMultiChannel', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock',
+           'register_source', 'register_dataset', 'register_loader', 'register_task', 'route_kwargs',
+           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource',
+           'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
+           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader',
+           'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
+           'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
+           'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
+           'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
+           'build_df_from_folder', 'extract_patches', 'save_patches_grid', 'extract_random_patches',
+           'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/01_data.ipynb #7a8886ba
 # =================================
@@ -359,6 +359,134 @@ class BioMIP(BioImageBase):
         kwargs = cls.get_kwargs_with_channels(kwargs)
         return LoadImaged(keys, reader=BioImageReader, **kwargs)
 
+
+# %% ../nbs/01_data.ipynb #0febd1d1
+class BioVideo(BioImageBase):
+    """
+    Tensor-backed video loaded from disk.
+
+    This is the class that:
+    - uses image_reader
+    - handles transforms
+    - returns MetaTensor-backed images
+    """
+
+    channels="TYX"
+
+    # --------------------------------------------------
+    # LOADING
+    # --------------------------------------------------
+    @classmethod
+    def create(
+        cls,
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        **kwargs,
+    ):
+
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+
+        return super().create(fn, **kwargs)
+    
+    # --------------------------------------------------
+    # MONAI INTEGRATION
+    # --------------------------------------------------
+    @classmethod
+    def load(cls, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels()
+        return super().load(**kwargs)
+
+    @classmethod
+    def load_dict(cls, keys, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels()
+        return super().load_dict(keys, **kwargs)
+
+# %% ../nbs/01_data.ipynb #b484acfa
+class BioMultiChannel(BioImageBase):
+    """
+    Multi-channel 2D/3D image assuming CZYX layout.
+    """
+    channels = "CZYX"
+    channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
+
+    @classmethod
+    def _get_layout(cls, img, kwargs):
+        return img.meta.get("layout") or kwargs.get("channels") or cls.channels
+
+    @classmethod
+    def _meta_from_layout(cls, shape, layout: str):
+        axis_map = dict(zip(layout, shape))
+        meta = {
+            "width": axis_map.get("X"),
+            "height": axis_map.get("Y"),
+            "channels": axis_map.get("C"),
+            "depth": axis_map.get("Z"),
+            "frames": axis_map.get("T"),
+            "sequence": axis_map.get("S"),
+        }
+
+        c = meta["channels"]
+        meta["mode"] = "L" if c is None else cls.channel_modes.get(c, f"{c} channels")
+
+        if meta["frames"] is not None:
+            meta["kind"] = "video"
+        elif meta["depth"] is not None:
+            meta["kind"] = "volume"
+        else:
+            meta["kind"] = "image"
+
+        if "C" in layout:
+            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = layout.index("C")
+        else:
+            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = float("nan")
+
+        return meta
+
+    @classmethod
+    def create(
+        cls,
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        merge_cd: bool = True,
+        interleaved: bool = True,
+        **kwargs,
+    ):
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        img = super().create(fn, **kwargs)
+        layout = cls._get_layout(img, kwargs)
+        tensor = img.as_tensor()
+
+        output_layout = layout
+        if merge_cd:
+            if layout is None or "C" not in layout or "Z" not in layout:
+                raise ValueError(f"BioImageMulti merge_cd requires C and Z axes, got {layout!r}")
+
+            c_dim = layout.index("C")
+            z_dim = layout.index("Z")
+            c = tensor.shape[c_dim]
+            d = tensor.shape[z_dim]
+            spatial_dims = [i for i in range(tensor.ndim) if i not in (c_dim, z_dim)]
+
+            if interleaved:
+                permute_dims = [z_dim, c_dim, *spatial_dims]
+            else:
+                permute_dims = [c_dim, z_dim, *spatial_dims]
+
+            tensor = tensor.permute(*permute_dims)
+            tensor = tensor.reshape(c * d, *tensor.shape[2:])
+            output_layout = layout.replace("Z", "")
+
+        meta = dict(img.meta)
+        if output_layout is not None:
+            meta.update(cls._meta_from_layout(tensor.shape, output_layout))
+            meta["layout"] = output_layout
+        meta["size_output"] = tuple(tensor.shape)
+
+        return cls(x=tensor, meta=meta)
+
+    def show(self, ctx=None, **kwargs):
+        return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
+
+    def __repr__(self) -> str:
+        return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
 
 # %% ../nbs/01_data.ipynb #98c6bb4c
 class Tensor2BioImage(DisplayedTransform):
@@ -2632,7 +2760,7 @@ def show_batch(
         # -------------------------
         # Convert tensors → BioImage
         # -------------------------
-        cls = BioImage if x[0].shape[0] == 1 else BioImageMulti
+        cls = BioImage if x[0].shape[0] == 1 else BioMultiChannel
         x_bio = [Tensor2BioImage(cls)(t) for t in x]
 
         # -------------------------
@@ -2768,7 +2896,7 @@ def show_results(dl: torchDataLoader,         # DataLoader containing the batch 
     x, y = batch
 
     # Choose the right BioImage class based on channels
-    cls = BioImage if x[0].shape[0]==1 else BioImageMulti
+    cls = BioImage if x[0].shape[0]==1 else BioMultiChannel
     x_bio = [Tensor2BioImage(cls)(t) for t in x]
 
     # Convert predictions and labels to lists
