@@ -395,7 +395,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#metaresolver" id="toc-metaresolver" class="nav-link" data-scroll-target="#metaresolver">MetaResolver</a></li>
   <li><a href="#bioimagebase" id="toc-bioimagebase" class="nav-link" data-scroll-target="#bioimagebase">BioImageBase</a></li>
   <li><a href="#bioimage" id="toc-bioimage" class="nav-link" data-scroll-target="#bioimage">BioImage</a></li>
-  <li><a href="#bioimagestack" id="toc-bioimagestack" class="nav-link" data-scroll-target="#bioimagestack">BioImageStack</a></li>
+  <li><a href="#BioVolume" id="toc-BioVolume" class="nav-link" data-scroll-target="#BioVolume">BioVolume</a></li>
   <li><a href="#bioimageproject" id="toc-bioimageproject" class="nav-link" data-scroll-target="#bioimageproject">BioImageProject</a></li>
   <li><a href="#bioimagemulti" id="toc-bioimagemulti" class="nav-link" data-scroll-target="#bioimagemulti">BioImageMulti</a></li>
   </ul></li>
@@ -574,17 +574,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data.py#L246" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="bioimagestack" class="level3">
-<h3 class="anchored" data-anchor-id="bioimagestack">BioImageStack</h3>
+<section id="BioVolume" class="level3">
+<h3 class="anchored" data-anchor-id="BioVolume">BioVolume</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImageStack(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioVolume(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Designed for 3D image data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagestack"><code>BioImageStack</code></a> extends <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to manage volumetric images effectively. </em> It includes functionalities for slicing, visualization, and manipulation of 3D data.</p>
+<p><em>Designed for 3D image data, <a href="https://deepCLEM.github.io/bioMONAI/data.html#BioVolume"><code>BioVolume</code></a> extends <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagebase"><code>BioImageBase</code></a> to manage volumetric images effectively. </em> It includes functionalities for slicing, visualization, and manipulation of 3D data.</p>
 <div id="c9b7701f" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageStack.create(<span class="st">'./data_examples/example_tiff.tiff'</span>, roi<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">10</span>))  </span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioVolume.create(<span class="st">'./data_examples/example_tiff.tiff'</span>, roi<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">10</span>))  </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch.Size([1, 10, 512, 512])</code></pre>

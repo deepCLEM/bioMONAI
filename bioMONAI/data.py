@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
-           'BioImageProject', 'BioImageMulti', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock', 'register_source',
+           'BioVolume', 'BioMIP', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock', 'register_source',
            'register_dataset', 'register_loader', 'register_task', 'route_kwargs', 'split_prefixed_kwargs',
            'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource',
            'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
@@ -79,6 +79,7 @@ from fastai.vision.all import (
 from monai.data import Dataset as MonaiDataset, CacheDataset, PersistentDataset, SmartCacheDataset
 from monai.data.utils import pickle_hashing
 from monai.transforms import Compose, CenterSpatialCrop, CenterScaleCrop
+from monai.utils import MetaKeys
 from monai.transforms.transform import Randomizable
 
 # =================================
@@ -157,6 +158,14 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     def item_preprocessing(cls, transforms):
         cls.transforms = transforms
 
+    @classmethod
+    def get_kwargs_with_channels(cls, kwargs=None):
+        kwargs = {} if kwargs is None else dict(kwargs)
+        return {
+            **({"channels": cls.channels} if cls.channels else {}),
+            **kwargs,
+        }
+
     # --------------------------------------------------
     # LOADING
     # --------------------------------------------------
@@ -194,11 +203,11 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        return LoadImage(BioImageReader(), **kwargs)
+        return LoadImage(BioImageReader, **kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        return LoadImaged(keys, reader=BioImageReader(), **kwargs)
+        return LoadImaged(keys, reader=BioImageReader, **kwargs)
 
     # --------------------------------------------------
     # VISUALIZATION
@@ -209,6 +218,7 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
             ctx=ctx,
             ncols=ncols,
             title=[title],
+            figsize=figsize,
             **merge(self._show_args, kwargs),
         )
 
@@ -241,112 +251,114 @@ class BioImage(BioImageBase):
         **kwargs,
     ):
 
-        kwargs = {
-            **({"channels": cls.channels} if cls.channels else {}),
-            **kwargs,
-        }
+        kwargs = cls.get_kwargs_with_channels(kwargs)
 
         return super().create(fn, **kwargs)
+    
+    def show(self, ctx=None, **kwargs):
+        "Show image using `merge(self._show_args, kwargs)`"
+        return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
 
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        return LoadImage(BioImageReader(), **kwargs)
+        kwargs = cls.get_kwargs_with_channels()
+        return LoadImage(BioImageReader, **kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        return LoadImaged(keys, reader=BioImageReader(), **kwargs)
+        kwargs = cls.get_kwargs_with_channels()
+        return LoadImaged(keys, reader=BioImageReader, **kwargs)
 
-# %% ../nbs/01_data.ipynb #a81086d5
-class BioImageProject(BioImageBase):
+# %% ../nbs/01_data.ipynb #a32aa47a
+class BioVolume(BioImageBase):
+    """
+    Tensor-backed bioimage loaded from disk.
+
+    This is the class that:
+    - uses image_reader
+    - handles transforms
+    - returns MetaTensor-backed images
+    """
+
+    channels="ZYX"
+
+    # --------------------------------------------------
+    # LOADING
+    # --------------------------------------------------
+    @classmethod
+    def create(
+        cls,
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        **kwargs,
+    ):
+
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+
+        return super().create(fn, **kwargs)
+    
+    # --------------------------------------------------
+    # MONAI INTEGRATION
+    # --------------------------------------------------
+    @classmethod
+    def load(cls, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels()
+        return LoadImage(BioImageReader, **kwargs)
+
+    @classmethod
+    def load_dict(cls, keys, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels()
+        return LoadImaged(keys, reader=BioImageReader, **kwargs)
+
+# %% ../nbs/01_data.ipynb #4ebea767
+class BioMIP(BioImageBase):
     """
     The `BioImageProject` class represents a 3D image stack as a 2D image using maximum intensity projection. This is particularly useful for visualizing volumetric data in a 2D format, aiding in quick assessments and presentations.
     """
-    _show_args = {'cmap':'gray'}
     
+    _show_args = {"cmap": "gray"}
+    channels = "CZYX"
+    channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
+
     @classmethod
-    def create(cls, fn: (Path, str, L, list, torchTensor), roi=None, **kwargs) -> torchTensor: 
-        """
-        Opens an image and casts it to BioImageBase object.
-        If `fn` is a torchTensor, it's cast to BioImageBase object.
-
-        Args:
-            fn : (Path, str, torchTensor)
-                Image path or a 4D torchTensor.
-            kwargs : dict
-                Additional parameters for the medical image reader.
-
-        Returns:
-            torchTensor : A 3D tensor as a BioImage object.
-        """
-        if isinstance(fn, torchTensor):
-            return cls(fn)
-
-        img = image_reader(fn, dtype=cls, resample=cls.resample, reorder=cls.reorder)
-        
-        if roi is not None:
-            return torchmax(img[:,roi[0]:roi[1]], dim=1)[0]  # Taking the maximum intensity projection along axis 1
-        return torchmax(img, dim=1)[0]  # Taking the maximum intensity projection along axis 1
-    
-    def show(self, ctx=None, **kwargs):
-        "Show image using `merge(self._show_args, kwargs)`"
-        return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
-    
-    def __repr__(self) -> str:
-        """Returns the string representation of the ImageBase instance."""
-        return f"BioImageProject{self.as_tensor().__repr__()[6:]}"
-
-# %% ../nbs/01_data.ipynb #b484acfa
-class BioImageMulti(BioImageBase):
-    """
-    Multi-channel 2D/3D image assuming CDHW layout.
-    """
+    def _get_layout(cls, img, kwargs):
+        return img.meta.get("layout") or kwargs.get("channels") or cls.channels
 
     @classmethod
     def create(
         cls,
-        fn: (Path, str, L, list, torchTensor),
-        roi=None,
-        merge_cd: bool = True,
-        interleaved: bool = True,
-        **kwargs
-    ) -> torchTensor:
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        **kwargs,
+    ):
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        img = super().create(fn, **kwargs)
 
-        if isinstance(fn, torchTensor):
-            img = fn
-        else:
-            img = image_reader(
-                fn,
-                dtype=cls,
-                resample=cls.resample,
-                reorder=cls.reorder,
-                **kwargs
-            )
-            img = torchsqueeze(img)
+        layout = kwargs.get("channels") or cls.channels
 
-        if roi is not None:
-            img = img[roi[0]:roi[1]]
+        z_dim = layout.index("Z")
+        mip = torchmax(img.as_tensor(), dim=z_dim).values
+        output_layout = layout.replace("Z", "")
+        meta = dict(img.meta)
+        meta["layout"] = output_layout
+        meta["size_output"] = tuple(mip.shape)
 
-        # Assume layout: (C, D, H, W)
-        if merge_cd and img.ndim == 4:
-            c, d, h, w = img.shape
-
-            if interleaved:
-                # (C, D, H, W) → (D, C, H, W) → flatten
-                img = img.permute(1, 0, 2, 3).reshape(c * d, h, w)
-            else:
-                # Sequential flatten (C blocks)
-                img = img.reshape(c * d, h, w)
-
-        return cls(img)
+        return cls(x=mip, meta=meta)
 
     def show(self, ctx=None, **kwargs):
-        return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
+        return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
 
-    def __repr__(self) -> str:
-        return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
+    @classmethod
+    def load(cls, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return LoadImage(BioImageReader, **kwargs)
+
+    @classmethod
+    def load_dict(cls, keys, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return LoadImaged(keys, reader=BioImageReader, **kwargs)
+
 
 # %% ../nbs/01_data.ipynb #98c6bb4c
 class Tensor2BioImage(DisplayedTransform):

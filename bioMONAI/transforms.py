@@ -49,7 +49,7 @@ from fastai.vision.all import *
 # bioMONAI
 # =================================
 from .core import torchTensor
-from .data import BioImageBase, BioImageStack, Tensor2BioImage
+from .data import BioImageBase, BioVolume, Tensor2BioImage
 
 # %% ../nbs/05_transforms.ipynb #425f62e2
 class FunctionTransform(Transform):

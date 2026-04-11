@@ -500,7 +500,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>vocab</code>: The vocabulary or labels for the dataset.</li>
 <li><code>item_tfms</code>: A list of transformations to apply to each image individually. Examples include <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#scaleintensity"><code>ScaleIntensity()</code></a>, <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#randrot90"><code>RandRot90()</code></a>, and <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#resize"><code>Resize()</code></a>.</li>
 <li><code>batch_tfms</code>: A list of transformations to apply to a batch of images. This can be set to <code>None</code> if no batch transformations are needed.</li>
-<li><code>img_cls</code>: The class to use for loading images. For 3D images, this is typically <a href="https://deepCLEM.github.io/bioMONAI/data.html#bioimagestack"><code>BioImageStack</code></a>.</li>
+<li><code>img_cls</code>: The class to use for loading images. For 3D images, this is typically <a href="https://deepCLEM.github.io/bioMONAI/data.html#BioVolume"><code>BioVolume</code></a>.</li>
 <li><code>bs</code>: The batch size, which determines how many images are processed together in each batch.</li>
 <li><code>show_summary</code>: A boolean flag to display a summary of the dataset and the transformations applied.</li>
 </ul>
@@ -514,7 +514,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'train'</span>: <span class="st">'train'</span>,                                       <span class="co"># folder for training data</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'valid'</span>: <span class="st">'val'</span>,                                           <span class="co"># folder for validation data</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'vocab'</span>: info[<span class="st">'label'</span>],                                 <span class="co"># list of class labels</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'img_cls'</span>: BioImageStack,                               <span class="co"># class to use for images</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'img_cls'</span>: BioVolume,                               <span class="co"># class to use for images</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'bs'</span>: batch_size,                                       <span class="co"># batch size</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'batch_tfms'</span>: <span class="va">None</span>,</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'item_tfms'</span>: [ScaleIntensity(),</span>
