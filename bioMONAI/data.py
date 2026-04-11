@@ -134,11 +134,11 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     - visualization utilities
     - lightweight tensor wrapper
 
-    Does NOT handle file loading.
     """
 
     _bypass_type = torchTensor
     _show_args = {"cmap": "gray"}
+    transforms = None
 
     # --------------------------------------------------
     # BASIC CONSTRUCTORS
@@ -156,37 +156,6 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     @classmethod
     def item_preprocessing(cls, transforms):
         cls.transforms = transforms
-
-    # --------------------------------------------------
-    # VISUALIZATION
-    # --------------------------------------------------
-    def show(self, ctx=None, figsize=None, ncols: int = 10, title=None, **kwargs):
-        return show_images_grid(
-            self,
-            ctx=ctx,
-            ncols=ncols,
-            title=[title],
-            **merge(self._show_args, kwargs),
-        )
-
-    # --------------------------------------------------
-    # REPR
-    # --------------------------------------------------
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}{self.as_tensor().__repr__()[6:]}"
-
-# %% ../nbs/01_data.ipynb #461fb287
-class BioImage(BioImageBase):
-    """
-    Tensor-backed bioimage loaded from disk.
-
-    This is the class that:
-    - uses image_reader
-    - handles transforms
-    - returns MetaTensor-backed images
-    """
-
-    transforms = None
 
     # --------------------------------------------------
     # LOADING
@@ -219,6 +188,65 @@ class BioImage(BioImageBase):
             meta['final_size'] = tuple(tensor.shape)
 
         return cls(x=tensor, meta=meta)
+
+    # --------------------------------------------------
+    # MONAI INTEGRATION
+    # --------------------------------------------------
+    @classmethod
+    def load(cls, **kwargs) -> Callable:
+        return LoadImage(BioImageReader(), **kwargs)
+
+    @classmethod
+    def load_dict(cls, keys, **kwargs) -> Callable:
+        return LoadImaged(keys, reader=BioImageReader(), **kwargs)
+
+    # --------------------------------------------------
+    # VISUALIZATION
+    # --------------------------------------------------
+    def show(self, ctx=None, figsize=None, ncols: int = 10, title=None, **kwargs):
+        return show_images_grid(
+            self,
+            ctx=ctx,
+            ncols=ncols,
+            title=[title],
+            **merge(self._show_args, kwargs),
+        )
+
+    # --------------------------------------------------
+    # REPR
+    # --------------------------------------------------
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}{self.as_tensor().__repr__()[6:]}"
+
+# %% ../nbs/01_data.ipynb #bcec9658
+class BioImage(BioImageBase):
+    """
+    Tensor-backed bioimage loaded from disk.
+
+    This is the class that:
+    - uses image_reader
+    - handles transforms
+    - returns MetaTensor-backed images
+    """
+
+    channels="CYX"
+
+    # --------------------------------------------------
+    # LOADING
+    # --------------------------------------------------
+    @classmethod
+    def create(
+        cls,
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        **kwargs,
+    ):
+
+        kwargs = {
+            **({"channels": cls.channels} if cls.channels else {}),
+            **kwargs,
+        }
+
+        return super().create(fn, **kwargs)
 
     # --------------------------------------------------
     # MONAI INTEGRATION

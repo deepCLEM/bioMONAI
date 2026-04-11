@@ -57,7 +57,7 @@ from monai.utils import MetaKeys, ensure_tuple
 # =================================
 # bioMONAI
 # =================================
-from .core import L, torchTensor, torch_from_numpy
+from .core import L, torchTensor, torch_from_numpy, torchsqueeze
 
 # %% ../nbs/02_io.ipynb #453fb47a
 def write_image(data, file_path, dimension_order="TCZYX"):
@@ -334,13 +334,13 @@ class PreprocessMetadata:
     Metadata container for preprocessing.
 
     Attributes:
-        original_size: Shape before preprocessing.
-        final_size: Shape after preprocessing.
+        size_original: Shape before preprocessing.
+        size_after_tfms: Shape after preprocessing.
         transforms: List of applied transforms.
         format: File format(s) (e.g. NIFTI, HDF5, PNG).
     """
-    original_size: tuple
-    final_size: tuple | None = None
+    size_original: tuple
+    size_after_tfms: tuple | None = None
     transforms: list[TransformMetadata] = field(default_factory=list)
     format: str | None = None
     layout: str | None = None
@@ -364,7 +364,7 @@ def _preprocess(obj: ScalarImage, transforms: Callable|Iterable[Callable]|None=N
     elif callable(transforms):
         transforms = [transforms]
 
-    metadata = PreprocessMetadata(original_size=obj.shape)
+    metadata = PreprocessMetadata(size_original=obj.shape)
 
     for t in transforms:
         start = time.time()
@@ -379,7 +379,7 @@ def _preprocess(obj: ScalarImage, transforms: Callable|Iterable[Callable]|None=N
             )
         )
 
-    metadata.final_size = obj.shape if hasattr(obj, "shape") else None
+    metadata.size_after_tfms = obj.shape if hasattr(obj, "shape") else None
 
     return obj, metadata
 
@@ -832,12 +832,13 @@ class BioImageReader(ImageReader):
 
         # inject normalized metadata
         layout = kwargs_.get("channels", "CZYX")
+        mt = self._normalize_layout(mt, layout)
         mt.meta.update(self._meta_from_layout(mt.shape, layout))
 
         return mt
 
     # --------------------------------------------------
-    def get_data(self, img: "MetaTensor") -> tuple[np.ndarray, dict]:
+    def get_data(self, img: MetaTensor) -> tuple[np.ndarray, dict]:
 
         if self.reverse_indexing and img.ndim >= 2:
             img = MetaTensor(
@@ -853,6 +854,21 @@ class BioImageReader(ImageReader):
 
         return array, meta 
 
+    def _normalize_layout(self, img: MetaTensor, layout: str | None) -> MetaTensor:
+        if layout is None or len(layout) >= 4:
+            return img
+
+        tensor = img.as_tensor()
+
+        if tensor.ndim > len(layout):
+            tensor = torchsqueeze(tensor, dim=0)
+
+        if len(layout) < 3 and tensor.ndim > len(layout):
+            tensor = torchsqueeze(tensor, dim=-1)
+
+        meta = dict(img.meta)
+        meta["size_output"] = tuple(tensor.shape)
+        return MetaTensor(x=tensor, meta=meta)
 
     # ==================================================
     # META FROM LAYOUT
@@ -864,6 +880,7 @@ class BioImageReader(ImageReader):
         axis_map = dict(zip(layout, shape))
 
         meta = {
+            "size_output": tuple(shape),
             "width": axis_map.get("X"),
             "height": axis_map.get("Y"),
             "channels": axis_map.get("C"),
