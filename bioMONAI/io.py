@@ -860,11 +860,14 @@ class BioImageReader(ImageReader):
 
         tensor = img.as_tensor()
 
-        if tensor.ndim > len(layout):
+        while tensor.ndim > len(layout) and tensor.shape[0] == 1:
             tensor = torchsqueeze(tensor, dim=0)
 
-        if len(layout) < 3 and tensor.ndim > len(layout):
+        while tensor.ndim > len(layout) and tensor.shape[-1] == 1:
             tensor = torchsqueeze(tensor, dim=-1)
+
+        if tensor.ndim != len(layout):
+            return img
 
         meta = dict(img.meta)
         meta["size_output"] = tuple(tensor.shape)

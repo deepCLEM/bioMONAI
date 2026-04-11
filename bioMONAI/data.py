@@ -203,10 +203,12 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
+        kwargs.setdefault("ensure_channel_first", True)
         return LoadImage(BioImageReader, **kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
+        kwargs.setdefault("ensure_channel_first", True)
         return LoadImaged(keys, reader=BioImageReader, **kwargs)
 
     # --------------------------------------------------
@@ -264,13 +266,13 @@ class BioImage(BioImageBase):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels()
-        return LoadImage(BioImageReader, **kwargs)
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels()
-        return LoadImaged(keys, reader=BioImageReader, **kwargs)
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return super().load_dict(keys, **kwargs)
 
 # %% ../nbs/01_data.ipynb #a32aa47a
 class BioVolume(BioImageBase):
@@ -304,13 +306,13 @@ class BioVolume(BioImageBase):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels()
-        return LoadImage(BioImageReader, **kwargs)
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels()
-        return LoadImaged(keys, reader=BioImageReader, **kwargs)
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return super().load_dict(keys, **kwargs)
 
 # %% ../nbs/01_data.ipynb #4ebea767
 class BioMIP(BioImageBase):
@@ -349,15 +351,18 @@ class BioMIP(BioImageBase):
     def show(self, ctx=None, **kwargs):
         return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
 
+    # --------------------------------------------------
+    # MONAI INTEGRATION
+    # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
         kwargs = cls.get_kwargs_with_channels(kwargs)
-        return LoadImage(BioImageReader, **kwargs)
+        return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
         kwargs = cls.get_kwargs_with_channels(kwargs)
-        return LoadImaged(keys, reader=BioImageReader, **kwargs)
+        return super().load_dict(keys, **kwargs)
 
 
 # %% ../nbs/01_data.ipynb #0febd1d1
@@ -392,12 +397,12 @@ class BioVideo(BioImageBase):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels()
+        kwargs = cls.get_kwargs_with_channels(kwargs)
         return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels()
+        kwargs = cls.get_kwargs_with_channels(kwargs)
         return super().load_dict(keys, **kwargs)
 
 # %% ../nbs/01_data.ipynb #b484acfa
@@ -457,7 +462,7 @@ class BioMultiChannel(BioImageBase):
         output_layout = layout
         if merge_cd:
             if layout is None or "C" not in layout or "Z" not in layout:
-                raise ValueError(f"BioImageMulti merge_cd requires C and Z axes, got {layout!r}")
+                raise ValueError(f"BioMultiChannel merge_cd requires C and Z axes, got {layout!r}")
 
             c_dim = layout.index("C")
             z_dim = layout.index("Z")
@@ -485,8 +490,21 @@ class BioMultiChannel(BioImageBase):
     def show(self, ctx=None, **kwargs):
         return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
 
+    # --------------------------------------------------
+    # MONAI INTEGRATION
+    # --------------------------------------------------
+    @classmethod
+    def load(cls, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return super().load(**kwargs)
+
+    @classmethod
+    def load_dict(cls, keys, **kwargs) -> Callable:
+        kwargs = cls.get_kwargs_with_channels(kwargs)
+        return super().load_dict(keys, **kwargs)
+
     def __repr__(self) -> str:
-        return f"BioImageMulti{self.as_tensor().__repr__()[6:]}"
+        return f"BioMultiChannel{self.as_tensor().__repr__()[6:]}"
 
 # %% ../nbs/01_data.ipynb #98c6bb4c
 class Tensor2BioImage(DisplayedTransform):
@@ -3293,8 +3311,8 @@ def save_patches_grid(data_paths,                   # Path to folder or list of 
             data_file_name = os.path.splitext(os.path.basename(data_file_path))[0]
         
         # Load the images
-        data = image_reader(data_file_path, dtype=np.array)
-        gt = image_reader(gt_file_path, dtype=np.array)
+        data = np.array(image_reader(data_file_path))
+        gt = np.array(image_reader(gt_file_path)) 
         
         if squeeze_input:
             data = np.squeeze(data)
