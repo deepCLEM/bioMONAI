@@ -100,7 +100,6 @@ from plum import dispatch as typedispatch
 # bioMONAI
 # =================================
 from .datasets import download_medmnist
-from .visualize import plot_histogram_and_kde, display_statistics_table
 
 # %% ../nbs/00_core.ipynb #d0707803
 DataBlock = DataBlock
@@ -392,11 +391,14 @@ def evaluate_model(trainer:Learner,                                 # The model 
                    show_results=True,                       # Boolean flag to show model results on test data. 
                    as_dataframe=True,                       # Boolean flag to display table as a DataFrame. 
                    cmap='magma',                            # Colormap for visualization.
+                   use_plotly=True,                         # Boolean flag to use Plotly for interactive plots instead of Matplotlib.
                    ):
     """
     Calculate and optionally plot the distribution of loss values from predictions
     made by the trainer on test data, with an optional table of key statistics.
     """
+    from .visualize import plot_histogram_and_kde, display_statistics_table, plot_dist
+
     out = dict()
     
     if loss is None:
@@ -419,7 +421,11 @@ def evaluate_model(trainer:Learner,                                 # The model 
     loss_name = loss.__class__.__name__  # Get loss function name
     out[loss_name] = losses    
     if show_graph:
-        plot_histogram_and_kde(losses, loss_stats, bw_method, loss_name)
+        if use_plotly:
+            plot_dist(losses, title=loss_name)
+        else:
+            plot_histogram_and_kde(losses, loss_stats, bw_method, loss_name)
+
     if show_table:
         display_statistics_table(loss_stats, loss_name, as_dataframe=as_dataframe)
             
@@ -435,7 +441,10 @@ def evaluate_model(trainer:Learner,                                 # The model 
                 metric_name = getattr(metric, 'func', metric).__name__  # Support AvgMetric or regular functions                
                 out[metric_name] = metric_values       
                 if show_graph:
-                    plot_histogram_and_kde(metric_values, metric_stats, bw_method, metric_name)
+                    if use_plotly:
+                        plot_dist(losses, title=loss_name)
+                    else:
+                        plot_histogram_and_kde(losses, loss_stats, bw_method, loss_name)
                 if show_table:
                     display_statistics_table(metric_stats, metric_name, as_dataframe=as_dataframe)
 
@@ -456,10 +465,13 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
                                   show_results=True,            # Boolean flag to show model results on test data. 
                                   as_dataframe=True,            # Boolean flag to display table as a DataFrame. 
                                   cmap=warm_cmap,               # Color map for the confusion matrix plot. 
+                                  use_plotly=True,              # Boolean flag to use Plotly for interactive plots instead of Matplotlib.
                                   ):
     """
     Evaluates a classification model by displaying results, confusion matrix, and most confused classes.
     """
+    from .visualize import plot_histogram_and_kde, display_statistics_table, plot_dist
+
     out = dict()
     
     if loss_fn is None:
@@ -497,7 +509,10 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     loss_name = loss_fn.__class__.__name__  # Get loss function name
     out[loss_name] = losses
     if show_graph:
-        plot_histogram_and_kde(losses, loss_stats, bw_method, loss_name)
+            if use_plotly:
+                plot_dist(losses, title=loss_name)
+            else:
+                plot_histogram_and_kde(losses, loss_stats, bw_method, loss_name)
     if show_table:
         display_statistics_table(loss_stats, loss_name, as_dataframe=as_dataframe)
             
@@ -513,7 +528,10 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
                 metric_name = getattr(metric, 'func', metric).__name__  # Support AvgMetric or regular functions 
                 out[metric_name] = metric_values                      
                 if show_graph:
-                    plot_histogram_and_kde(metric_values, metric_stats, bw_method, metric_name)
+                    if use_plotly:
+                        plot_dist(losses, title=loss_name)
+                    else:
+                        plot_histogram_and_kde(losses, loss_stats, bw_method, loss_name)
                 if show_table:
                     display_statistics_table(metric_stats, metric_name, as_dataframe=as_dataframe)
     

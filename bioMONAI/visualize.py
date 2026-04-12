@@ -704,6 +704,7 @@ def plot_dist(
     labels=None,
     opacity=0.65,
     barmode="overlay",
+    show_kde=False,
 ):
     """
     Plot one or more distributions with a Matplotlib-like Plotly layout.
@@ -726,6 +727,8 @@ def plot_dist(
         Bar opacity when plotting multiple distributions.
     barmode : str
         Plotly bar mode, usually "overlay" or "group".
+    show_kde : bool
+        If True, overlay KDE curves on the same density axis.
     """
     if isinstance(values, (list, tuple)) and len(values) > 0 and hasattr(values[0], "__len__"):
         dists = values
@@ -738,10 +741,12 @@ def plot_dist(
     if len(labels) != len(dists):
         raise ValueError("`labels` must have the same length as `values`.")
 
+    clean_dists = []
     frames = []
     for vals, label in zip(dists, labels):
         x = np.asarray(vals).ravel()
         x = x[~np.isnan(x)]
+        clean_dists.append(x)
         frames.append(pd.DataFrame({"values": x, "dist": label}))
 
     df = pd.concat(frames, ignore_index=True)
@@ -753,12 +758,14 @@ def plot_dist(
         marginal=marginal,
         hover_data=df.columns,
         nbins=nbins,
+        histnorm="probability density",
         template="simple_white",
         title=title,
         barmode=barmode,
         opacity=opacity,
     )
 
+    colors = None
     if color is not None:
         if isinstance(color, str):
             colors = [color] * len(dists)
@@ -770,9 +777,25 @@ def plot_dist(
 
     fig = px.histogram(**hist_kwargs)
 
-    fig.update_traces(
-        marker=dict(line=dict(color="black", width=0.8)),
-    )
+    fig.update_traces(marker=dict(line=dict(color="black", width=0.8)))
+
+    if show_kde:
+        import plotly.figure_factory as ff
+
+        kde_colors = colors
+        if kde_colors is None:
+            kde_colors = px.colors.qualitative.Plotly[:len(clean_dists)]
+
+        kde_fig = ff.create_distplot(
+            [x.tolist() for x in clean_dists],
+            group_labels=labels,
+            colors=kde_colors,
+            show_hist=False,
+            show_rug=False,
+        )
+
+        for trace in kde_fig.data:
+            fig.add_trace(trace)
 
     fig.update_layout(
         font=dict(family="DejaVu Sans, Arial, sans-serif", size=12, color="black"),
@@ -793,6 +816,7 @@ def plot_dist(
     )
 
     fig.update_yaxes(
+        title_text="Density",
         showline=True,
         linewidth=1,
         linecolor="black",
