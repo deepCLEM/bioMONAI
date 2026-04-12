@@ -4,10 +4,9 @@
 
 # %% auto #0
 __all__ = ['DataBlock', 'DataLoaders', 'Learner', 'cells3d', 'coolwarm', 'warm_cmap', 'read_yaml', 'dictlist_to_funclist',
-           'fastTrainer', 'visionTrainer', 'compute_losses', 'compute_metric', 'calculate_statistics', 'format_sig',
-           'plot_histogram_and_kde', 'display_statistics_table', 'evaluate_model', 'evaluate_classification_model',
-           'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor', 'TargetedTransform',
-           'apply_transforms']
+           'fastTrainer', 'visionTrainer', 'compute_losses', 'compute_metric', 'calculate_statistics', 'evaluate_model',
+           'evaluate_classification_model', 'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor',
+           'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/00_core.ipynb #e46d9793
 # =================================
@@ -24,7 +23,6 @@ from attr import dataclass
 # =================================
 import numpy as np
 import pandas as pd
-from scipy.stats import gaussian_kde
 
 # =================================
 # Visualization
@@ -102,6 +100,7 @@ from plum import dispatch as typedispatch
 # bioMONAI
 # =================================
 from .datasets import download_medmnist
+from .visualize import plot_histogram_and_kde, display_statistics_table
 
 # %% ../nbs/00_core.ipynb #d0707803
 DataBlock = DataBlock
@@ -375,81 +374,6 @@ def calculate_statistics(data):
         "Q1": np.percentile(data, 25),
         "Q3": np.percentile(data, 75),
     }
-
-
-def format_sig(value):
-    """
-    Format numbers with two significant digits.
-    """
-    if value == 0:
-        return "0"
-    elif abs(value) < 0.01 or abs(value) > 100:
-        return f"{value:.2e}"  # 2 significant digits in scientific notation
-    else:
-        return f"{value:.2g}"  # Standard notation with 2 significant figures
-
-
-def plot_histogram_and_kde(data, stats, bw_method=0.3, fn_name=''):
-    """
-    Plot the histogram and KDE of the data with key statistics marked.
-    """
-    kde = gaussian_kde(data, bw_method=bw_method)
-    x = np.linspace(min(data), max(data), 1000)
-    y = kde(x)
-
-    gauss_color = 'lightslategrey'
-    plt.figure(figsize=(8, 6))
-    plt.hist(data, bins=30, density=True, color='darkgray', edgecolor='black', alpha=0.5)
-    plt.plot(x, y, color=gauss_color, lw=2)
-    plt.fill_between(x, y, color=gauss_color, alpha=0.3)
-
-    # Add vertical lines for key statistics with formatted significant digits
-    plt.axvline(stats["Mean"], color='crimson', linestyle='--', linewidth=1.5, label=f'Mean: {format_sig(stats["Mean"])}')
-    plt.axvline(stats["Median"], color='steelblue', linestyle='--', linewidth=1.5, label=f'Median: {format_sig(stats["Median"])}')
-    plt.axvline(stats["Q1"], color='purple', linestyle=':', linewidth=1.5, label=f'Q1: {format_sig(stats["Q1"])}')
-    plt.axvline(stats["Q3"], color='purple', linestyle=':', linewidth=1.5, label=f'Q3: {format_sig(stats["Q3"])}')
-
-    # Display min, max, std deviation as text on the plot
-    plt.text(stats["Mean"] + stats["Standard Deviation"], 0.1, f'Std Dev: {format_sig(stats["Standard Deviation"])}', color='black', fontsize=10)
-    plt.text(stats["Min"], 0.02, f'Min: {format_sig(stats["Min"])}', color='black', fontsize=10, ha='center')
-    plt.text(stats["Max"], 0.02, f'Max: {format_sig(stats["Max"])}', color='black', fontsize=10, ha='center')
-
-    # Add loss function name to the title
-    plt.title(f"Combined Histogram and KDE with Statistics\n{fn_name}")
-    plt.xlabel("Value")
-    plt.ylabel("Density")
-    plt.legend()
-    # plt.grid(True)
-    plt.show()
-
-
-def display_statistics_table(stats, fn_name='', as_dataframe=True):
-    """
-    Display a table of the key statistics.
-    """
-    if as_dataframe:
-        # Convert statistics to a DataFrame and display
-        df = pd.DataFrame.from_dict(stats, orient='index', columns=['Value'])
-        df.index.name = f"{fn_name}"
-        display(df)
-    else:
-        fig, ax = plt.subplots(figsize=(5, 2))
-        ax.axis("off")
-        
-        # Header title row
-        table_data = [[f"{fn_name}", ""]]
-        table_data += [[key, format_sig(value)] for key, value in stats.items()]
-        
-        table = ax.table(cellText=table_data, colLabels=["Statistic", "Value"], cellLoc="center", loc="center")
-        table.auto_set_font_size(False)
-        table.set_fontsize(10)
-        table.scale(1.2, 1.2)
-        
-        # Style for header row
-        header = table[0, 0]
-        header.set_fontsize(12)
-        header.set_text_props(weight="bold")
-        plt.show()
 
 # %% ../nbs/00_core.ipynb #23aaa747
 # Retrieve the 'coolwarm' colormap
