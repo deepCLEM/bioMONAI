@@ -397,7 +397,7 @@ def evaluate_model(trainer:Learner,                                 # The model 
     Calculate and optionally plot the distribution of loss values from predictions
     made by the trainer on test data, with an optional table of key statistics.
     """
-    from .visualize import plot_histogram_and_kde, display_statistics_table, plot_dist
+    from bioMONAI.visualize import plot_histogram_and_kde, display_statistics_table, plot_dist
 
     out = dict()
     
@@ -470,7 +470,7 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
     """
     Evaluates a classification model by displaying results, confusion matrix, and most confused classes.
     """
-    from .visualize import plot_histogram_and_kde, display_statistics_table, plot_dist
+    from bioMONAI.visualize import plot_histogram_and_kde, display_statistics_table, plot_dist
 
     out = dict()
     

@@ -188,13 +188,13 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
             output="tensor+meta",
             **kwargs,
         )
-
+        
         channels = kwargs.get("channels")
-        if channels is not None and len(channels) < 4:
+        while tensor.ndim > len(channels) and tensor.shape[0] == 1:
             tensor = torchsqueeze(tensor, dim=0)
-            if len(channels) < 3:
-                tensor = torchsqueeze(tensor, dim=-1)
-            meta['final_size'] = tuple(tensor.shape)
+        while tensor.ndim > len(channels) and tensor.shape[-1] == 1:
+            tensor = torchsqueeze(tensor, dim=-1)
+        meta['final_size'] = tuple(tensor.shape)
 
         return cls(x=tensor, meta=meta)
 
