@@ -33,7 +33,7 @@ import torchvision
 # =================================
 # fastai
 # =================================
-from fastai.vision.all import ifnone, plt
+from fastai.vision.all import ifnone
 
 # =================================
 # bioMONAI
@@ -47,6 +47,7 @@ from bioMONAI.core import (
     torchTensor,
     torch_from_numpy,
 )
+from .data import route_kwargs
 
 # =================================
 # Optional / commented
@@ -54,6 +55,7 @@ from bioMONAI.core import (
 # from bioMONAI.io import tiff2torch
 
 # %% ../nbs/09_visualize.ipynb #4273c3de
+@delegates(plt.Axes.imshow, keep=True)
 def show_image(values, # A 2D or 3D array of pixel values representing the image.
                cmap = 'gray', # The colormap to use for displaying the image. Default is 'gray' for grayscale images.
                **kwargs,
@@ -184,7 +186,8 @@ def _fig_bounds(x):
     return min(15, max(1,r))
 
 # %% ../nbs/09_visualize.ipynb #ba0b8261
-def show_mosaic(t: (np.ndarray, torchTensor),   # 3D image to plot
+@delegates(plt.Axes.imshow, keep=True)
+def show_mosaic(t: np.ndarray | torchTensor,   # 3D image to plot
                   axis: int = 0,                    # axis to split 3D array to 2D images
                   figsize: tuple = (15,15),         # size of the figure
                   cmap: str = 'gray',               # colormap to use
@@ -327,6 +330,7 @@ def show_plane(ax,                  # The axis object to display the slice on.
 
 
 # %% ../nbs/09_visualize.ipynb #92ed68f5
+@delegates(show_plane, keep=True)
 def show_slices(data,          # A 3D numpy array representing the image tensor.
                 planes=None,   # A tuple containing the indices of the planes to visualize.
                 showlines=True,# Whether to show dashed lines on the planes, rows, and columns.
@@ -408,6 +412,7 @@ def slice_explorer(data,            # A 3D numpy array representing the image te
     pio.show(fig)
 
 # %% ../nbs/09_visualize.ipynb #5e7e936b
+@delegates(go.Figure)
 def show_volume(values,             # A 3D array of pixel values representing the volume.
                 opacity=0.1,        # Opacity level for the surfaces in the volume plot.
                 min=None,            # Minimum threshold for the visualization.
@@ -472,7 +477,7 @@ def show_biodata(
         x = np.asarray(data)
 
     if x.ndim == 2:
-        return show_image(x, **kwargs)
+        return show_image(x, **route_kwargs(show_image, kwargs))
 
     if x.ndim == 4:
         if not (-x.ndim <= mip_dim < x.ndim):
@@ -481,14 +486,14 @@ def show_biodata(
 
     if x.ndim == 3:
         if x.shape[0] <= channel_threshold:
-            return show_multichannel(x, max_slices=max_slices, **kwargs)
+            return show_multichannel(x, max_slices=max_slices, **route_kwargs(show_multichannel, kwargs))
         if volume_mode == "mosaic":
-            return show_mosaic(x, **kwargs)
+            return show_mosaic(x, **route_kwargs(show_mosaic, kwargs))
         if volume_mode == "grid":
-            return show_images_grid(x, **kwargs)
+            return show_images_grid(x, **route_kwargs(show_images_grid, kwargs))
         if volume_mode == "3D":
-            return show_volume(x, **kwargs)
-        return show_slices(x, **kwargs)
+            return show_volume(x, **route_kwargs(show_volume, kwargs))
+        return show_slices(x, **route_kwargs(show_slices, kwargs))
 
     raise ValueError(f"Unsupported input shape {x.shape}. Expected 2D, 3D, or 4D data.")
 
@@ -646,7 +651,7 @@ def plot_histogram_and_kde(data, stats, bw_method=0.3, fn_name=''):
 
     gauss_color = 'lightslategrey'
     plt.figure(figsize=(8, 6))
-    plt.hist(data, bins=30, density=True, color='darkgray', edgecolor='black', alpha=0.5)
+    plt.hist(data, bins=30, density=True, color='darkgray', edgecolor=None, alpha=0.5)
     plt.plot(x, y, color=gauss_color, lw=2)
     plt.fill_between(x, y, color=gauss_color, alpha=0.3)
 
@@ -708,6 +713,7 @@ def plot_dist(
     labels=None,
     opacity=0.65,
     barmode="overlay",
+    markerline_width=0.5,
     show_kde=False,
 ):
     """
@@ -781,7 +787,7 @@ def plot_dist(
 
     fig = px.histogram(**hist_kwargs)
 
-    fig.update_traces(marker=dict(line=dict(color="black", width=0.8)))
+    fig.update_traces(marker=dict(line=dict(color="white", width=markerline_width)))
 
     if show_kde:
         import plotly.figure_factory as ff
@@ -805,7 +811,6 @@ def plot_dist(
         font=dict(family="DejaVu Sans, Arial, sans-serif", size=12, color="black"),
         plot_bgcolor="white",
         paper_bgcolor="white",
-        bargap=0.05,
         legend_title_text="",
     )
 
