@@ -93,7 +93,7 @@ from bioMONAI.core import (
 )
 
 from .io import image_reader, BioImageReader, LoadImage, LoadImaged
-from .visualize import show_images_grid, show_multichannel
+from .visualize import show_biodata, show_images_grid, show_multichannel
 
 # =================================
 # Multiple dispatch
@@ -139,6 +139,7 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
 
     _bypass_type = torchTensor
     _show_args = {"cmap": "gray"}
+    channels="CZYX"
     transforms = None
 
     # --------------------------------------------------
@@ -189,6 +190,7 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
             **kwargs,
         )
         
+        kwargs = cls.get_kwargs_with_channels(kwargs)
         channels = kwargs.get("channels")
         while tensor.ndim > len(channels) and tensor.shape[0] == 1:
             tensor = torchsqueeze(tensor, dim=0)
@@ -214,12 +216,12 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     # --------------------------------------------------
     # VISUALIZATION
     # --------------------------------------------------
-    def show(self, ctx=None, figsize=None, ncols: int = 10, title=None, **kwargs):
-        return show_images_grid(
+    def show(self, ctx=None, figsize=None, title=None, **kwargs):
+        return show_biodata(
             self,
             ctx=ctx,
-            ncols=ncols,
             title=[title],
+            volume_mode='grid',
             figsize=figsize,
             **merge(self._show_args, kwargs),
         )
@@ -244,19 +246,8 @@ class BioImage(BioImageBase):
     channels="CYX"
 
     # --------------------------------------------------
-    # LOADING
+    # VISUALIZATION
     # --------------------------------------------------
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        **kwargs,
-    ):
-
-        kwargs = cls.get_kwargs_with_channels(kwargs)
-
-        return super().create(fn, **kwargs)
-    
     def show(self, ctx=None, **kwargs):
         "Show image using `merge(self._show_args, kwargs)`"
         return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
@@ -286,20 +277,6 @@ class BioVolume(BioImageBase):
     """
 
     channels="ZYX"
-
-    # --------------------------------------------------
-    # LOADING
-    # --------------------------------------------------
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        **kwargs,
-    ):
-
-        kwargs = cls.get_kwargs_with_channels(kwargs)
-
-        return super().create(fn, **kwargs)
     
     # --------------------------------------------------
     # MONAI INTEGRATION
@@ -3311,9 +3288,9 @@ def save_patches_grid(data_paths,                   # Path to folder or list of 
             data_file_name = os.path.splitext(os.path.basename(data_file_path))[0]
         
         # Load the images
-        data = np.array(image_reader(data_file_path))
-        gt = np.array(image_reader(gt_file_path)) 
-        
+        data = image_reader(data_file_path, output="nparray")
+        gt = image_reader(gt_file_path, output="nparray")
+
         if squeeze_input:
             data = np.squeeze(data)
             gt = np.squeeze(gt)
@@ -3489,8 +3466,8 @@ def save_patches_random(data_paths,                # Path to folder or list of p
         gt_file_name = os.path.basename(gt_file_path)
         
         # Load the images
-        data = np.array(image_reader(data_file_path))
-        gt = np.array(image_reader(gt_file_path))  
+        data = image_reader(data_file_path, output="nparray")
+        gt = image_reader(gt_file_path, output="nparray")
         
         if squeeze_input:
             data = np.squeeze(data)

@@ -55,6 +55,8 @@ from bioMONAI.core import (
 
 # %% ../nbs/09_visualize.ipynb #4273c3de
 def show_image(values, # A 2D or 3D array of pixel values representing the image.
+               cmap = 'gray', # The colormap to use for displaying the image. Default is 'gray' for grayscale images.
+               **kwargs,
                ):
     """
     Show a 2D image or the central slice of a 3D image using Matplotlib. 
@@ -75,7 +77,7 @@ def show_image(values, # A 2D or 3D array of pixel values representing the image
     
     # Display the image using imshow. The np.flipud function is applied to flip the array vertically, 
     # which is necessary because Matplotlib's default orientation might differ from NumPy's or Plotly's.
-    ax.imshow(np.flipud(central_slice), cmap='gray')
+    ax.imshow(np.flipud(central_slice), cmap=cmap, **kwargs)
     
     # Turn off axis numbers and ticks for a cleaner visual appearance of the image
     ax.axis('off')
@@ -225,7 +227,7 @@ def show_mosaic(t: (np.ndarray, torchTensor),   # 3D image to plot
     if not add_to_existing:
         plt.figure(figsize=figsize)
 
-    plt.imshow(grid[0,:,:], cmap=cmap, alpha=alpha)
+    plt.imshow(grid[0,:,:], cmap=cmap, alpha=alpha, **kwargs)
     plt.axis('off')
 
 # %% ../nbs/09_visualize.ipynb #ad679cb0
@@ -482,6 +484,8 @@ def show_biodata(
             return show_multichannel(x, max_slices=max_slices, **kwargs)
         if volume_mode == "mosaic":
             return show_mosaic(x, **kwargs)
+        if volume_mode == "grid":
+            return show_images_grid(x, **kwargs)
         if volume_mode == "3D":
             return show_volume(x, **kwargs)
         return show_slices(x, **kwargs)

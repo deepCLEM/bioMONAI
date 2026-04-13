@@ -591,6 +591,8 @@ def image_reader(
     | list[ScalarImage]
     | tuple[ScalarImage, dict]
     | tuple[list[ScalarImage], dict]
+    | np.ndarray
+    | tuple[np.ndarray, dict]
     | torch.Tensor
     | tuple[torch.Tensor, dict]
     | tuple[torch.Tensor, dict]
@@ -606,7 +608,7 @@ def image_reader(
         - single image loading
         - multi-image / multi-sequence loading
         - lazy or eager execution
-        - scalar, tensor, and MetaTensor outputs
+        - scalar, NumPy, tensor, and MetaTensor outputs
         - flexible axis control for multi-image stacking
 
     ----------------------------------------------------------------------
@@ -637,6 +639,8 @@ def image_reader(
     ----------------------------------------------------------------------
         "scalar"        -> ScalarImage or list[ScalarImage]
         "scalar+meta"   -> (ScalarImage, Meta) or (list, list)
+        "nparray"       -> np.ndarray
+        "nparray+meta"  -> (np.ndarray, Meta or list[Meta])
         "tensor"        -> torch.Tensor
         "tensor+meta"   -> (torch.Tensor, Meta or list[Meta])
         "metatensor"    -> MetaTensor
@@ -714,6 +718,9 @@ def image_reader(
 
         return t
 
+    def _to_numpy(tensor):
+        return tensor.detach().cpu().numpy()
+
     # -------------------------------------------------
     # detect multi
     # -------------------------------------------------
@@ -732,6 +739,12 @@ def image_reader(
             return list(imgs), {i:asdict(m) for i, m in enumerate(metas)}
 
         tensor = _stack(imgs)
+
+        if output == "nparray":
+            return _to_numpy(tensor)
+
+        if output == "nparray+meta":
+            return _to_numpy(tensor), {i:asdict(m) for i, m in enumerate(metas)}
 
         if output == "tensor":
             return tensor
@@ -764,6 +777,12 @@ def image_reader(
         tensor = tensor.squeeze()
 
     tensor = tensor.to(dtype)
+
+    if output == "nparray":
+        return _to_numpy(tensor)
+
+    if output == "nparray+meta":
+        return _to_numpy(tensor), asdict(meta)
 
     if output == "tensor":
         return tensor
