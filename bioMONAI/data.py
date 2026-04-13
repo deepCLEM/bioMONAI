@@ -21,11 +21,8 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
 # Standard library
 # =================================
 import os
-# import sys
 import random
-# import re
 import types
-import inspect
 
 # =================================
 # Third-party scientific stack
@@ -49,7 +46,6 @@ from sklearn.model_selection import train_test_split
 # =================================
 # PyTorch
 # =================================
-# from torch import stack as torch_stack
 from torch.utils.data import DataLoader as torchDataLoader
 from torch.utils.data import Dataset as torchDataset
 
@@ -1811,6 +1807,37 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
+    def create_from_yaml(cls, yaml_path):
+        """
+        Build training + validation DataLoaders from a YAML configuration file.
+
+        The YAML file may include the same arguments as ``BioDataLoaders.create``:
+        ``data``, ``val_data``, ``task``, ``dataset``, ``backend``, plus any
+        additional keyword arguments that should be forwarded through the pipeline.
+        """
+        config = read_yaml(yaml_path) or {}
+        config = {key: (None if value == "None" else value) for key, value in config.items()}
+
+        data = config.pop("data", None)
+        if data is None:
+            raise ValueError("YAML config must contain a 'data' key for BioDataLoaders.create_from_yaml.")
+
+        val_data = config.pop("val_data", None)
+        task = config.pop("task", None)
+        dataset = config.pop("dataset", None)
+        backend = config.pop("backend", None)
+
+        return cls._run_pipeline(
+            data,
+            val_data=val_data,
+            task=task,
+            dataset=dataset,
+            backend=backend,
+            **config,
+        )
+    
+    # --------------------------------------------------
+    @classmethod
     def test_dl(cls,
                 data,
                 task=None,
@@ -1841,6 +1868,35 @@ class BioDataLoaders(DataLoaders):
             backend=backend,
             mode="test",
             **kwargs
+        )
+    
+    # --------------------------------------------------
+    @classmethod
+    def test_dl_from_yaml(cls, yaml_path):
+        """
+        Build a test DataLoader from a YAML configuration file.
+
+        The YAML file may include the same arguments as ``BioDataLoaders.test_dl``:
+        ``data``, ``task``, ``dataset``, ``backend``, plus any additional
+        keyword arguments that should be forwarded through the pipeline.
+        """
+        config = read_yaml(yaml_path) or {}
+        config = {key: (None if value == "None" else value) for key, value in config.items()}
+
+        data = config.pop("data", None)
+        if data is None:
+            raise ValueError("YAML config must contain a 'data' key for BioDataLoaders.test_dl_from_yaml.")
+
+        task = config.pop("task", None)
+        dataset = config.pop("dataset", None)
+        backend = config.pop("backend", None)
+
+        return cls.test_dl(
+            data,
+            task=task,
+            dataset=dataset,
+            backend=backend,
+            **config,
         )
 
 # %% ../nbs/001_data.ipynb #5bec1991

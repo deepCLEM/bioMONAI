@@ -17,6 +17,7 @@ import yaml
 from random import randint, random as rand, choice
 from dataclasses import dataclass, field
 from pathlib import Path, PurePath
+from types import SimpleNamespace
 from typing import Any, List, Optional, Union
 import inspect
 
