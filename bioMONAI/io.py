@@ -5,7 +5,7 @@
 # %% auto #0
 __all__ = ['SaveImage', 'SaveImaged', 'LOADER_REGISTRY', 'LoadImage', 'LoadImaged', 'write_image', 'tiff2torch', 'string2dict',
            'split_path', 'is_ome_tiff', 'extract_formats', 'bioio_loader', 'split_hdf_path', 'hdf5_loader',
-           'TransformMetadata', 'PreprocessMetadata', 'LoaderRegistry', 'image_reader', 'BioImageReader']
+           'LoaderRegistry', 'image_reader', 'BioImageReader']
 
 # %% ../nbs/002_io.ipynb #58b60095
 # =================================
@@ -204,6 +204,7 @@ def extract_formats(filenames: Sequence[str] | str) -> list[str | None]:
 
 # %% ../nbs/002_io.ipynb #e1ba1c73
 class bioio_loader():
+    
     def __init__(self,
                  ind_dict=None, # Dictionary indicating the channels to load
                  loader=None, # Optional custom reader to use for loading the image
@@ -241,10 +242,12 @@ class bioio_loader():
 
         # Convert to numpy array    
         data = image_aics.get_image_data(self.channels, **ind_dict)
+        # extract metadata
+        meta = image_aics.metadata
         # Create an identity affine transformation matrix
         affine = np.eye(4)
         # Return the image data and the affine matrix
-        return data, affine
+        return data, meta, affine
 
 
 # %% ../nbs/002_io.ipynb #2bf5edc3
@@ -308,41 +311,8 @@ class hdf5_loader():
         return data, affine
 
 
-# %% ../nbs/002_io.ipynb #e8248528
-@dataclass
-class TransformMetadata:
-    """
-    Metadata for a single transform applied during preprocessing.
-
-    Attributes:
-        name: Name of the transform class.
-        time: Execution time in seconds.
-        params: Dictionary of transform parameters.
-    """
-    name: str
-    time: float
-    params: dict[str, Any]
-
-
-@dataclass
-class PreprocessMetadata:
-    """
-    Metadata container for preprocessing.
-
-    Attributes:
-        size_original: Shape before preprocessing.
-        size_after_tfms: Shape after preprocessing.
-        transforms: List of applied transforms.
-        format: File format(s) (e.g. NIFTI, HDF5, PNG).
-    """
-    size_original: tuple
-    size_after_tfms: tuple | None = None
-    transforms: list[TransformMetadata] = field(default_factory=list)
-    format: str | None = None
-    layout: str | None = None
-
 # %% ../nbs/002_io.ipynb #d418d00e
-def _preprocess(obj: ScalarImage, transforms: Callable|Iterable[Callable]|None=None) -> tuple[ScalarImage, PreprocessMetadata]:
+def _preprocess(obj: MetaTensor, transforms: Callable|Iterable[Callable]|None=None) -> MetaTensor:
     """
     Apply a sequence of transforms to an image object.
 
@@ -351,33 +321,30 @@ def _preprocess(obj: ScalarImage, transforms: Callable|Iterable[Callable]|None=N
         transforms: Callable or list of callables.
 
     Returns:
-        tuple:
-            - transformed object
-            - PreprocessMetadata
+        MetaTensor: Transformed object.
     """
     if transforms is None:
         transforms = []
     elif callable(transforms):
         transforms = [transforms]
 
-    metadata = PreprocessMetadata(size_original=obj.shape)
+    obj.meta['size_original'] = obj.shape
+    obj.meta['transforms'] = {}
 
     for t in transforms:
         start = time.time()
 
         obj = t(obj)
 
-        metadata.transforms.append(
-            TransformMetadata(
-                name=t.__class__.__name__,
-                time=time.time() - start,
-                params=getattr(t, "__dict__", {}),
-            )
-        )
+        obj.meta['transforms'][t.__class__.__name__] = obj.meta['transforms'].get(t.__class__.__name__, [])
+        obj.meta['transforms'][t.__class__.__name__] = {
+                'time': time.time() - start,
+                'params': getattr(t, "__dict__", {}),
+        }
 
-    metadata.size_after_tfms = obj.shape if hasattr(obj, "shape") else None
+    obj.meta['size_after_tfms'] = obj.shape if hasattr(obj, "shape") else None
 
-    return obj, metadata
+    return obj
 
 # %% ../nbs/002_io.ipynb #c60c74aa
 class LoaderRegistry:
@@ -405,9 +372,9 @@ def _load_default(path, ind_dict=None, loader=None, channels="CZYX", **kwargs):
     path_str = str(path)
     if ind_dict == None:
         path_str, ind_dict = split_path(path_str)
-    reader = bioio_loader(ind_dict, loader=loader, channels=channels)
+    data, meta, affine = bioio_loader(ind_dict, loader=loader, channels=channels)(path_str)
 
-    return ScalarImage(path_str, reader=reader)
+    return MetaTensor(x=data, affine=affine, meta=meta)
 
 
 
@@ -415,7 +382,7 @@ def _load_default(path, ind_dict=None, loader=None, channels="CZYX", **kwargs):
 @LOADER_REGISTRY.register(".npy")
 def _load_npy(path, **kwargs):
     data = np.load(path)
-    return ScalarImage(tensor=data)
+    return MetaTensor(x=data) 
 
 
 # %% ../nbs/002_io.ipynb #27932955
@@ -427,7 +394,7 @@ def _load_npz(path, npz_key=None, **kwargs):
     if key not in npz_file:
         raise KeyError(f"Key '{key}' not found. Available: {list(npz_file.keys())}")
 
-    return ScalarImage(tensor=npz_file[key])
+    return MetaTensor(x=npz_file[key])
 
 
 
@@ -439,9 +406,9 @@ def _load_hdf5(path, **kwargs):
     hdf5_ext = [ext for ext in ('.h5', '.hdf5') if ext in path_str]
     path, dataset, patch = split_hdf_path(path_str, hdf5_exts=hdf5_ext)
 
-    reader = hdf5_loader(dataset=dataset, patch=patch, hdf5_exts=hdf5_ext)
+    data, affine = hdf5_loader(dataset=dataset, patch=patch, hdf5_exts=hdf5_ext)(path)
 
-    return ScalarImage(path, reader=reader)
+    return MetaTensor(x=data, affine=affine)
 
 # %% ../nbs/002_io.ipynb #44f42658
 @LOADER_REGISTRY.register(".png")
@@ -457,9 +424,9 @@ def _load_png(path, ind_dict=None, channels="CZYX", loader=None, **kwargs):
     if ind_dict == None:
         path_str, ind_dict = split_path(path_str)
     channels = channels.replace("C", "S")
-    reader = bioio_loader(ind_dict, channels=channels, loader=loader)
+    data, meta, affine = bioio_loader(ind_dict, loader=loader, channels=channels)(path_str)
 
-    return ScalarImage(path_str, reader=reader)
+    return MetaTensor(x=data, affine=affine, meta=meta)
 
 # %% ../nbs/002_io.ipynb #e4ff27ed
 @LOADER_REGISTRY.register(".tiff", ".tif")
@@ -481,9 +448,9 @@ def _load_tiff(path, ind_dict=None, channels="CZYX", **kwargs):
     else:
         image_loader = TiffReader
 
-    reader = bioio_loader(ind_dict, loader=image_loader, channels=channels)
+    data, meta, affine = bioio_loader(ind_dict, loader=image_loader, channels=channels)(path_str)
 
-    return ScalarImage(path_str, reader=reader)
+    return MetaTensor(x=data, affine=affine, meta=meta)
 
 # %% ../nbs/002_io.ipynb #42c796c8
 def _get_loader(path: Path):
@@ -518,7 +485,7 @@ def _load_and_preprocess(
     channels: str ="CZYX",
     ind_dict: dict|None =None,
     npz_key: str|None =None,
-) -> tuple[ScalarImage, PreprocessMetadata]:
+) -> MetaTensor:
     """
     Load image and apply preprocessing transforms.
 
@@ -527,16 +494,16 @@ def _load_and_preprocess(
     path = Path(file_path)
 
     image_loader = _get_loader(path)
-    img = image_loader(path, loader=loader, channels=channels, ind_dict=ind_dict, npz_key=npz_key)
+    metatensor = image_loader(path, loader=loader, channels=channels, ind_dict=ind_dict, npz_key=npz_key)
 
-    img, meta = _preprocess(img, transforms)
+    metatensor = _preprocess(metatensor, transforms)
 
     # format extraction
-    meta.format = extract_formats(path)[0]
+    metatensor.meta['format'] = extract_formats(path)[0]
     # save channels info
-    meta.layout = channels
+    metatensor.meta['layout'] = channels
 
-    return img, meta
+    return metatensor
 
 # %% ../nbs/002_io.ipynb #08b998f4
 def _multi_sequence_stream(
@@ -546,7 +513,7 @@ def _multi_sequence_stream(
     channels="CZYX",
     ind_dict=None,
     npz_key=None,
-) -> Iterable[tuple[ScalarImage, PreprocessMetadata]]:
+) -> Iterable[MetaTensor]:
     """
     Lazily yield preprocessed image samples.
 
@@ -583,16 +550,12 @@ def image_reader(
     squeeze: bool = False,
     stack_axis: str = "C",
 ) -> (
-    ScalarImage
-    | list[ScalarImage]
-    | tuple[ScalarImage, dict]
-    | tuple[list[ScalarImage], dict]
+    MetaTensor
     | np.ndarray
     | tuple[np.ndarray, dict]
     | torch.Tensor
     | tuple[torch.Tensor, dict]
     | tuple[torch.Tensor, dict]
-    | MetaTensor
 ):
     """
     Main entry point for medical image loading.
@@ -633,8 +596,6 @@ def image_reader(
     ----------------------------------------------------------------------
     OUTPUT MODES
     ----------------------------------------------------------------------
-        "scalar"        -> ScalarImage or list[ScalarImage]
-        "scalar+meta"   -> (ScalarImage, Meta) or (list, list)
         "nparray"       -> np.ndarray
         "nparray+meta"  -> (np.ndarray, Meta or list[Meta])
         "tensor"        -> torch.Tensor
@@ -665,54 +626,43 @@ def image_reader(
                 ind_dict=ind_dict,
                 npz_key=npz_key,
             )
-        return (_load(p) for p in file_path)
+        return [_load(p) for p in file_path]
 
     # tensor builder
-    def _stack(imgs):
+    def _stack(input_metatensors):
 
-        tensors = []
-        for img in imgs:
-            t = img.data
+        metatensors = []
+        for t in input_metatensors:
 
             if squeeze:
                 t = t.squeeze()
 
             t = t.to(dtype)
 
-            tensors.append(t)
+            metatensors.append(t)
 
         # stack along a new dimension 
-        t = torch.stack(tensors, dim=0)
+        output_metatensor = torch.stack(metatensors, dim=0)
 
         # CASE A: stack_axis NOT in channel_order → just insert new axis
         if stack_axis not in channels:
             # insert S as new semantic axis
             # (no fusion, no concat)
 
-            return t
+            return output_metatensor
         
         # stack_axis EXISTS in channel_order → concatenate into that axis
         axis_idx = channels.index(stack_axis)
 
         # -------------------------------------------------
-        # move stack dim (0) next to target axis
-        # -------------------------------------------------
-        perm = list(range(t.ndim))
-
-        perm.remove(0)
-        perm.insert(axis_idx + 1, 0)
-
-        t = t.permute(*perm)
-
-        # -------------------------------------------------
         # concatenate along stack_axis
         # -------------------------------------------------
-        t = torch.cat(
-            torch.unbind(t, dim=axis_idx + 1),
+        output_metatensor = torch.cat(
+            torch.unbind(output_metatensor, dim=axis_idx),
             dim=axis_idx
         )
 
-        return t
+        return output_metatensor
 
     def _to_numpy(tensor):
         return tensor.detach().cpu().numpy()
@@ -726,68 +676,51 @@ def image_reader(
     # MULTI CASE
     # =====================================================
     if is_multi:
-        imgs, metas = zip(*_iter_multi())
+        metatensors = _iter_multi()
 
-        if output == "scalar":
-            return list(imgs)
-
-        if output == "scalar+meta":
-            return list(imgs), {i:asdict(m) for i, m in enumerate(metas)}
-
-        tensor = _stack(imgs)
-
-        if output == "nparray":
-            return _to_numpy(tensor)
-
-        if output == "nparray+meta":
-            return _to_numpy(tensor), {i:asdict(m) for i, m in enumerate(metas)}
+        metatensor = _stack(metatensors)
+        if output == "metatensor":
+            return metatensor
 
         if output == "tensor":
-            return tensor
+            return Tensor(metatensor)
 
         if output == "tensor+meta":
-            return tensor, {i:asdict(m) for i, m in enumerate(metas)}
+            return Tensor(metatensor), {i:m.meta for i, m in enumerate(metatensors)}
 
-        if output == "metatensor":
-            return MetaTensor(
-                x=tensor,
-                meta = {i:asdict(m) for i, m in enumerate(metas)},
-            )
+        if output == "nparray":
+            return _to_numpy(metatensor)
+        
+        if output == "nparray+meta":
+            return _to_numpy(metatensor), {i:m.meta for i, m in enumerate(metatensors)}
+
 
         raise ValueError(f"Unknown output mode: {output}")
 
     # =====================================================
     # SINGLE CASE
     # =====================================================
-    img, meta = _load(file_path)
-
-    if output == "scalar":
-        return img
-
-    if output == "scalar+meta":
-        return img, asdict(meta)
-
-    tensor = img.data
+    metatensor = _load(file_path)
 
     if squeeze:
-        tensor = tensor.squeeze()
+        metatensor = metatensor.squeeze()
 
-    tensor = tensor.to(dtype)
-
-    if output == "nparray":
-        return _to_numpy(tensor)
-
-    if output == "nparray+meta":
-        return _to_numpy(tensor), asdict(meta)
-
-    if output == "tensor":
-        return tensor
-
-    if output == "tensor+meta":
-        return tensor, asdict(meta)
+    metatensor = metatensor.to(dtype)
 
     if output == "metatensor":
-        return MetaTensor(x=tensor, meta=asdict(meta))
+        return metatensor
+    
+    if output == "tensor":
+        return Tensor(metatensor)
+
+    if output == "tensor+meta":
+        return Tensor(metatensor), metatensor.meta
+    
+    if output == "nparray":
+        return _to_numpy(metatensor)
+
+    if output == "nparray+meta":
+        return _to_numpy(metatensor), metatensor.meta
 
     raise ValueError(f"Unknown output mode: {output}")
 
@@ -928,7 +861,7 @@ class BioImageReader(ImageReader):
 
         return meta
     
-    def _get_spatial_shape(self, img: "MetaTensor"):
+    def _get_spatial_shape(self, img: MetaTensor):
         m = img.meta
         return tuple(
             v for v in (m.get("width"), m.get("height"), m.get("depth")) if v is not None

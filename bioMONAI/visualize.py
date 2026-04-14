@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['show_image', 'show_multichannel', 'show_mosaic', 'show_images_grid', 'show_plane', 'show_slices', 'slice_explorer',
-           'show_volume', 'show_biodata', 'plot_metrics', 'plot_intensity_histogram', 'format_sig',
+           'show_volume', 'show_biodata', 'show_gif', 'plot_metrics', 'plot_intensity_histogram', 'format_sig',
            'plot_histogram_and_kde', 'display_statistics_table', 'plot_dist']
 
 # %% ../nbs/009_visualize.ipynb #b19af8ae
@@ -489,6 +489,140 @@ def show_biodata(
         return show_slices(x, **route_kwargs(show_slices, kwargs))
 
     raise ValueError(f"Unsupported input shape {x.shape}. Expected 2D, 3D, or 4D data.")
+
+# %% ../nbs/009_visualize.ipynb #362e7518
+def show_gif(data,                     # A 3D image stack or 4D image sequence to convert into a GIF.
+             path=None,                # Optional filesystem path to save the resulting GIF.
+             fps=5,                    # Frames per second for the animation.
+             loop=0,                   # Number of times the GIF repeats. 0 means infinite.
+             cmap='gray',              # Colormap used when displaying a grayscale stack in Jupyter.
+             alt_text='animated gif',  # Alt text for inline notebook display.
+             **kwargs):                # Additional keyword arguments for future compatibility.
+    """
+    Create and display an animated GIF from a 3D stack or 4D image sequence.
+
+    Parameters
+    ----------
+    data : array-like or tensor
+        A stack of frames. Accepted shapes are:
+        - (frames, height, width)
+        - (frames, height, width, channels)
+        - (height, width, channels, frames) if the last axis is 3 or 4.
+    path : str or pathlib.Path, optional
+        If provided, save the generated GIF to this path.
+    fps : int
+        Frames per second for the resulting animation.
+    loop : int
+        Loop count for the GIF. 0 means infinite.
+    cmap : str
+        Colormap used for grayscale display in notebooks.
+    alt_text : str
+        Alternative text for the inline HTML image.
+
+    Returns
+    -------
+    bytes
+        The raw GIF bytes.
+    """
+    # Convert tensors to numpy arrays where possible
+    if hasattr(data, 'as_tensor'):
+        data = data.as_tensor().detach().cpu().numpy()
+    elif hasattr(data, 'detach'):
+        try:
+            data = data.detach().cpu().numpy()
+        except Exception:
+            data = np.asarray(data)
+    else:
+        data = np.asarray(data)
+
+    # Detect frame layout
+    if data.ndim == 2:
+        raise ValueError('show_gif expects a stack or sequence, not a single 2D image.')
+    if data.ndim == 3:
+        frames = data
+    elif data.ndim == 4:
+        if data.shape[-1] in (3, 4):
+            frames = data
+        elif data.shape[-2] in (3, 4) and data.shape[-1] > 1:
+            frames = np.moveaxis(data, -1, 0)
+        elif data.shape[-1] == 1:
+            frames = data[..., 0]
+        else:
+            raise ValueError('Ambiguous 4D shape. Provide a frame sequence with channels in the last dimension.')
+    else:
+        raise ValueError('show_gif supports 3D or 4D arrays only.')
+
+    frames = np.asarray(frames)
+    if frames.ndim not in (3, 4):
+        raise ValueError('Unsupported frame shape for GIF creation.')
+
+    # Convert values to uint8
+    def normalize_frame(x):
+        if np.issubdtype(x.dtype, np.floating):
+            if x.max() <= 1.0:
+                x = np.clip(x * 255.0, 0, 255)
+            else:
+                x = np.clip(x, 0, 255)
+            return x.astype(np.uint8)
+        if x.dtype == np.bool_ or x.max() <= 1:
+            return (x.astype(np.uint8) * 255)
+        return x.astype(np.uint8)
+
+    frames_uint8 = normalize_frame(frames)
+
+    if frames_uint8.ndim == 4 and frames_uint8.shape[-1] == 1:
+        frames_uint8 = frames_uint8[..., 0]
+
+    if frames_uint8.ndim == 3 and cmap != 'gray':
+        cmap_obj = plt.get_cmap(cmap)
+        frames_uint8 = np.stack([
+            (cmap_obj(frame.astype(np.float32) / 255.0)[..., :3] * 255).astype(np.uint8)
+            for frame in frames_uint8
+        ], axis=0)
+
+    # Create GIF bytes
+    buffer = io.BytesIO()
+
+    def _write_gif_bytes(output):
+        try:
+            import imageio
+            with imageio.get_writer(output, mode='I', format='GIF', duration=1.0 / fps, loop=loop) as writer:
+                for frame in frames_uint8:
+                    writer.append_data(frame)
+            return
+        except Exception:
+            pass
+
+        try:
+            from PIL import Image
+            pil_frames = []
+            for frame in frames_uint8:
+                if frame.ndim == 2:
+                    pil_frames.append(Image.fromarray(frame, mode='L'))
+                elif frame.shape[2] == 4:
+                    pil_frames.append(Image.fromarray(frame, mode='RGBA'))
+                else:
+                    pil_frames.append(Image.fromarray(frame, mode='RGB'))
+            pil_frames[0].save(output, format='GIF', save_all=True, append_images=pil_frames[1:], duration=int(round(1000.0 / fps)), loop=loop)
+            return
+        except Exception as exc:
+            raise RuntimeError('Unable to write GIF. Install imageio or pillow to use show_gif.') from exc
+
+    _write_gif_bytes(buffer)
+    gif_bytes = buffer.getvalue()
+
+    if path is not None:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(gif_bytes)
+
+    try:
+        from IPython.display import HTML, display
+        data64 = base64.b64encode(gif_bytes).decode('ascii')
+        html = HTML(f'<img src="data:image/gif;base64,{data64}" alt="{alt_text}" style="max-width:100%; height:auto;" />')
+        display(html)
+    except Exception:
+        return gif_bytes
 
 # %% ../nbs/009_visualize.ipynb #c9528154
 def plot_metrics(learn):
