@@ -9,6 +9,12 @@ __all__ = ['show_image', 'show_multichannel', 'show_mosaic', 'show_images_grid',
 
 # %% ../nbs/009_visualize.ipynb #b19af8ae
 # =================================
+# Standard libraries
+# =================================
+import base64
+import io
+
+# =================================
 # Scientific / data
 # =================================
 import numpy as np
