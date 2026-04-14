@@ -272,6 +272,7 @@ class hdf5_loader():
                  dataset=None, # The dataset to load
                  patch=0, # The patch to load from the dataset
                  hdf5_exts:(L, list)=['.h5','.hdf5'], # List of filename extensions 
+                 channels="CZYX" # The desired channel layout for the output data
                 ):
         store_attr()
 
@@ -303,12 +304,21 @@ class hdf5_loader():
                 if self.dataset == None: print('List of datasets in this file: \n',list(file.keys())); return None
                 else:
                     data = file[self.dataset + '/' + '%d'%(self.patch)][:] 
+                    meta = dict(file[self.dataset + '/' + '%d'%(self.patch)].attrs)
 
+        # adjust data dimensions according to channels layout
+        while len(data.shape) < len(self.channels):
+            # add absent dimensions assuming missing dimensions are at the beginning
+            data = np.expand_dims(data, axis=0)
+        if len(data.shape) > len(self.channels):
+            # remove absent dimensions assuming that data is in CZYX order and missing dimensions are at the beginning
+            data = data[(0,)*(data.ndim - len(self.channels)) + (slice(None),)*len(self.channels)]
+                
         # Create a 4x4 identity affine NumpyArray
         affine = np.eye(4)
 
         # Return the image data and the affine matrix
-        return data, affine
+        return data, meta, affine
 
 
 # %% ../nbs/002_io.ipynb #d418d00e
@@ -400,15 +410,15 @@ def _load_npz(path, npz_key=None, **kwargs):
 
 # %% ../nbs/002_io.ipynb #6d8439bf
 @LOADER_REGISTRY.register(".h5", ".hdf5")
-def _load_hdf5(path, **kwargs):
+def _load_hdf5(path, channels="CZYX", **kwargs):
     path_str = str(path)
 
     hdf5_ext = [ext for ext in ('.h5', '.hdf5') if ext in path_str]
     path, dataset, patch = split_hdf_path(path_str, hdf5_exts=hdf5_ext)
 
-    data, affine = hdf5_loader(dataset=dataset, patch=patch, hdf5_exts=hdf5_ext)(path)
+    data, meta, affine = hdf5_loader(dataset=dataset, patch=patch, hdf5_exts=hdf5_ext, channels=channels)(path)
 
-    return MetaTensor(x=data, affine=affine)
+    return MetaTensor(x=data, affine=affine, meta=meta)
 
 # %% ../nbs/002_io.ipynb #44f42658
 @LOADER_REGISTRY.register(".png")
