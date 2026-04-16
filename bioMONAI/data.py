@@ -36,7 +36,8 @@ from tqdm import tqdm
 # Bioimage IO
 # =================================
 from bioio import BioImage as AICSImage
-from bioio.writers import OmeTiffWriter
+from bioio import Writer as OmeTiffWriter
+from bioio_ome_tiff import Reader as OmeTiffReader
 
 # =================================
 # Machine Learning
@@ -125,8 +126,8 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
 
     _bypass_type = torchTensor
     _show_args = {"cmap": "gray"}
-    channels="CZYX"
-    transforms = None
+    _channels="CZYX"
+    _transforms = None
 
     # --------------------------------------------------
     # BASIC CONSTRUCTORS
@@ -143,15 +144,7 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     # --------------------------------------------------
     @classmethod
     def item_preprocessing(cls, transforms):
-        cls.transforms = transforms
-
-    @classmethod
-    def get_kwargs_with_channels(cls, kwargs=None):
-        kwargs = {} if kwargs is None else dict(kwargs)
-        return {
-            **({"channels": cls.channels} if cls.channels else {}),
-            **kwargs,
-        }
+        cls._transforms = transforms
 
     # --------------------------------------------------
     # LOADING
@@ -165,26 +158,16 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
         if isinstance(fn, torchTensor):
             return cls.from_tensor(fn)
 
-        kwargs = {
-            **({"transforms": cls.transforms} if cls.transforms else {}),
-            **kwargs,
-        }
+        kwargs.setdefault("channels", cls._channels)
+        kwargs.setdefault("transforms", cls._transforms)
 
-        tensor, meta = image_reader(
+        metatensor = image_reader(
             fn,
-            output="tensor+meta",
+            output="metatensor",
             **kwargs,
         )
-        
-        kwargs = cls.get_kwargs_with_channels(kwargs)
-        channels = kwargs.get("channels")
-        while tensor.ndim > len(channels) and tensor.shape[0] == 1:
-            tensor = torchsqueeze(tensor, dim=0)
-        while tensor.ndim > len(channels) and tensor.shape[-1] == 1:
-            tensor = torchsqueeze(tensor, dim=-1)
-        meta['final_size'] = tuple(tensor.shape)
 
-        return cls(x=tensor, meta=meta)
+        return cls(metatensor.data, meta=metatensor.meta)
 
     # --------------------------------------------------
     # MONAI INTEGRATION
@@ -229,7 +212,7 @@ class BioImage(BioImageBase):
     - returns MetaTensor-backed images
     """
 
-    channels="CYX"
+    _channels="YX"
 
     # --------------------------------------------------
     # VISUALIZATION
@@ -237,18 +220,30 @@ class BioImage(BioImageBase):
     def show(self, ctx=None, **kwargs):
         "Show image using `merge(self._show_args, kwargs)`"
         return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
+    
+    # --------------------------------------------------
+    # LOADING
+    # --------------------------------------------------
+    @classmethod
+    def create(
+        cls,
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        **kwargs,
+    ):
+        kwargs.setdefault("channels", cls._channels)  
+        return super().create(fn, **kwargs)
 
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
 
 # %% ../nbs/001_data.ipynb #a32aa47a
@@ -262,19 +257,31 @@ class BioVolume(BioImageBase):
     - returns MetaTensor-backed images
     """
 
-    channels="ZYX"
+    _channels="ZYX"
+    
+    # --------------------------------------------------
+    # LOADING
+    # --------------------------------------------------
+    @classmethod
+    def create(
+        cls,
+        fn: PathLike | Sequence[PathLike] | torchTensor,
+        **kwargs,
+    ):
+        kwargs.setdefault("channels", cls._channels)  
+        return super().create(fn, **kwargs)
     
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
 
 # %% ../nbs/001_data.ipynb #4ebea767
@@ -284,12 +291,12 @@ class BioMIP(BioImageBase):
     """
     
     _show_args = {"cmap": "gray"}
-    channels = "CZYX"
-    channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
+    _channels = "CZYX"
+    _channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
 
     @classmethod
     def _get_layout(cls, img, kwargs):
-        return img.meta.get("layout") or kwargs.get("channels") or cls.channels
+        return img.meta.get("layout") or kwargs.get("channels") or cls._channels
 
     @classmethod
     def create(
@@ -297,10 +304,10 @@ class BioMIP(BioImageBase):
         fn: PathLike | Sequence[PathLike] | torchTensor,
         **kwargs,
     ):
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         img = super().create(fn, **kwargs)
 
-        layout = kwargs.get("channels") or cls.channels
+        layout = kwargs.get("channels")
 
         z_dim = layout.index("Z")
         mip = torchmax(img.as_tensor(), dim=z_dim).values
@@ -339,7 +346,7 @@ class BioVideo(BioImageBase):
     - returns MetaTensor-backed images
     """
 
-    channels="TYX"
+    _channels="TYX"
 
     # --------------------------------------------------
     # LOADING
@@ -351,7 +358,7 @@ class BioVideo(BioImageBase):
         **kwargs,
     ):
 
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
 
         return super().create(fn, **kwargs)
     
@@ -360,12 +367,12 @@ class BioVideo(BioImageBase):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
 
 # %% ../nbs/001_data.ipynb #b484acfa
@@ -373,12 +380,12 @@ class BioMultiChannel(BioImageBase):
     """
     Multi-channel 2D/3D image assuming CZYX layout.
     """
-    channels = "CZYX"
-    channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
+    _channels = "CZYX"
+    _channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
 
     @classmethod
     def _get_layout(cls, img, kwargs):
-        return img.meta.get("layout") or kwargs.get("channels") or cls.channels
+        return img.meta.get("layout") or kwargs.get("channels") or cls._channels
 
     @classmethod
     def _meta_from_layout(cls, shape, layout: str):
@@ -393,7 +400,7 @@ class BioMultiChannel(BioImageBase):
         }
 
         c = meta["channels"]
-        meta["mode"] = "L" if c is None else cls.channel_modes.get(c, f"{c} channels")
+        meta["mode"] = "L" if c is None else cls._channel_modes.get(c, f"{c} channels")
 
         if meta["frames"] is not None:
             meta["kind"] = "video"
@@ -417,7 +424,7 @@ class BioMultiChannel(BioImageBase):
         interleaved: bool = True,
         **kwargs,
     ):
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         img = super().create(fn, **kwargs)
         layout = cls._get_layout(img, kwargs)
         tensor = img.as_tensor()
@@ -458,12 +465,12 @@ class BioMultiChannel(BioImageBase):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
 
     def __repr__(self) -> str:
@@ -3256,8 +3263,8 @@ def save_patches_grid(data_paths,                   # Path to folder or list of 
                       overlap,                       # float (between 0 and 1) defining the overlap between patches.
                       use_parent_folder = False,     # If True, use the parent folder name of the input files for naming the output HDF5 files.
                       threshold=None,                # If provided, patches with a mean value below this threshold will be discarded.
-                      squeeze_input=True,            # If True, squeeze the input data to remove single-dimensional entries. 
-                      squeeze_patches=False,         # If True, squeeze the patches to remove single-dimensional entries.
+                      squeeze_input=True,            # If True, squeeze the input data to remove singleton dimensions. 
+                      squeeze_patches=False,         # If True, squeeze the patches to remove singleton dimensions.
                       csv_output=True,               # If True, a CSV file listing all patch paths is created.
                       split_dataset=True,            # Split dataset into train and test CSV files (e.g., 0.8 for 80% train).
                       tfms_before: List|None = None,      # List of transforms to apply before extracting patches.
@@ -3613,7 +3620,7 @@ def extract_substacks(input_file, # Path to the input OME-TIFF file.
                       squeeze_dims=True, # Dimension to squeeze substacks along. 
                       *kwargs):
     """
-    Extract substacks from a multidimensional OME-TIFF stack using AICSImageIO.
+    Extract substacks from a multidimensional OME-TIFF stack.
 
     """
     # Load the OME-TIFF file

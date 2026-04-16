@@ -272,7 +272,7 @@ class hdf5_loader():
                  dataset=None, # The dataset to load
                  patch=0, # The patch to load from the dataset
                  hdf5_exts:(L, list)=['.h5','.hdf5'], # List of filename extensions 
-                 channels="CZYX" # The desired channel layout for the output data
+                 channels="CYX" # The desired channel layout for the output data
                 ):
         store_attr()
 
@@ -851,6 +851,8 @@ class BioImageReader(ImageReader):
     # --------------------------------------------------
     def read(self, data: PathLike | Sequence[PathLike] | np.ndarray, **kwargs) -> MetaTensor:
         kwargs_ = {**self.kwargs, **kwargs}
+        if len(data) == 1 and isinstance(data, Sequence) and not isinstance(data, (str, Path)):
+            data = data[0]
 
         mt = image_reader(
             data,
