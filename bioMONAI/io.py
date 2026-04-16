@@ -753,6 +753,9 @@ def image_reader(
     # -------------------------------------------------
     # detect multi
     # -------------------------------------------------
+    # if isinstance(file_path, Sequence) and not isinstance(file_path, (str, Path)) and len(file_path) == 1:
+    #     file_path = file_path
+
     is_multi = isinstance(file_path, Sequence) and not isinstance(file_path, (str, Path))
 
     # =====================================================
