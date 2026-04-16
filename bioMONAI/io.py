@@ -546,26 +546,134 @@ def _multi_sequence_stream(
             npz_key=npz_key,
         )
 
+# %% ../nbs/002_io.ipynb #c4fc78a7
+def _stack(input_metatensors: Sequence[MetaTensor], # The sequence of MetaTensors to stack
+           stack_axis: str = "C",                   # The axis along which to stack the tensors (e.g., "S" for sequence)
+           channels: str = "CZYX",                  # The desired channel order for the output tensor
+           dtype: torch.dtype = torch.float32,      # The desired data type for the output tensor
+           squeeze: bool = True,                    # Whether to squeeze singleton dimensions from the input tensors before stacking
+           ) -> torch.Tensor:                       # The resulting stacked tensor
+    """
+    Stack a sequence of MetaTensors into a single tensor.
+    Args:
+        input_metatensors: The sequence of MetaTensors to stack
+        stack_axis: The axis along which to stack the tensors (e.g., "S" for sequence)
+        channels: The desired channel order for the output tensor
+        dtype: The desired data type for the output tensor
+        squeeze: Whether to squeeze singleton dimensions from the input tensors before stacking
+    Returns:
+        The resulting stacked tensor
+    """
+    metatensors = []
+    for t in input_metatensors:
+
+        if squeeze:
+            t = t.squeeze()
+
+        t = t.to(dtype)
+
+        metatensors.append(t)
+
+    # stack along a new dimension 
+    output_metatensor = torch.stack(metatensors, dim=0)
+
+    # CASE A: stack_axis NOT in channel_order → just insert new axis
+    if stack_axis not in channels:
+        # insert S as new semantic axis
+        # (no fusion, no concat)
+        output_metatensor.meta.update({'layout': stack_axis + channels})
+
+        return output_metatensor
+    
+    # stack_axis EXISTS in channel_order → concatenate into that axis
+    axis_idx = channels.index(stack_axis)
+
+    # -------------------------------------------------
+    # concatenate along stack_axis
+    # -------------------------------------------------
+    output_metatensor = torch.cat(
+        torch.unbind(output_metatensor, dim=axis_idx),
+        dim=axis_idx
+    )
+
+    return output_metatensor
+
+
+def _meta_from_layout(shape: tuple[int, ...],           # The shape of the image tensor
+                      layout: str                       # The channel layout string (e.g., "CZYX")
+                      ) -> dict[str, int | str | None]: # A dictionary containing metadata extracted from the layout, including size, width, height, channels, depth, frames, sequence, mode, and kind.
+    """
+    Extract metadata from channel layout.
+    Args:
+        shape: The shape of the image tensor
+        layout: The channel layout string (e.g., "CZYX")    
+    Returns:
+        A dictionary containing metadata extracted from the layout, including size, width, height, channels, depth, frames, sequence, mode, and kind.
+     """
+
+    _channel_modes = {1: "L", 3: "RGB"}
+    
+    if len(shape) != len(layout):
+        raise ValueError(f"{shape} vs {layout}")
+
+    axis_map = dict(zip(layout, shape))
+
+    meta = {
+        "size_output": tuple(shape),
+        "width": axis_map.get("X"),
+        "height": axis_map.get("Y"),
+        "channels": axis_map.get("C"),
+        "depth": axis_map.get("Z"),
+        "frames": axis_map.get("T"),
+        "sequence": axis_map.get("S"),
+        MetaKeys.SPATIAL_SHAPE: tuple(axis_map[ax] for ax in "ZYX" if ax in axis_map),
+    }
+
+    # mode
+    c = meta["channels"]
+    meta["mode"] = (
+        "L" if c is None else _channel_modes.get(c, f"multichannel ({c})")
+    )
+
+    # kind
+    if meta["sequence"] is not None and meta["sequence"] > 1:
+        meta["kind"] = "sequence"
+    if meta["frames"] is not None and meta["frames"] > 1:
+        meta["kind"] = "video"
+    elif meta["depth"] is not None and meta["depth"] > 1:
+        meta["kind"] = "volume"
+    else:
+        meta["kind"] = "image"
+
+    if "C" in layout:
+        meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = layout.index("C")
+    else:
+        meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = float("nan")
+
+    return meta
+
+
+
 # %% ../nbs/002_io.ipynb #f4177cc4
 def image_reader(
-    file_path: PathLike | Sequence[PathLike],
-    lazy: bool = False,
-    output: str = "tensor",
-    transforms: Callable|list[Callable]|None = None,
-    loader: Callable|None = None,
-    channels: str ="CZYX",
-    ind_dict: dict|None = None,
-    npz_key: str|None = None,
-    dtype=torch.float32,
-    squeeze: bool = False,
-    stack_axis: str = "C",
-) -> (
+    file_path: PathLike | Sequence[PathLike],           # The file path(s) to the image(s) to be read. Can be a single path or a sequence of paths for multi-image loading.
+    lazy: bool = False,                                 # Whether to use lazy loading (streaming) for multi-image inputs. If True, returns an iterable of MetaTensors instead of a single stacked tensor.
+    output: str = "tensor",                             # The desired output format. Options: "nparray", "nparray+meta", "tensor", "tensor+meta", "metatensor"
+    transforms: Callable|list[Callable]|None = None,    # Optional transforms to apply to the loaded image(s). Can be a single callable or a list of callables.
+    loader: Callable|None = None,                       # Optional custom reader to use for loading the image. If None, the loader will be selected based on file format.
+    channels: str ="CZYX",                              # The desired channel layout for the output tensor. Should be compatible with the input data and the loader used.
+    ind_dict: dict|None = None,                         # Optional dictionary indicating specific channels or slices to load. Keys should correspond to axes in the channel layout (e.g., {"Y": slice(0, 10)}).
+    npz_key: str|None = None,                           # The key to use for loading data from .npz files.
+    dtype=torch.float32,                                # The desired data type for the output tensor. Only applicable if output includes tensor formats.
+    squeeze: bool = False,                              # Whether to squeeze singleton dimensions from the input tensors before stacking.
+    stack_axis: str = "C",                              # The axis along which to stack multi-image inputs. Should be one of the characters in the channel layout (e.g., "C", "S") or a new axis if not present in the layout.
+) -> (                                                  # The type of the returned value depends on the `output` parameter.
     MetaTensor
     | np.ndarray
     | tuple[np.ndarray, dict]
     | torch.Tensor
     | tuple[torch.Tensor, dict]
-    | tuple[torch.Tensor, dict]
+    | tuple[torch.Tensor, dict]                         
 ):
     """
     Main entry point for medical image loading.
@@ -614,7 +722,6 @@ def image_reader(
 
     ----------------------------------------------------------------------
     """
-
     # loader
     def _load(p):
         return _load_and_preprocess(
@@ -638,41 +745,7 @@ def image_reader(
             )
         return [_load(p) for p in file_path]
 
-    # tensor builder
-    def _stack(input_metatensors):
-
-        metatensors = []
-        for t in input_metatensors:
-
-            if squeeze:
-                t = t.squeeze()
-
-            t = t.to(dtype)
-
-            metatensors.append(t)
-
-        # stack along a new dimension 
-        output_metatensor = torch.stack(metatensors, dim=0)
-
-        # CASE A: stack_axis NOT in channel_order → just insert new axis
-        if stack_axis not in channels:
-            # insert S as new semantic axis
-            # (no fusion, no concat)
-
-            return output_metatensor
-        
-        # stack_axis EXISTS in channel_order → concatenate into that axis
-        axis_idx = channels.index(stack_axis)
-
-        # -------------------------------------------------
-        # concatenate along stack_axis
-        # -------------------------------------------------
-        output_metatensor = torch.cat(
-            torch.unbind(output_metatensor, dim=axis_idx),
-            dim=axis_idx
-        )
-
-        return output_metatensor
+    
 
     def _to_numpy(tensor):
         return tensor.detach().cpu().numpy()
@@ -687,8 +760,9 @@ def image_reader(
     # =====================================================
     if is_multi:
         metatensors = _iter_multi()
+        metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, dtype=dtype, squeeze=squeeze)
+        metatensor.meta.update(_meta_from_layout(metatensor.shape, metatensor.meta['layout']))
 
-        metatensor = _stack(metatensors)
         if output == "metatensor":
             return metatensor
 
@@ -711,6 +785,7 @@ def image_reader(
     # SINGLE CASE
     # =====================================================
     metatensor = _load(file_path)
+    metatensor.meta.update(_meta_from_layout(metatensor.shape, channels))
 
     if squeeze:
         metatensor = metatensor.squeeze()
@@ -742,7 +817,7 @@ LoadImaged = LoadImaged
 class BioImageReader(ImageReader):
     def __init__(
         self,
-        converter: Callable | None = None,
+        converter: Callable[[MetaTensor], MetaTensor] | None = None,  # A callable that takes a MetaTensor and returns a MetaTensor
         reverse_indexing: bool = False,
         **kwargs,
     ):
@@ -750,8 +825,6 @@ class BioImageReader(ImageReader):
         self.converter = converter
         self.reverse_indexing = reverse_indexing
         self.kwargs = kwargs
-
-        self.channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
 
     # --------------------------------------------------
     def verify_suffix(self, filename:Sequence[PathLike] | PathLike) -> bool:
@@ -783,15 +856,7 @@ class BioImageReader(ImageReader):
         )
 
         if self.converter:
-            mt = MetaTensor(
-                x=self.converter(mt.data),
-                meta=mt.meta,
-            )
-
-        # inject normalized metadata
-        layout = kwargs_.get("channels", "CZYX")
-        mt = self._normalize_layout(mt, layout)
-        mt.meta.update(self._meta_from_layout(mt.shape, layout))
+            mt = self.converter(mt)
 
         return mt
 
@@ -811,65 +876,6 @@ class BioImageReader(ImageReader):
         meta = dict(img.meta)
 
         return array, meta 
-
-    def _normalize_layout(self, img: MetaTensor, layout: str | None) -> MetaTensor:
-        if layout is None or len(layout) >= 4:
-            return img
-
-        tensor = img.as_tensor()
-
-        while tensor.ndim > len(layout) and tensor.shape[0] == 1:
-            tensor = torchsqueeze(tensor, dim=0)
-
-        while tensor.ndim > len(layout) and tensor.shape[-1] == 1:
-            tensor = torchsqueeze(tensor, dim=-1)
-
-        if tensor.ndim != len(layout):
-            return img
-
-        meta = dict(img.meta)
-        meta["size_output"] = tuple(tensor.shape)
-        return MetaTensor(x=tensor, meta=meta)
-
-    # ==================================================
-    # META FROM LAYOUT
-    # ==================================================
-    def _meta_from_layout(self, shape, layout: str):
-        if len(shape) != len(layout):
-            raise ValueError(f"{shape} vs {layout}")
-
-        axis_map = dict(zip(layout, shape))
-
-        meta = {
-            "size_output": tuple(shape),
-            "width": axis_map.get("X"),
-            "height": axis_map.get("Y"),
-            "channels": axis_map.get("C"),
-            "depth": axis_map.get("Z"),
-            "frames": axis_map.get("T"),
-            "sequence": axis_map.get("S"),
-        }
-
-        # mode
-        c = meta["channels"]
-        meta["mode"] = (
-            "L" if c is None else self.channel_modes.get(c, f"{c} channels")
-        )
-
-        # kind
-        if meta["frames"] is not None:
-            meta["kind"] = "video"
-        elif meta["depth"] is not None:
-            meta["kind"] = "volume"
-        else:
-            meta["kind"] = "image"
-
-        if "C" in layout:
-            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = layout.index("C")
-        else:
-            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = float("nan")
-
-        return meta
     
     def _get_spatial_shape(self, img: MetaTensor):
         m = img.meta
