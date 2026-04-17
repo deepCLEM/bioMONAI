@@ -212,7 +212,7 @@ class BioImage(BioImageBase):
     - returns MetaTensor-backed images
     """
 
-    _channels="YX"
+    _channels="CYX"
 
     # --------------------------------------------------
     # VISUALIZATION
@@ -257,7 +257,7 @@ class BioVolume(BioImageBase):
     - returns MetaTensor-backed images
     """
 
-    _channels="ZYX"
+    _channels="CZYX"
     
     # --------------------------------------------------
     # LOADING
@@ -346,7 +346,7 @@ class BioVideo(BioImageBase):
     - returns MetaTensor-backed images
     """
 
-    _channels="TYX"
+    _channels="CTYX"
 
     # --------------------------------------------------
     # LOADING
