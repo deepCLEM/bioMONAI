@@ -547,56 +547,80 @@ def _multi_sequence_stream(
         )
 
 # %% ../nbs/002_io.ipynb #c4fc78a7
-def _stack(input_metatensors: Sequence[MetaTensor], # The sequence of MetaTensors to stack
-           stack_axis: str = "C",                   # The axis along which to stack the tensors (e.g., "S" for sequence)
-           channels: str = "CZYX",                  # The desired channel order for the output tensor
-           dtype: torch.dtype = torch.float32,      # The desired data type for the output tensor
-           squeeze: bool = True,                    # Whether to squeeze singleton dimensions from the input tensors before stacking
-           ) -> torch.Tensor:                       # The resulting stacked tensor
+def _stack(
+    input_metatensors: Sequence[MetaTensor],
+    stack_axis: str = "C",
+    channels: str = "CZYX",
+    dtype: torch.dtype = torch.float32,
+    squeeze: bool = True,
+) -> torch.Tensor:
     """
     Stack a sequence of MetaTensors into a single tensor.
-    Args:
-        input_metatensors: The sequence of MetaTensors to stack
-        stack_axis: The axis along which to stack the tensors (e.g., "S" for sequence)
-        channels: The desired channel order for the output tensor
-        dtype: The desired data type for the output tensor
-        squeeze: Whether to squeeze singleton dimensions from the input tensors before stacking
-    Returns:
-        The resulting stacked tensor
-    """
-    metatensors = []
-    for t in input_metatensors:
-
-        if squeeze:
-            t = t.squeeze()
-
-        t = t.to(dtype)
-
-        metatensors.append(t)
-
-    # stack along a new dimension 
-    output_metatensor = torch.stack(metatensors, dim=0)
-
-    # CASE A: stack_axis NOT in channel_order → just insert new axis
-    if stack_axis not in channels:
-        # insert S as new semantic axis
-        # (no fusion, no concat)
-        output_metatensor.meta.update({'layout': stack_axis + channels})
-
-        return output_metatensor
     
-    # stack_axis EXISTS in channel_order → concatenate into that axis
+    Args:
+        input_metatensors: Sequence of MetaTensors to stack.
+        stack_axis: Axis along which to stack (e.g., "S" for sequence).
+        channels: Desired channel order for output (e.g., "CZYX").
+        dtype: Data type for output tensor.
+        squeeze: Whether to squeeze singleton dimensions before stacking.
+    
+    Returns:
+        Stacked tensor with metadata from each input tensor indexed by position.
+    
+    Raises:
+        ValueError: If input is empty or invalid parameters provided.
+    """
+    # Validation
+    if not input_metatensors:
+        raise ValueError("input_metatensors cannot be empty")
+    if not stack_axis or len(stack_axis) != 1:
+        raise ValueError(f"stack_axis must be a single character, got {stack_axis!r}")
+    if not channels or not all(c in "SCZYX" for c in channels):
+        raise ValueError(f"channels must contain valid axis labels, got {channels!r}")
+    
+    # Preprocess tensors: squeeze and convert dtype
+    processed = [
+        t.squeeze().to(dtype) if squeeze else t.to(dtype)
+        for t in input_metatensors
+    ]
+    
+    # Preserve metadata from each original tensor
+    metadata_dict = {i: m.meta for i, m in enumerate(input_metatensors)}
+    
+    # Case A: stack_axis is new (not in current channels)
+    if stack_axis not in channels:
+        # Stack along new dimension at position 0
+        stacked = torch.stack(processed, dim=0)
+        # Update metadata: new axis prepended to layout, plus indexed original metadata
+        stacked.meta.update({
+            'layout': stack_axis + channels,
+            'tensors': metadata_dict
+        })
+        return stacked
+    
+    # Case B: stack_axis exists in channels → concatenate along that axis
     axis_idx = channels.index(stack_axis)
-
-    # -------------------------------------------------
-    # concatenate along stack_axis
-    # -------------------------------------------------
-    output_metatensor = torch.cat(
-        torch.unbind(output_metatensor, dim=axis_idx),
-        dim=axis_idx
-    )
-
-    return output_metatensor
+    
+    # Stack first to add a new dimension, then move it to the target position
+    stacked = torch.stack(processed, dim=0)
+    
+    # Move the stacking dimension to the target axis position
+    # (adjust for the fact that we stacked at dim=0)
+    target_dim = axis_idx + 1  # +1 because stack added a dimension at position 0
+    stacked = torch.moveaxis(stacked, 0, target_dim)
+    
+    # Flatten the stacking dimension into the target axis
+    shape = list(stacked.shape)
+    shape[axis_idx:axis_idx+2] = [shape[axis_idx] * shape[axis_idx+1]]
+    output = stacked.reshape(shape)
+    
+    # Update metadata with indexed original metadata
+    output.meta.update({
+        'layout': channels,
+        'tensors': metadata_dict
+    })
+    
+    return output
 
 
 def _meta_from_layout(shape: tuple[int, ...],           # The shape of the image tensor
