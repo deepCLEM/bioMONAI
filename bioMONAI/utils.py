@@ -5,9 +5,10 @@
 # %% auto #0
 __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'dataclass', 'field', 'risinstance', 'typedispatch',
            'MetaTensor', 'set_determinism', 'Callable', 'Iterable', 'Sequence', 'MutableSequence', 'Optional', 'Union',
-           'Path', 'PurePath', 'PathLike', 'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze',
-           'torchmax', 'is_cuda_available', 'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor',
-           'route_kwargs', 'read_yaml', 'dictlist_to_funclist', 'TargetedTransform', 'apply_transforms']
+           'Path', 'PurePath', 'PathLike', 'ensure_tuple', 'ensure_tuple_rep', 'torchTensor', 'torch_from_numpy',
+           'torch_device', 'torchsqueeze', 'torchmax', 'is_cuda_available', 'add_method', 'attributesFromDict',
+           'get_device', 'img2float', 'img2Tensor', 'route_kwargs', 'read_yaml', 'dictlist_to_funclist',
+           'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/010_utils.ipynb #f6eab00d
 # =================================
@@ -46,6 +47,7 @@ from monai.data import MetaTensor
 from monai.utils import set_determinism
 from collections.abc import Callable, Iterable, Sequence, MutableSequence
 from monai.config import PathLike
+from monai.utils.misc import ensure_tuple, ensure_tuple_rep
 
 # =================================
 # fastai
@@ -90,6 +92,9 @@ Union = Union
 Path = Path
 PurePath = PurePath
 PathLike = PathLike
+
+ensure_tuple = ensure_tuple
+ensure_tuple_rep = ensure_tuple_rep
 
 torchTensor = torchTensor
 torch_from_numpy = torch_from_numpy
