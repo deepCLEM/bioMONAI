@@ -380,42 +380,6 @@ class BioMultiChannel(BioImageBase):
     """
     Multi-channel 2D/3D image assuming CZYX layout.
     """
-    _channels = "CZYX"
-    _channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
-
-    @classmethod
-    def _get_layout(cls, img, kwargs):
-        return img.meta.get("layout") or kwargs.get("channels") or cls._channels
-
-    @classmethod
-    def _meta_from_layout(cls, shape, layout: str):
-        axis_map = dict(zip(layout, shape))
-        meta = {
-            "width": axis_map.get("X"),
-            "height": axis_map.get("Y"),
-            "channels": axis_map.get("C"),
-            "depth": axis_map.get("Z"),
-            "frames": axis_map.get("T"),
-            "sequence": axis_map.get("S"),
-        }
-
-        c = meta["channels"]
-        meta["mode"] = "L" if c is None else cls._channel_modes.get(c, f"{c} channels")
-
-        if meta["frames"] is not None:
-            meta["kind"] = "video"
-        elif meta["depth"] is not None:
-            meta["kind"] = "volume"
-        else:
-            meta["kind"] = "image"
-
-        if "C" in layout:
-            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = layout.index("C")
-        else:
-            meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = float("nan")
-
-        return meta
-
     @classmethod
     def create(
         cls,
@@ -425,9 +389,8 @@ class BioMultiChannel(BioImageBase):
         **kwargs,
     ):
         kwargs.setdefault("channels", cls._channels)
-        img = super().create(fn, **kwargs)
-        layout = cls._get_layout(img, kwargs)
-        tensor = img.as_tensor()
+        tensor = super().create(fn, **kwargs)
+        layout = kwargs.get("layout") or tensor.meta.get("layout") or cls._channels
 
         output_layout = layout
         if merge_cd:
@@ -449,13 +412,10 @@ class BioMultiChannel(BioImageBase):
             tensor = tensor.reshape(c * d, *tensor.shape[2:])
             output_layout = layout.replace("Z", "")
 
-        meta = dict(img.meta)
-        if output_layout is not None:
-            meta.update(cls._meta_from_layout(tensor.shape, output_layout))
-            meta["layout"] = output_layout
-        meta["size_output"] = tuple(tensor.shape)
+        tensor.meta["layout"] = output_layout
+        tensor.meta["size_output"] = tuple(tensor.shape)
 
-        return cls(x=tensor, meta=meta)
+        return cls(x=tensor, meta=tensor.meta)
 
     def show(self, ctx=None, **kwargs):
         return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
@@ -473,8 +433,6 @@ class BioMultiChannel(BioImageBase):
         kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
 
-    def __repr__(self) -> str:
-        return f"BioMultiChannel{self.as_tensor().__repr__()[6:]}"
 
 # %% ../nbs/001_data.ipynb #98c6bb4c
 class Tensor2BioImage(DisplayedTransform):
@@ -956,37 +914,45 @@ class DataFrameSource:
         self.suffixes = suffixes or {}
         self.keep_original = keep_original
 
+    def _build_path(self, value, new_col):
+        folder = self.folders.get(new_col)
+        suffix = self.suffixes.get(new_col, "")
+
+        base = Path(self.base_path)
+        if folder:
+            base = base / folder
+
+        return base.as_posix() + "/" + str(value) + suffix
+    
+    # def _build_paths(self, values, new_col):
+    #     return [self._build_path(v, new_col) for v in values]
+
     def _resolve_paths(self):
 
         df = self.df.copy()
+        cols_to_drop = set()
 
         for new_col, src_col in self.colmap.items():
+            if isinstance(src_col, list):
+                df[new_col] = df[src_col].values.tolist()
+                # df[new_col] = str(self._build_path(df[new_col], new_col))
+                cols_to_drop.update(src_col)
+            else:
 
-            folder = self.folders.get(new_col)
-            suffix = self.suffixes.get(new_col, "")
+                df[new_col] = df[src_col].astype(str).apply(
+                    lambda x: self._build_path(x, new_col)
+                )
+                cols_to_drop.add(src_col)
 
-            base = Path(self.base_path)
-            if folder:
-                base = base / folder
-
-            df[new_col] = (
-                base.as_posix()
-                + "/"
-                + df[src_col].astype(str)
-                + suffix
-            )
+        if not self.keep_original:
+            cols_to_drop = [col for col in cols_to_drop if col in df.columns]
+            if cols_to_drop:
+                df.drop(columns=cols_to_drop, inplace=True)
 
         return df
 
     def load(self):
-
-        df = self._resolve_paths()
-
-        if not self.keep_original and self.colmap:
-            # Keep mapped columns + any columns not in colmap
-            df = df[[c for c in df.columns if c in self.colmap.keys() or c not in self.colmap.values()]]
-
-        return df
+        return self._resolve_paths()
 
 # %% ../nbs/001_data.ipynb #a04d0f49
 @register_source("csv")
