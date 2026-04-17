@@ -6,15 +6,14 @@
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MetaResolver', 'BioImageBase', 'BioImage',
            'BioVolume', 'BioMIP', 'BioVideo', 'BioMultiChannel', 'Tensor2BioImage', 'BioImageBlock', 'BioDataBlock',
            'register_source', 'register_dataset', 'register_loader', 'register_task', 'split_prefixed_kwargs',
-           'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource', 'FolderSource',
-           'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
-           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders', 'from_source',
-           'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
-           'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
-           'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
-           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches',
-           'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims',
-           'extract_substacks']
+           'ReadDictDataset', 'detect_source', 'build_source', 'CSVSource', 'FolderSource', 'ListSource',
+           'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder',
+           'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders', 'from_source', 'from_folder',
+           'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df',
+           'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader',
+           'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe',
+           'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches', 'save_patches_grid',
+           'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/001_data.ipynb #7a8886ba
 # =================================
@@ -867,92 +866,6 @@ def build_source(data, **kwargs):
     source_cls = SOURCE_REGISTRY[name]
 
     return source_cls(data, **kwargs)
-
-# %% ../nbs/001_data.ipynb #f998bcd6
-@register_source("dataframe")
-class DataFrameSource:
-    """
-    A source class for handling data from pandas DataFrames, providing path resolution and column mapping for file-based datasets.
-    """
-
-    def __init__(
-        self,
-        df,
-        colmap=None,
-        base_path=None,
-        folders=None,
-        suffixes=None,
-        keep_original=False,
-    ):
-        """
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Input dataframe.
-
-        colmap : dict
-            Mapping {"new_column": "existing_column"}.
-            Only columns in colmap will be treated as paths.
-
-        base_path : str | Path
-            Base path prepended to files.
-
-        folders : dict
-            Optional subfolder for each new column.
-
-        suffixes : dict
-            Optional suffix for each new column.
-
-        keep_original : bool
-            If True keep original dataframe columns.
-        """
-
-        self.df = df
-        self.colmap = colmap or {}
-        self.base_path = base_path or ""
-        self.folders = folders or {}
-        self.suffixes = suffixes or {}
-        self.keep_original = keep_original
-
-    def _build_path(self, value, new_col):
-        folder = self.folders.get(new_col)
-        suffix = self.suffixes.get(new_col, "")
-
-        base = Path(self.base_path)
-        if folder:
-            base = base / folder
-
-        return base.as_posix() + "/" + str(value) + suffix
-    
-    # def _build_paths(self, values, new_col):
-    #     return [self._build_path(v, new_col) for v in values]
-
-    def _resolve_paths(self):
-
-        df = self.df.copy()
-        cols_to_drop = set()
-
-        for new_col, src_col in self.colmap.items():
-            if isinstance(src_col, list):
-                df[new_col] = df[src_col].values.tolist()
-                # df[new_col] = str(self._build_path(df[new_col], new_col))
-                cols_to_drop.update(src_col)
-            else:
-
-                df[new_col] = df[src_col].astype(str).apply(
-                    lambda x: self._build_path(x, new_col)
-                )
-                cols_to_drop.add(src_col)
-
-        if not self.keep_original:
-            cols_to_drop = [col for col in cols_to_drop if col in df.columns]
-            if cols_to_drop:
-                df.drop(columns=cols_to_drop, inplace=True)
-
-        return df
-
-    def load(self):
-        return self._resolve_paths()
 
 # %% ../nbs/001_data.ipynb #a04d0f49
 @register_source("csv")
