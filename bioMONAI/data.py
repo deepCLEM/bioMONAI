@@ -3081,7 +3081,6 @@ def make_patches(data_paths,                    # Path to folder or list of path
                 output_type='metatensor',            # Output type for the loaded images (e.g., 'numpy', 'torch', etc.).
                 colmap=None,                    # Optional dictionary to map column names in the input dataframe (e
                 use_parent_folder = False,      # If True, use the parent folder name of the input files for naming the output HDF5 files.
-                threshold=None,                 # If provided, patches with a mean value below this threshold will be discarded.
                 csv_output=True,                # If True, a CSV file listing all patch paths is created.
                 split_dataset=True,             # Split dataset into train and test CSV files (e.g., 0.8 for 80% train).
                 image_transforms: List|None = None,  # List of transforms to apply before extracting patches.
@@ -3154,9 +3153,6 @@ def make_patches(data_paths,                    # Path to folder or list of path
                                             #  total=len(data_patches), 
                                                 desc=f"Saving patches for {data_file_name}", 
                                                 leave=False):
-                # Calculate the mean of the patch and discard if below threshold (if provided)
-                if threshold is not None and np.mean(data_patch) < threshold:
-                    continue  # Skip this patch
                 
                 # Extract corresponding gt patch using the same location
                 gt_patch = _image_splitter._get_patch(data_dict["gt"], location=loc, patch_size=gt_patch_size)
