@@ -12,9 +12,9 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
            'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
            'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
-           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'extract_patches',
-           'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string', 'remove_singleton_dims',
-           'extract_substacks']
+           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'make_patches',
+           'extract_patches', 'save_patches_grid', 'extract_random_patches', 'save_patches_random', 'dict2string',
+           'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/001_data.ipynb #7a8886ba
 # =================================
@@ -2960,7 +2960,7 @@ def split_dataframe(
             valid_file = os.path.join(data_save_path, valid_path)
             valid_df.to_csv(valid_file, index=False)
 
-        print("Datasets saved to %s", data_save_path)
+        print(f"Datasets saved to {data_save_path}")
 
     return train_df, test_df, valid_df
 
@@ -3068,6 +3068,146 @@ def build_df_from_folder(
 
 # %% ../nbs/001_data.ipynb #fd1ae9aa
 SlidingWindowSplitter = SlidingWindowSplitter
+
+# %% ../nbs/001_data.ipynb #b8bd22a0
+def make_patches(data_paths,                    # Path to folder or list of paths to data files (n-dimensional data).
+                output_folder,                  # Path to the folder where the HDF5 files will be saved.
+                output_filename,                # Base name for the output HDF5 files (without extension).
+                patch_size,                     # tuple of integers defining the size of the patches.
+                overlap,                        # float (between 0 and 1) defining the overlap between patches.
+                input_col=None,                    # Optional column name for input data in the dataframe. If None, the first column is used.
+                target_col=None,                   # Optional column name for target data in the dataframe. If None
+                image_splitter=SlidingWindowSplitter,                   # Function to split images into patches (e.g., SlidingWindowSplitter or RandomPatchSplitter).
+                output_type='metatensor',            # Output type for the loaded images (e.g., 'numpy', 'torch', etc.).
+                colmap=None,                    # Optional dictionary to map column names in the input dataframe (e
+                use_parent_folder = False,      # If True, use the parent folder name of the input files for naming the output HDF5 files.
+                threshold=None,                 # If provided, patches with a mean value below this threshold will be discarded.
+                csv_output=True,                # If True, a CSV file listing all patch paths is created.
+                split_dataset=True,             # Split dataset into train and test CSV files (e.g., 0.8 for 80% train).
+                image_transforms: List|None = None,  # List of transforms to apply before extracting patches.
+                patch_transforms: List|None = None,   # List of transforms to apply after extracting patches.
+                **kwargs,                       # Additional keyword arguments for splitting the dataset (see split_dataframe function)
+                ):
+    """
+    Loads n-dimensional data from data_paths and gt_paths, generates patches, and saves them into individual HDF5 files.
+    Each HDF5 file will have datasets with the structure X/patch_idx and y/patch_idx.
+    
+    """
+    
+    # Ensure output folder exists
+    if output_folder is not None or output_folder != '':
+        os.makedirs(output_folder, exist_ok=True)
+        use_full_path = False
+    else:
+        use_full_path = True
+    
+    df = BioDataLoaders._load_dataframe(data_paths, {'colmap': colmap})
+    input_col = list(df.columns)[0] if input_col is None else input_col
+    target_col = list(df.columns)[1] if target_col is None else target_col
+    data_files = df[input_col].tolist()
+    gt_files = df[target_col].tolist()
+ 
+    # Prepare CSV records list
+    csv_records = []
+
+    # Create a new HDF5 file for this pair of files
+    hdf5_filename = os.path.join(output_folder, f"{output_filename}.h5")
+
+    with h5py.File(hdf5_filename, 'w') as hf:
+        # Loop through the files
+        for data_file_path, gt_file_path in tqdm(zip(data_files, gt_files), total=len(data_files), desc="Processing files"):
+            # Extract filename for HDF5 output
+            if use_full_path:
+                data_file_name = os.path.splitext(data_file_path)[0]
+            elif use_parent_folder: 
+                data_file_name = os.path.splitext(os.path.join(os.path.basename(os.path.dirname(data_file_path)), os.path.basename(data_file_path)))[0]
+            else:   
+                data_file_name = os.path.splitext(os.path.basename(data_file_path))[0]
+            
+            # Load the images
+            data_dict = {
+                "data": image_reader(data_file_path, output=output_type),
+                "gt": image_reader(gt_file_path, output=output_type)
+            }
+
+            # Apply transforms before extracting patches
+            if image_transforms is not None:
+                for tfm in image_transforms:
+                    data_dict = tfm(data_dict)
+
+            gt_patch_size = patch_size  # Default gt patch size is the same as data patch size
+            # Check if data and gt have the same shape, if not, attempt to align spatial dimensions
+            if data_dict["data"].shape != data_dict["gt"].shape:
+                if data_dict["data"].shape[-2:] != data_dict["gt"].shape[-2:]:
+                    raise ValueError(f"Spatial dimension mismatch between {os.path.basename(data_file_path)} and {os.path.basename(gt_file_path)}: {data_dict['data'].shape} vs {data_dict['gt'].shape}")
+                gt_patch_size = patch_size[-2:]  # Use only spatial dimensions for gt patches
+            
+            # Extract patches from both datasets
+            _image_splitter = image_splitter(patch_size=patch_size, overlap=overlap)
+            data_patches = _image_splitter(data_dict["data"])
+            
+            # Create a new HDF5 folder for this pair of files
+            image_folder = os.path.join(f"{os.path.splitext(data_file_name)[0]}")
+                    
+            # Store each patch in a separate dataset
+            for data_patch, loc in tqdm(data_patches, 
+                                            #  total=len(data_patches), 
+                                                desc=f"Saving patches for {data_file_name}", 
+                                                leave=False):
+                # Calculate the mean of the patch and discard if below threshold (if provided)
+                if threshold is not None and np.mean(data_patch) < threshold:
+                    continue  # Skip this patch
+                
+                # Extract corresponding gt patch using the same location
+                gt_patch = _image_splitter._get_patch(data_dict["gt"], location=loc, patch_size=gt_patch_size)
+
+                patch_dict = {
+                    "data": data_patch,
+                    "gt": gt_patch
+                }
+
+
+                # Apply transforms after extracting patches
+                if patch_transforms is not None:
+                    for tfm in patch_transforms:
+                        patch_dict = tfm(patch_dict)
+                
+                hf.create_dataset(f'{image_folder}/X/{loc}', data=patch_dict["data"])
+                hf.create_dataset(f'{image_folder}/y/{loc}', data=patch_dict["gt"])
+                
+                # Append patch paths to CSV records
+                csv_records.append({
+                    "path_signal": f"{hdf5_filename}/{image_folder}/X/{loc}",
+                    "path_target": f"{hdf5_filename}/{image_folder}/y/{loc}"
+                })
+
+    # Save the paths to a CSV file if csv_output is True
+    if csv_output:
+        csv_df = pd.DataFrame(csv_records)
+        
+        if split_dataset:
+            # Split data into train and test sets
+                        
+            ops = {
+                'train_fraction': kwargs.get('train_fraction', 0.7),
+                'valid_fraction': kwargs.get('valid_fraction', 0.1),
+                'split_column': kwargs.get('split_column', None),
+                'stratify': kwargs.get('stratify', False),  
+                'add_is_valid': kwargs.get('add_is_valid', True),
+                'train_path': kwargs.get('train_path', "patches_train.csv"),
+                'test_path': kwargs.get('test_path', "patches_test.csv"),
+                'valid_path': kwargs.get('valid_path', "patches_valid.csv"),
+                'data_save_path': kwargs.get('data_save_path', output_folder)
+            }
+            
+            split_dataframe(csv_df, **ops)
+        
+        else:
+            # Save a single CSV file
+            csv_path = os.path.join(output_folder, "all_patches.csv")
+            csv_df.to_csv(csv_path, index=False)
+            print(f"CSV file saved to: {csv_path}")
+
 
 # %% ../nbs/001_data.ipynb #bf008823
 def extract_patches(
