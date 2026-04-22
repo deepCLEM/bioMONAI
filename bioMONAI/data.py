@@ -327,12 +327,12 @@ class BioMIP(BioImageBase):
     # --------------------------------------------------
     @classmethod
     def load(cls, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load(**kwargs)
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs = cls.get_kwargs_with_channels(kwargs)
+        kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
 
 
@@ -3143,6 +3143,8 @@ def _process_single_image(
     patch_transforms,
     output_type,
     compression,
+    input_class,
+    target_class,
     kwargs
 ):
     data_path = row[input_key]
@@ -3153,12 +3155,16 @@ def _process_single_image(
     # --------------------------------------------------
     # Load images
     # --------------------------------------------------
-    data_img, data_meta = image_reader(
-        data_path, transforms=image_transforms, output=output_type
+    image_reader_kwargs = route_kwargs(image_reader, kwargs)
+    input_metatensor = input_class.create(
+        data_path, transforms=image_transforms, **image_reader_kwargs
     )
-    gt_img, gt_meta = image_reader(
-        gt_path, transforms=image_transforms, output=output_type
+    gt_metatensor = target_class.create(
+        gt_path, transforms=image_transforms, **image_reader_kwargs
     )
+
+    data_img, data_meta = input_metatensor.data, input_metatensor.meta
+    gt_img, gt_meta = gt_metatensor.data, gt_metatensor.meta
 
     # --------------------------------------------------
     # Validate shapes
@@ -3259,6 +3265,8 @@ def ProcessDataset(
     output_folder,
     output_filename,
     patch_size,
+    input_class=BioImageBase,
+    target_class=BioImageBase,
     image_splitter=SlidingWindowSplitter,
     output_type='tensor+meta',
     colmap=None,
@@ -3322,6 +3330,8 @@ def ProcessDataset(
                     patch_transforms=patch_transforms,
                     output_type=output_type,
                     compression=compression,
+                    input_class=input_class,
+                    target_class=target_class,
                     kwargs=kwargs
                 )
 

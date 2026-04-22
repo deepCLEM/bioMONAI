@@ -306,7 +306,8 @@ class hdf5_loader():
                 else:
                     data = file[self.dataset + '/' + self.patch][:] 
                     meta = dict(file[self.dataset].attrs)
-                    meta['patch_location'] = file[self.dataset + '/' + self.patch].attrs['patch_location']
+                    if 'patch_location' in file[self.dataset + '/' + self.patch].attrs:
+                        meta['patch_location'] = file[self.dataset + '/' + self.patch].attrs['patch_location']
 
         # adjust data dimensions according to channels layout
         while len(data.shape) < len(self.channels):
