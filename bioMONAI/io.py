@@ -262,17 +262,18 @@ def split_hdf_path(file_path, # The path to the HDF5 file to split
         return file_path, None, None
     else:
         path = p[0] + hdf5_ext
-        dataset, patch = p[1].split('/')[1:]
-        patch = int(patch)
+        tmp = p[1].split('/')[1:]
+        dataset = os.path.join(*tmp[:-1])
+        patch = tmp[-1]
     return path, dataset, patch
 
 # %% ../nbs/002_io.ipynb #82d62082
 class hdf5_loader():
     def __init__(self,
-                 dataset=None, # The dataset to load
-                 patch=0, # The patch to load from the dataset
-                 hdf5_exts:(L, list)=['.h5','.hdf5'], # List of filename extensions 
-                 channels="CYX" # The desired channel layout for the output data
+                 dataset: Optional[str]=None, # The dataset to load
+                 patch: Optional[str]=None, # The patch to load from the dataset
+                 hdf5_exts: List[str]=['.h5','.hdf5'], # List of filename extensions 
+                 channels: str="CYX" # The desired channel layout for the output data
                 ):
         store_attr()
 
@@ -303,8 +304,9 @@ class hdf5_loader():
         with h5py.File(path, 'r') as file:
                 if self.dataset == None: print('List of datasets in this file: \n',list(file.keys())); return None
                 else:
-                    data = file[self.dataset + '/' + '%d'%(self.patch)][:] 
-                    meta = dict(file[self.dataset + '/' + '%d'%(self.patch)].attrs)
+                    data = file[self.dataset + '/' + self.patch][:] 
+                    meta = dict(file[self.dataset].attrs)
+                    meta['patch_location'] = file[self.dataset + '/' + self.patch].attrs['patch_location']
 
         # adjust data dimensions according to channels layout
         while len(data.shape) < len(self.channels):
@@ -314,8 +316,11 @@ class hdf5_loader():
             # remove absent dimensions assuming that data is in CZYX order and missing dimensions are at the beginning
             data = data[(0,)*(data.ndim - len(self.channels)) + (slice(None),)*len(self.channels)]
                 
-        # Create a 4x4 identity affine NumpyArray
-        affine = np.eye(4)
+        # If affine is not in meta dict, create a 4x4 identity affine NumpyArray
+        if 'affine' in meta:
+            affine = meta['affine']
+        else:
+            affine = np.eye(4)
 
         # Return the image data and the affine matrix
         return data, meta, affine

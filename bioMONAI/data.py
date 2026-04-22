@@ -6,14 +6,14 @@
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'SlidingWindowSplitter', 'MetaResolver',
            'BioImageBase', 'BioImage', 'BioVolume', 'BioMIP', 'BioVideo', 'BioMultiChannel', 'Tensor2BioImage',
            'BioImageBlock', 'BioDataBlock', 'register_source', 'register_dataset', 'register_loader', 'register_task',
-           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'CSVSource', 'FolderSource',
-           'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
-           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders', 'from_source',
-           'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
-           'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
-           'test_biodataloader', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
-           'split_dataframe', 'add_columns_to_csv', 'build_df', 'build_df_from_folder', 'make_patches', 'dict2string',
-           'remove_singleton_dims', 'extract_substacks']
+           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource',
+           'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
+           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader',
+           'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
+           'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
+           'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
+           'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
+           'build_df_from_folder', 'make_patches', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/001_data.ipynb #7a8886ba
 # =================================
@@ -868,6 +868,68 @@ def build_source(data, **kwargs):
     source_cls = SOURCE_REGISTRY[name]
 
     return source_cls(data, **kwargs)
+
+# %% ../nbs/001_data.ipynb #f998bcd6
+class DataFrameSource:
+    def __init__(
+        self,
+        df,
+        colmap=None,
+        base_path=None,
+        folders=None,
+        suffixes=None,
+        keep_original=False,
+    ):
+        self.df = df
+        self.colmap = colmap or {}
+        self.base_path = Path(base_path) if base_path else Path()
+        self.folders = folders or {}
+        self.suffixes = suffixes or {}
+        self.keep_original = keep_original
+
+    def _build_path(self, value, new_col):
+        if pd.isna(value):
+            return None
+
+        base = self.base_path
+
+        folder = self.folders.get(new_col)
+        if folder:
+            base = base / folder
+
+        suffix = self.suffixes.get(new_col, "")
+
+        return (base / f"{value}{suffix}").as_posix()
+
+    def _build_paths(self, values, new_col):
+        return [self._build_path(v, new_col) for v in values]
+
+    def _resolve_paths(self):
+        df = self.df.copy()
+        cols_to_drop = set()
+
+        for new_col, src_col in self.colmap.items():
+
+            if isinstance(src_col, list):
+                df[new_col] = df[src_col].apply(
+                    lambda row: self._build_paths(row.tolist(), new_col),
+                    axis=1,
+                )
+                cols_to_drop.update(src_col)
+
+            else:
+                df[new_col] = df[src_col].apply(
+                    lambda x: self._build_path(x, new_col)
+                )
+                cols_to_drop.add(src_col)
+
+        if not self.keep_original:
+            df.drop(columns=[c for c in cols_to_drop if c in df.columns], inplace=True)
+
+        return df
+
+    def load(self):
+        return self._resolve_paths()
 
 # %% ../nbs/001_data.ipynb #a04d0f49
 @register_source("csv")
@@ -3073,11 +3135,10 @@ def make_patches(data_paths,                    # Path to folder or list of path
                 output_folder,                  # Path to the folder where the HDF5 files will be saved.
                 output_filename,                # Base name for the output HDF5 files (without extension).
                 patch_size,                     # tuple of integers defining the size of the patches.
-                overlap,                        # float (between 0 and 1) defining the overlap between patches.
                 input_col=None,                    # Optional column name for input data in the dataframe. If None, the first column is used.
                 target_col=None,                   # Optional column name for target data in the dataframe. If None
                 image_splitter=SlidingWindowSplitter,                   # Function to split images into patches (e.g., SlidingWindowSplitter or RandomPatchSplitter).
-                output_type='metatensor',            # Output type for the loaded images (e.g., 'numpy', 'torch', etc.).
+                output_type='tensor+meta',            # Output type for the loaded images (e.g., 'numpy', 'torch', etc.).
                 colmap=None,                    # Optional dictionary to map column names in the input dataframe (e
                 use_parent_folder = False,      # If True, use the parent folder name of the input files for naming the output HDF5 files.
                 csv_output=True,                # If True, a CSV file listing all patch paths is created.
@@ -3123,15 +3184,13 @@ def make_patches(data_paths,                    # Path to folder or list of path
                 data_file_name = os.path.splitext(os.path.basename(data_file_path))[0]
             
             # Load the images
+            data_image, data_meta = image_reader(data_file_path, transforms=image_transforms, output=output_type)
+            gt_image, gt_meta = image_reader(gt_file_path, transforms=image_transforms, output=output_type)
+            
             data_dict = {
-                "data": image_reader(data_file_path, output=output_type),
-                "gt": image_reader(gt_file_path, output=output_type)
+                "data": data_image,
+                "gt": gt_image
             }
-
-            # Apply transforms before extracting patches
-            if image_transforms is not None:
-                for tfm in image_transforms:
-                    data_dict = tfm(data_dict)
 
             gt_patch_size = patch_size  # Default gt patch size is the same as data patch size
             # Check if data and gt have the same shape, if not, attempt to align spatial dimensions
@@ -3141,39 +3200,65 @@ def make_patches(data_paths,                    # Path to folder or list of path
                 gt_patch_size = patch_size[-2:]  # Use only spatial dimensions for gt patches
             
             # Extract patches from both datasets
-            _image_splitter = image_splitter(patch_size=patch_size, overlap=overlap)
+            splitter_kwargs = route_kwargs(RandomPatchSplitter,kwargs)
+            _image_splitter = image_splitter(patch_size=patch_size, **splitter_kwargs)
             data_patches = _image_splitter(data_dict["data"])
             
             # Create a new HDF5 folder for this pair of files
             image_folder = os.path.join(f"{os.path.splitext(data_file_name)[0]}")
-                    
+
+            # create groups for data and gt
+            hf.create_group(f'{image_folder}/X')
+            hf.create_group(f'{image_folder}/y')
+
+            # add attributes to the group from metadata dictionaries
+            for key, value in data_meta.items():
+                hf[f'{image_folder}/X'].attrs[key] = str(value)
+            for key, value in gt_meta.items():
+                hf[f'{image_folder}/y'].attrs[key] = str(value)
+
+            hf[f'{image_folder}/X'].attrs['affine'] = data_meta['affine']
+
+            # update metadata to include patching information and patch transforms applied
+            hf[f'{image_folder}/X'].attrs['patch_size'] = str(patch_size)
+            hf[f'{image_folder}/X'].attrs['overlap'] = str(overlap)
+            hf[f'{image_folder}/y'].attrs['patch_size'] = str(gt_patch_size)
+            hf[f'{image_folder}/y'].attrs['overlap'] = str(overlap)
+            if patch_transforms is not None:
+                patch_transforms_info = {tfm.__class__.__name__: {'params': getattr(tfm, "__dict__", {})} for tfm in patch_transforms}
+                hf[f'{image_folder}/X'].attrs['patch_transforms'] = str(patch_transforms_info)
+                hf[f'{image_folder}/y'].attrs['patch_transforms'] = str(patch_transforms_info)
+
             # Store each patch in a separate dataset
-            for data_patch, loc in tqdm(data_patches, 
-                                            #  total=len(data_patches), 
+            for index, (data_patch, loc) in enumerate(tqdm(data_patches, 
                                                 desc=f"Saving patches for {data_file_name}", 
-                                                leave=False):
+                                                leave=False)):
                 
                 # Extract corresponding gt patch using the same location
                 gt_patch = _image_splitter._get_patch(data_dict["gt"], location=loc, patch_size=gt_patch_size)
 
+                # Apply transforms after extracting patches
+                if patch_transforms is not None:
+                    for tfm in patch_transforms:
+                        data_patch = tfm(data_patch)
+                        gt_patch = tfm(gt_patch)
+                
                 patch_dict = {
                     "data": data_patch,
                     "gt": gt_patch
                 }
 
+                # save patches to groups in the HDF5 file
+                hf.create_dataset(f'{image_folder}/X/{index}', data=patch_dict["data"])
+                hf.create_dataset(f'{image_folder}/y/{index}', data=patch_dict["gt"])
 
-                # Apply transforms after extracting patches
-                if patch_transforms is not None:
-                    for tfm in patch_transforms:
-                        patch_dict = tfm(patch_dict)
-                
-                hf.create_dataset(f'{image_folder}/X/{loc}', data=patch_dict["data"])
-                hf.create_dataset(f'{image_folder}/y/{loc}', data=patch_dict["gt"])
+                hf[f'{image_folder}/X/{index}'].attrs['patch_location'] = str(loc)
+                hf[f'{image_folder}/y/{index}'].attrs['patch_location'] = str(loc)
                 
                 # Append patch paths to CSV records
                 csv_records.append({
-                    "path_signal": f"{hdf5_filename}/{image_folder}/X/{loc}",
-                    "path_target": f"{hdf5_filename}/{image_folder}/y/{loc}"
+                    "path_signal": f"{hdf5_filename}/{image_folder}/X/{index}",
+                    "path_target": f"{hdf5_filename}/{image_folder}/y/{index}"
                 })
 
     # Save the paths to a CSV file if csv_output is True
