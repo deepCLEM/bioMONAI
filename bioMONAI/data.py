@@ -13,7 +13,7 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
            'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
            'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
-           'build_df_from_folder', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'build_df_from_folder', 'ProcessDataset', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/001_data.ipynb #7a8886ba
 # =================================
@@ -3129,6 +3129,201 @@ def build_df_from_folder(
 
 # %% ../nbs/001_data.ipynb #fd1ae9aa
 SlidingWindowSplitter = SlidingWindowSplitter
+
+# %% ../nbs/001_data.ipynb #0d381dff
+def _process_single_image(
+    row,
+    hf,
+    split_name,
+    input_key,
+    target_key,
+    patch_size,
+    image_splitter,
+    image_transforms,
+    patch_transforms,
+    output_type,
+    compression,
+    kwargs
+):
+    data_path = row[input_key]
+    gt_path   = row[target_key]
+
+    image_name = _get_image_name(data_path)
+
+    # --------------------------------------------------
+    # Load images
+    # --------------------------------------------------
+    data_img, data_meta = image_reader(
+        data_path, transforms=image_transforms, output=output_type
+    )
+    gt_img, gt_meta = image_reader(
+        gt_path, transforms=image_transforms, output=output_type
+    )
+
+    # --------------------------------------------------
+    # Validate shapes
+    # --------------------------------------------------
+    if data_img.shape != gt_img.shape:
+        if data_img.shape[-2:] != gt_img.shape[-2:]:
+            raise ValueError(f"Shape mismatch: {data_img.shape} vs {gt_img.shape}")
+        gt_patch_size = patch_size[-2:]
+    else:
+        gt_patch_size = patch_size
+
+    # --------------------------------------------------
+    # Create splitter
+    # --------------------------------------------------
+    splitter_kwargs = route_kwargs(image_splitter, kwargs)
+    splitter = image_splitter(patch_size=patch_size, **splitter_kwargs)
+
+    patches = splitter(data_img)
+
+    # --------------------------------------------------
+    # Create HDF5 groups
+    # --------------------------------------------------
+    base = f"{split_name}/{image_name}"
+
+    x_group = hf.require_group(f"{base}/X")
+    y_group = hf.require_group(f"{base}/y")
+
+    _store_metadata(x_group, data_meta, patch_size, patch_transforms)
+    _store_metadata(y_group, gt_meta, gt_patch_size, patch_transforms)
+
+    # --------------------------------------------------
+    # Save patches
+    # --------------------------------------------------
+    for idx, (data_patch, loc) in enumerate(patches):
+
+        gt_patch = splitter._get_patch(
+            gt_img, location=loc, patch_size=gt_patch_size
+        )
+
+        if patch_transforms:
+            for tfm in patch_transforms:
+                data_patch = tfm(data_patch)
+                gt_patch = tfm(gt_patch)
+
+        x_ds = f"{base}/X/{idx}"
+        y_ds = f"{base}/y/{idx}"
+
+        hf.create_dataset(x_ds, data=data_patch, compression=compression)
+        hf.create_dataset(y_ds, data=gt_patch, compression=compression)
+
+        hf[x_ds].attrs["patch_location"] = str(loc)
+        hf[y_ds].attrs["patch_location"] = str(loc)
+
+    
+def _resolve_columns(df, colmap):
+    if colmap:
+        keys = list(colmap.keys())
+
+        if len(keys) < 2:
+            raise ValueError("colmap must have at least two keys")
+
+        input_key, target_key = keys[:2]
+        df = df[[input_key, target_key]].copy()
+
+    else:
+        input_key, target_key = "input", "target"
+        df = df[[df.columns[0], df.columns[1]]].copy()
+        df.columns = [input_key, target_key]
+
+    return input_key, target_key, df
+
+def _store_metadata(group, meta, patch_size, patch_transforms):
+    for k, v in meta.items():
+        group.attrs[k] = str(v)
+
+    group.attrs["patch_size"] = str(patch_size)
+    group.attrs['affine'] = meta['affine']
+    if patch_transforms is not None:
+        patch_transforms_info = {tfm.__class__.__name__: {'params': getattr(tfm, "__dict__", {})} for tfm in patch_transforms}
+        group.attrs['patch_transforms'] = str(patch_transforms_info)
+        group.attrs['patch_transforms'] = str(patch_transforms_info)
+
+def _get_image_name(path):
+    return os.path.splitext(os.path.basename(path))[0]
+
+def _extract_split_kwargs(kwargs):
+    allowed = [
+        "train_fraction",
+        "valid_fraction",
+        "split_column",
+        "stratify"
+    ]
+    return {k: kwargs[k] for k in allowed if k in kwargs}
+
+# %% ../nbs/001_data.ipynb #b6f9d525
+def ProcessDataset(
+    data_paths,
+    output_folder,
+    output_filename,
+    patch_size,
+    image_splitter=SlidingWindowSplitter,
+    output_type='tensor+meta',
+    colmap=None,
+    split_dataset=True,
+    image_transforms=None,
+    patch_transforms=None,
+    compression=None,
+    **kwargs
+):
+    """
+    Single-process dataset preparation:
+    - Split dataset BEFORE patching
+    - Extract patches
+    - Save into HDF5
+    """
+
+    os.makedirs(output_folder, exist_ok=True)
+
+    # --------------------------------------------------
+    # Load dataframe
+    # --------------------------------------------------
+    df = BioDataLoaders._load_dataframe(data_paths, {'colmap': colmap})
+
+    input_key, target_key, df = _resolve_columns(df, colmap)
+
+    # --------------------------------------------------
+    # Split BEFORE patching
+    # --------------------------------------------------
+    if split_dataset:
+        split_kwargs = _extract_split_kwargs(kwargs)
+        train_df, valid_df, test_df = split_dataframe(df, **split_kwargs)
+
+        splits = {
+            "train": train_df,
+            "valid": valid_df,
+            "test": test_df
+        }
+    else:
+        splits = {"all": df}
+
+    # --------------------------------------------------
+    # Create HDF5 file
+    # --------------------------------------------------
+    h5_path = os.path.join(output_folder, f"{output_filename}.h5")
+
+    with h5py.File(h5_path, "w") as hf:
+
+        for split_name, split_df in splits.items():
+            print(f"\nProcessing split: {split_name}")
+
+            for row in tqdm(split_df.to_dict("records")):
+                _process_single_image(
+                    row=row,
+                    hf=hf,
+                    split_name=split_name,
+                    input_key=input_key,
+                    target_key=target_key,
+                    patch_size=patch_size,
+                    image_splitter=image_splitter,
+                    image_transforms=image_transforms,
+                    patch_transforms=patch_transforms,
+                    output_type=output_type,
+                    compression=compression,
+                    kwargs=kwargs
+                )
 
 # %% ../nbs/001_data.ipynb #3bb0b176
 def dict2string(d, # The dictionary to convert.
