@@ -4,8 +4,8 @@
 
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'SlidingWindowSplitter', 'MetaResolver',
-           'BioImageBase', 'BioImage', 'BioVolume', 'BioMIP', 'BioVideo', 'BioMultiChannel', 'Tensor2BioImage',
-           'BioImageBlock', 'BioDataBlock', 'register_source', 'register_dataset', 'register_loader', 'register_task',
+           'BioImageBase', 'BioImage', 'BioVolume', 'BioVideo', 'BioMultiChannel', 'Tensor2BioImage', 'BioImageBlock',
+           'BioDataBlock', 'register_source', 'register_dataset', 'register_loader', 'register_task',
            'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource',
            'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
            'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader',
@@ -156,17 +156,7 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
         fn: PathLike | Sequence[PathLike] | torchTensor,
         **kwargs,
     ):
-        if isinstance(fn, torchTensor):
-            return cls.from_tensor(fn)
-
-        kwargs.setdefault("channels", cls._channels)
-        kwargs.setdefault("transforms", cls._transforms)
-
-        metatensor = image_reader(
-            fn,
-            output="metatensor",
-            **kwargs,
-        )
+        metatensor = cls.load(**kwargs)(fn)
 
         return cls(metatensor.data, meta=metatensor.meta)
 
@@ -174,14 +164,34 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
-    def load(cls, **kwargs) -> Callable:
-        kwargs.setdefault("ensure_channel_first", True)
-        return LoadImage(BioImageReader, **kwargs)
+    def load(cls,**kwargs) -> Callable:
+        def _load(fn):
+            if isinstance(fn, torchTensor):
+                return cls.from_tensor(fn)
+
+            local_kwargs = dict(kwargs)
+            local_kwargs.setdefault("channels", cls._channels)
+            local_kwargs.setdefault("transforms", cls._transforms)
+
+            return image_reader(
+                fn,
+                output="metatensor",
+                **local_kwargs,
+            )
+
+        return _load
 
     @classmethod
     def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs.setdefault("ensure_channel_first", True)
-        return LoadImaged(keys, reader=BioImageReader, **kwargs)
+        loader = cls.load(**kwargs)
+
+        def _load_dict(data: dict):
+            out = dict(data)
+            for k in keys:
+                out[k] = loader(out[k])
+            return out
+
+        return _load_dict
 
     # --------------------------------------------------
     # VISUALIZATION
@@ -206,14 +216,9 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
 class BioImage(BioImageBase):
     """
     Tensor-backed bioimage loaded from disk.
-
-    This is the class that:
-    - uses image_reader
-    - handles transforms
-    - returns MetaTensor-backed images
     """
 
-    _channels="CYX"
+    _channels = "CYX"
 
     # --------------------------------------------------
     # VISUALIZATION
@@ -221,29 +226,28 @@ class BioImage(BioImageBase):
     def show(self, ctx=None, **kwargs):
         "Show image using `merge(self._show_args, kwargs)`"
         return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
-    
-    # --------------------------------------------------
-    # LOADING
-    # --------------------------------------------------
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        **kwargs,
-    ):
-        kwargs.setdefault("channels", cls._channels)  
-        return super().create(fn, **kwargs)
 
     # --------------------------------------------------
-    # MONAI INTEGRATION
+    # LOADING 
     # --------------------------------------------------
     @classmethod
-    def load(cls, **kwargs) -> Callable:
+    def create(cls, fn: PathLike | Sequence[PathLike] | torchTensor, **kwargs):
+        metatensor = cls.load(**kwargs)(fn)
+        return cls(metatensor.data, meta=metatensor.meta)
+
+    # --------------------------------------------------
+    # LOADER FACTORY
+    # --------------------------------------------------
+    @classmethod
+    def load(cls, **kwargs):
         kwargs.setdefault("channels", cls._channels)
         return super().load(**kwargs)
 
+    # --------------------------------------------------
+    # DICT LOADER
+    # --------------------------------------------------
     @classmethod
-    def load_dict(cls, keys, **kwargs) -> Callable:
+    def load_dict(cls, keys, **kwargs):
         kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
 
@@ -269,8 +273,8 @@ class BioVolume(BioImageBase):
         fn: PathLike | Sequence[PathLike] | torchTensor,
         **kwargs,
     ):
-        kwargs.setdefault("channels", cls._channels)  
-        return super().create(fn, **kwargs)
+        metatensor = cls.load(**kwargs)(fn)
+        return cls(metatensor.data, meta=metatensor.meta)
     
     # --------------------------------------------------
     # MONAI INTEGRATION
@@ -284,57 +288,6 @@ class BioVolume(BioImageBase):
     def load_dict(cls, keys, **kwargs) -> Callable:
         kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
-
-# %% ../nbs/001_data.ipynb #4ebea767
-class BioMIP(BioImageBase):
-    """
-    The `BioImageProject` class represents a 3D image stack as a 2D image using maximum intensity projection. This is particularly useful for visualizing volumetric data in a 2D format, aiding in quick assessments and presentations.
-    """
-    
-    _show_args = {"cmap": "gray"}
-    _channels = "CZYX"
-    _channel_modes = {1: "L", 3: "RGB", 4: "RGBA"}
-
-    @classmethod
-    def _get_layout(cls, img, kwargs):
-        return img.meta.get("layout") or kwargs.get("channels") or cls._channels
-
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        **kwargs,
-    ):
-        kwargs.setdefault("channels", cls._channels)
-        img = super().create(fn, **kwargs)
-
-        layout = kwargs.get("channels")
-
-        z_dim = layout.index("Z")
-        mip = torchmax(img.as_tensor(), dim=z_dim).values
-        output_layout = layout.replace("Z", "")
-        meta = dict(img.meta)
-        meta["layout"] = output_layout
-        meta["size_output"] = tuple(mip.shape)
-
-        return cls(x=mip, meta=meta)
-
-    def show(self, ctx=None, **kwargs):
-        return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
-
-    # --------------------------------------------------
-    # MONAI INTEGRATION
-    # --------------------------------------------------
-    @classmethod
-    def load(cls, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load(**kwargs)
-
-    @classmethod
-    def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load_dict(keys, **kwargs)
-
 
 # %% ../nbs/001_data.ipynb #0febd1d1
 class BioVideo(BioImageBase):
