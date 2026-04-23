@@ -48,7 +48,7 @@ from fastai.vision.all import *
 # =================================
 # bioMONAI
 # =================================
-from .utils import torchTensor
+from .utils import *
 from .data import BioImageBase, BioVolume, Tensor2BioImage
 
 # %% ../nbs/005_transforms.ipynb #425f62e2
@@ -79,108 +79,234 @@ class FunctionTransform(Transform):
         return type(img)(result)
 
 # %% ../nbs/005_transforms.ipynb #6162be1b
-class MonaiTransform(Transform):
+class MonaiTransform(DisplayedTransform):
     """
-    Generic MonaiTransform for MONAI transforms (non-dictionary versions).
+    Wrapper for MONAI transforms with typedispatch support.
 
-    This MonaiTransform allows MONAI transforms to be used within the BioImage
-    transform pipeline while supporting both BioImageBase objects and
-    NumPy arrays as inputs.
-
-    The MONAI transform is internally instantiated and applied to the
-    input image after converting it to the appropriate tensor format.
+    Supports:
+    - MetaTensor (native MONAI)
+    - dict (auto *d/*D transform + keys)
+    - BioImageBase (type preserved)
+    - NumPy arrays (type preserved)
     """
 
-    def __init__(self,
-                 monai_transform,  # MONAI transform class (e.g., monai.transforms.GaussianSmooth)
-                 has_channels=True,  # Whether numpy input already has a channel dimension
-                 **kwargs,  # Arguments passed to the MONAI transform
-                 ):
-        """
-        Initializes the MONAI transform MonaiTransform.
-
-        Parameters
-        ----------
-        monai_transform : callable
-            MONAI transform class (not the dictionary variant).
-        has_channels : bool
-            Whether NumPy inputs already contain a channel dimension.
-        **kwargs : dict
-            Additional arguments forwarded to the MONAI transform constructor.
-        """
+    def __init__(
+        self,
+        monai_transform,
+        dict_transform=None,
+        keys=None,              # <-- NEW
+        has_channels=True,
+        **kwargs,
+    ):
         store_attr()
 
-        # Instantiate the MONAI transform
+        # Base transform (no keys!)
         self.transform = monai_transform(**kwargs)
 
-    def encodes(self, img: BioImageBase):
-        """Applies the MONAI transform to a BioImageBase object."""
-        tensor = img.as_tensor()
-        out = self.transform(tensor)
-        return type(img)(out)
+        # Only handle dict transforms if keys are provided
+        if keys is not None:
+            if dict_transform is None:
+                dict_transform = self._infer_dict_transform(monai_transform)
 
-    def encodes(self, img: np.ndarray):
-        """
-        Applies the MONAI transform to a NumPy array.
+            if dict_transform is None:
+                raise ValueError(
+                    f"No dict transform found for {monai_transform.__name__}"
+                )
 
-        The array is converted to a BioImage-compatible tensor before
-        applying the MONAI transform.
-        """
+            self.dict_transform = dict_transform(keys=keys, **kwargs)
+        else:
+            self.dict_transform = None
+
+    # -------------------------
+    # Helper: infer dict transform
+    # -------------------------
+    def _infer_dict_transform(self, base_cls):
+        name = base_cls.__name__
+
+        for suffix in ("d", "D"):
+            candidate = name + suffix
+            if hasattr(tfms, candidate):
+                return getattr(tfms, candidate)
+
+        return None
+
+    # -------------------------
+    # MetaTensor
+    # -------------------------
+    def encodes(self, x: "MetaTensor"):
+        return self.transform(x)
+
+    # -------------------------
+    # torch.Tensor
+    # -------------------------
+    def encodes(self, x: torchTensor):
+        return self.transform(x)
+
+    # -------------------------
+    # dict (MONAI dict pipeline)
+    # -------------------------
+    def encodes(self, x: dict):
+        if self.dict_transform is None:
+            raise ValueError(
+                f"No dict transform available for {type(self.transform).__name__}"
+            )
+        return self.dict_transform(x)
+
+    # -------------------------
+    # BioImageBase
+    # -------------------------
+    def encodes(self, x: BioImageBase):
+        out = self.transform(x)
+        return type(x)(x=out, meta=out.meta)
+
+    # -------------------------
+    # NumPy
+    # -------------------------
+    def encodes(self, x: np.ndarray):
         if not self.has_channels:
-            img = np.expand_dims(img, axis=0)
+            x = np.expand_dims(x, axis=0)
 
-        tensor_img = Tensor2BioImage()(torchTensor(img))
-        out = self.transform(tensor_img)
+        tensor = MetaTensor(x)
+        out = self.transform(tensor)
 
-        return out.numpy()
+        if isinstance(out, torch.Tensor):
+            return out.detach().cpu().numpy()
+        return np.asarray(out)
 
 # %% ../nbs/005_transforms.ipynb #ee7925d5
 class RandMonaiTransform(RandTransform):
     """
-    Wrap a deterministic MONAI transform inside a fastai RandTransform.
-
-    Random parameters are sampled in `before_call`, then used to
-    instantiate a deterministic MONAI transform.
+    MONAI RandTransform wrapper with:
+    - Lazy instantiation
+    - Auto-selection of Rand vs Rand*d
+    - Typedispatch-aware execution
     """
 
     split_idx = None
 
-    def __init__(self,
-                 monai_transform,     # Deterministic MONAI transform class
-                 prob=0.1,            # Probability of applying transform
-                 param_sampler=None,  # Function that returns sampled kwargs
-                 has_channels=True,
-                 **kwargs             # Static kwargs for the MONAI transform
-                 ):
+    def __init__(
+        self,
+        monai_transform,
+        prob=0.1,
+        param_sampler=None,
+        dict_transform=None,
+        keys=None,
+        has_channels=True,
+        **kwargs
+    ):
         store_attr()
         self.p = prob
         self.kwargs = kwargs
         super().__init__()
 
-    def before_call(self, b, split_idx:int):
+    # -------------------------
+    # Helpers
+    # -------------------------
+    def _infer_dict_transform(self, base_cls):
+        name = base_cls.__name__
+        module = importlib.import_module(base_cls.__module__)
+
+        # RandXxx -> RandXxxd / RandXxxD
+        for suffix in ("d", "D"):
+            candidate = name + suffix
+            if hasattr(module, candidate):
+                return getattr(module, candidate)
+
+        return None
+
+    # -------------------------
+    # Sampling
+    # -------------------------
+    def before_call(self, b, split_idx: int):
         super().before_call(b, split_idx)
 
-        # sample parameters
-        sampled_kwargs = {}
-        if self.param_sampler is not None:
-            sampled_kwargs = self.param_sampler()
+        sampled = self.param_sampler() if self.param_sampler else {}
+        self._params = {**self.kwargs, **sampled}
 
-        # merge static + sampled parameters
-        params = {**self.kwargs, **sampled_kwargs}
+        self._process = None
+        self._process_dict = None
 
-        # create deterministic MONAI transform
-        self._process = self.monai_transform(**params)
+    # -------------------------
+    # Lazy tensor builder (Rand*)
+    # -------------------------
+    def _build_tensor(self, rand=True):
+        cls = self.monai_transform
+        if not rand:
+            # strip Rand prefix → deterministic version
+            name = cls.__name__
+            if name.startswith("Rand"):
+                base_name = name[4:]
+                module = importlib.import_module(cls.__module__)
+                cls = getattr(module, base_name)
 
+        self._process = cls(**self._params)
+
+    # -------------------------
+    # Lazy dict builder (Rand*d)
+    # -------------------------
+    def _build_dict(self):
+        dict_cls = self.dict_transform or self._infer_dict_transform(self.monai_transform)
+
+        if dict_cls is None:
+            raise ValueError(
+                f"No dict transform found for {self.monai_transform.__name__}"
+            )
+
+        if self.keys is None:
+            raise ValueError("`keys` must be provided for dict transforms")
+
+        self._process_dict = dict_cls(keys=self.keys, **self._params)
+
+    # -------------------------
+    # MetaTensor → Rand*
+    # -------------------------
+    def encodes(self, x: "MetaTensor"):
+        if self._process is None:
+            self._build_tensor()
+        return self._process(x)
+
+    # -------------------------
+    # torch.Tensor → Rand*
+    # -------------------------
+    def encodes(self, x: torch.Tensor):
+        if self._process is None:
+            self._build_tensor()
+        return self._process(x)
+
+    # -------------------------
+    # dict → Rand*d
+    # -------------------------
+    def encodes(self, x: dict):
+        if self._process_dict is None:
+            self._build_dict()
+        return self._process_dict(x)
+
+    # -------------------------
+    # BioImageBase 
+    # -------------------------
     def encodes(self, x: BioImageBase):
-        bioimagetype = type(x)
-        return bioimagetype(self._process(x))
+        if self._process is None:
+            self._build_tensor(rand=False)
 
-    def encodes(self, img: np.ndarray):
+        out = self._process(x.as_tensor())
+        return type(x)(x=out, meta=x.meta)
+
+    # -------------------------
+    # NumPy
+    # -------------------------
+    def encodes(self, x: np.ndarray):
+        if self._process is None:
+            self._build_tensor(rand=False)
+
         if not self.has_channels:
-            img = np.expand_dims(img, axis=0)
+            x = np.expand_dims(x, axis=0)
 
-        tensor_img = Tensor2BioImage()(torchTensor(img))
-        return self._process(tensor_img).numpy()
+        tensor = torch.as_tensor(x)
+        out = self._process(tensor)
+
+        if isinstance(out, torch.Tensor):
+            return out.detach().cpu().numpy()
+        return np.asarray(out)
 
 # %% ../nbs/005_transforms.ipynb #83011f10
 class ApplyTo(Transform):
@@ -207,94 +333,77 @@ class ApplyTo(Transform):
         elems[self.idx] = self.tfm(elems[self.idx], **kwargs)
         return tuple(elems)
 
-# %% ../nbs/005_transforms.ipynb #e49a336f
-class Resample(Transform):
+# %% ../nbs/005_transforms.ipynb #9a9cd349
+class Resample(MonaiTransform):
     """
     A subclass of Spacing that handles image resampling based on specified sampling factors or voxel dimensions.
     
     The `Resample` class inherits from `Spacing` and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.
     
     """
-    
-    def __init__(self, sampling, # Sampling factor for isotropic resampling
-                 has_channels=True, # Indicates whether the input image has a channel dimension (only for numpy arrays)
-                 **kwargs, # Additional keyword arguments that can include 'pixdim' to specify custom voxel dimensions
-                 ):
-        """
-        Initializes the Resample class instance.
-                    
-        If 'pixdim' is provided in kwargs, it will be used directly; otherwise, the sampling factor will determine the new voxel dimensions.
-        
-        The Spacing class from which Resample inherits is initialized with either the provided pixdim or calculated based on the sampling factor and original image properties.
-        """
-        store_attr()
-        if 'pixdim' in kwargs:
-            self.spacing = tfms.Spacing(**kwargs)
-        else:
-            self.spacing = tfms.Spacing(sampling, **kwargs)
-                    
-    def encodes(self, img:BioImageBase):
-        return type(img)(self.spacing(img))
-    
-    def encodes(self, img: np.ndarray):
-        """Transforms a NumPy array to BioImage and resamples with Spacing."""
-        if not self.has_channels:
-            img = np.expand_dims(img, axis=0)  # Add channel dimension if not present
-        tensor_img = Tensor2BioImage()(torchTensor(img))
-        return self.spacing(tensor_img).numpy()
 
+    def __init__(
+        self,
+        sampling=None,        # isotropic factor OR pixdim fallback
+        has_channels=True,
+        dict_transform=None,
+        keys=None,
+        **kwargs
+    ):
+        """
+        If `pixdim` is provided in kwargs, it is used directly.
+        Otherwise `sampling` is used as pixdim.
+        """
+
+        if 'pixdim' not in kwargs:
+            if sampling is None:
+                raise ValueError("Provide either `sampling` or `pixdim`")
+            kwargs['pixdim'] = sampling
+
+        super().__init__(
+            monai_transform=tfms.Spacing,
+            dict_transform=dict_transform,
+            keys=keys,
+            has_channels=has_channels,
+            **kwargs
+        )
 
 # %% ../nbs/005_transforms.ipynb #9110a2b2
-class Resize(Transform):
+class Resize(MonaiTransform):
     """
-    A subclass of Reshape that handles image resizing based on specified target dimensions.
+    MONAI Resize wrapper using MonaiTransform.
 
-    The `Resize` class inherits from `Reshape` and provides a flexible way to adjust the size of images by specifying either a target size or scaling factors.
-    
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (Resize*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
     """
 
-    def __init__(self, size=None, # Target dimensions for resizing (height, width). If its length is smaller than the spatial dimensions, values will be repeated. If an int is provided, it will be broadcast to all spatial dimensions.
-                 **kwargs, # Additional keyword arguments that can include scaling factors or interpolation methods.
-                 ):
+    def __init__(
+        self,
+        size=None,
+        has_channels=True,
+        dict_transform=None,
+        keys=None,
+        **kwargs,
+    ):
         """
-        Initializes the Resize class instance.
-
-        If 'size' is provided, it will be used directly to resize the image; otherwise, scaling factors or default values will determine the new dimensions.
-
-        The Reshape class from which Resize inherits is initialized with the provided size or calculated dimensions.
+        size:
+            - int → broadcast to all spatial dims
+            - tuple/list → target spatial size
         """
+
         self.size = size
-        self.kwargs = kwargs
 
-    def _expand_size(self, size, # The target size provided.
-                     spatial_dims, # Number of spatial dimensions in the image.
-                     ):
-        """
-        Expands the size to match the spatial dimensions by repeating values if necessary or broadcasting if size is an int."""
-        if size is None:
-            return None
-        if isinstance(size, int):
-            return [size] * spatial_dims
-        size = list(size)
-        while len(size) < spatial_dims:
-            size.extend(size)
-        return size[:spatial_dims]
-
-    def encodes(self, img: BioImageBase):
-        """
-        Resizes the given image to the target dimensions."""
-        bioimagetype = type(img)
-        spatial_dims = len(img.shape) - 1  # Assuming the first dimension is channels or similar.
-        expanded_size = self._expand_size(self.size, spatial_dims)
-        reshape_instance = tfms.Resize(spatial_size=expanded_size, **self.kwargs)
-        return bioimagetype(reshape_instance(img))
-    
-    def encodes(self, img: np.ndarray):
-        """Resizes a NumPy array."""
-        spatial_dims = img.ndim - 1  # Assuming first dimension is channels or similar.
-        expanded_size = self._expand_size(self.size, spatial_dims)
-        return resize(img, expanded_size, **self.kwargs)
-
+        super().__init__(
+            monai_transform=tfms.Resize,
+            dict_transform=dict_transform,
+            keys=keys,
+            has_channels=has_channels,
+            spatial_size=size,   # MONAI expects this arg
+            **kwargs,
+        )
 
 # %% ../nbs/005_transforms.ipynb #ac665ddb
 class CropND(Transform):
@@ -341,88 +450,150 @@ class CropND(Transform):
 # %% ../nbs/005_transforms.ipynb #01606d8a
 class RandCameraNoise(RandTransform):
     """
-    Simulates camera noise by adding Poisson shot noise, dark current noise, and optionally CMOS fixed pattern noise.
-    
-    Returns:
-        numpy.ndarray: The noisy image as a NumPy array with dimensions of input_image.
+    Simulates camera noise with typedispatch support:
+    - MetaTensor (kept in tensor domain)
+    - dict (image key-based pipeline)
+    - BioImageBase (type preserved)
+    - NumPy arrays
     """
-    def __init__(self, p:float=1., # Probability of applying Transform
-                 damp=1e-2, # Dampening factor to prevent saturation when adding noise
-                 qe=0.7, # Quantum efficiency of the camera (0 to 1).
-                 gain=2, # Camera gain factor. If an array, it should be broadcastable with input_image shape. 
-                 offset=100, # Camera offset in ADU. If an array, it should be broadcastable with input_image shape. 
-                 exp_time=0.1, # Exposure time in seconds. 
-                 dark_current=0.6, # Dark current per pixel in electrons/second. 
-                 readout=1.5, # Readout noise standard deviation in electrons.
-                 bitdepth=16, # Bit depth of the camera output.
-                 seed=42, # Seed for random number generator for reproducibility. 
-                 simulation=False, # If True, assumes input_image is already in units of photons and does not convert from electrons.
-                 camera='cmos', # Specifies the type of camera ('cmos' or any other). Used to add CMOS fixed pattern noise if 'cmos' is specified. 
-                 gain_variance=.1, # Variance for the gain noise in CMOS cameras. Only applicable if camera type is 'cmos'. 
-                 offset_variance=5 # Variance for the offset noise in CMOS cameras. Only applicable if camera type is 'cmos'.
-                 ):
+
+    def __init__(
+        self,
+        p: float = 1.0,
+        damp=1e-2,
+        qe=0.7,
+        gain=2,
+        offset=100,
+        exp_time=0.1,
+        dark_current=0.6,
+        readout=1.5,
+        bitdepth=16,
+        seed=42,
+        simulation=False,
+        camera='cmos',
+        gain_variance=0.1,
+        offset_variance=5,
+        keys=None,  # <-- for dict support
+    ):
         store_attr()
         self.rs = np.random.RandomState(seed=seed)
-        
-    def encodes(self, 
-               input_image: BioImageBase, # The original image 
-               ):
-        rs = self.rs
-        bioimagetype = type(input_image)
-        # If the input image is between 0.0 and 1.0 and bitdepth is specified, rescale it to fit within the bit depth range (0 to 2^bitdepth - 1)
-        max_adu = float(2**self.bitdepth - 1)  # Calculate maximum possible ADU value for the given bit depth
-        if input_image.min() >= 0.0 and input_image.max() <= 1.0:
-            input_image = (input_image * max_adu).astype(np.uint16 if self.bitdepth > 8 else np.uint8)
-            
-        # If simulation mode, assume input_image is already in units of photons
-        if not self.simulation:
-            input_photons = input_image / self.gain / self.qe * self.damp
-        else:
-            input_photons = input_image
-        
-        # Add Poisson shot noise to the input image in terms of photons or directly as electrons
-        photons = rs.poisson(input_photons, size=input_photons.shape)
-        electrons = self.qe * photons  # Convert photons to electrons using quantum efficiency (qe)
-        
-        # Add dark current noise
-        dark_noise = rs.poisson(self.dark_current * self.exp_time, size=electrons.shape)
-        electrons += dark_noise  # Convert dark current from rate to number of events
-        
-        # Add readout noise
-        read_noise = rs.normal(scale=self.readout**2, size=electrons.shape)*self.bitdepth/16
-        electrons += read_noise  # Adding normal distributed noise based on readout standard deviation
-        
-        gain = self.gain
-        offset = self.offset
-        
-        if self.camera == 'cmos':
-            # Add gain noise in CMOS cameras
-            gain_noise = rs.normal(scale=self.gain_variance, size=electrons.shape)
-            # Add offset noise and fixed pattern noise in CMOS cameras
-            offset_noise = rs.normal(scale=self.offset_variance, size=electrons.shape) + rs.normal(scale=self.offset_variance, size=electrons.shape[0])
-            gain += gain_noise # Adjusting the gain by adding normally distributed noise
-            offset += offset_noise  # Adding offset noise and fixed pattern noise
-        
-        adu = (electrons * gain) + offset  # Convert electrons to ADU, then add offset
-        adu[adu > max_adu] = max_adu  # Clip values above full scale to avoid overflow
-        
-        return bioimagetype(adu)
 
+    # -------------------------
+    # CORE NOISE FUNCTION 
+    # -------------------------
+    def _apply_noise(self, x, rs):
+        max_adu = float(2**self.bitdepth - 1)
+
+        # normalize input
+        if x.min() >= 0.0 and x.max() <= 1.0:
+            x = (x * max_adu).astype(np.uint16 if self.bitdepth > 8 else np.uint8)
+
+        # photon model
+        if not self.simulation:
+            photons = x / self.gain / self.qe * self.damp
+        else:
+            photons = x
+
+        photons = rs.poisson(photons, size=photons.shape)
+        electrons = self.qe * photons
+
+        # dark current
+        electrons += rs.poisson(self.dark_current * self.exp_time, size=electrons.shape)
+
+        # read noise (FIX: std should NOT be squared)
+        electrons += rs.normal(scale=self.readout, size=electrons.shape) * (self.bitdepth / 16)
+
+        gain = np.broadcast_to(self.gain, electrons.shape).astype(np.float32).copy()
+        offset = np.broadcast_to(self.offset, electrons.shape).astype(np.float32).copy()
+
+        if self.camera == 'cmos':
+            gain_noise = rs.normal(scale=self.gain_variance, size=electrons.shape)
+            offset_noise = (
+                rs.normal(scale=self.offset_variance, size=electrons.shape)
+                + rs.normal(scale=self.offset_variance, size=(electrons.shape[0],))
+            )
+
+            gain = gain + gain_noise
+            offset = offset + offset_noise
+
+        adu = electrons * gain + offset
+        adu = np.clip(adu, 0, max_adu)
+
+        return adu
+
+    # -------------------------
+    # MetaTensor
+    # -------------------------
+    def encodes(self, x: "MetaTensor"):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        out = self._apply_noise(x, rs)
+        return type(x)(out)
+
+    # -------------------------
+    # torch.Tensor
+    # -------------------------
+    def encodes(self, x: torchTensor):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        out = self._apply_noise(x.numpy(), rs)
+        return torch.as_tensor(out)
+
+    # -------------------------
+    # dict (MONAI-style)
+    # -------------------------
+    def encodes(self, x: dict):
+        if self.keys is None:
+            raise ValueError("keys must be provided for dict input")
+
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+
+        x = dict(x)  # avoid mutation
+        for k in self.keys:
+            x[k] = self._apply_noise(x[k], rs)
+
+        return x
+
+    # -------------------------
+    # BioImageBase
+    # -------------------------
+    def encodes(self, x: BioImageBase):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        out = self._apply_noise(x, rs)
+        return type(x)(out)
+
+    # -------------------------
+    # NumPy
+    # -------------------------
+    def encodes(self, x: np.ndarray):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        return self._apply_noise(x, rs)
 
 # %% ../nbs/005_transforms.ipynb #d883888d
-class Blur(RandTransform):
-    """Apply Gaussian blur to the image."""
-    split_idx,order = None,1
-    def __init__(self, sigma=1.0, ksize=5, prob=0.5):
-        store_attr()
-        self.p = prob
+class Blur(MonaiTransform):
+    """
+    MONAI-aligned Gaussian blur wrapper.
 
-    def encodes(self, x: BioImageBase):
-        bioimagetype = type(x)
-        return bioimagetype(tfms.GaussianSmooth(self.sigma)(x))
-    
-    def encodes(self, x: np.ndarray):
-        return cv2.GaussianBlur(x, (self.ksize, self.ksize), self.sigma)
+    Built on MonaiTransform to ensure:
+    - MetaTensor support
+    - BioImageBase preservation
+    - NumPy compatibility
+    - future dict support if needed
+    """
+
+    def __init__(
+        self,
+        sigma=1.0,
+        keys=None,
+        **kwargs,
+    ):
+        self.sigma = sigma
+
+        super().__init__(
+            monai_transform=tfms.GaussianSmooth,
+            dict_transform=None,   # MONAI will handle if needed via MonaiTransform logic
+            keys=keys,
+            sigma=sigma,
+            **kwargs,
+        )
 
 # %% ../nbs/005_transforms.ipynb #5c450a5a
 class GaussianSmooth(MonaiTransform):
