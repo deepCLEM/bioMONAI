@@ -3,7 +3,10 @@ project:
 
 format:
   html:
-    theme: skriptum.css
+    theme:
+      light:  skriptum.css
+      dark:  skriptum_nord.css
+    toggle: true
     toc: true
     toc-depth: 4
     html-math-method: katex
