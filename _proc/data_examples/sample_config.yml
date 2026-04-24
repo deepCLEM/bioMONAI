@@ -8,18 +8,6 @@
 
 # --------------------------------------------------------------------------------------------------
 
-  
-# DATALOADER CONFIGURATION: ----------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------------
-# ---------- SAMPLE YAML FILE FOR CONFIGURING BOTH THE DATALOADING AND TRAINING PROCESSES ----------
-# --------------------------------------------------------------------------------------------------
-
-# DISCLAIMER: the values displayed in this file are the established default ones within the code, 
-# except for metrics and callbacks, whose default value is None, as a basic example is needed to
-# know the correct formatting for each of them. 
-
-# --------------------------------------------------------------------------------------------------
-
 # DATALOADER CONFIGURATION: ----------------------------------------------------------------------
 bs: 32 # Set to 32 due to the example the configuration is used on, although the default is 64
 val_bs: 32
