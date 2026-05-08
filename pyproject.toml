@@ -31,3 +31,4 @@ version = {attr = "bioMONAI.__version__"}
 include = ["bioMONAI"]
 
 [tool.nbdev]
+custom_sidebar = false
