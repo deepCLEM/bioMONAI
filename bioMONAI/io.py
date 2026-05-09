@@ -5,7 +5,7 @@
 # %% auto #0
 __all__ = ['SaveImage', 'SaveImaged', 'LOADER_REGISTRY', 'LoadImage', 'LoadImaged', 'write_image', 'tiff2torch', 'string2dict',
            'split_path', 'is_ome_tiff', 'extract_formats', 'bioio_loader', 'split_hdf_path', 'hdf5_loader',
-           'LoaderRegistry', 'image_reader', 'BioImageReader']
+           'LoaderRegistry', 'image_reader', 'image_reader_dict', 'BioImageReader']
 
 # %% ../nbs/010_io.ipynb #58b60095
 # =================================
@@ -202,6 +202,25 @@ def extract_formats(filenames: Sequence[str] | str) -> list[str | None]:
 
     return formats
 
+# %% ../nbs/010_io.ipynb #3a3cad7c
+def _sanitize(obj):
+    """
+    Convert non-serializable objects (types, dtypes, callables) into safe representations.
+    """
+    if isinstance(obj, dict):
+        return {k: _sanitize(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return type(obj)(_sanitize(v) for v in obj)
+    elif isinstance(obj, type):
+        # FIX: <class 'numpy.float32'> -> "numpy.float32"
+        return obj.__name__
+    elif isinstance(obj, np.dtype):
+        return str(obj)
+    elif callable(obj):
+        return obj.__name__ if hasattr(obj, "__name__") else str(obj)
+    else:
+        return obj
+
 # %% ../nbs/010_io.ipynb #e1ba1c73
 class bioio_loader():
     
@@ -328,17 +347,7 @@ class hdf5_loader():
 
 
 # %% ../nbs/010_io.ipynb #d418d00e
-def _preprocess(obj: MetaTensor, transforms: Callable|Iterable[Callable]|None=None) -> MetaTensor:
-    """
-    Apply a sequence of transforms to an image object.
-
-    Args:
-        obj: Input image object.
-        transforms: Callable or list of callables.
-
-    Returns:
-        MetaTensor: Transformed object.
-    """
+def _preprocess(obj, transforms=None):
     if transforms is None:
         transforms = []
     elif callable(transforms):
@@ -352,13 +361,17 @@ def _preprocess(obj: MetaTensor, transforms: Callable|Iterable[Callable]|None=No
 
         obj = t(obj)
 
-        obj.meta['transforms'][t.__class__.__name__] = obj.meta['transforms'].get(t.__class__.__name__, [])
-        obj.meta['transforms'][t.__class__.__name__] = {
-                'time': time.time() - start,
-                'params': getattr(t, "__dict__", {}),
+        name = t.__class__.__name__
+
+        raw_params = getattr(t, "__dict__", {})
+        safe_params = _sanitize(raw_params)
+
+        obj.meta['transforms'][name] = {
+            'time': time.time() - start,
+            'params': safe_params,
         }
 
-    obj.meta['size_after_tfms'] = obj.shape if hasattr(obj, "shape") else None
+    obj.meta['size_after_tfms'] = getattr(obj, "shape", None)
 
     return obj
 
@@ -521,6 +534,69 @@ def _load_and_preprocess(
 
     return metatensor
 
+# %% ../nbs/010_io.ipynb #80e604f7
+def _load_and_preprocess_dict(
+    obj: dict,
+    keys: str | Iterable[str],
+    transforms: Callable | Iterable[Callable] | None = None,
+    loader: Callable | None = None,
+    channels: str = "CZYX",
+    ind_dict: dict | None = None,
+    npz_key: str | None = None,
+) -> dict:
+    """
+    Load images from paths stored inside dictionary keys and apply preprocessing.
+
+    Args:
+        obj:
+            Input dictionary.
+        keys:
+            Key or iterable of keys containing file paths.
+        transforms:
+            Callable or iterable of callables.
+        loader:
+            Optional custom loader.
+        channels:
+            Channel layout string.
+        ind_dict:
+            Optional index dictionary.
+        npz_key:
+            Optional npz key.
+
+    Returns:
+        dict:
+            Updated dictionary with loaded/preprocessed MetaTensor(s).
+    """
+    if isinstance(keys, str):
+        keys = [keys]
+
+    # load images into dict first
+    for key in keys:
+        path = Path(obj[key])
+
+        image_loader = _get_loader(path)
+
+        obj[key] = image_loader(
+            path,
+            loader=loader,
+            channels=channels,
+            ind_dict=ind_dict,
+            npz_key=npz_key,
+        )
+
+        # store path
+        obj[key].meta["filepath"] = str(path)
+
+    # apply dict-aware preprocessing (handles metadata internally)
+    obj = _preprocess_dict(obj, transforms)
+
+    # attach non-transform metadata
+    for key in keys:
+        obj[key].meta["format"] = extract_formats(Path(obj[key].meta["filepath"]))[0]
+        obj[key].meta["layout"] = channels
+
+    return obj
+
 # %% ../nbs/010_io.ipynb #08b998f4
 def _multi_sequence_stream(
     image_paths: Sequence[PathLike],
@@ -545,6 +621,56 @@ def _multi_sequence_stream(
     for p in image_paths:
         yield _load_and_preprocess(
             p,
+            transforms=transforms,
+            loader=loader,
+            channels=channels,
+            ind_dict=ind_dict,
+            npz_key=npz_key,
+        )
+
+# %% ../nbs/010_io.ipynb #050e2bb0
+def _multi_sequence_stream_dict(
+    objs: Sequence[dict],
+    keys: str | Iterable[str],
+    transforms=None,
+    loader=None,
+    channels: str = "CZYX",
+    ind_dict=None,
+    npz_key=None,
+) -> Iterable[dict]:
+    """
+    Lazily yield dictionary samples with loaded and preprocessed MetaTensor objects.
+
+    Each yielded item preserves the original dictionary structure, where
+    specified keys contain MetaTensor objects instead of file paths.
+
+    Args:
+        objs:
+            Sequence of input dictionaries containing file paths.
+        keys:
+            Key or iterable of keys containing file paths.
+        transforms:
+            Optional transforms applied to loaded tensors.
+        loader:
+            Optional reader/loader function.
+        channels:
+            Channel layout string.
+        ind_dict:
+            Optional index dictionary.
+        npz_key:
+            Optional NPZ key.
+
+    Yields:
+        dict:
+            Dictionary with loaded and preprocessed MetaTensor(s).
+    """
+    if isinstance(keys, str):
+        keys = [keys]
+
+    for obj in objs:
+        yield _load_and_preprocess_dict(
+            obj=obj.copy(),
+            keys=keys,
             transforms=transforms,
             loader=loader,
             channels=channels,
@@ -783,8 +909,6 @@ def image_reader(
     # -------------------------------------------------
     # detect multi
     # -------------------------------------------------
-    # if isinstance(file_path, Sequence) and not isinstance(file_path, (str, Path)) and len(file_path) == 1:
-    #     file_path = file_path
 
     is_multi = isinstance(file_path, Sequence) and not isinstance(file_path, (str, Path))
 
@@ -842,6 +966,92 @@ def image_reader(
 
     raise ValueError(f"Unknown output mode: {output}")
 
+# %% ../nbs/010_io.ipynb #3135d535
+def image_reader_dict(
+    data: dict | Sequence[dict],
+    keys: str | Iterable[str],
+    lazy: bool = False,
+    transforms: Callable | list[Callable] | None = None,
+    loader: Callable | None = None,
+    channels: str = "CZYX",
+    ind_dict: dict | None = None,
+    npz_key: str | None = None,
+):
+    """
+    Load images from paths stored inside dictionary keys.
+
+    Supports:
+        - single dictionary input
+        - sequence of dictionaries
+        - eager or lazy execution
+
+    The specified keys are replaced with loaded/preprocessed MetaTensor
+    objects while preserving the remaining dictionary structure.
+
+    Args:
+        data:
+            Input dictionary or sequence of dictionaries.
+        keys:
+            Key or iterable of keys containing file paths.
+        lazy:
+            Whether to lazily stream sequence inputs.
+        transforms:
+            Optional dictionary-based transforms.
+        loader:
+            Optional custom loader.
+        channels:
+            Channel layout string.
+        ind_dict:
+            Optional indexing dictionary.
+        npz_key:
+            Optional NPZ key.
+
+    Returns:
+        dict | list[dict] | Iterable[dict]:
+            Loaded dictionary sample(s).
+    """
+
+    def _load(obj):
+        return _load_and_preprocess_dict(
+            obj=obj,
+            keys=keys,
+            transforms=transforms,
+            loader=loader,
+            channels=channels,
+            ind_dict=ind_dict,
+            npz_key=npz_key,
+        )
+
+    def _iter_multi():
+        if lazy:
+            return _multi_sequence_stream_dict(
+                objs=data,
+                keys=keys,
+                transforms=transforms,
+                loader=loader,
+                channels=channels,
+                ind_dict=ind_dict,
+                npz_key=npz_key,
+            )
+
+        return [_load(obj) for obj in data]
+
+    # -------------------------------------------------
+    # MULTI CASE
+    # -------------------------------------------------
+    is_multi = (
+        isinstance(data, Sequence)
+        and not isinstance(data, dict)
+    )
+
+    if is_multi:
+        return _iter_multi()
+
+    # -------------------------------------------------
+    # SINGLE CASE
+    # -------------------------------------------------
+    return _load(data)
+
 # %% ../nbs/010_io.ipynb #514dacd9
 LoadImage = LoadImage
 LoadImaged = LoadImaged
@@ -881,6 +1091,7 @@ class BioImageReader(ImageReader):
     # --------------------------------------------------
     def read(self, data: PathLike | Sequence[PathLike] | np.ndarray, **kwargs) -> MetaTensor:
         kwargs_ = {**self.kwargs, **kwargs}
+        
         if len(data) == 1 and isinstance(data, Sequence) and not isinstance(data, (str, Path)):
             data = data[0]
 

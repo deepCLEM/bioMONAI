@@ -13,7 +13,7 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
            'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
            'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
-           'build_df_from_folder', 'ProcessDataset', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
+           'build_df_from_folder', 'ProcessImageDataset', 'dict2string', 'remove_singleton_dims', 'extract_substacks']
 
 # %% ../nbs/020_data.ipynb #7a8886ba
 # =================================
@@ -3171,8 +3171,8 @@ def _process_single_image(
 
         # Store the pair in the provided list instead of returning immediately
         patch_list.append({
-            "x_path": x_ds,
-            "y_path": y_ds,
+            input_key: x_ds,
+            target_key: y_ds,
             "image_name": image_name,
             "split_name": split_name,
             "patch_idx": idx,
@@ -3221,7 +3221,7 @@ def _extract_split_kwargs(kwargs):
     return {k: kwargs[k] for k in allowed if k in kwargs}
 
 # %% ../nbs/020_data.ipynb #b6f9d525
-def ProcessDataset(
+def ProcessImageDataset(
     data_paths,
     output_folder,
     output_filename,
