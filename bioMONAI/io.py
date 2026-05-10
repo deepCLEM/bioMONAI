@@ -525,6 +525,9 @@ def _load_and_preprocess(
     image_loader = _get_loader(path)
     metatensor = image_loader(path, loader=loader, channels=channels, ind_dict=ind_dict, npz_key=npz_key)
 
+    # store path
+    metatensor.meta["filepath"] = str(path)
+    
     metatensor = _preprocess(metatensor, transforms)
 
     # format extraction
@@ -976,6 +979,10 @@ def image_reader_dict(
     channels: str = "CZYX",
     ind_dict: dict | None = None,
     npz_key: str | None = None,
+    dtype=torch.float32,                                
+    squeeze: bool = False,                              
+    stack_axis: str = "C",                              
+
 ):
     """
     Load images from paths stored inside dictionary keys.
@@ -1039,18 +1046,37 @@ def image_reader_dict(
     # -------------------------------------------------
     # MULTI CASE
     # -------------------------------------------------
+    if isinstance(keys, str):
+        keys = [keys]
+
     is_multi = (
         isinstance(data, Sequence)
         and not isinstance(data, dict)
     )
 
     if is_multi:
-        return _iter_multi()
+        d_list = _iter_multi()
+        out = d_list[0]
+
+        for key in keys:
+            metatensors = [d[key] for d in d_list]
+            metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, dtype=dtype, squeeze=squeeze)
+            metatensor.meta.update(_meta_from_layout(metatensor.shape, metatensor.meta['layout']))
+
+            out[key] = metatensor
+
+
+        return out
 
     # -------------------------------------------------
     # SINGLE CASE
     # -------------------------------------------------
-    return _load(data)
+    out = _load(data)
+
+    for key in keys:
+        out[key].meta.update(_meta_from_layout(out[key].shape, channels))
+
+    return out
 
 # %% ../nbs/010_io.ipynb #514dacd9
 LoadImage = LoadImage
