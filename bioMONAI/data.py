@@ -56,7 +56,7 @@ from torch.utils.data import Dataset as torchDataset
 # =================================
 from fastai.data.all import (
     DataLoaders, delegates, RegexLabeller, is_listy,
-    ColReader, ColSplitter
+    ColReader
 )
 
 from fastai.torch_core import TensorImage
@@ -65,7 +65,6 @@ from fastai.vision.all import (
     DataBlock, CategoryBlock, MultiCategoryBlock, RegressionBlock,
     TfmdDL, TransformBlock, Pipeline,
     get_image_files, get_grid, merge, show_image,
-    RandomSplitter, GrandparentSplitter, TrainTestSplitter, FuncSplitter,
     parent_label, CategoryMap,
     partial, show_results, show_batch, store_attr
 )
@@ -1149,17 +1148,18 @@ class CallableSource(BaseSource):
 
 # %% ../nbs/020_data.ipynb #615d3f08
 class DataSplitMixin:
-    """Shared logic for splitting datalists into MONAI datalists."""
+    """Shared logic for splitting datalists into index-based splits."""
 
     # --------------------------------------------------
     def _resolve_splitter(self, data):
 
-        df = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-
         if self.splitter:
             return self.splitter
 
-        if self.valid_col in df.columns:
+        if isinstance(data, pd.DataFrame):
+            data = data.to_dict("records")
+
+        if isinstance(data, list) and data and self.valid_col in data[0]:
             return ColSplitter(self.valid_col)
 
         return TrainTestSplitter(
@@ -1169,17 +1169,16 @@ class DataSplitMixin:
             train_size=self.train_size,
             shuffle=self.shuffle,
         )
+
     # --------------------------------------------------
     def _split_data(self, data, mode="train"):
 
-        # TEST MODE → no split
         if mode == "test":
             return None, data
 
-        df = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
+        splitter = self._resolve_splitter(data)
 
-        splitter = self._resolve_splitter(df)
-        train_idx, valid_idx = splitter(df)
+        train_idx, valid_idx = splitter(data)
 
         train = [data[i] for i in train_idx]
         valid = [data[i] for i in valid_idx]
@@ -1316,7 +1315,8 @@ class DataBlockBuilder(DataSplitMixin):
                 (BioImageBlock(cls=BioImage),)
             )
 
-        splitter = None if mode == "test" else self._resolve_splitter(pd.DataFrame(data))
+        # IMPORTANT: pass raw list[dict], not DataFrame
+        splitter = None if mode == "test" else self._resolve_splitter(data)
 
         item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
         batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
@@ -1337,9 +1337,7 @@ class DataBlockBuilder(DataSplitMixin):
         datablock._val_item_tfms = val_item_tfms
         datablock._val_batch_tfms = val_batch_tfms
 
-        df = pd.DataFrame(data)
-
-        return datablock, df
+        return datablock, data
 
 # %% ../nbs/020_data.ipynb #795e12ca
 @register_dataset("monaidataset", backend="monai")
@@ -1479,7 +1477,7 @@ class FastaiLoader:
 
         # Create DataLoaders
         dls = datablock.dataloaders(
-            data_source,
+            pd.DataFrame(data_source),
             bs=self.batch_size,
             shuffle=self.shuffle,
             num_workers=self.num_workers,
@@ -1677,59 +1675,44 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
-    def _load_dataframe(cls, data, kwargs, val_data=None):
-        """
-        Load data into a unified DataFrame.
+    def _load_data(cls, data, kwargs, val_data=None):
 
-        | Parameter | Type | Default | Description |
-        |----------|------|--------|-------------|
-        | data | Any | — | Input data (df, csv, folder, etc.) |
-        | kwargs | dict | {} | Source-related kwargs |
-        | val_data | Any | None | Optional validation data |
-
-        Returns
-        -------
-        df : pd.DataFrame
-            Combined dataframe with optional validation column
-        """
         source_name = detect_source(data)
         SourceClass = SOURCE_REGISTRY[source_name]
 
-        # Split kwargs into train / val groups
         source_splits = split_prefixed_kwargs(kwargs)
 
-        # ---- load training data ----
         train_kwargs = route_kwargs(SourceClass.__init__, source_splits["train"])
-        df = SourceClass(data, **train_kwargs).load().copy()
+        train = SourceClass(data, **train_kwargs).load()
 
-        # ---- optional validation data ----
-        if val_data is not None:
-            val_kwargs = route_kwargs(
-                SourceClass.__init__,
-                source_splits.get("val", source_splits["train"])
-            )
+        if val_data is None:
+            return train
 
-            val_df = SourceClass(val_data, **val_kwargs).load().copy()
+        val_kwargs = route_kwargs(
+            SourceClass.__init__,
+            source_splits.get("val", source_splits["train"])
+        )
 
-            # Mark train vs validation rows
-            valid_col = kwargs.get("valid_col", "is_valid")
-            df[valid_col] = False
-            val_df[valid_col] = True
+        val = SourceClass(val_data, **val_kwargs).load()
 
-            # Merge datasets
-            df = pd.concat([df, val_df], ignore_index=True)
+        valid_col = kwargs.get("valid_col", "is_valid")
 
-        return df
+        for r in train:
+            r[valid_col] = False
+        for r in val:
+            r[valid_col] = True
+
+        return train + val
 
     # --------------------------------------------------
     @classmethod
-    def _build_dataset(cls, df, dataset, backend, kwargs, mode):
+    def _build_dataset(cls, data, dataset, backend, kwargs, mode):
         """
         Build dataset(s) using the registered dataset builder.
 
         | Parameter | Type | Default | Description |
         |----------|------|--------|-------------|
-        | df | pd.DataFrame | — | Input dataframe |
+        | data | list[dict] | — | Input data |
         | dataset | str | — | Dataset builder name |
         | backend | str | None | Backend (fastai, monai, etc.) |
         | kwargs | dict | {} | Dataset builder kwargs |
@@ -1745,7 +1728,7 @@ class BioDataLoaders(DataLoaders):
         builder_kwargs = route_kwargs(DatasetBuilderClass.__init__, kwargs)
         builder = DatasetBuilderClass(**builder_kwargs)
 
-        return builder.build(df, mode=mode), backend
+        return builder.build(data, mode=mode), backend
 
     # --------------------------------------------------
     @classmethod
@@ -1801,11 +1784,11 @@ class BioDataLoaders(DataLoaders):
         dataset, kwargs = cls._apply_task_defaults(task, dataset, kwargs)
 
         # ---- load dataframe ----
-        df = cls._load_dataframe(data, kwargs, val_data)
+        data_dict = cls._load_data(data, kwargs, val_data)
 
         # ---- build dataset ----
         (ds_train, ds_valid), backend = cls._build_dataset(
-            df, dataset, backend, kwargs, mode
+            data_dict, dataset, backend, kwargs, mode
         )
 
         # ---- test mode ----
@@ -2009,7 +1992,18 @@ def from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col=0, folder=None, 
         target_pref = pref
     else:
         target_pref = f'{Path(path)/target_folder}{os.path.sep}'
-    splitter = RandomSplitter(valid_pct, seed=seed) if valid_col is None else ColSplitter(valid_col)        
+
+    def _split(o):
+        df = o if isinstance(o, pd.DataFrame) else pd.DataFrame(o)
+        train, valid = (
+            RandomSplitter(valid_pct, seed=seed)(df)
+            if valid_col is None
+            else ColSplitter(valid_col)(df)
+        )
+        return L(train), L(valid)
+
+    splitter = _split     
+    
     target_img_cls = img_cls if target_img_cls is None else target_img_cls
     ops = { 
         'blocks':       (BioImageBlock(img_cls), BioImageBlock(target_img_cls)),
@@ -2073,7 +2067,16 @@ def class_from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col='filename'
     if y_block is None:
         is_multi = (is_listy(label_col) and len(label_col) > 1) or label_delim is not None
         y_block = MultiCategoryBlock if is_multi else CategoryBlock
-    splitter = RandomSplitter(valid_pct, seed=seed) if valid_col is None else ColSplitter(valid_col)        
+    def _split(o):
+        df = o if isinstance(o, pd.DataFrame) else pd.DataFrame(o)
+        train, valid = (
+            RandomSplitter(valid_pct, seed=seed)(df)
+            if valid_col is None
+            else ColSplitter(valid_col)(df)
+        )
+        return L(train), L(valid)
+    splitter = _split      
+
     ops = { 
         'blocks':       (BioImageBlock(img_cls), y_block),
         'get_items':    None,
@@ -3407,7 +3410,7 @@ def ProcessImageDataset(
     # --------------------------------------------------
     # Load dataframe
     # --------------------------------------------------
-    df = pd.DataFrame(BioDataLoaders._load_dataframe(data_paths, {'colmap': colmap}))
+    df = pd.DataFrame(BioDataLoaders._load_data(data_paths, {'colmap': colmap}))
 
     input_key, target_key, df = _resolve_columns(df, colmap)
 

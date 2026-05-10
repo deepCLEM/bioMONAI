@@ -8,7 +8,8 @@ __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNew
            'MutableSequence', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple', 'ensure_tuple_rep',
            'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax', 'is_cuda_available',
            'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor', 'route_kwargs', 'read_yaml',
-           'dictlist_to_funclist', 'TargetedTransform', 'apply_transforms']
+           'dictlist_to_funclist', 'ColSplitter', 'TrainTestSplitter', 'RandomSplitter', 'GrandparentSplitter',
+           'FuncSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/000_utils.ipynb #f6eab00d
 # =================================
@@ -21,6 +22,8 @@ from pathlib import Path, PurePath
 from types import SimpleNamespace
 from typing import Any, List, Optional, Union
 import inspect
+from pandas import DataFrame
+from sklearn.model_selection import train_test_split
 
 # =================================
 # Imaging
@@ -36,6 +39,7 @@ from torch import (
     max as torchmax,
     from_numpy as torch_from_numpy,
     device as torch_device,
+    manual_seed, randperm,
 )
 
 from torch.cuda import is_available as is_cuda_available
@@ -185,6 +189,165 @@ def dictlist_to_funclist(transform_dicts):
             transforms.append(transform_obj(**params))
 
     return transforms
+
+# %% ../nbs/000_utils.ipynb #958ddd9b
+def ColSplitter(col='is_valid', on=None):
+    "Split items (DataFrame or list[dict]) by value in `col`"
+
+    def _inner(o):
+
+        # ----------------------------
+        # Normalize input
+        # ----------------------------
+        if isinstance(o, DataFrame):
+            data = o.to_dict("records")
+        elif isinstance(o, list):
+            data = o
+        else:
+            raise TypeError("ColSplitter supports DataFrame or list[dict]")
+
+        if not data:
+            return [], []
+
+        # ----------------------------
+        # Build mask
+        # ----------------------------
+        if isinstance(col, int):
+            values = [row[list(row.keys())[col]] for row in data]
+        else:
+            values = [row.get(col) for row in data]
+
+        if on is None:
+            valid_mask = [bool(v) for v in values]
+        elif isinstance(on, (list, tuple, set)):
+            valid_mask = [v in on for v in values]
+        else:
+            valid_mask = [v == on for v in values]
+
+        # ----------------------------
+        # Convert mask → indices (fastai-style)
+        # ----------------------------
+        train_idx = [i for i, v in enumerate(valid_mask) if not v]
+        valid_idx = [i for i, v in enumerate(valid_mask) if v]
+
+        return train_idx, valid_idx
+
+    return _inner
+
+def TrainTestSplitter(
+    test_size=0.2,
+    random_state=None,
+    stratify=None,
+    train_size=None,
+    shuffle=True
+):
+    "Split items into random train/valid subsets using sklearn train_test_split."
+
+    def _inner(o, **kwargs):
+
+        n = len(o)
+        idxs = list(range(n))
+
+        train_idx, valid_idx = train_test_split(
+            idxs,
+            test_size=test_size,
+            random_state=random_state,
+            stratify=stratify,
+            train_size=train_size,
+            shuffle=shuffle
+        )
+
+        return list(train_idx), list(valid_idx)
+
+    return _inner
+
+def RandomSplitter(valid_pct=0.2, seed=None):
+    "Split items randomly into train/valid subsets."
+
+    def _inner(o):
+
+        n = len(o)
+
+        if seed is not None:
+            manual_seed(seed)
+
+        # generate shuffled indices (pure torch → python)
+        perm = randperm(n).tolist()
+
+        cut = int(valid_pct * n)
+
+        valid_idx = perm[:cut]
+        train_idx = perm[cut:]
+
+        return list(train_idx), list(valid_idx)
+
+    return _inner
+
+def _grandparent_idxs(items, name, key="image"):
+    "Return indices where grandparent folder matches name"
+
+    from pathlib import Path
+
+    def match(o):
+        path = o.get(key, o) if isinstance(o, dict) else o
+        return Path(path).parent.parent.name == name
+
+    return [i for i, o in enumerate(items) if match(o)]
+
+def GrandparentSplitter(train_name='train', valid_name='valid', key="image"):
+    "Split items by grandparent folder name"
+
+    def _inner(o):
+        train_idx = _grandparent_idxs(o, train_name, key)
+        valid_idx = _grandparent_idxs(o, valid_name, key)
+        return list(train_idx), list(valid_idx)
+
+    return _inner
+
+def FuncSplitter(func):
+    "Split items by function (True = validation, False = train)"
+
+    def _inner(o):
+
+        valid_idx = [
+            i for i, x in enumerate(o)
+            if func(x)
+        ]
+
+        train_idx = [
+            i for i in range(len(o))
+            if i not in set(valid_idx)
+        ]
+
+        return list(train_idx), list(valid_idx)
+
+    return _inner
+
+def FileSplitter(fname):
+    "Split items using file containing valid names"
+
+    valid = set(Path(fname).read_text().splitlines())
+
+    def _inner(o):
+
+        def get_name(x):
+            if isinstance(x, dict):
+                return Path(x.get("image", x.get("path", ""))).name
+            return Path(x).name
+
+        valid_idx = [
+            i for i, x in enumerate(o)
+            if get_name(x) in valid
+        ]
+
+        train_idx = [
+            i for i in range(len(o))
+            if i not in set(valid_idx)
+        ]
+
+        return list(train_idx), list(valid_idx)
+
+    return _inner
 
 # %% ../nbs/000_utils.ipynb #0de5c206
 @dataclass
