@@ -375,6 +375,84 @@ def _preprocess(obj, transforms=None):
 
     return obj
 
+# %% ../nbs/010_io.ipynb #582c31aa
+def _preprocess_dict(
+    obj: dict,
+    transforms: Callable | Iterable[Callable] | None = None,
+) -> dict:
+    """
+    Apply dictionary-based transforms and attach metadata to transformed
+    MetaTensor entries.
+
+    This function is designed for MONAI-style dictionary transforms
+    (e.g. MapTransform subclasses) that expose a ``keys`` attribute.
+    Metadata is stored directly in each transformed MetaTensor under
+    ``tensor.meta``.
+
+    Stored metadata includes:
+        - ``size_original``:
+            Shape before preprocessing.
+        - ``transforms``:
+            Per-transform timing and parameter information.
+        - ``size_after_tfms``:
+            Final shape after all transforms.
+
+    Args:
+        obj:
+            Input dictionary containing MetaTensor objects.
+        transforms:
+            A callable or iterable of callables operating on dictionaries.
+
+    Returns:
+        dict:
+            Transformed dictionary with updated MetaTensor metadata.
+    """
+    if transforms is None:
+        transforms = []
+    elif callable(transforms):
+        transforms = [transforms]
+
+    processed_keys = set()
+
+    for t in transforms:
+        keys = getattr(t, "keys", [])
+
+        start = time.time()
+
+        obj = t(obj)
+
+        elapsed = time.time() - start
+
+        for key in keys:
+            if key not in obj:
+                continue
+
+            tensor = obj[key]
+
+            if not isinstance(tensor, MetaTensor):
+                continue
+
+            processed_keys.add(key)
+
+            tensor.meta.setdefault("size_original", tensor.shape)
+            tensor.meta.setdefault("transforms", {})
+
+            raw_params = getattr(t, "__dict__", {})
+            safe_params = _sanitize(raw_params)
+
+            tensor.meta["transforms"][t.__class__.__name__] = {
+                "time": elapsed,
+                "params": safe_params,
+            }
+
+    for key in processed_keys:
+        tensor = obj[key]
+
+        if isinstance(tensor, MetaTensor):
+            tensor.meta["size_after_tfms"] = tensor.shape 
+
+    return obj
+
 # %% ../nbs/010_io.ipynb #c60c74aa
 class LoaderRegistry:
     def __init__(self):
@@ -589,6 +667,9 @@ def _load_and_preprocess_dict(
 
         # store path
         obj[key].meta["filepath"] = str(path)
+        obj[key].meta["size_original"] = obj[key].shape
+        obj[key].meta.setdefault("transforms", {})
+        obj[key].meta.setdefault("size_after_tfms", None)
 
     # apply dict-aware preprocessing (handles metadata internally)
     obj = _preprocess_dict(obj, transforms)
@@ -1043,9 +1124,10 @@ def image_reader_dict(
 
         return [_load(obj) for obj in data]
 
-    # -------------------------------------------------
-    # MULTI CASE
-    # -------------------------------------------------
+    
+    if not keys: 
+        return data
+    
     if isinstance(keys, str):
         keys = [keys]
 
@@ -1054,6 +1136,9 @@ def image_reader_dict(
         and not isinstance(data, dict)
     )
 
+    # -------------------------------------------------
+    # MULTI CASE
+    # -------------------------------------------------
     if is_multi:
         d_list = _iter_multi()
         out = d_list[0]

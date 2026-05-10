@@ -23,6 +23,7 @@ import os
 import random
 import types
 from inspect import signature, _empty
+from plum import dispatch
 
 # =================================
 # Third-party scientific stack
@@ -83,7 +84,7 @@ from monai.inferers import SlidingWindowSplitter, Splitter
 # bioMONAI
 # =================================
 from .utils import *
-from .io import image_reader, BioImageReader, LoadImage, LoadImaged
+from .io import image_reader, image_reader_dict
 from .visualize import show_biodata, show_multichannel
 
 # =================================
@@ -111,6 +112,30 @@ class MetaResolver(type(torchTensor), metaclass=BypassNewMeta):
     pass
     
 
+# %% ../nbs/020_data.ipynb #2ec695f1
+@dispatch
+def _create(cls, fn: dict, keys=None, **kwargs):
+    if keys is None:
+        keys = []
+
+    metatensor_dict = cls.load_dict(keys=keys, **kwargs)(fn)
+
+    if isinstance(keys, str):
+        keys = [keys]
+
+    for key in keys:
+        if key in metatensor_dict:
+            x = metatensor_dict[key]
+            metatensor_dict[key] = cls(x.data, meta=x.meta)
+
+    return metatensor_dict
+
+
+@dispatch
+def _create(cls, fn: object, **kwargs):
+    metatensor = cls.load(**kwargs)(fn)
+    return cls(metatensor.data, meta=metatensor.meta)
+
 # %% ../nbs/020_data.ipynb #c04e0a04
 class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     """
@@ -127,6 +152,7 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     _show_args = {"cmap": "gray"}
     _channels="CZYX"
     _transforms = None
+    _keys = []
 
     # --------------------------------------------------
     # BASIC CONSTRUCTORS
@@ -148,16 +174,8 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
     # --------------------------------------------------
     # LOADING
     # --------------------------------------------------
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        **kwargs,
-    ):
-        metatensor = cls.load(**kwargs)(fn)
-
-        return cls(metatensor.data, meta=metatensor.meta)
-
+    create = classmethod(_create)
+    
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
@@ -180,14 +198,18 @@ class BioImageBase(MetaTensor, TensorImage, metaclass=MetaResolver):
         return _load
 
     @classmethod
-    def load_dict(cls, keys, **kwargs) -> Callable:
-        loader = cls.load(**kwargs)
+    def load_dict(cls, **kwargs) -> Callable:
+        def _load_dict(data: dict|Sequence[dict]):
 
-        def _load_dict(data: dict):
-            out = dict(data)
-            for k in keys:
-                out[k] = loader(out[k])
-            return out
+            local_kwargs = dict(kwargs)
+            local_kwargs.setdefault("keys", cls._keys)
+            local_kwargs.setdefault("channels", cls._channels)
+            local_kwargs.setdefault("transforms", cls._transforms)
+
+            return image_reader_dict(
+                data,
+                **local_kwargs,
+            )
 
         return _load_dict
 
@@ -223,15 +245,7 @@ class BioImage(BioImageBase):
     # --------------------------------------------------
     def show(self, ctx=None, **kwargs):
         "Show image using `merge(self._show_args, kwargs)`"
-        return show_image(self, ctx=ctx, **merge(self._show_args, kwargs))
-
-    # --------------------------------------------------
-    # LOADING 
-    # --------------------------------------------------
-    @classmethod
-    def create(cls, fn: PathLike | Sequence[PathLike] | torchTensor, **kwargs):
-        metatensor = cls.load(**kwargs)(fn)
-        return cls(metatensor.data, meta=metatensor.meta)
+        return show_biodata(self, ctx=ctx, **merge(self._show_args, kwargs))
 
     # --------------------------------------------------
     # LOADER FACTORY
@@ -245,9 +259,9 @@ class BioImage(BioImageBase):
     # DICT LOADER
     # --------------------------------------------------
     @classmethod
-    def load_dict(cls, keys, **kwargs):
+    def load_dict(cls, **kwargs):
         kwargs.setdefault("channels", cls._channels)
-        return super().load_dict(keys, **kwargs)
+        return super().load_dict(**kwargs)
 
 # %% ../nbs/020_data.ipynb #a32aa47a
 class BioVolume(BioImageBase):
@@ -263,18 +277,6 @@ class BioVolume(BioImageBase):
     _channels="CZYX"
     
     # --------------------------------------------------
-    # LOADING
-    # --------------------------------------------------
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        **kwargs,
-    ):
-        metatensor = cls.load(**kwargs)(fn)
-        return cls(metatensor.data, meta=metatensor.meta)
-    
-    # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
@@ -286,6 +288,63 @@ class BioVolume(BioImageBase):
     def load_dict(cls, keys, **kwargs) -> Callable:
         kwargs.setdefault("channels", cls._channels)
         return super().load_dict(keys, **kwargs)
+
+# %% ../nbs/020_data.ipynb #b6cdac7d
+def _mip_transform(cls, img, layout):
+    z_dim = layout.index("Z")
+
+    mip = torchmax(img.as_tensor(), dim=z_dim).values
+
+    meta = dict(img.meta)
+    meta["layout"] = layout.replace("Z", "")
+    meta["size_output"] = tuple(mip.shape)
+
+    return cls(x=mip, meta=meta)
+
+@dispatch
+def _create_mip(
+    cls,
+    fn: PathLike | Sequence[PathLike] | torchTensor,
+    **kwargs,
+):
+    kwargs.setdefault("channels", cls._channels)
+
+    img = super(cls, cls).create(fn, **kwargs)
+
+    layout = kwargs.get("channels")
+
+    return _mip_transform(cls, img, layout)
+
+@dispatch
+def _create_mip(
+    cls,
+    fn: dict | Sequence[dict],
+    keys=None,
+    **kwargs,
+):
+    kwargs.setdefault("channels", cls._channels)
+
+    out = super(cls, cls).create(
+        fn,
+        keys=keys,
+        **kwargs,
+    )
+
+    if keys is None:
+        keys = []
+
+    if isinstance(keys, str):
+        keys = [keys]
+
+    layout = kwargs.get("channels")
+
+    for key in keys:
+
+        img = out[key]
+
+        out[key] = _mip_transform(cls, img, layout)
+
+    return out
 
 # %% ../nbs/020_data.ipynb #0febd1d1
 class BioVideo(BioImageBase):
