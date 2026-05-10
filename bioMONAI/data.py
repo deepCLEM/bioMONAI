@@ -84,7 +84,7 @@ from monai.inferers import SlidingWindowSplitter, Splitter
 # bioMONAI
 # =================================
 from .utils import *
-from .io import image_reader, image_reader_dict
+from .io import image_reader, image_reader_dict, _sanitize
 from .visualize import show_biodata, show_multichannel
 
 # =================================
@@ -3157,21 +3157,22 @@ def _process_single_image(
     target_class,
     kwargs
 ):
-    data_path = row[input_key]
-    gt_path   = row[target_key]
 
-    image_name = _get_image_name(data_path)
+    image_name = _get_image_name(row[input_key])
 
     # --------------------------------------------------
     # Load images
     # --------------------------------------------------
     image_reader_kwargs = route_kwargs(image_reader, kwargs)
-    input_metatensor = input_class.create(
-        data_path, transforms=image_transforms, **image_reader_kwargs
+    row = input_class.create(
+        row, keys=[input_key], transforms=_select_transforms(image_transforms, [input_key]), **image_reader_kwargs
     )
-    gt_metatensor = target_class.create(
-        gt_path, transforms=image_transforms, **image_reader_kwargs
+    row = target_class.create(
+        row, keys=[target_key], transforms=_select_transforms(image_transforms, [target_key]), **image_reader_kwargs
     )
+
+    input_metatensor = row[input_key]
+    gt_metatensor = row[target_key]
 
     data_img, data_meta = input_metatensor.data, input_metatensor.meta
     gt_img, gt_meta = gt_metatensor.data, gt_metatensor.meta
@@ -3215,9 +3216,11 @@ def _process_single_image(
         )
 
         if patch_transforms:
+            patch_dict = {input_key: data_patch, target_key: gt_patch}
             for tfm in patch_transforms:
-                data_patch = tfm(data_patch)
-                gt_patch = tfm(gt_patch)
+                patch_dict = tfm(patch_dict)
+            data_patch = patch_dict[input_key]
+            gt_patch = patch_dict[target_key]
 
         x_ds = f"{base}/X/{idx}"
         y_ds = f"{base}/y/{idx}"
@@ -3238,6 +3241,10 @@ def _process_single_image(
             "location": loc
         })
 
+def _select_transforms(transforms, keys):
+    if transforms is None:
+        return None
+    return [fn for fn in transforms if set(fn.keys) & set(keys)]
     
 def _resolve_columns(df, colmap):
     if colmap:
@@ -3261,11 +3268,17 @@ def _store_metadata(group, meta, patch_size, patch_transforms):
         group.attrs[k] = str(v)
 
     group.attrs["patch_size"] = str(patch_size)
-    group.attrs['affine'] = meta['affine']
+    group.attrs["affine"] = meta["affine"]
+
+    patch_transforms_info = "None"
+
     if patch_transforms is not None:
-        patch_transforms_info = {tfm.__class__.__name__: {'params': getattr(tfm, "__dict__", {})} for tfm in patch_transforms}
-        group.attrs['patch_transforms'] = str(patch_transforms_info)
-        group.attrs['patch_transforms'] = str(patch_transforms_info)
+        patch_transforms_info = {
+            tfm.__class__.__name__: _sanitize(tfm)
+            for tfm in patch_transforms
+        }
+
+    group.attrs["patch_transforms"] = str(patch_transforms_info)
 
 def _get_image_name(path):
     return os.path.splitext(os.path.basename(path))[0]
@@ -3290,6 +3303,7 @@ def ProcessImageDataset(
     image_splitter=SlidingWindowSplitter,
     colmap=None,
     split_dataset=True,
+    csv = True,
     csv_filename=None,
     image_transforms=None,
     patch_transforms=None,
@@ -3359,7 +3373,10 @@ def ProcessImageDataset(
     # --------------------------------------------------
     # Save CSV with patch info if requested
     # --------------------------------------------------
-    if csv_filename:
+    if csv:
+        if csv_filename is None:
+            csv_filename = f"{output_filename}.csv"
+
         csv_path = os.path.join(output_folder, csv_filename)
         pd.DataFrame(all_patches).to_csv(csv_path, index=False)
         print(f"Patch information saved to CSV: {csv_path}")

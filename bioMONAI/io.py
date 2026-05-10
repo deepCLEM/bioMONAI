@@ -205,19 +205,42 @@ def extract_formats(filenames: Sequence[str] | str) -> list[str | None]:
 # %% ../nbs/010_io.ipynb #3a3cad7c
 def _sanitize(obj):
     """
-    Convert non-serializable objects (types, dtypes, callables) into safe representations.
+    Convert non-serializable objects into safe representations
+    and recursively extract nested transform parameters.
     """
+
+    # dictionaries
     if isinstance(obj, dict):
         return {k: _sanitize(v) for k, v in obj.items()}
+
+    # lists / tuples
     elif isinstance(obj, (list, tuple)):
         return type(obj)(_sanitize(v) for v in obj)
+
+    # classes/types
     elif isinstance(obj, type):
-        # FIX: <class 'numpy.float32'> -> "numpy.float32"
         return obj.__name__
+
+    # numpy dtypes
     elif isinstance(obj, np.dtype):
         return str(obj)
+
+    # nested objects / transforms
+    elif hasattr(obj, "__dict__") and not isinstance(obj, (str, int, float, bool)):
+        return {
+            "__class__": obj.__class__.__name__,
+            **{
+                k: _sanitize(v)
+                for k, v in vars(obj).items()
+                if not k.startswith("_")
+            },
+        }
+
+    # callables
     elif callable(obj):
         return obj.__name__ if hasattr(obj, "__name__") else str(obj)
+
+    # everything else
     else:
         return obj
 
