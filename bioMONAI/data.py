@@ -6,8 +6,8 @@
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'SlidingWindowSplitter', 'MetaResolver',
            'BioImageBase', 'BioImage', 'BioVolume', 'BioVideo', 'BioMultiChannel', 'Tensor2BioImage', 'BioImageBlock',
            'BioDataBlock', 'register_source', 'register_dataset', 'register_loader', 'register_task',
-           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DataFrameSource', 'CSVSource',
-           'FolderSource', 'ListSource', 'CallableSource', 'DataFrameSplitMixin', 'MonaiTransformMixin',
+           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DictSource', 'DataFrameSource',
+           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin',
            'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader',
            'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
            'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
@@ -849,6 +849,10 @@ def _show_summary(train_dl, val_dl=None):
         _describe_dl(val_dl, "Valid")
 
 # %% ../nbs/020_data.ipynb #d8e838b9
+from pathlib import Path
+import pandas as pd
+
+
 def detect_source(data):
 
     if callable(data):
@@ -857,7 +861,20 @@ def detect_source(data):
     if isinstance(data, pd.DataFrame):
         return "dataframe"
 
+    # single dict
+    if isinstance(data, dict):
+        return "dict"
+
+    # list/tuple handling
     if isinstance(data, (list, tuple)):
+
+        if len(data) == 0:
+            return "list"
+
+        # list of dicts
+        if all(isinstance(x, dict) for x in data):
+            return "dict"
+
         return "list"
 
     if isinstance(data, str):
@@ -879,18 +896,22 @@ def build_source(data, **kwargs):
 
     return source_cls(data, **kwargs)
 
-# %% ../nbs/020_data.ipynb #f998bcd6
-class DataFrameSource:
+# %% ../nbs/020_data.ipynb #20a3f90e
+@register_source("dict")
+class DictSource(BaseSource):
     def __init__(
         self,
-        df,
+        data,
         colmap=None,
         base_path=None,
         folders=None,
         suffixes=None,
         keep_original=False,
     ):
-        self.df = df
+        if isinstance(data, dict):
+            data = [data]
+
+        self.data = data
         self.colmap = colmap or {}
         self.base_path = Path(base_path) if base_path else Path()
         self.folders = folders or {}
@@ -898,7 +919,7 @@ class DataFrameSource:
         self.keep_original = keep_original
 
     def _build_path(self, value, new_col):
-        if pd.isna(value):
+        if value is None or pd.isna(value):
             return None
 
         base = self.base_path
@@ -914,36 +935,65 @@ class DataFrameSource:
     def _build_paths(self, values, new_col):
         return [self._build_path(v, new_col) for v in values]
 
-    def _resolve_paths(self):
-        df = self.df.copy()
-        cols_to_drop = set()
+    def _resolve(self):
+        out = []
 
-        for new_col, src_col in self.colmap.items():
+        for row in self.data:
+            item = dict(row)
+            cols_to_drop = set()
 
-            if isinstance(src_col, list):
-                df[new_col] = df[src_col].apply(
-                    lambda row: self._build_paths(row.tolist(), new_col),
-                    axis=1,
-                )
-                cols_to_drop.update(src_col)
+            for new_col, src_col in self.colmap.items():
 
-            else:
-                df[new_col] = df[src_col].apply(
-                    lambda x: self._build_path(x, new_col)
-                )
-                cols_to_drop.add(src_col)
+                if isinstance(src_col, list):
+                    values = [item.get(c) for c in src_col]
+                    item[new_col] = self._build_paths(values, new_col)
+                    cols_to_drop.update(src_col)
 
-        if not self.keep_original:
-            df.drop(columns=[c for c in cols_to_drop if c in df.columns], inplace=True)
+                else:
+                    item[new_col] = self._build_path(item.get(src_col), new_col)
+                    cols_to_drop.add(src_col)
 
-        return df
+            if not self.keep_original:
+                for c in cols_to_drop:
+                    item.pop(c, None)
+
+            out.append(item)
+
+        return out
 
     def load(self):
-        return self._resolve_paths()
+        return self._resolve()
+
+# %% ../nbs/020_data.ipynb #f998bcd6
+@register_source("dataframe")
+class DataFrameSource(BaseSource):
+    def __init__(
+        self,
+        df,
+        colmap=None,
+        base_path=None,
+        folders=None,
+        suffixes=None,
+        keep_original=False,
+    ):
+        self.df = df
+
+        self.dict_source = DictSource(
+            data=df.to_dict(orient="records"),
+            colmap=colmap,
+            base_path=base_path,
+            folders=folders,
+            suffixes=suffixes,
+            keep_original=keep_original,
+        )
+
+    def load(self):
+        return self.dict_source.load()
+    
 
 # %% ../nbs/020_data.ipynb #a04d0f49
 @register_source("csv")
-class CSVSource:
+class CSVSource(BaseSource):
 
     @delegates(DataFrameSource.__init__)
     def __init__(self, path, **kwargs):
@@ -960,7 +1010,7 @@ class CSVSource:
 
 # %% ../nbs/020_data.ipynb #7111765f
 @register_source("folder")
-class FolderSource:
+class FolderSource(BaseSource):
 
     def __init__(self, root, colmap):
         self.root = Path(root)
@@ -973,26 +1023,29 @@ class FolderSource:
 
     def load(self):
 
-        data = {}
+        scanned = {
+            key: self._scan(folder)
+            for key, folder in self.colmap.items()
+        }
 
-        for key, folder in self.colmap.items():
-            data[key] = self._scan(folder)
+        records = [
+            dict(zip(scanned.keys(), values))
+            for values in zip(*scanned.values())
+        ]
 
-        df = pd.DataFrame(data)
-
-        source = DataFrameSource(
-            df,
-            colmap={k: k for k in df.columns},
-            base_path=str(self.root),
+        source = DictSource(
+            records,
+            colmap={k: k for k in scanned.keys()},
+            base_path=self.root,
             folders=self.colmap,
-            keep_original=True
+            keep_original=True,
         )
 
         return source.load()
 
 # %% ../nbs/020_data.ipynb #be11809c
 @register_source("list")
-class ListSource:
+class ListSource(BaseSource):
 
     def __init__(self, items, colmap=None, base_path="."):
         self.items = items
@@ -1006,34 +1059,46 @@ class ListSource:
         # case 1: list of paths
         if isinstance(first, (str, Path)):
 
-            df = pd.DataFrame({"image": self.items})
+            records = [{"image": str(x)} for x in self.items]
             colmap = {"image": "image"}
 
         # case 2: list of dicts
         else:
 
-            df = pd.DataFrame(self.items)
+            records = [dict(x) for x in self.items]
 
             if self.colmap:
-                df = df.rename(columns={v: k for k, v in self.colmap.items()})
-                colmap = {k: k for k in self.colmap}
-            else:
-                colmap = {c: c for c in df.columns}
 
-        source = DataFrameSource(
-            df,
+                records = [
+                    {
+                        dst: row[src]
+                        for dst, src in self.colmap.items()
+                    }
+                    for row in records
+                ]
+
+                colmap = {k: k for k in self.colmap.keys()}
+
+            else:
+                colmap = {
+                    k: k
+                    for k in records[0].keys()
+                }
+
+        source = DictSource(
+            records,
             colmap=colmap,
             base_path=self.base_path,
-            keep_original=True
+            keep_original=True,
         )
 
         return source.load()
 
 # %% ../nbs/020_data.ipynb #57918c64
 @register_source("callable")
-class CallableSource:
+class CallableSource(BaseSource):
 
-    @delegates(DataFrameSource.__init__)
+    @delegates(DictSource.__init__)
     def __init__(
         self,
         items_fn,
@@ -1056,28 +1121,44 @@ class CallableSource:
 
         # Case 1: items already dictionaries
         if isinstance(first, dict):
-            df = pd.DataFrame(items)
+
+            records = [dict(x) for x in items]
 
         # Case 2: items are inputs only (paths, ids, etc.)
         else:
 
-            data = {self.x_key: items}
+            records = []
 
-            if self.target_fn:
-                data[self.y_key] = [self.target_fn(x) for x in items]
+            for x in items:
 
-            df = pd.DataFrame(data, **self.kwargs)
+                row = {
+                    self.x_key: x
+                }
 
-        return df
+                if self.target_fn:
+                    row[self.y_key] = self.target_fn(x)
+
+                records.append(row)
+
+        source = DictSource(
+            records,
+            **self.kwargs,
+        )
+
+        return source.load()
 
 # %% ../nbs/020_data.ipynb #615d3f08
-class DataFrameSplitMixin:
-    """Shared logic for splitting DataFrames into MONAI datalists."""
+class DataSplitMixin:
+    """Shared logic for splitting datalists into MONAI datalists."""
 
     # --------------------------------------------------
-    def _resolve_splitter(self, df):
+    def _resolve_splitter(self, data):
+
+        df = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
+
         if self.splitter:
             return self.splitter
+
         if self.valid_col in df.columns:
             return ColSplitter(self.valid_col)
 
@@ -1088,21 +1169,22 @@ class DataFrameSplitMixin:
             train_size=self.train_size,
             shuffle=self.shuffle,
         )
-
     # --------------------------------------------------
-    def _split_dataframe(self, df, mode="train"):
+    def _split_data(self, data, mode="train"):
 
         # TEST MODE → no split
         if mode == "test":
-            return None, df.to_dict("records")
+            return None, data
+
+        df = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
 
         splitter = self._resolve_splitter(df)
         train_idx, valid_idx = splitter(df)
 
-        df_train = df.iloc[train_idx].copy()
-        df_valid = df.iloc[valid_idx].copy()
+        train = [data[i] for i in train_idx]
+        valid = [data[i] for i in valid_idx]
 
-        return df_train.to_dict("records"), df_valid.to_dict("records")
+        return train, valid
 
 # %% ../nbs/020_data.ipynb #84fb0210
 class MonaiTransformMixin:
@@ -1165,7 +1247,7 @@ class MonaiTransformMixin:
 
 # %% ../nbs/020_data.ipynb #85a42e13
 @register_dataset("dataset", backend="fastai")
-class DataBlockBuilder(DataFrameSplitMixin):
+class DataBlockBuilder(DataSplitMixin):
 
     DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
     DEFAULT_TARGET_COLS = ["label", "mask", "y", "target"]
@@ -1186,9 +1268,9 @@ class DataBlockBuilder(DataFrameSplitMixin):
         splitter=None,
         valid_pct=0.2,
         seed=None,
-        stratify=None, 
+        stratify=None,
         train_size=None,
-        shuffle:bool=True,
+        shuffle: bool = True,
         valid_col="is_valid",
         x_keys=None,
         y_keys=None,
@@ -1197,30 +1279,31 @@ class DataBlockBuilder(DataFrameSplitMixin):
         store_attr()
 
     # --------------------------------------------------
-    def _infer_columns(self, df):
-        """
-        Determine input/output column names. If x_col/y_col are explicitly provided,
-        use them; otherwise infer from DataFrame columns.
-        """
-        cols = list(df.columns)
-        x_col = self.x_keys or next((c for c in self.DEFAULT_INPUT_COLS if c in cols), cols[0])
-        y_col = self.y_keys or next((c for c in self.DEFAULT_TARGET_COLS if c in cols), None)
+    def _infer_columns(self, data):
+        cols = list(data[0].keys()) if data else []
+
+        x_col = (
+            self.x_keys
+            or next((c for c in self.DEFAULT_INPUT_COLS if c in cols), cols[0])
+        )
+
+        y_col = (
+            self.y_keys
+            or next((c for c in self.DEFAULT_TARGET_COLS if c in cols), None)
+        )
+
         return x_col, y_col
 
     # --------------------------------------------------
     def _wrap_pipeline(self, transforms, val_transforms):
-        """
-        Wrap transforms and val_transforms in Pipelines.
-        If val_transforms is None, fallback to transforms.
-        """
         train_pipeline = Pipeline(transforms) if transforms is not None else None
         valid_pipeline = Pipeline(val_transforms) if val_transforms is not None else train_pipeline
         return train_pipeline, valid_pipeline
 
     # --------------------------------------------------
-    def build(self, df, mode="train"):
+    def build(self, data, mode="train"):
 
-        x_col, y_col = self._infer_columns(df)
+        x_col, y_col = self._infer_columns(data)
 
         get_x = self.get_x or ColReader(x_col)
         get_y = self.get_y or (ColReader(y_col) if y_col else None)
@@ -1233,7 +1316,7 @@ class DataBlockBuilder(DataFrameSplitMixin):
                 (BioImageBlock(cls=BioImage),)
             )
 
-        splitter = None if mode == "test" else self._resolve_splitter(df)
+        splitter = None if mode == "test" else self._resolve_splitter(pd.DataFrame(data))
 
         item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
         batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
@@ -1241,7 +1324,7 @@ class DataBlockBuilder(DataFrameSplitMixin):
         datablock = DataBlock(
             blocks=blocks,
             dl_type=self.dl_type,
-            get_items=lambda x: x if self.get_items is None else self.get_items,
+            get_items=(lambda x: x) if self.get_items is None else self.get_items,
             get_x=get_x,
             get_y=get_y,
             getters=self.getters,
@@ -1254,11 +1337,13 @@ class DataBlockBuilder(DataFrameSplitMixin):
         datablock._val_item_tfms = val_item_tfms
         datablock._val_batch_tfms = val_batch_tfms
 
+        df = pd.DataFrame(data)
+
         return datablock, df
 
 # %% ../nbs/020_data.ipynb #795e12ca
 @register_dataset("monaidataset", backend="monai")
-class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
+class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     def __init__(self, transforms=None, val_transforms=None,
                  splitter=None, valid_pct=0.2, seed=None,
@@ -1269,7 +1354,7 @@ class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
     # --------------------------------------------------
     def build(self, df, mode="train"):
 
-        datalist_train, datalist_valid = self._split_dataframe(df, mode=mode)
+        datalist_train, datalist_valid = self._split_data(df, mode=mode)
 
         train_transform = self._prepare_transform(self.transforms)
 
@@ -1296,7 +1381,7 @@ class MonaiDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
 
 # %% ../nbs/020_data.ipynb #f7b3f8b3
 @register_dataset("cache", backend="monai")
-class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
+class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     @delegates(CacheDataset.__init__, but=['transform'])
     def __init__(self, splitter=None, valid_pct=0.2, seed=None,
@@ -1322,7 +1407,7 @@ class CacheDatasetBuilder(DataFrameSplitMixin, MonaiTransformMixin):
     # --------------------------------------------------
     def build(self, df, mode="train"):
 
-        datalist_train, datalist_valid = self._split_dataframe(df, mode=mode)
+        datalist_train, datalist_valid = self._split_data(df, mode=mode)
 
         self.train_transform = self._prepare_transform(self.transforms)
 
@@ -3322,7 +3407,7 @@ def ProcessImageDataset(
     # --------------------------------------------------
     # Load dataframe
     # --------------------------------------------------
-    df = BioDataLoaders._load_dataframe(data_paths, {'colmap': colmap})
+    df = pd.DataFrame(BioDataLoaders._load_dataframe(data_paths, {'colmap': colmap}))
 
     input_key, target_key, df = _resolve_columns(df, colmap)
 
