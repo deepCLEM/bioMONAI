@@ -4,7 +4,8 @@
 
 # %% auto #0
 __all__ = ['MSELoss', 'L1Loss', 'CombinedLoss', 'MSSSIMLoss', 'MSSSIML1Loss', 'MSSSIML2Loss', 'CellLoss', 'InstanceSegLoss',
-           'DiceBCELoss', 'activation', 'CrossEntropyLossFlat3D', 'BCELoss', 'DiceLoss', 'FRCLoss', 'FCRCutoff']
+           'DiceBCELoss', 'activation', 'CrossEntropyLossFlat3D', 'BCELoss', 'DiceLoss', 'radial_mask',
+           'get_fourier_ring_correlations', 'FCRCutoff', 'FRCLoss']
 
 # %% ../nbs/040_losses.ipynb #97c8e1f9
 # =================================
@@ -12,6 +13,7 @@ __all__ = ['MSELoss', 'L1Loss', 'CombinedLoss', 'MSSSIMLoss', 'MSSSIML1Loss', 'M
 # =================================
 import numpy as np
 from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
 
 # =================================
 # PyTorch
@@ -43,7 +45,6 @@ from fastai.vision.all import (
 # bioMONAI
 # =================================
 from .utils import *
-from .metrics import FRCMetric, get_fourier_ring_correlations
 
 # %% ../nbs/040_losses.ipynb #42a19e7f
 def MSELoss(
@@ -588,50 +589,163 @@ class DiceLoss(nn.Module):
         return loss
         
 
-# %% ../nbs/040_losses.ipynb #119713a0
-def FRCLoss(image1,# The first input image.
-            image2,# The second input image.
-            ):
-
+# %% ../nbs/040_losses.ipynb #8c39d9e5
+def radial_mask(r, cx, cy, sx, sy, delta=1):
     """
-    Compute the Fourier Ring Correlation (FRC) loss between two images.
-
-    Returns:
-        - torch.Tensor: The FRC loss.
+    Create a radial ring mask.
     """
-    
-    return (1 - FRCMetric(image1, image2))
-    
+
+    x = np.arange(sx)
+    y = np.arange(sy)
+
+    xx, yy = np.meshgrid(x, y, indexing="xy")
+
+    dist2 = (xx - cx) ** 2 + (yy - cy) ** 2
+
+    inner = dist2 > (r[0] ** 2)
+    outer = dist2 <= ((r[0] + delta) ** 2)
+
+    return inner & outer
+
+# %% ../nbs/040_losses.ipynb #d9c7454c
+def get_fourier_ring_correlations(image1, image2):
+    """
+    Compute Fourier Ring Correlation curve.
+    """
+
+    device = image1.device
+
+    H, W = image1.shape[-2:]
+
+    freq_nyq = min(H, W) // 2
+
+    radii = torch.arange(freq_nyq, device=device).float()
+
+    spatial_freq = radii / freq_nyq
+
+    radial_masks = torch.stack([
+        torch.tensor(
+            radial_mask(
+                r=[int(r)],
+                cx=W // 2,
+                cy=H // 2,
+                sx=W,
+                sy=H,
+                delta=1,
+            ),
+            device=device,
+            dtype=torch.bool,
+        )
+        for r in radii
+    ])
+
+    fft1 = torch.fft.fftshift(torch.fft.fft2(image1))
+    fft2 = torch.fft.fftshift(torch.fft.fft2(image2))
+
+    fft1 = fft1.unsqueeze(0).expand(freq_nyq, -1, -1)
+    fft2 = fft2.unsqueeze(0).expand(freq_nyq, -1, -1)
+
+    t1 = fft1 * radial_masks
+    t2 = fft2 * radial_masks
+
+    numerator = torch.abs(
+        torch.real((t1 * t2.conj()).sum(dim=(-2, -1)))
+    )
+
+    denom = torch.sqrt(
+        (t1.abs() ** 2).sum(dim=(-2, -1)) *
+        (t2.abs() ** 2).sum(dim=(-2, -1)) +
+        1e-8
+    )
+
+    frc = numerator / denom
+
+    frc = torch.nan_to_num(frc, nan=0.0, posinf=0.0, neginf=0.0)
+
+    return frc, spatial_freq
 
 # %% ../nbs/040_losses.ipynb #53b2a382
-def FCRCutoff(image1,# The first input image.
-             image2,# The second input image.
-             ):
-
-
+def FCRCutoff(
+    image1,
+    image2,
+    threshold=1/7,
+    plot=False,
+):
     """
-    Calculate the cutoff frequency at when Fourier ring correlation drops to 1/7.
+    Frequency where FRC drops below a threshold.
+
+    Args:
+        image1:
+            First input image.
+
+        image2:
+            Second input image.
+
+        threshold:
+            FRC cutoff threshold.
+
+        plot:
+            If True, plots the FRC curve and cutoff point.
 
     Returns:
-        - float: The cutoff frequency.
+        float:
+            Cutoff frequency.
     """
 
-    # Get y and x coordinates
-    y, x = get_fourier_ring_correlations(image1, image2)
+    frc, freq = get_fourier_ring_correlations(image1, image2)
 
-    # x -> frequency   y -> correlation
-    x = x.numpy()
-    y = y.numpy()
+    frc_np = frc.detach().cpu().numpy()
+    freq_np = freq.detach().cpu().numpy()
 
+    below = frc_np < threshold
 
-    # Exponential function to fit
-    def exponential_func(x, a, b, c):
-        return a * np.exp(-b * x) + c
+    if not np.any(below):
+        cutoff = freq_np[-1]
+    else:
+        cutoff = freq_np[np.where(below)[0][0]]
 
-    # Make fit
-    params, _ = curve_fit(exponential_func, x, y, p0=[1, 1, 1])
+    # ---------------------------------
+    # Optional plotting
+    # ---------------------------------
+    if plot:
+        import matplotlib.pyplot as plt
 
-    # Get Cutoff requency at 1/7
-    cutoff_frequency = (exponential_func((1/7), *params))
+        plt.figure(figsize=(6, 4))
 
-    return cutoff_frequency
+        plt.plot(freq_np, frc_np, label="FRC curve")
+
+        plt.axhline(
+            y=threshold,
+            linestyle="--",
+            color="red",
+            label=f"threshold = {threshold:.3f}",
+        )
+
+        plt.axvline(
+            x=cutoff,
+            linestyle="--",
+            color="green",
+            label=f"cutoff = {cutoff:.3f}",
+        )
+
+        plt.xlabel("Spatial frequency")
+        plt.ylabel("FRC")
+        plt.title("Fourier Ring Correlation Cutoff")
+        plt.legend()
+
+        plt.tight_layout()
+        plt.show()
+
+    return cutoff
+
+# %% ../nbs/040_losses.ipynb #119713a0
+def FRCLoss(image1, image2):
+    """
+    FRC loss defined as:
+    1 - mean correlation over frequencies
+    """
+
+    frc, _ = get_fourier_ring_correlations(image1, image2)
+
+    return 1.0 - frc.mean()
+    

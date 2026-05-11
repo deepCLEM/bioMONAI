@@ -5,8 +5,7 @@
 # %% auto #0
 __all__ = ['SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric', 'RMSEMetric', 'get_metric', 'DiceMetric',
            'PanopticQualityMetric', 'ROCAUCMetric', 'plot_roc_curve_with_std', 'plot_roc_curve_with_std_interactive',
-           'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'radial_mask', 'get_radial_masks',
-           'get_fourier_ring_correlations', 'FRCMetric']
+           'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'radial_mask', 'get_radial_masks', 'FRCMetric']
 
 # %% ../nbs/060_metrics.ipynb #09106178
 # =================================
@@ -54,6 +53,7 @@ import monai.metrics as mm
 # bioMONAI
 # =================================
 from .utils import torch_from_numpy
+from .losses import FRCLoss
 
 # %% ../nbs/060_metrics.ipynb #b2246e52
 def get_metric(metric_cls, backend="monai", *args, **kwargs):
@@ -504,96 +504,11 @@ def get_radial_masks(width, # Width of the image
     return radial_masks, spatial_freq
 
 
-# %% ../nbs/060_metrics.ipynb #15a0deef
-def get_fourier_ring_correlations(image1, # First input image
-                                  image2, # Second input image
-                                  ):
-  
-    """
-    Compute Fourier Ring Correlation (FRC) between two images.
-
-    Returns:
-        tuple: A tuple containing:
-            - torch.Tensor: Fourier Ring Correlation values.
-            - torch.Tensor: Array of spatial frequencies.
-    """
-    
-
-    # Get image height and width
-    height = image1.shape[len(image1.shape)-1]
-    width = image1.shape[len(image1.shape)-2]
-    
-    # Get set of radial masks, spatial frequency, and Nyquist frequency
-    radial_masks, spatial_frequency = get_radial_masks(height,width)
-
-    # Get Nyquist frequency
-    freq_nyq = len(spatial_frequency)
-    
-    # Transform tensor to complex
-    image1 = image1.to(complex64)
-    image2 = image2.to(complex64)
-
-    # Transofrm array dimensions to (freq_nyq, width. height)
-    image1 = image1.unsqueeze(0).repeat(freq_nyq, 1, 1)
-    image2 = image2.unsqueeze(0).repeat(freq_nyq, 1, 1)
-
-    # Convert spatial frequency and radial masks to torch.tensor
-    spatial_frequency = torch_from_numpy(spatial_frequency)
-    radial_masks = torch_from_numpy(radial_masks)
-
-    # Transform tensor to complex
-    radial_masks = radial_masks.to(complex64)
-         
-    # Compute fourier transform
-    fft_image1 = fftshift(fft2(image1))
-    fft_image2 = fftshift(fft2(image2))
-
-    # Get elements only in the ring
-    t1 = fft_image1 * radial_masks
-    t2 = fft_image2 * radial_masks
-        
-    # image2 to complex conjugate
-    t2_conj = t2.conj()
-
-    # Numerator
-    numerator = abs(real((t1 * t2_conj).sum(dim=(1,2))))
-
-    # Denominator    
-    denominator_1 = ((abs(t1) * abs(t1)).sum(dim=(1,2)))
-    denominator_2 = ((abs(t2) * abs(t2)).sum(dim=(1,2)))     
-    denominator = sqrt(denominator_1 * denominator_2)
-   
-    # Fourier shell correlation
-    FRC = div(numerator, denominator)
-
-    # Remove possible inf and NaN.
-    FRC = where(isinf(FRC), zeros_like(FRC), FRC)  # inf
-    FRC = where(isnan(FRC), zeros_like(FRC), FRC)  # NaN
-
-    return FRC , spatial_frequency
-
 # %% ../nbs/060_metrics.ipynb #c8d22398
-def FRCMetric(image1, # First input image
-              image2, # Second input image
-              ):
-
-
+def FRCMetric(image1, image2):
     """
-    Compute the area under the Fourier Ring Correlation (FRC) curve between two images.
-
-    Returns:
-        - float: The area under the FRC curve.
+    Metric derived from loss.
     """
 
-    # Calculate the Fourier Ring Correlation and spatial frequency
-    FRC, spatial_frequency = get_fourier_ring_correlations(image1, image2)
-
-    # Convert to numpy
-    FRC = FRC.numpy()
-    spatial_frequency = spatial_frequency.numpy()
-      
-    # Compute the area under the curve using trapezoidal integration
-    area = trapz(FRC, spatial_frequency)
-    
-    return area
+    return 1.0 - FRCLoss(image1, image2)
 

@@ -9,61 +9,23 @@ __all__ = ['OptimWrapper', 'Adam', 'Optimizer']
 # =================================
 # Scientific / data
 # =================================
-import numpy as np
-import pandas as pd
-
-# =================================
-# Visualization
-# =================================
-import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
-
-# =================================
-# Imaging
-# =================================
-# from skimage import util
+# import numpy as np
+# import pandas as pd
 
 # =================================
 # PyTorch
 # =================================
 import torch.optim as toptim
-from torch.cuda import is_available as is_cuda_available
-from torch.nn.init import kaiming_normal_
 
 # =================================
 # fastai
 # =================================
-# import fastai.losses
-# import fastai.metrics
-# import fastai.optimizer
-
-from fastai.callback.core import Callback
-from fastai.callback.all import *
-
-from fastai.data.all import (
-    DataLoaders, Path, trainable_params, delegates,
-    hasattrs, List, L, Normalize
-)
-
 from fastai.optimizer import Adam, OptimWrapper, Optimizer
-
-from fastai.vision.all import (
-    Any, BypassNewMeta, CSVLogger, ClassificationInterpretation,
-    DataBlock, DisplayedTransform, Learner, ShowGraphCallback,
-    create_vision_model, create_timm_model, default_split,
-    get_c, ifnone, minimum, model_meta, slide, steep, store_attr, valley
-)
-
-# =================================
-# fastcore
-# =================================
-from fastcore.script import risinstance
 
 # =================================
 # bioMONAI
 # =================================
 from .utils import *
-from .datasets import download_medmnist
 
 # %% ../nbs/060_optimizers.ipynb #574e843b
 OptimWrapper = OptimWrapper
