@@ -2,17 +2,19 @@ website:
   sidebar:
     contents:
       - index.ipynb
-      - 000_core.ipynb
-      - 001_data.ipynb
-      - 002_io.ipynb
-      - 003_losses.ipynb
-      - 004_nets.ipynb
-      - 005_transforms.ipynb
-      - 006_metrics.ipynb
-      - 007_callbacks.ipynb
-      - 008_datasets.ipynb
-      - 009_visualize.ipynb
-      - 010_utils.ipynb
+      - 000_utils.ipynb
+      - 010_io.ipynb
+      - 020_data.ipynb
+      - 030_transforms.ipynb
+      - 040_losses.ipynb
+      - 050_nets.ipynb
+      - 060_metrics.ipynb
+      - 060_optimizers.ipynb
+      - 070_engines.ipynb
+      - 080_callbacks.ipynb
+      - 090_inference.ipynb
+      - 100_datasets.ipynb
+      - 110_visualize.ipynb
       - section: Benchmarks
         contents:
           - Benchmarks/801_mednist_tutorial_biomonai.ipynb

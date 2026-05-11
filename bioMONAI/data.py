@@ -6,10 +6,10 @@
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'SlidingWindowSplitter', 'MetaResolver',
            'BioImageBase', 'BioImage', 'BioVolume', 'BioVideo', 'BioMultiChannel', 'Tensor2BioImage', 'BioImageBlock',
            'BioDataBlock', 'register_source', 'register_dataset', 'register_loader', 'register_task',
-           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'DictSource', 'DataFrameSource',
-           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin',
-           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader',
-           'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
+           'split_prefixed_kwargs', 'ReadDictDataset', 'detect_source', 'build_source', 'BaseSource', 'DictSource',
+           'DataFrameSource', 'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataSplitMixin',
+           'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader',
+           'MonaiLoader', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder',
            'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists',
            'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader', 'get_images', 'get_gt', 'get_target',
            'get_noisy_pair', 'show_batch', 'show_results', 'split_dataframe', 'add_columns_to_csv', 'build_df',
@@ -894,6 +894,18 @@ def build_source(data, **kwargs):
     source_cls = SOURCE_REGISTRY[name]
 
     return source_cls(data, **kwargs)
+
+# %% ../nbs/020_data.ipynb #b3c95d7a
+class BaseSource:
+    def __init__(self, data, **kwargs):
+        self.data = data
+        self.kwargs = kwargs
+
+    def load(self):
+        raise NotImplementedError
+
+    def load_as_df(self):
+        return pd.DataFrame(self.load())
 
 # %% ../nbs/020_data.ipynb #20a3f90e
 @register_source("dict")

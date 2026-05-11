@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-45ec649e7a56dc33049fce0ddbf815ed.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-d85730fcda1aea684a42267215df7c54.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-45ec649e7a56dc33049fce0ddbf815ed.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-0675760bc1887e56605b46c456b3b157.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-baff0cd72efbefcf44502bcb6328cb54.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-0675760bc1887e56605b46c456b3b157.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -112,13 +112,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <meta property="og:title" content="I/O – bioMONAI">
 <meta property="og:description" content="input/output management">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/002_io_files/figure-html/cell-21-output-1.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/010_io_files/figure-html/cell-21-output-1.png">
 <meta property="og:site_name" content="bioMONAI">
 <meta property="og:image:height" content="389">
 <meta property="og:image:width" content="389">
 <meta name="twitter:title" content="I/O – bioMONAI">
 <meta name="twitter:description" content="input/output management">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/002_io_files/figure-html/cell-21-output-1.png">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/010_io_files/figure-html/cell-21-output-1.png">
 <meta name="twitter:image-height" content="389">
 <meta name="twitter:image-width" content="389">
 <meta name="twitter:card" content="summary_large_image">
@@ -394,8 +394,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./core.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Core</span></a>
+  <a href="./utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./io.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">I/O</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -406,8 +412,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./io.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">I/O</span></a>
+  <a href="./transforms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transforms</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -424,20 +430,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./transforms.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Transforms</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./metrics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Metrics</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./optimizers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimizers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./engines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engines</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./callbacks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inference &amp; Evaluation</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -449,13 +467,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./visualize.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualize</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./utils.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Utilities</span></a>
+ <span class="menu-text">Visualizations</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -603,6 +615,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#axis-model" id="toc-axis-model" class="nav-link" data-scroll-target="#axis-model">AXIS MODEL</a>
   <ul>
+  <li><a href="#image_reader_dict" id="toc-image_reader_dict" class="nav-link" data-scroll-target="#image_reader_dict">image_reader_dict</a></li>
+  <li><a href="#image-loaders-1" id="toc-image-loaders-1" class="nav-link" data-scroll-target="#image-loaders-1">Image Loaders</a></li>
   <li><a href="#runtime-reader" id="toc-runtime-reader" class="nav-link" data-scroll-target="#runtime-reader">Runtime reader</a></li>
   <li><a href="#bioimagereader" id="toc-bioimagereader" class="nav-link" data-scroll-target="#bioimagereader">BioImageReader</a></li>
   </ul></li>
@@ -828,7 +842,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <section id="bioio-formats" class="level3">
 <h3 class="anchored" data-anchor-id="bioio-formats">BioIO Formats</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L206" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L248" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioio_loader" class="level3">
 <h3 class="anchored" data-anchor-id="bioio_loader">bioio_loader</h3>
@@ -884,7 +898,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <section id="hierarchical-data-format" class="level3">
 <h3 class="anchored" data-anchor-id="hierarchical-data-format">Hierarchical Data Format</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L254" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L296" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="split_hdf_path" class="level3">
 <h3 class="anchored" data-anchor-id="split_hdf_path">split_hdf_path</h3>
@@ -895,7 +909,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L271" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L313" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="hdf5_loader" class="level3">
 <h3 class="anchored" data-anchor-id="hdf5_loader">hdf5_loader</h3>
@@ -922,7 +936,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="002_io_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="010_io_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -941,7 +955,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="002_io_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="010_io_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -984,12 +998,12 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
          [0., 0., 0., 1.]], dtype=torch.float64),
  space: RAS,
  'size_original': torch.Size([1, 1, 10, 225]),
- 'transforms': {'ScaleIntensity': {'time': 0.0010738372802734375,
+ 'transforms': {'ScaleIntensity': {'time': 0.0012667179107666016,
    'params': {'minv': 0.0,
     'maxv': 1.0,
     'factor': None,
     'channel_wise': False,
-    'dtype': numpy.float32}}},
+    'dtype': 'float32'}}},
  'size_after_tfms': torch.Size([1, 1, 10, 225])}</code></pre>
 </div>
 </div>
@@ -1000,7 +1014,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <section id="loaders-registry" class="level3">
 <h3 class="anchored" data-anchor-id="loaders-registry">Loaders registry</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L366" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L480" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="loaderregistry" class="level3">
 <h3 class="anchored" data-anchor-id="loaderregistry">LoaderRegistry</h3>
@@ -1051,6 +1065,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
          [0., 0., 1., 0.],
          [0., 0., 0., 1.]], dtype=torch.float64),
  space: RAS,
+ 'filepath': 'data_examples/0450_1.hdf5/clean/10',
  'size_original': torch.Size([1, 96, 96]),
  'transforms': {},
  'size_after_tfms': torch.Size([1, 96, 96]),
@@ -1072,7 +1087,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <section id="base-image-reader" class="level3">
 <h3 class="anchored" data-anchor-id="base-image-reader">Base image reader</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L688" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L921" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="image_reader" class="level3">
 <h3 class="anchored" data-anchor-id="image_reader">image_reader</h3>
@@ -1240,7 +1255,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <span id="cb48-100"><a href="#cb48-100" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb48-101"><a href="#cb48-101" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">type</span>(t).<span class="va">__name__</span>, <span class="st">"MetaTensor"</span>)</span>
 <span id="cb48-102"><a href="#cb48-102" aria-hidden="true" tabindex="-1"></a>test_eq(t.data.shape[<span class="dv">0</span>], <span class="dv">2</span>)</span>
-<span id="cb48-103"><a href="#cb48-103" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">len</span>(t.meta), <span class="dv">19</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb48-103"><a href="#cb48-103" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">len</span>(t.meta), <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="f7e4a113" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>t.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1250,6 +1265,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
          [0., 0., 1., 0.],
          [0., 0., 0., 1.]], dtype=torch.float64),
  space: RAS,
+ 'filepath': 'data_examples/0450_1.hdf5/clean/10',
  'size_original': torch.Size([1, 1, 96, 96]),
  'transforms': {},
  'size_after_tfms': torch.Size([1, 1, 96, 96]),
@@ -1260,6 +1276,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
            [0., 0., 1., 0.],
            [0., 0., 0., 1.]], dtype=torch.float64),
    space: RAS,
+   'filepath': 'data_examples/0450_1.hdf5/clean/10',
    'size_original': torch.Size([1, 1, 96, 96]),
    'transforms': {},
    'size_after_tfms': torch.Size([1, 1, 96, 96]),
@@ -1270,6 +1287,7 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
            [0., 0., 1., 0.],
            [0., 0., 0., 1.]], dtype=torch.float64),
    space: RAS,
+   'filepath': 'data_examples/0450_1.hdf5/clean/10',
    'size_original': torch.Size([1, 1, 96, 96]),
    'transforms': {},
    'size_after_tfms': torch.Size([1, 1, 96, 96]),
@@ -1299,19 +1317,141 @@ savepath_in_metadict: if ``True``, adds a key ``"saved_to"`` to the metadata, wh
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> image_reader(d[<span class="st">"images"</span>], output<span class="op">=</span><span class="st">"metatensor"</span>, channels<span class="op">=</span><span class="st">"ZYX"</span>)</span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>test_eq(t.shape, (<span class="dv">2</span>, <span class="dv">96</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L1077" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="image_reader_dict" class="level3">
+<h3 class="anchored" data-anchor-id="image_reader_dict">image_reader_dict</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> image_reader_dict(</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    data:<span class="bu">dict</span> <span class="op">|</span> collections.abc.Sequence[<span class="bu">dict</span>], keys:<span class="bu">str</span> <span class="op">|</span> collections.abc.Iterable[<span class="bu">str</span>], lazy:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    transforms:collections.abc.Callable <span class="op">|</span> <span class="bu">list</span>[collections.abc.Callable] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    loader:collections.abc.Callable <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, channels:<span class="bu">str</span><span class="op">=</span><span class="st">'CZYX'</span>, ind_dict:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    npz_key:<span class="bu">str</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, dtype:dtype<span class="op">=</span>torch.float32, squeeze:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, stack_axis:<span class="bu">str</span><span class="op">=</span><span class="st">'C'</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Load images from paths stored inside dictionary keys.</em></p>
+<p>Supports: - single dictionary input - sequence of dictionaries - eager or lazy execution</p>
+<p>The specified keys are replaced with loaded/preprocessed MetaTensor objects while preserving the remaining dictionary structure.</p>
+<p>Args: data: Input dictionary or sequence of dictionaries. keys: Key or iterable of keys containing file paths. lazy: Whether to lazily stream sequence inputs. transforms: Optional dictionary-based transforms. loader: Optional custom loader. channels: Channel layout string. ind_dict: Optional indexing dictionary. npz_key: Optional NPZ key.</p>
+<p>Returns: dict | list[dict] | Iterable[dict]: Loaded dictionary sample(s).</p>
+<div id="d04064ea" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.transforms <span class="im">import</span> ScaleIntensityd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="90d3b4c7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>dd <span class="op">=</span> [{<span class="st">'image'</span>:<span class="st">'./data_examples/example_tiff.tiff'</span>}, {<span class="st">'image'</span>:<span class="st">'./data_examples/example_tiff.tiff'</span>}]</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> image_reader_dict(dd, keys<span class="op">=</span><span class="st">'image'</span>, transforms<span class="op">=</span>ScaleIntensityd(<span class="st">'image'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="d2acd412" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>t[<span class="st">'image'</span>].meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>{256: 512,
+ 257: 512,
+ 258: 8,
+ 259: &lt;COMPRESSION.NONE: 1&gt;,
+ 262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
+ 273: (8,),
+ 274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
+ 277: 1,
+ 278: 512,
+ 279: (262144,),
+ 284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
+ 339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
+ affine: tensor([[1., 0., 0., 0.],
+         [0., 1., 0., 0.],
+         [0., 0., 1., 0.],
+         [0., 0., 0., 1.]], dtype=torch.float64),
+ space: RAS,
+ 'filepath': 'data_examples/example_tiff.tiff',
+ 'size_original': torch.Size([1, 96, 512, 512]),
+ 'transforms': {'ScaleIntensityd': {'time': 0.05082082748413086,
+   'params': {'keys': ('image',),
+    'allow_missing_keys': False,
+    'scaler': &lt;monai.transforms.intensity.array.ScaleIntensity&gt;}}},
+ 'size_after_tfms': torch.Size([1, 96, 512, 512]),
+ 'format': 'TIFF',
+ 'layout': 'CZYX',
+ 'tensors': {0: {256: 512,
+   257: 512,
+   258: 8,
+   259: &lt;COMPRESSION.NONE: 1&gt;,
+   262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
+   273: (8,),
+   274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
+   277: 1,
+   278: 512,
+   279: (262144,),
+   284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
+   339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
+   affine: tensor([[1., 0., 0., 0.],
+           [0., 1., 0., 0.],
+           [0., 0., 1., 0.],
+           [0., 0., 0., 1.]], dtype=torch.float64),
+   space: RAS,
+   'filepath': 'data_examples/example_tiff.tiff',
+   'size_original': torch.Size([1, 96, 512, 512]),
+   'transforms': {'ScaleIntensityd': {'time': 0.05082082748413086,
+     'params': {'keys': ('image',),
+      'allow_missing_keys': False,
+      'scaler': &lt;monai.transforms.intensity.array.ScaleIntensity&gt;}}},
+   'size_after_tfms': torch.Size([1, 96, 512, 512]),
+   'format': 'TIFF',
+   'layout': 'CZYX'},
+  1: {256: 512,
+   257: 512,
+   258: 8,
+   259: &lt;COMPRESSION.NONE: 1&gt;,
+   262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
+   273: (8,),
+   274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
+   277: 1,
+   278: 512,
+   279: (262144,),
+   284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
+   339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
+   affine: tensor([[1., 0., 0., 0.],
+           [0., 1., 0., 0.],
+           [0., 0., 1., 0.],
+           [0., 0., 0., 1.]], dtype=torch.float64),
+   space: RAS,
+   'filepath': 'data_examples/example_tiff.tiff',
+   'size_original': torch.Size([1, 96, 512, 512]),
+   'transforms': {'ScaleIntensityd': {'time': 0.04619407653808594,
+     'params': {'keys': ('image',),
+      'allow_missing_keys': False,
+      'scaler': &lt;monai.transforms.intensity.array.ScaleIntensity&gt;}}},
+   'size_after_tfms': torch.Size([1, 96, 512, 512]),
+   'format': 'TIFF',
+   'layout': 'CZYX'}},
+ 'size_output': (2, 96, 512, 512),
+ 'width': 512,
+ 'height': 512,
+ 'channels': 2,
+ 'depth': 96,
+ 'frames': None,
+ 'sequence': None,
+ spatial_shape: (96, 512, 512),
+ 'mode': 'multichannel (2)',
+ 'kind': 'volume',
+ original_channel_dim: 0}</code></pre>
+</div>
+</div>
+</section>
+<section id="image-loaders-1" class="level3">
+<h3 class="anchored" data-anchor-id="image-loaders-1">Image Loaders</h3>
+</section>
 <section id="runtime-reader" class="level3">
 <h3 class="anchored" data-anchor-id="runtime-reader">Runtime reader</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L850" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/io.py#L1194" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioimagereader" class="level3">
 <h3 class="anchored" data-anchor-id="bioimagereader">BioImageReader</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImageReader(</span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    converter:collections.abc.Callable[[monai.data.meta_tensor.MetaTensor], monai.data.meta_tensor.MetaTensor] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># A callable that takes a MetaTensor and returns a MetaTensor</span></span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    reverse_indexing:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, kwargs:VAR_KEYWORD</span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImageReader(</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    converter:collections.abc.Callable[[monai.data.meta_tensor.MetaTensor], monai.data.meta_tensor.MetaTensor] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># A callable that takes a MetaTensor and returns a MetaTensor</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    reverse_indexing:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>An abstract class defines APIs to load image files.</em></p>
 <p>Typical usage of an implementation of this class is:</p>
 <p>.. code-block:: python</p>
@@ -1324,9 +1464,9 @@ img_data, meta_data = image_reader.get_data(img_obj)</code></pre>
 <li>A reader should implement <code>verify_suffix</code> with the logic of checking the input filename by the filename extensions.</li>
 </ul>
 <div id="8bef0869" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>imtransforms <span class="op">=</span> [ScaleIntensity(), SpatialCrop(roi_center<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">10</span>), roi_size<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">5</span>))]</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> BioImageReader(channels<span class="op">=</span><span class="st">"CZYX"</span>, transforms<span class="op">=</span>imtransforms).read(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>t.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>imtransforms <span class="op">=</span> [ScaleIntensity(), SpatialCrop(roi_center<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">10</span>), roi_size<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">5</span>))]</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> BioImageReader(channels<span class="op">=</span><span class="st">"CZYX"</span>, transforms<span class="op">=</span>imtransforms).read(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>t.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <pre><code>{256: 512,
  257: 512,
@@ -1345,14 +1485,15 @@ img_data, meta_data = image_reader.get_data(img_obj)</code></pre>
          [0., 0., 1., 8.],
          [0., 0., 0., 1.]], dtype=torch.float64),
  space: RAS,
+ 'filepath': 'data_examples/example_tiff.tiff',
  'size_original': torch.Size([1, 96, 512, 512]),
- 'transforms': {'ScaleIntensity': {'time': 0.05971217155456543,
+ 'transforms': {'ScaleIntensity': {'time': 0.0488131046295166,
    'params': {'minv': 0.0,
     'maxv': 1.0,
     'factor': None,
     'channel_wise': False,
-    'dtype': numpy.float32}},
-  'SpatialCrop': {'time': 0.0004284381866455078,
+    'dtype': 'float32'}},
+  'SpatialCrop': {'time': 0.0005891323089599609,
    'params': {'_lazy': False,
     'slices': (slice(0, 1, None), slice(8, 13, None), slice(8, 13, None)),
     '_tracing': &lt;_thread._local&gt;}}},
@@ -1373,9 +1514,9 @@ img_data, meta_data = image_reader.get_data(img_obj)</code></pre>
 </div>
 </div>
 <div id="38a26194" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> LoadImage(BioImageReader(), ensure_channel_first<span class="op">=</span><span class="va">True</span>)(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>test_eq(t.shape, [<span class="dv">1</span>, <span class="dv">96</span>, <span class="dv">512</span>, <span class="dv">512</span>])</span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>t.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> LoadImage(BioImageReader(), ensure_channel_first<span class="op">=</span><span class="va">True</span>)(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>test_eq(t.shape, [<span class="dv">1</span>, <span class="dv">96</span>, <span class="dv">512</span>, <span class="dv">512</span>])</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>t.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <pre><code>{256: 512,
  257: 512,
@@ -1394,6 +1535,7 @@ img_data, meta_data = image_reader.get_data(img_obj)</code></pre>
          [0., 0., 1., 0.],
          [0., 0., 0., 1.]], dtype=torch.float64),
  space: RAS,
+ 'filepath': 'data_examples/example_tiff.tiff',
  'size_original': (1, 96, 512, 512),
  'transforms': {},
  'size_after_tfms': (1, 96, 512, 512),
@@ -1414,21 +1556,21 @@ img_data, meta_data = image_reader.get_data(img_obj)</code></pre>
 </div>
 </div>
 <div id="df08b7e5" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>data, metadata <span class="op">=</span> BioImageReader().get_data(t)</span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">type</span>(data), np.ndarray)</span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>test_eq(metadata, t.meta)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>data, metadata <span class="op">=</span> BioImageReader().get_data(t)</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">type</span>(data), np.ndarray)</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>test_eq(metadata, t.meta)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="154b16be" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> LoadImage(BioImageReader, channels<span class="op">=</span><span class="st">"YX"</span>)(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> LoadImage(BioImageReader, channels<span class="op">=</span><span class="st">"YX"</span>, transforms<span class="op">=</span>ScaleIntensity())(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="e2cd0228" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>t.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>t.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <pre><code>torch.Size([512, 512])</code></pre>
 </div>
 </div>
 <div id="12352c9b" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>t.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>t.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <pre><code>{256: 512,
  257: 512,
@@ -1447,8 +1589,14 @@ img_data, meta_data = image_reader.get_data(img_obj)</code></pre>
          [0., 0., 1., 0.],
          [0., 0., 0., 1.]], dtype=torch.float64),
  space: RAS,
+ 'filepath': 'data_examples/example_tiff.tiff',
  'size_original': (512, 512),
- 'transforms': {},
+ 'transforms': {'ScaleIntensity': {'time': 0.0008072853088378906,
+   'params': {'minv': 0.0,
+    'maxv': 1.0,
+    'factor': None,
+    'channel_wise': False,
+    'dtype': 'float32'}}},
  'size_after_tfms': (512, 512),
  'format': 'TIFF',
  'layout': 'YX',
@@ -1463,6 +1611,58 @@ img_data, meta_data = image_reader.get_data(img_obj)</code></pre>
  'mode': 'L',
  'kind': 'image',
  original_channel_dim: nan,
+ 'filename_or_obj': 'data_examples/example_tiff.tiff'}</code></pre>
+</div>
+</div>
+<div id="980fc11f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> LoadImaged(<span class="st">'image'</span>, reader<span class="op">=</span>BioImageReader, transforms<span class="op">=</span>[ScaleIntensity()])({<span class="st">'image'</span>:<span class="st">'./data_examples/example_tiff.tiff'</span>})</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(t[<span class="st">'image'</span>]).<span class="va">__name__</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>'MetaTensor'</code></pre>
+</div>
+</div>
+<div id="7764a915" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>t[<span class="st">'image'</span>].meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>{256: 512,
+ 257: 512,
+ 258: 8,
+ 259: &lt;COMPRESSION.NONE: 1&gt;,
+ 262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
+ 273: (8,),
+ 274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
+ 277: 1,
+ 278: 512,
+ 279: (262144,),
+ 284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
+ 339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
+ affine: tensor([[1., 0., 0., 0.],
+         [0., 1., 0., 0.],
+         [0., 0., 1., 0.],
+         [0., 0., 0., 1.]], dtype=torch.float64),
+ space: RAS,
+ 'filepath': 'data_examples/example_tiff.tiff',
+ 'size_original': (1, 96, 512, 512),
+ 'transforms': {'ScaleIntensity': {'time': 0.042218685150146484,
+   'params': {'minv': 0.0,
+    'maxv': 1.0,
+    'factor': None,
+    'channel_wise': False,
+    'dtype': 'float32'}}},
+ 'size_after_tfms': (1, 96, 512, 512),
+ 'format': 'TIFF',
+ 'layout': 'CZYX',
+ 'size_output': (1, 96, 512, 512),
+ 'width': 512,
+ 'height': 512,
+ 'channels': 1,
+ 'depth': 96,
+ 'frames': None,
+ 'sequence': None,
+ spatial_shape: (96, 512, 512),
+ 'mode': 'L',
+ 'kind': 'volume',
+ original_channel_dim: 0,
  'filename_or_obj': 'data_examples/example_tiff.tiff'}</code></pre>
 </div>
 </div>

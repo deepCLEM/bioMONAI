@@ -4,9 +4,9 @@
 
 # %% auto #0
 __all__ = ['SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric', 'RMSEMetric', 'get_metric', 'DiceMetric',
-           'PanopticQualityMetric', 'ROCAUCMetric', 'plot_roc_curve_with_std_interactive', 'MetricsReloadedBinary',
-           'MetricsReloadedCategorical', 'radial_mask', 'get_radial_masks', 'get_fourier_ring_correlations',
-           'FRCMetric']
+           'PanopticQualityMetric', 'ROCAUCMetric', 'plot_roc_curve_with_std', 'plot_roc_curve_with_std_interactive',
+           'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'radial_mask', 'get_radial_masks',
+           'get_fourier_ring_correlations', 'FRCMetric']
 
 # %% ../nbs/060_metrics.ipynb #09106178
 # =================================
@@ -200,6 +200,110 @@ def ROCAUCMetric(num_classes=None, # if not None, checks if preds and targets ar
         return rocaucmetric.aggregate()
 
     return AvgMetric(ROCAUC)
+
+# %% ../nbs/060_metrics.ipynb #c21e7570
+def plot_roc_curve_with_std(
+    y_probs_folds,
+    y_true_folds,
+    n_points=200,
+    show_folds=False,
+    title="ROC curve with cross-validation"
+):
+    """
+    Plot ROC curves across CV folds with mean ROC and ±1 std band.
+
+    Parameters
+    ----------
+    y_probs_folds : list of array-like
+        Predicted probabilities for the positive class per fold.
+    y_true_folds : list of array-like
+        Ground truth labels per fold.
+    n_points : int
+        Resolution of interpolated ROC curve.
+    show_folds : bool
+        Whether to display individual fold curves.
+    title : str
+        Plot title.
+    """
+
+    fpr_grid = np.linspace(0, 1, n_points)
+
+    tprs = []
+    aucs = []
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+
+    # ---------------------------------------------------------------------
+    # Per-fold ROC
+    # ---------------------------------------------------------------------
+    for fold, (y_prob, y_true) in enumerate(zip(y_probs_folds, y_true_folds)):
+
+        roc = RocCurveDisplay.from_predictions(
+            y_true,
+            y_prob,
+            ax=ax,
+            curve_kwargs={
+                "alpha": 0.25 if show_folds else 0.0,
+                "lw": 1
+            }
+        )
+
+        # Interpolate TPR onto common grid
+        tpr_interp = np.interp(fpr_grid, roc.fpr, roc.tpr)
+        tpr_interp[0] = 0.0
+
+        tprs.append(tpr_interp)
+        aucs.append(roc.roc_auc)
+
+        # Hide legend entries if not requested
+        if not show_folds:
+            roc.line_.set_label("_nolegend_")
+
+    # ---------------------------------------------------------------------
+    # Aggregate statistics
+    # ---------------------------------------------------------------------
+    tprs = np.array(tprs)
+
+    mean_tpr = tprs.mean(axis=0)
+    mean_tpr[-1] = 1.0
+
+    std_tpr = tprs.std(axis=0)
+
+    mean_auc = np.mean(aucs)
+    std_auc = np.std(aucs)
+
+    # ---------------------------------------------------------------------
+    # Mean ROC curve
+    # ---------------------------------------------------------------------
+    ax.plot(
+        fpr_grid,
+        mean_tpr,
+        color="red",
+        lw=2,
+        label=f"Mean ROC (AUC = {mean_auc:.2f} ± {std_auc:.2f})"
+    )
+
+    # ---------------------------------------------------------------------
+    # Confidence band
+    # ---------------------------------------------------------------------
+    ax.fill_between(
+        fpr_grid,
+        np.maximum(mean_tpr - std_tpr, 0),
+        np.minimum(mean_tpr + std_tpr, 1),
+        color="grey",
+        alpha=0.2,
+        label="±1 std. dev."
+    )
+
+    # ---------------------------------------------------------------------
+    # Final styling
+    # ---------------------------------------------------------------------
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.set_title(title)
+    ax.legend(loc="lower right")
+
+    plt.show()
 
 # %% ../nbs/060_metrics.ipynb #8a6477fd
 def plot_roc_curve_with_std_interactive(

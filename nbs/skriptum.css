@@ -21,7 +21,7 @@ $highlight-color-shade: #DFB2B2; // hover color for buttons
 $dark: #3a3a3a;;  // mostly used for borders
 $font-color: #1b1b1b; // self explanatory 
 
-$font-family-headings: 'Inter', serif;
+$font-family-headings: 'Josefin Sans', sans-serif;
 $font-family-text: 'Josefin Sans', sans-serif;
 $font-family-smallcaps: 'Inter', serif;
 
@@ -41,6 +41,8 @@ $footer-fg: $font-color;
 
 $table-border-width: 0px;
 $table-border-color: $highlight-color;
+
+$card-border-radius: 20px;
 
 /*-- scss:rules --*/
 
@@ -264,7 +266,7 @@ a {
 pre {
   background-color: $code-block-bg;
   padding: 1em;
-  border-radius: 5px;
+  border-radius: $card-border-radius;
   font-family: 'Courier New', Courier, monospace;
 }
 
@@ -299,6 +301,12 @@ pre {
 // The line above footnotes etc styled the same as HR
 #quarto-appendix.default {
   border-top: 1px solid $dark;
+}
+
+div.sourceCode {
+    background-color: #f7f6f5;
+    border: 1px solid #f7f6f5;
+    border-radius: $card-border-radius;
 }
 
 // Custom Classes
@@ -362,4 +370,23 @@ pre {
   margin: 1.5rem auto 1rem auto;
   max-width: 160px;
   height: auto;
+}
+
+.code-copy-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+    margin-top: 10px;
+    margin-right: 10px;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 3;
+}
+
+pre.sourceCode {
+    border: none;
+    font-size: .875em;
+    overflow-y: visible !important;
+    padding: .4em;   
+    border: 1px solid var(--bs-border-color, #ccbbb1);
 }
