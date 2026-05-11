@@ -8,8 +8,9 @@ __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNew
            'MutableSequence', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple', 'ensure_tuple_rep',
            'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax', 'is_cuda_available',
            'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor', 'route_kwargs', 'read_yaml',
-           'read_args_from_yaml', 'dictlist_to_funclist', 'ColSplitter', 'TrainTestSplitter', 'RandomSplitter',
-           'GrandparentSplitter', 'FuncSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
+           'read_args_from_yaml', 'dictlist_to_funclist', 'add_columns_to_csv', 'ColSplitter', 'TrainTestSplitter',
+           'FuncSplitter', 'NameSplitter', 'RandomSplitter', 'GrandparentSplitter', 'ParentSplitter', 'FileSplitter',
+           'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/000_utils.ipynb #f6eab00d
 # =================================
@@ -206,11 +207,49 @@ def dictlist_to_funclist(transform_dicts):
 
     return transforms
 
+# %% ../nbs/000_utils.ipynb #18e0fe6e
+def add_columns_to_csv(csv_path, # Path to the input CSV file
+                       column_data, # Dictionary of column names and values to add. Each value can be a scalar (single value for all rows) or a list matching the number of rows.
+                       output_path=None, # Path to save the updated CSV file. If None, it overwrites the input CSV file.
+                       ):
+    """
+    Adds one or more new columns to an existing CSV file.
+
+    """
+    # Load the CSV file into a DataFrame
+    df = pd.read_csv(csv_path)
+
+    # Iterate over each column and add to the DataFrame
+    for column_name, column_values in column_data.items():
+        # Check if column_values is a list and matches DataFrame length
+        if isinstance(column_values, list) and len(column_values) != len(df):
+            raise ValueError(f"Length of values for column '{column_name}' does not match the number of rows in the CSV.")
+        
+        # Add the new column
+        df[column_name] = column_values
+
+    # Save the updated DataFrame to a CSV file
+    output_path = output_path or csv_path
+    df.to_csv(output_path, index=False)
+
+    print(f"Columns {list(column_data.keys())} added successfully. Updated file saved to '{output_path}'")
+
+# %% ../nbs/000_utils.ipynb #e275ef13
+def _remaining_idxs(all_idxs, used_idxs):
+    "Return indices not present in used indices."
+
+    used = set(used_idxs)
+
+    return [
+        i for i in all_idxs
+        if i not in used
+    ]
+
 # %% ../nbs/000_utils.ipynb #958ddd9b
-def ColSplitter(col='is_valid', on=None):
+def ColSplitter(col='is_valid', on=None, **kwargs):
     "Split items (DataFrame or list[dict]) by value in `col`"
 
-    def _inner(o):
+    def _inner(o, **kwargs):
 
         # ----------------------------
         # Normalize input
@@ -247,15 +286,24 @@ def ColSplitter(col='is_valid', on=None):
         valid_idx = [i for i, v in enumerate(valid_mask) if v]
 
         return train_idx, valid_idx
+    
+    # -------------------------------------
+    # Splitter metadata
+    # -------------------------------------
+    _inner.split_names = kwargs.get("split_names", ("train", "valid"))
+    _inner.col = col
+    _inner.on = on
 
     return _inner
+
 
 def TrainTestSplitter(
     test_size=0.2,
     random_state=None,
     stratify=None,
     train_size=None,
-    shuffle=True
+    shuffle=True, 
+    **kwargs
 ):
     "Split items into random train/valid subsets using sklearn train_test_split."
 
@@ -274,97 +322,554 @@ def TrainTestSplitter(
         )
 
         return list(train_idx), list(valid_idx)
+    
+    _inner.split_names = kwargs.get("split_names", ("train", "valid"))
+    _inner.test_size = test_size
+    _inner.random_state = random_state
+    _inner.stratify = stratify
+    _inner.train_size = train_size
+    _inner.shuffle = shuffle
 
     return _inner
 
-def RandomSplitter(valid_pct=0.2, seed=None):
-    "Split items randomly into train/valid subsets."
 
-    def _inner(o):
 
-        n = len(o)
+def FuncSplitter(func, **kwargs):
+    """
+    Split items using a boolean function.
 
-        if seed is not None:
-            manual_seed(seed)
+    Items where ``func(item)`` is True go to validation.
+    Remaining items go to training.
 
-        # generate shuffled indices (pure torch → python)
-        perm = randperm(n).tolist()
+    Compatible with fastai-style splitters.
 
-        cut = int(valid_pct * n)
+    Args:
+        func:
+            Function returning True for validation items.
 
-        valid_idx = perm[:cut]
-        train_idx = perm[cut:]
+    Returns:
+        Callable returning:
+        ``(train_idx, valid_idx)``
+    """
 
-        return list(train_idx), list(valid_idx)
-
-    return _inner
-
-def _grandparent_idxs(items, name, key="image"):
-    "Return indices where grandparent folder matches name"
-
-    from pathlib import Path
-
-    def match(o):
-        path = o.get(key, o) if isinstance(o, dict) else o
-        return Path(path).parent.parent.name == name
-
-    return [i for i, o in enumerate(items) if match(o)]
-
-def GrandparentSplitter(train_name='train', valid_name='valid', key="image"):
-    "Split items by grandparent folder name"
-
-    def _inner(o):
-        train_idx = _grandparent_idxs(o, train_name, key)
-        valid_idx = _grandparent_idxs(o, valid_name, key)
-        return list(train_idx), list(valid_idx)
-
-    return _inner
-
-def FuncSplitter(func):
-    "Split items by function (True = validation, False = train)"
-
-    def _inner(o):
+    def _inner(o, **kwargs):
 
         valid_idx = [
             i for i, x in enumerate(o)
             if func(x)
         ]
 
-        train_idx = [
-            i for i in range(len(o))
-            if i not in set(valid_idx)
-        ]
+        train_idx = _remaining_idxs(
+            range(len(o)),
+            valid_idx,
+        )
 
         return list(train_idx), list(valid_idx)
+    
+    _inner.split_names = kwargs.get("split_names", ("train", "valid"))
+    _inner.func = func
 
     return _inner
 
-def FileSplitter(fname):
-    "Split items using file containing valid names"
+# %% ../nbs/000_utils.ipynb #0103be27
+def NameSplitter(
+    col='split_name',
+    split_names=('train', 'valid'),
+    **kwargs,
+):
+    """
+    Split items by values in a column.
 
-    valid = set(Path(fname).read_text().splitlines())
+    Supports pandas DataFrames or ``list[dict]`` inputs and returns
+    one index list per name in ``split_names``.
 
-    def _inner(o):
+    By default, returns two splits for fastai compatibility:
+    ``(train_idx, valid_idx)``.
 
-        def get_name(x):
-            if isinstance(x, dict):
-                return Path(x.get("image", x.get("path", ""))).name
-            return Path(x).name
+    Args:
+        col:
+            Column name or column index containing split labels.
 
-        valid_idx = [
-            i for i, x in enumerate(o)
-            if get_name(x) in valid
-        ]
+        split_names:
+            Sequence of split names to extract indices for.
 
-        train_idx = [
-            i for i in range(len(o))
-            if i not in set(valid_idx)
-        ]
+    Returns:
+        Callable:
+            Function returning a tuple of index lists in the
+            same order as ``split_names``.
+    """
 
-        return list(train_idx), list(valid_idx)
+    if not isinstance(split_names, (list, tuple)):
+        split_names = [split_names]
+
+    def _inner(o, **kwargs):
+
+        # ----------------------------
+        # Normalize input
+        # ----------------------------
+        if isinstance(o, DataFrame):
+            data = o.to_dict("records")
+
+        elif isinstance(o, list):
+            data = o
+
+        else:
+            raise TypeError(
+                "NameSplitter supports "
+                "DataFrame or list[dict]"
+            )
+
+        if not data:
+            return tuple([] for _ in split_names)
+
+        # ----------------------------
+        # Extract split column values
+        # ----------------------------
+        if isinstance(col, int):
+            values = [
+                row[list(row.keys())[col]]
+                for row in data
+            ]
+        else:
+            values = [
+                row.get(col)
+                for row in data
+            ]
+
+        # ----------------------------
+        # Build index lists
+        # ----------------------------
+        idx_lists = []
+
+        for split_name in split_names:
+
+            if split_name not in values:
+                raise ValueError(
+                    f"Custom name '{split_name}' "
+                    f"not found in column '{col}'"
+                )
+
+            idx = [
+                i for i, v in enumerate(values)
+                if v == split_name
+            ]
+
+            idx_lists.append(idx)
+
+        return tuple(idx_lists)
+    
+    _inner.split_names = split_names
+    _inner.col = col
 
     return _inner
 
+# %% ../nbs/000_utils.ipynb #55038b98
+def RandomSplitter(
+    split_names=("train", "valid"),
+    valid_fraction=0.2,
+    test_fraction=0.1,
+    random_state=None,
+    stratify=None,
+    shuffle=True,
+    **kwargs,
+):
+    """
+    Randomly split items into subsets.
+
+    Uses ``sklearn.train_test_split``.
+
+    The number of returned splits depends on
+    ``split_names``:
+
+    - ``("train", "valid")``
+        returns ``(train_idx, valid_idx)``
+
+    - ``("train", "valid", "test")``
+        returns ``(train_idx, valid_idx, test_idx)``
+
+    Args:
+        split_names:
+            Names of output splits.
+
+            Supported values:
+
+            - ``("train", "valid")``
+            - ``("train", "valid", "test")``
+
+        valid_fraction:
+            Fraction assigned to validation.
+
+        test_fraction:
+            Fraction assigned to test.
+
+            Ignored when only two splits
+            are requested.
+
+        random_state:
+            Random seed for reproducibility.
+
+        stratify:
+            Labels used for stratified splitting.
+
+            Can be:
+
+            - sequence of labels
+            - column name for dict-like items
+
+        shuffle:
+            Whether to shuffle before splitting.
+
+    Returns:
+        Callable returning index lists in the
+        same order as ``split_names``.
+    """
+
+    split_names = tuple(split_names)
+
+    supported = {
+        ("train", "valid"),
+        ("train", "valid", "test"),
+    }
+
+    if split_names not in supported:
+        raise ValueError(
+            "split_names must be either "
+            "('train', 'valid') or "
+            "('train', 'valid', 'test')"
+        )
+
+    if valid_fraction <= 0:
+        raise ValueError(
+            "valid_fraction must be > 0"
+        )
+
+    if test_fraction < 0:
+        raise ValueError(
+            "test_fraction must be >= 0"
+        )
+
+    if len(split_names) == 3:
+
+        if valid_fraction + test_fraction >= 1:
+            raise ValueError(
+                "valid_fraction + test_fraction "
+                "must be < 1"
+            )
+
+    def _inner(o, **kwargs):
+
+        n = len(o)
+        idxs = list(range(n))
+
+        # ---------------------------------
+        # Optional stratification labels
+        # ---------------------------------
+        stratify_labels = None
+
+        if stratify is not None:
+
+            if isinstance(stratify, str):
+
+                stratify_labels = [
+                    item[stratify]
+                    for item in o
+                ]
+
+            else:
+                stratify_labels = stratify
+
+        # =================================
+        # TWO-WAY SPLIT
+        # =================================
+        if len(split_names) == 2:
+
+            split1_idx, split2_idx = train_test_split(
+                idxs,
+                test_size=valid_fraction,
+                random_state=random_state,
+                stratify=stratify_labels,
+                shuffle=shuffle,
+            )
+
+            return (
+                list(split1_idx),
+                list(split2_idx)
+            )
+
+        # =================================
+        # THREE-WAY SPLIT
+        # =================================
+        train_valid_idx, test_idx = train_test_split(
+            idxs,
+            test_size=test_fraction,
+            random_state=random_state,
+            stratify=stratify_labels,
+            shuffle=shuffle,
+        )
+
+        # Stratification labels for second split
+        second_stratify = None
+
+        if stratify_labels is not None:
+
+            second_stratify = [
+                stratify_labels[i]
+                for i in train_valid_idx
+            ]
+
+        # Validation size relative to remaining data
+        relative_valid_size = (
+            valid_fraction / (1 - test_fraction)
+        )
+
+        train_idx, valid_idx = train_test_split(
+            train_valid_idx,
+            test_size=relative_valid_size,
+            random_state=random_state,
+            stratify=second_stratify,
+            shuffle=shuffle,
+        )
+
+        return (
+            list(train_idx),
+            list(valid_idx),
+            list(test_idx),
+        )
+    
+    _inner.split_names = split_names
+    _inner.valid_fraction = valid_fraction
+    _inner.test_fraction = test_fraction
+    _inner.random_state = random_state
+    _inner.stratify = stratify
+    _inner.shuffle = shuffle
+
+    return _inner
+
+# %% ../nbs/000_utils.ipynb #da7ccee6
+def _get_path(o, key="image"):
+    "Extract path from dict item or raw path-like object."
+
+    if isinstance(o, dict):
+        return Path(o.get(key, o.get("path", "")))
+
+    return Path(o)
+
+
+def _normalize_names(names):
+    "Ensure split names are always a list."
+
+    if not isinstance(names, (list, tuple)):
+        names = [names]
+
+    return list(names)
+
+
+def _folder_idxs(
+    items,
+    name,
+    folder="grandparent",
+    key="image",
+):
+    """
+    Return indices matching a folder name.
+
+    Args:
+        items:
+            Dataset items.
+
+        name:
+            Folder name to match.
+
+        folder:
+            One of:
+            ``"parent"``
+            ``"grandparent"``.
+
+        key:
+            Dictionary key containing path.
+    """
+
+    idxs = []
+
+    for i, o in enumerate(items):
+
+        path = _get_path(o, key)
+
+        folder_name = (
+            path.parent.name
+            if folder == "parent"
+            else path.parent.parent.name
+        )
+
+        if folder_name == name:
+            idxs.append(i)
+
+    return idxs
+
+# %% ../nbs/000_utils.ipynb #471f1782
+def GrandparentSplitter(
+    split_names=("train", "valid"),
+    key="image",
+    **kwargs,
+):
+    """
+    Split items by grandparent folder names.
+
+    Example structure::
+
+        dataset/
+            train/
+                cats/img1.jpg
+            valid/
+                dogs/img2.jpg
+            test/
+                dogs/img3.jpg
+
+    Args:
+        split_names:
+            Grandparent folder names to split on.
+
+        key:
+            Dictionary key containing file path.
+
+    Returns:
+        Callable returning one index list
+        per name in ``split_names``.
+    """
+
+    split_names = _normalize_names(split_names)
+
+    def _inner(o, **kwargs):
+
+        return tuple(
+            _folder_idxs(
+                o,
+                name=name,
+                folder="grandparent",
+                key=key,
+            )
+            for name in split_names
+        )
+    
+    _inner.split_names = split_names
+    _inner.key = key
+
+    return _inner
+
+
+def ParentSplitter(
+    split_names=("train", "valid"),
+    key="image",
+    **kwargs
+):
+    """
+    Split items by parent folder names.
+
+    Args:
+        split_names:
+            Parent folder names to split on.
+
+        key:
+            Dictionary key containing file path.
+
+    Returns:
+        Callable returning one index list
+        per name in ``split_names``.
+    """
+
+    split_names = _normalize_names(split_names)
+
+    def _inner(o, **kwargs):
+
+        return tuple(
+            _folder_idxs(
+                o,
+                name=name,
+                folder="parent",
+                key=key,
+            )
+            for name in split_names
+        )
+
+    _inner.split_names = split_names
+    _inner.key = key
+
+    return _inner
+
+
+def FileSplitter(
+    fname,
+    split_names=("valid",),
+    key="image",
+    **kwargs,
+):
+    """
+    Split items using filenames listed in a text file.
+
+    The file should contain one filename per line.
+
+    Supports multiple split names similarly to
+    ``NameSplitter``.
+
+    Expected format::
+
+        train img1.jpg
+        valid img2.jpg
+        test img3.jpg
+
+    Args:
+        fname:
+            Path to split-definition file.
+
+        split_names:
+            Split names to extract.
+
+        key:
+            Dictionary key containing file path.
+
+    Returns:
+        Callable returning one index list
+        per split name.
+    """
+
+    split_names = _normalize_names(split_names)
+
+    split_map = {}
+
+    for line in Path(fname).read_text().splitlines():
+
+        parts = line.strip().split()
+
+        if len(parts) != 2:
+            continue
+
+        split_name, file_name = parts
+
+        split_map.setdefault(split_name, set())
+        split_map[split_name].add(file_name)
+
+    def _inner(o, **kwargs):
+
+        split_idxs = []
+
+        for split_name in split_names:
+
+            valid_files = split_map.get(split_name, set())
+
+            idxs = [
+                i for i, x in enumerate(o)
+                if _get_path(x, key).name in valid_files
+            ]
+
+            split_idxs.append(idxs)
+
+        return tuple(split_idxs)
+    
+    _inner.split_names = split_names
+    _inner.key = key
+    _inner.fname = fname
+
+    return _inner
 
 
 # %% ../nbs/000_utils.ipynb #0de5c206
