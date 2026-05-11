@@ -8,8 +8,8 @@ __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNew
            'MutableSequence', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple', 'ensure_tuple_rep',
            'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax', 'is_cuda_available',
            'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor', 'route_kwargs', 'read_yaml',
-           'dictlist_to_funclist', 'ColSplitter', 'TrainTestSplitter', 'RandomSplitter', 'GrandparentSplitter',
-           'FuncSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
+           'read_args_from_yaml', 'dictlist_to_funclist', 'ColSplitter', 'TrainTestSplitter', 'RandomSplitter',
+           'GrandparentSplitter', 'FuncSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/000_utils.ipynb #f6eab00d
 # =================================
@@ -175,6 +175,22 @@ def read_yaml(yaml_path):
     with open(yaml_path, 'r') as file:
         config = yaml.safe_load(file)
     return config 
+
+# %% ../nbs/000_utils.ipynb #b96632fb
+def read_args_from_yaml(yaml_path):
+    """Reads arguments from a YAML file and converts them into a namespace."""
+    config = read_yaml(yaml_path)
+    if config is None:
+        config = {}
+
+    def _convert(value):
+        if isinstance(value, dict):
+            return SimpleNamespace(**{k: _convert(v) for k, v in value.items()})
+        if isinstance(value, list):
+            return [_convert(v) for v in value]
+        return None if value == "None" else value
+
+    return _convert(config)
 
 # %% ../nbs/000_utils.ipynb #67dea582
 def dictlist_to_funclist(transform_dicts):

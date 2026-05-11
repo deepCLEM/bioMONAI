@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-0675760bc1887e56605b46c456b3b157.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-baff0cd72efbefcf44502bcb6328cb54.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-0675760bc1887e56605b46c456b3b157.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-480c2803ffe5ab5d6b0bfe6db136e446.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1205,8 +1205,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Original Tensor Variance:'</span>, rand_tensor.var().item())</span>
 <span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Scaled Tensor Variance:'</span>, scaled_tensor.var().item())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Original Tensor Variance: 0.08368905633687973
-Scaled Tensor Variance: 0.9999999403953552</code></pre>
+<pre><code>Original Tensor Variance: 0.08328362554311752
+Scaled Tensor Variance: 1.0</code></pre>
 </div>
 </div>
 <hr>
@@ -1453,13 +1453,13 @@ Scaled Tensor Variance: 0.9999999403953552</code></pre>
 <span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>test_eq(image[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>], flipped_image[<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>]) <span class="co"># Check if the image is flipped correctly</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>original:
- [[[0.85236378 0.74988942 0.63054643]
-  [0.2193008  0.13508962 0.71442953]
-  [0.98148723 0.0314222  0.75972639]]]
+ [[[0.29273602 0.69511702 0.02703655]
+  [0.33490333 0.14658978 0.48388692]
+  [0.31495079 0.60386037 0.19304222]]]
 flipped:
- [[[0.98148723 0.0314222  0.75972639]
-  [0.2193008  0.13508962 0.71442953]
-  [0.85236378 0.74988942 0.63054643]]]</code></pre>
+ [[[0.31495079 0.60386037 0.19304222]
+  [0.33490333 0.14658978 0.48388692]
+  [0.29273602 0.69511702 0.02703655]]]</code></pre>
 </div>
 </div>
 <div id="c1f263d9" class="cell">
@@ -1470,23 +1470,23 @@ flipped:
 <span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandFlip(prob<span class="op">=</span><span class="fl">.75</span>, spatial_axis<span class="op">=</span><span class="va">None</span>)(rand_tensor))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.7183, 0.6539, 0.6135, 0.2136],
-         [0.2408, 0.7686, 0.6257, 0.7788],
-         [0.3650, 0.6601, 0.6638, 0.0918],
-         [0.1672, 0.1962, 0.5997, 0.0535]]]) 
+<pre><code>orig tensor:  metatensor([[[0.8451, 0.3482, 0.6406, 0.2835],
+         [0.1567, 0.4949, 0.4521, 0.2929],
+         [0.6852, 0.3709, 0.4744, 0.8434],
+         [0.2013, 0.6327, 0.5455, 0.2261]]]) 
 
-metatensor([[[0.0535, 0.5997, 0.1962, 0.1672],
-         [0.0918, 0.6638, 0.6601, 0.3650],
-         [0.7788, 0.6257, 0.7686, 0.2408],
-         [0.2136, 0.6135, 0.6539, 0.7183]]])
-metatensor([[[0.1672, 0.1962, 0.5997, 0.0535],
-         [0.3650, 0.6601, 0.6638, 0.0918],
-         [0.2408, 0.7686, 0.6257, 0.7788],
-         [0.7183, 0.6539, 0.6135, 0.2136]]])
-metatensor([[[0.0535, 0.5997, 0.1962, 0.1672],
-         [0.0918, 0.6638, 0.6601, 0.3650],
-         [0.7788, 0.6257, 0.7686, 0.2408],
-         [0.2136, 0.6135, 0.6539, 0.7183]]])</code></pre>
+metatensor([[[0.8451, 0.3482, 0.6406, 0.2835],
+         [0.1567, 0.4949, 0.4521, 0.2929],
+         [0.6852, 0.3709, 0.4744, 0.8434],
+         [0.2013, 0.6327, 0.5455, 0.2261]]])
+metatensor([[[0.2013, 0.6327, 0.5455, 0.2261],
+         [0.6852, 0.3709, 0.4744, 0.8434],
+         [0.1567, 0.4949, 0.4521, 0.2929],
+         [0.8451, 0.3482, 0.6406, 0.2835]]])
+metatensor([[[0.8451, 0.3482, 0.6406, 0.2835],
+         [0.1567, 0.4949, 0.4521, 0.2929],
+         [0.6852, 0.3709, 0.4744, 0.8434],
+         [0.2013, 0.6327, 0.5455, 0.2261]]])</code></pre>
 </div>
 </div>
 <hr>
@@ -1516,23 +1516,23 @@ metatensor([[[0.0535, 0.5997, 0.1962, 0.1672],
 <span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRot90(prob<span class="op">=</span><span class="dv">1</span>, k<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)(rand_tensor))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.5848, 0.7691, 0.5323, 0.1517],
-         [0.1039, 0.8278, 0.1615, 0.2918],
-         [0.1811, 0.4905, 0.4593, 0.3070],
-         [0.7904, 0.8759, 0.4994, 0.1696]]]) 
+<pre><code>orig tensor:  metatensor([[[0.0370, 0.1912, 0.7562, 0.7039],
+         [0.1962, 0.9246, 0.1309, 0.8235],
+         [0.4617, 0.0017, 0.5932, 0.3676],
+         [0.7256, 0.5437, 0.7622, 0.6132]]]) 
 
-metatensor([[[0.1517, 0.2918, 0.3070, 0.1696],
-         [0.5323, 0.1615, 0.4593, 0.4994],
-         [0.7691, 0.8278, 0.4905, 0.8759],
-         [0.5848, 0.1039, 0.1811, 0.7904]]])
-metatensor([[[0.1696, 0.4994, 0.8759, 0.7904],
-         [0.3070, 0.4593, 0.4905, 0.1811],
-         [0.2918, 0.1615, 0.8278, 0.1039],
-         [0.1517, 0.5323, 0.7691, 0.5848]]])
-metatensor([[[0.7904, 0.1811, 0.1039, 0.5848],
-         [0.8759, 0.4905, 0.8278, 0.7691],
-         [0.4994, 0.4593, 0.1615, 0.5323],
-         [0.1696, 0.3070, 0.2918, 0.1517]]])</code></pre>
+metatensor([[[0.7039, 0.8235, 0.3676, 0.6132],
+         [0.7562, 0.1309, 0.5932, 0.7622],
+         [0.1912, 0.9246, 0.0017, 0.5437],
+         [0.0370, 0.1962, 0.4617, 0.7256]]])
+metatensor([[[0.6132, 0.7622, 0.5437, 0.7256],
+         [0.3676, 0.5932, 0.0017, 0.4617],
+         [0.8235, 0.1309, 0.9246, 0.1962],
+         [0.7039, 0.7562, 0.1912, 0.0370]]])
+metatensor([[[0.7256, 0.4617, 0.1962, 0.0370],
+         [0.5437, 0.0017, 0.9246, 0.1912],
+         [0.7622, 0.5932, 0.1309, 0.7562],
+         [0.6132, 0.3676, 0.8235, 0.7039]]])</code></pre>
 </div>
 </div>
 <hr>
@@ -1557,23 +1557,23 @@ metatensor([[[0.7904, 0.1811, 0.1039, 0.5848],
 <span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandRotate(prob<span class="op">=</span><span class="dv">1</span>, range_x<span class="op">=</span><span class="dv">1</span>)(rand_tensor))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.5848, 0.7691, 0.5323, 0.1517],
-         [0.1039, 0.8278, 0.1615, 0.2918],
-         [0.1811, 0.4905, 0.4593, 0.3070],
-         [0.7904, 0.8759, 0.4994, 0.1696]]]) 
+<pre><code>orig tensor:  metatensor([[[0.0370, 0.1912, 0.7562, 0.7039],
+         [0.1962, 0.9246, 0.1309, 0.8235],
+         [0.4617, 0.0017, 0.5932, 0.3676],
+         [0.7256, 0.5437, 0.7622, 0.6132]]]) 
 
-metatensor([[[0.1129, 0.4346, 0.7549, 0.5599],
-         [0.1765, 0.5909, 0.4508, 0.3274],
-         [0.7222, 0.5291, 0.3392, 0.2927],
-         [0.8320, 0.5220, 0.3001, 0.3052]]])
-metatensor([[[0.5741, 0.3411, 0.2921, 0.3043],
-         [0.7651, 0.4631, 0.3343, 0.2975],
-         [0.4084, 0.5839, 0.5280, 0.5057],
-         [0.1175, 0.1798, 0.7400, 0.8095]]])
-metatensor([[[0.6938, 0.6428, 0.3188, 0.2346],
-         [0.4518, 0.7001, 0.2306, 0.2999],
-         [0.1399, 0.5027, 0.4805, 0.3022],
-         [0.4300, 0.7097, 0.7002, 0.3647]]])</code></pre>
+metatensor([[[0.2847, 0.7422, 0.6917, 0.7480],
+         [0.2319, 0.5755, 0.3771, 0.3789],
+         [0.2028, 0.3599, 0.4256, 0.6561],
+         [0.4178, 0.4992, 0.5491, 0.7260]]])
+metatensor([[[0.1284, 0.4932, 0.6620, 0.7748],
+         [0.2369, 0.7030, 0.2934, 0.5798],
+         [0.3198, 0.2155, 0.5100, 0.5330],
+         [0.5691, 0.5254, 0.6454, 0.7015]]])
+metatensor([[[0.1159, 0.4551, 0.6671, 0.7651],
+         [0.2338, 0.7261, 0.2772, 0.6105],
+         [0.3377, 0.1915, 0.5215, 0.5129],
+         [0.5905, 0.5290, 0.6601, 0.6895]]])</code></pre>
 </div>
 </div>
 <hr>
@@ -1597,23 +1597,23 @@ metatensor([[[0.6938, 0.6428, 0.3188, 0.2346],
 <span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(RandZoom(prob<span class="op">=</span><span class="dv">1</span>)(rand_tensor))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>orig tensor:  metatensor([[[0.5848, 0.7691, 0.5323, 0.1517],
-         [0.1039, 0.8278, 0.1615, 0.2918],
-         [0.1811, 0.4905, 0.4593, 0.3070],
-         [0.7904, 0.8759, 0.4994, 0.1696]]]) 
+<pre><code>orig tensor:  metatensor([[[0.0370, 0.1912, 0.7562, 0.7039],
+         [0.1962, 0.9246, 0.1309, 0.8235],
+         [0.4617, 0.0017, 0.5932, 0.3676],
+         [0.7256, 0.5437, 0.7622, 0.6132]]]) 
 
-metatensor([[[0.5848, 0.7691, 0.5323, 0.1517],
-         [0.1039, 0.8278, 0.1615, 0.2918],
-         [0.1811, 0.4905, 0.4593, 0.3070],
-         [0.7904, 0.8759, 0.4994, 0.1696]]])
-metatensor([[[0.5714, 0.5727, 0.2843, 0.2843],
-         [0.4008, 0.4848, 0.3049, 0.3049],
-         [0.5845, 0.5813, 0.3588, 0.3588],
-         [0.5845, 0.5813, 0.3588, 0.3588]]])
-metatensor([[[0.5714, 0.5727, 0.2843, 0.2843],
-         [0.4008, 0.4848, 0.3049, 0.3049],
-         [0.5845, 0.5813, 0.3588, 0.3588],
-         [0.5845, 0.5813, 0.3588, 0.3588]]])</code></pre>
+metatensor([[[0.3372, 0.5007, 0.6036, 0.6036],
+         [0.3960, 0.4126, 0.4788, 0.4788],
+         [0.4332, 0.4752, 0.5840, 0.5840],
+         [0.4332, 0.4752, 0.5840, 0.5840]]])
+metatensor([[[0.0370, 0.1912, 0.7562, 0.7039],
+         [0.1962, 0.9246, 0.1309, 0.8235],
+         [0.4617, 0.0017, 0.5932, 0.3676],
+         [0.7256, 0.5437, 0.7622, 0.6132]]])
+metatensor([[[0.3372, 0.5007, 0.6036, 0.6036],
+         [0.3960, 0.4126, 0.4788, 0.4788],
+         [0.4332, 0.4752, 0.5840, 0.5840],
+         [0.4332, 0.4752, 0.5840, 0.5840]]])</code></pre>
 </div>
 </div>
 </section>
