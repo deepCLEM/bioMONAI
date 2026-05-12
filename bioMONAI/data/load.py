@@ -764,10 +764,10 @@ class DataSplitMixin:
             return ColSplitter(self.valid_col)
 
         return TrainTestSplitter(
-            test_size=self.valid_pct,
+            test_fraction=self.valid_fraction,
             random_state=self.seed,
             stratify=self.stratify,
-            train_size=self.train_size,
+            train_fraction=self.train_fraction,
             shuffle=self.shuffle,
         )
 
@@ -861,15 +861,15 @@ class DataBlockBuilder(DataSplitMixin):
         get_y=None,
         getters=None,
         n_inp=None,
+        item_transforms=None,
+        val_item_transforms=None,
         transforms=None,
         val_transforms=None,
-        batch_transforms=None,
-        val_batch_transforms=None,
         splitter=None,
-        valid_pct=0.2,
+        valid_fraction=0.2,
         seed=None,
         stratify=None,
-        train_size=None,
+        train_fraction=None,
         shuffle: bool = True,
         valid_col="is_valid",
         x_keys=None,
@@ -919,8 +919,8 @@ class DataBlockBuilder(DataSplitMixin):
         # IMPORTANT: pass raw list[dict], not DataFrame
         splitter = None if mode == "test" else self._resolve_splitter(data)
 
-        item_tfms, val_item_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
-        batch_tfms, val_batch_tfms = self._wrap_pipeline(self.batch_transforms, self.val_batch_transforms)
+        item_tfms, val_item_tfms = self._wrap_pipeline(self.item_transforms, self.val_item_transforms)
+        batch_tfms, val_batch_tfms = self._wrap_pipeline(self.transforms, self.val_transforms)
 
         datablock = DataBlock(
             blocks=blocks,
@@ -944,16 +944,35 @@ class DataBlockBuilder(DataSplitMixin):
 @register_dataset("monaidataset", backend="monai")
 class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
-    def __init__(self, transforms=None, val_transforms=None,
-                 splitter=None, valid_pct=0.2, seed=None,
-                 stratify=None, train_size=None,
-                 shuffle=True, valid_col="is_valid", **kwargs):
+    def __init__(
+        self,
+        blocks=None,
+        get_items=None,
+        get_x=None,
+        get_y=None,
+        getters=None,
+        n_inp=None,
+        item_transforms=None,
+        val_item_transforms=None,
+        transforms=None,
+        val_transforms=None,
+        splitter=None,
+        valid_fraction=0.2,
+        seed=None,
+        stratify=None,
+        train_fraction=None,
+        shuffle: bool = True,
+        valid_col="is_valid",
+        x_keys=None,
+        y_keys=None,
+        **kwargs,
+    ):
         store_attr()
 
     # --------------------------------------------------
-    def build(self, df, mode="train"):
+    def build(self, data, mode="train"):
 
-        datalist_train, datalist_valid = self._split_data(df, mode=mode)
+        datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
         train_transform = self._prepare_transform(self.transforms)
 
@@ -983,21 +1002,30 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     @delegates(CacheDataset.__init__, but=['transform'])
-    def __init__(self, splitter=None, valid_pct=0.2, seed=None,
-                 stratify=None, train_size=None, shuffle=True,
-                 valid_col="is_valid", transforms=None,
-                 val_transforms=None, **kwargs):
-
-        self.splitter = splitter
-        self.valid_pct = valid_pct
-        self.seed = seed
-        self.stratify = stratify
-        self.train_size = train_size
-        self.shuffle = shuffle
-        self.valid_col = valid_col
-
-        self.transforms = transforms
-        self.val_transforms = val_transforms
+    def __init__(
+        self,
+        blocks=None,
+        get_items=None,
+        get_x=None,
+        get_y=None,
+        getters=None,
+        n_inp=None,
+        item_transforms=None,
+        val_item_transforms=None,
+        transforms=None,
+        val_transforms=None,
+        splitter=None,
+        valid_fraction=0.2,
+        seed=None,
+        stratify=None,
+        train_fraction=None,
+        shuffle: bool = True,
+        valid_col="is_valid",
+        x_keys=None,
+        y_keys=None,
+        **kwargs,
+    ):
+        store_attr()
         
         split = split_prefixed_kwargs(kwargs, prefixes=("train_", "val_"))
         self.train_kwargs = split["train"]

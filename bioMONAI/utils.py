@@ -298,10 +298,10 @@ def ColSplitter(col='is_valid', on=None, **kwargs):
 
 
 def TrainTestSplitter(
-    test_size=0.2,
+    test_fraction=0.2,
     random_state=None,
     stratify=None,
-    train_size=None,
+    train_fraction=None,
     shuffle=True, 
     **kwargs
 ):
@@ -314,20 +314,20 @@ def TrainTestSplitter(
 
         train_idx, valid_idx = train_test_split(
             idxs,
-            test_size=test_size,
+            test_size=test_fraction,
             random_state=random_state,
             stratify=stratify,
-            train_size=train_size,
+            train_size=train_fraction,
             shuffle=shuffle
         )
 
         return list(train_idx), list(valid_idx)
     
     _inner.split_names = kwargs.get("split_names", ("train", "valid"))
-    _inner.test_size = test_size
+    _inner.test_fraction = test_fraction
     _inner.random_state = random_state
     _inner.stratify = stratify
-    _inner.train_size = train_size
+    _inner.train_fraction = train_fraction
     _inner.shuffle = shuffle
 
     return _inner
