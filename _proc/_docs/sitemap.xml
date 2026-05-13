@@ -106,7 +106,7 @@
   </url>
   <url>
     <loc>https://deepCLEM.github.io/bioMONAI/data.core.html</loc>
-    <lastmod>2026-05-13T15:48:15.155Z</lastmod>
+    <lastmod>2026-05-13T17:36:00.840Z</lastmod>
   </url>
   <url>
     <loc>https://deepCLEM.github.io/bioMONAI/utils.html</loc>
@@ -115,5 +115,9 @@
   <url>
     <loc>https://deepCLEM.github.io/bioMONAI/engines.html</loc>
     <lastmod>2026-05-13T15:48:15.559Z</lastmod>
+  </url>
+  <url>
+    <loc>https://deepCLEM.github.io/bioMONAI/data.html</loc>
+    <lastmod>2026-05-13T17:35:55.939Z</lastmod>
   </url>
 </urlset>
