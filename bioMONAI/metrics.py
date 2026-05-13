@@ -5,7 +5,7 @@
 # %% auto #0
 __all__ = ['SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric', 'RMSEMetric', 'get_metric', 'DiceMetric',
            'PanopticQualityMetric', 'ROCAUCMetric', 'plot_roc_curve_with_std', 'plot_roc_curve_with_std_interactive',
-           'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'radial_mask', 'get_radial_masks', 'FRCMetric']
+           'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric']
 
 # %% ../nbs/060_metrics.ipynb #09106178
 # =================================
@@ -17,7 +17,14 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.datasets import load_iris
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import RocCurveDisplay, auc
+from sklearn.metrics import RocCurveDisplay, auc, roc_curve
+
+# =================================
+# Plots
+# =================================
+import plotly.graph_objects as go
+import plotly.io as pio
+pio.renderers.default = "notebook_connected"
 
 # =================================
 # PyTorch
@@ -441,73 +448,10 @@ def MetricsReloadedCategorical(metric_name, **kwargs):
         return mm.MetricsReloadedCategorical(metric_name, **kwargs)(x,y).mean()
     return AvgMetric(MRC)
 
-# %% ../nbs/060_metrics.ipynb #324dc6f4
-def radial_mask(r,      # Radius of the radial mask
-                cx=128, # X coordinate mask center
-                cy=128, # Y coordinate maske center
-                sx=256, # Size of the x-axis
-                sy=256, # Size of the y-axis
-                delta=1,# Thickness adjustment for the circular mask
-               ):
-
-    """
-    Generate a radial mask.
-
-    Returns:
-       - numpy.ndarray: Radial mask.
-    """
-    
-    sx = np.arange(0, sx)
-    sy = np.arange(0, sy)
-
-    # Calculate squared distances from each point in the grid to the center
-    ind = (sx[np.newaxis, :] - cx) ** 2 + (sy[:, np.newaxis] - cy) ** 2
-
-    # Define inner boundary of the circular mask
-    ind1 = ind <= ((r[0] + delta) ** 2)
-
-    # Define outer boundary of the circular mask
-    ind2 = ind > (r[0] ** 2)
-
-    # Create the radial mask by combining inner and outer boundaries
-    return ind1 * ind2
-
-
-# %% ../nbs/060_metrics.ipynb #c3d18392
-def get_radial_masks(width, # Width of the image
-                     height, # Height of the image
-                     ):
-
-    """
-    Generates a set of radial masks and corresponding to spatial frequencies.
-
-    Returns:
-        tuple: A tuple containing:
-            - numpy.ndarray: Array of radial masks.
-            - numpy.ndarray: Array of spatial frequencies corresponding to the masks.
-    """
-
-    # Calculate Nyquist frequency
-    freq_nyq = int(np.floor(int(min(width, height)) / 2.0))
-   
-    # Generate radii from 0 to Nyquist frequency
-    radii = np.arange(freq_nyq).reshape(freq_nyq, 1)
-
-    # Generate radial masks using the radial_mask function    
-    radial_masks = np.apply_along_axis(radial_mask, 1, radii, width//2, height//2, width, height, 1)
-
-    # Calculate spatial frequencies
-    spatial_freq = radii.astype(np.float32) / freq_nyq
-    spatial_freq = spatial_freq / max(spatial_freq)
-    spatial_freq = spatial_freq.squeeze(1)
-
-    return radial_masks, spatial_freq
-
-
 # %% ../nbs/060_metrics.ipynb #c8d22398
 def FRCMetric(image1, image2):
     """
-    Metric derived from loss.
+    Metric derived from FRC loss.
     """
 
     return 1.0 - FRCLoss(image1, image2)

@@ -117,12 +117,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:description" content="Event handlers">
 <meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/080_callbacks_files/figure-html/cell-10-output-3.png">
 <meta property="og:site_name" content="bioMONAI">
-<meta property="og:image:height" content="351">
+<meta property="og:image:height" content="354">
 <meta property="og:image:width" content="521">
 <meta name="twitter:title" content="Callbacks – bioMONAI">
 <meta name="twitter:description" content="Event handlers">
 <meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/080_callbacks_files/figure-html/cell-10-output-3.png">
-<meta name="twitter:image-height" content="351">
+<meta name="twitter:image-height" content="354">
 <meta name="twitter:image-width" content="521">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -383,8 +383,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
       <a href="./index.html" class="sidebar-logo-link">
-      <img src="./images/logo_bioMONAI_full.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
-      <img src="./images/logo_bioMONAI_full.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
       </a>
       </div>
     <div class="sidebar-menu-container"> 
@@ -763,45 +763,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Update a graph of training and validation loss</em></p>
-<div id="dc6d7869" class="cell">
+<div id="dc6d7869" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.test_utils <span class="im">import</span> synth_learner</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="ed021d9c" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set global parameters</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>plt.rcParams.update({</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'font.family'</span>: <span class="st">'sans-serif'</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'font.size'</span>: <span class="dv">10</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'text.color'</span>: <span class="st">'black'</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.labelsize'</span>: <span class="dv">10</span>,</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'xtick.labelsize'</span>: <span class="dv">10</span>,</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'ytick.labelsize'</span>: <span class="dv">10</span>,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.titlesize'</span>: <span class="dv">16</span>,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.grid'</span>: <span class="va">True</span>,</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.axisbelow'</span>: <span class="va">False</span>,</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'grid.alpha'</span>: <span class="fl">0.25</span>,</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'grid.linestyle'</span>: <span class="st">'-'</span>,</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'grid.color'</span> : <span class="st">'gray'</span>,</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'xtick.color'</span>: <span class="st">'white'</span>,</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'ytick.color'</span>: <span class="st">'white'</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">'xtick.labelcolor'</span>: <span class="st">'black'</span>,</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">'ytick.labelcolor'</span>: <span class="st">'black'</span>,</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'figure.dpi'</span>: <span class="dv">100</span>,</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">'savefig.dpi'</span>: <span class="dv">300</span>,</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.spines.top'</span>: <span class="va">False</span>,</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.spines.right'</span>: <span class="va">False</span>,</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.spines.left'</span>: <span class="va">True</span>,</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.spines.bottom'</span>: <span class="va">True</span>,  </span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'figure.facecolor'</span>: <span class="st">'white'</span>,</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.facecolor'</span>: <span class="st">'#f7f6f6'</span>,</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">'savefig.facecolor'</span>: <span class="st">'white'</span>,</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">'lines.color'</span>: <span class="st">'black'</span>,</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">'axes.prop_cycle'</span>: plt.cycler(<span class="st">'color'</span>, [<span class="st">'dimgray'</span>, <span class="st">'maroon'</span>, <span class="st">'teal'</span>, <span class="st">'#102e42'</span>, <span class="st">"goldenrod"</span>, <span class="st">'darkslateblue'</span>, <span class="st">'#1c5175'</span>, <span class="st">'cadetblue'</span>,<span class="st">'steelblue'</span>])</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.style.use('petroff10')</span></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> synth_learner(cbs<span class="op">=</span>ShowGraphCallback())</span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>learn.fit(<span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="687e30d9" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> synth_learner(cbs<span class="op">=</span>ShowGraphCallback())</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>learn.fit(<span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 
 <style>
@@ -833,32 +801,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>10.285473</td>
-<td>8.976877</td>
+<td>12.469683</td>
+<td>10.642752</td>
 <td>00:00</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>8.909032</td>
-<td>6.201019</td>
+<td>10.907568</td>
+<td>7.576888</td>
 <td>00:00</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>7.382292</td>
-<td>3.919028</td>
+<td>9.167929</td>
+<td>5.002597</td>
 <td>00:00</td>
 </tr>
 <tr class="even">
 <td>3</td>
-<td>5.993356</td>
-<td>2.323699</td>
+<td>7.541678</td>
+<td>3.123832</td>
 <td>00:00</td>
 </tr>
 <tr class="odd">
 <td>4</td>
-<td>4.801883</td>
-<td>1.363611</td>
+<td>6.133796</td>
+<td>1.866151</td>
 <td>00:00</td>
 </tr>
 </tbody>
@@ -1372,7 +1340,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>Copyright © 2024 Biagio Mandracchia, MIT License</p>
+<p>Copyright © 2024 onward Biagio Mandracchia, MIT License</p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
