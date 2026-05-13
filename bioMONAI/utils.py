@@ -8,9 +8,9 @@ __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNew
            'MutableSequence', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple', 'ensure_tuple_rep',
            'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax', 'is_cuda_available',
            'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor', 'route_kwargs', 'read_yaml',
-           'read_args_from_yaml', 'dictlist_to_funclist', 'add_columns_to_csv', 'ColSplitter', 'TrainTestSplitter',
-           'FuncSplitter', 'NameSplitter', 'RandomSplitter', 'GrandparentSplitter', 'ParentSplitter', 'FileSplitter',
-           'TargetedTransform', 'apply_transforms']
+           'read_args_from_yaml', 'dictlist_to_funclist', 'dict2string', 'add_columns_to_csv', 'ColSplitter',
+           'TrainTestSplitter', 'FuncSplitter', 'NameSplitter', 'RandomSplitter', 'GrandparentSplitter',
+           'ParentSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/000_utils.ipynb #f6eab00d
 # =================================
@@ -206,6 +206,25 @@ def dictlist_to_funclist(transform_dicts):
             transforms.append(transform_obj(**params))
 
     return transforms
+
+# %% ../nbs/000_utils.ipynb #73e25968
+def dict2string(d, # The dictionary to convert.
+                item_sep="_", # The separator between dictionary items (default is ", ").
+                key_value_sep="", # The separator between keys and values (default is ": ").
+                pad_zeroes=None, # The minimum width for integer values, padded with zeros. If None, no padding is applied.
+                ):
+    """
+    Transforms a dictionary into a string with customizable separators and optional zero padding for integers.
+
+    Returns the formatted dictionary as a string.
+    """
+    def format_value(value):
+        if isinstance(value, int) and pad_zeroes is not None:
+            return f"{value:0{pad_zeroes}d}"
+        return str(value)
+    
+    return item_sep.join(f"{k}{key_value_sep}{format_value(v)}" for k, v in d.items())
+
 
 # %% ../nbs/000_utils.ipynb #18e0fe6e
 def add_columns_to_csv(csv_path, # Path to the input CSV file

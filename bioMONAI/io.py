@@ -4,8 +4,8 @@
 
 # %% auto #0
 __all__ = ['ScalarImage', 'SaveImage', 'SaveImaged', 'LOADER_REGISTRY', 'LoadImage', 'LoadImaged', 'write_image', 'tiff2torch',
-           'string2dict', 'split_path', 'is_ome_tiff', 'extract_formats', 'bioio_loader', 'split_hdf_path',
-           'hdf5_loader', 'LoaderRegistry', 'image_reader', 'image_reader_dict', 'BioImageReader']
+           'string2dict', 'split_path', 'is_ome_tiff', 'get_aics_metadata', 'extract_formats', 'bioio_loader',
+           'split_hdf_path', 'hdf5_loader', 'LoaderRegistry', 'image_reader', 'image_reader_dict', 'BioImageReader']
 
 # %% ../nbs/010_io.ipynb #58b60095
 # =================================
@@ -19,6 +19,7 @@ import re
 # =================================
 import h5py
 import numpy as np
+import xarray as xr
 
 # =================================
 # Bioimage IO
@@ -27,6 +28,7 @@ from bioio import BioImage as AICSImage
 from bioio import Writer as writer
 from bioio_tifffile import Reader as TiffReader
 from bioio_ome_tiff import Reader as OmeTiffReader
+from bioio_czi import Reader as CziReader
 
 # =================================
 # Medical imaging
@@ -165,6 +167,96 @@ def split_path(file_path, # The path to the file to split
 def is_ome_tiff(path: Path) -> bool:
     return path.suffixes[-2:] == [".ome", ".tiff"]
 
+# %% ../nbs/010_io.ipynb #646c32a6
+from google_crc32c import value
+
+
+def _to_serializable(value):
+    """
+    Expand metadata-like objects into dictionaries recursively.
+    """
+    # numpy scalar types
+    if isinstance(value, np.generic):
+        return value.item()
+    
+    # primitives
+    if isinstance(value, (str, int, float, bool, type(None))):
+        return value
+
+    # arrays
+    if isinstance(value, (np.ndarray, xr.DataArray)):
+        return "<array skipped>"
+
+    # dicts
+    if isinstance(value, dict):
+        return {
+            k: _to_serializable(v)
+            for k, v in value.items()
+        }
+
+    # lists / tuples
+    if isinstance(value, (list, tuple)):
+        return [_to_serializable(v) for v in value]
+
+    # objects with __dict__
+    if hasattr(value, "__dict__"):
+        return {
+            k: _to_serializable(v)
+            for k, v in vars(value).items()
+            if not k.startswith("_")
+        }
+
+    # attrs/dataclass-like objects
+    if hasattr(value, "__slots__"):
+        return {
+            k: _to_serializable(getattr(value, k))
+            for k in value.__slots__
+            if hasattr(value, k)
+        }
+
+    # fallback
+    return str(value)
+
+
+def get_aics_metadata(obj, skip=None):
+    """
+    Return expanded metadata dictionary from an AICSImage object.
+    """
+
+    default_skip = {
+        "data",
+        "dask_data",
+        "xarray_data",
+        "xarray_dask_data",
+    }
+
+    if skip is not None:
+        default_skip.update(skip)
+
+    attrs = {}
+
+    for attr in dir(obj):
+
+        if attr.startswith("_"):
+            continue
+
+        if attr in default_skip:
+            continue
+
+        try:
+            value = getattr(obj, attr)
+
+            # skip methods/functions
+            if callable(value):
+                continue
+
+            attrs[attr] = _to_serializable(value)
+
+        except Exception as e:
+            attrs[attr] = f"<error: {e}>"
+
+    return attrs
+
 # %% ../nbs/010_io.ipynb #0ae336ba
 def extract_formats(filenames: Sequence[str] | str) -> list[str | None]:
     """
@@ -253,9 +345,11 @@ class bioio_loader():
     def __init__(self,
                  ind_dict=None, # Dictionary indicating the channels to load
                  loader=None, # Optional custom reader to use for loading the image
-                 channels="CZYX" # The desired channel order for the output data
+                 channels="CZYX", # The desired channel order for the output data
+                 **kwargs,
                 ):
         store_attr()
+        self.kwargs = kwargs
 
     def __call__(self, path) -> Any:
         return self.image_reader(path)
@@ -283,12 +377,13 @@ class bioio_loader():
             
         # Support for tiff files    
         path = str(path)
-        image_aics = AICSImage(path, reconstruct_mosaic=False, reader=self.loader)
+        self.kwargs.setdefault('reconstruct_mosaic', False)
+        image_aics = AICSImage(path, reader=self.loader, **self.kwargs)
 
         # Convert to numpy array    
         data = image_aics.get_image_data(self.channels, **ind_dict)
         # extract metadata
-        meta = image_aics.metadata
+        meta = get_aics_metadata(image_aics)
         # Create an identity affine transformation matrix
         affine = np.eye(4)
         # Return the image data and the affine matrix
@@ -511,6 +606,30 @@ def _load_default(path, ind_dict=None, loader=None, channels="CZYX", **kwargs):
 
 
 
+# %% ../nbs/010_io.ipynb #039b0cf5
+@LOADER_REGISTRY.register(".jpg", ".jpeg")
+def _load_jpeg(path, ind_dict=None, loader=None, channels="CZYX", **kwargs):
+    """
+    Load JPG/JPEG images.
+
+    bioio only accepts `.jpg`, so `.jpeg` paths are internally
+    converted before calling the default loader.
+    """
+
+    path_str = str(path)
+
+    # bioio expects .jpg
+    if path_str.lower().endswith(".jpeg"):
+        path_str = path_str[:-5] + ".jpg"
+
+    return _load_default(
+        path_str,
+        ind_dict=ind_dict,
+        loader=loader,
+        channels=channels,
+        **kwargs,
+    )
+
 # %% ../nbs/010_io.ipynb #0bbc84e8
 @LOADER_REGISTRY.register(".npy")
 def _load_npy(path, **kwargs):
@@ -520,10 +639,10 @@ def _load_npy(path, **kwargs):
 
 # %% ../nbs/010_io.ipynb #27932955
 @LOADER_REGISTRY.register(".npz")
-def _load_npz(path, npz_key=None, **kwargs):
+def _load_npz(path, **kwargs):
     npz_file = np.load(path)
 
-    key = npz_key or next(iter(npz_file.keys()))
+    key = kwargs.get('npz_key') or next(iter(npz_file.keys()))
     if key not in npz_file:
         raise KeyError(f"Key '{key}' not found. Available: {list(npz_file.keys())}")
 
@@ -545,7 +664,7 @@ def _load_hdf5(path, channels="CZYX", **kwargs):
 
 # %% ../nbs/010_io.ipynb #44f42658
 @LOADER_REGISTRY.register(".png")
-def _load_png(path, ind_dict=None, channels="CZYX", loader=None, **kwargs):
+def _load_png(path, ind_dict=None, channels="CZYX", **kwargs):
     """
     Load a PNG image using AICSImage.
 
@@ -553,11 +672,13 @@ def _load_png(path, ind_dict=None, channels="CZYX", loader=None, **kwargs):
         ScalarImage containing the image tensor.
     """
 
+    kwargs.setdefault('loader', None)
+
     path_str = str(path)
     if ind_dict == None:
         path_str, ind_dict = split_path(path_str)
     channels = channels.replace("C", "S")
-    data, meta, affine = bioio_loader(ind_dict, loader=loader, channels=channels)(path_str)
+    data, meta, affine = bioio_loader(ind_dict, channels=channels, **kwargs)(path_str)
 
     return MetaTensor(x=data, affine=affine, meta=meta)
 
@@ -582,6 +703,33 @@ def _load_tiff(path, ind_dict=None, channels="CZYX", **kwargs):
         image_loader = TiffReader
 
     data, meta, affine = bioio_loader(ind_dict, loader=image_loader, channels=channels)(path_str)
+
+    return MetaTensor(x=data, affine=affine, meta=meta)
+
+# %% ../nbs/010_io.ipynb #6f152957
+@LOADER_REGISTRY.register(".czi")
+def _load_czi(path, ind_dict=None, channels="CZYX", **kwargs):
+    """
+    Load a CZI image using AICSImage.
+
+    Returns:
+        ScalarImage containing the image tensor.
+    """
+    
+    kwargs.setdefault('use_aicspylibczi', True)
+    kwargs.setdefault('include_subblock_metadata', False)
+
+    path_str = str(path)
+    if ind_dict == None:
+        path_str, ind_dict = split_path(path_str)
+    
+    # bioio-czi needs to operate in aicspylibczi mode to access tiles
+
+    data, meta, affine = bioio_loader(ind_dict=ind_dict,
+                                      loader=CziReader, 
+                                      channels=channels,
+                                      **kwargs,
+                                      )(path_str)
 
     return MetaTensor(x=data, affine=affine, meta=meta)
 
@@ -614,10 +762,9 @@ def _get_loader(path: Path):
 def _load_and_preprocess(
     file_path: PathLike,
     transforms: Callable|Iterable[Callable]|None =None,
-    loader: Callable|None =None,
     channels: str ="CZYX",
     ind_dict: dict|None =None,
-    npz_key: str|None =None,
+    **kwargs,
 ) -> MetaTensor:
     """
     Load image and apply preprocessing transforms.
@@ -627,7 +774,7 @@ def _load_and_preprocess(
     path = Path(file_path)
 
     image_loader = _get_loader(path)
-    metatensor = image_loader(path, loader=loader, channels=channels, ind_dict=ind_dict, npz_key=npz_key)
+    metatensor = image_loader(path, channels=channels, ind_dict=ind_dict, **kwargs)
 
     # store path
     metatensor.meta["filepath"] = str(path)
@@ -646,10 +793,9 @@ def _load_and_preprocess_dict(
     obj: dict,
     keys: str | Iterable[str],
     transforms: Callable | Iterable[Callable] | None = None,
-    loader: Callable | None = None,
     channels: str = "CZYX",
     ind_dict: dict | None = None,
-    npz_key: str | None = None,
+    **kwargs,
 ) -> dict:
     """
     Load images from paths stored inside dictionary keys and apply preprocessing.
@@ -661,14 +807,12 @@ def _load_and_preprocess_dict(
             Key or iterable of keys containing file paths.
         transforms:
             Callable or iterable of callables.
-        loader:
-            Optional custom loader.
         channels:
             Channel layout string.
         ind_dict:
             Optional index dictionary.
-        npz_key:
-            Optional npz key.
+        **kwargs:
+            Optional keyword arguments for the image loader.
 
     Returns:
         dict:
@@ -685,10 +829,9 @@ def _load_and_preprocess_dict(
 
         obj[key] = image_loader(
             path,
-            loader=loader,
             channels=channels,
             ind_dict=ind_dict,
-            npz_key=npz_key,
+            **kwargs
         )
 
         # store path
@@ -711,10 +854,9 @@ def _load_and_preprocess_dict(
 def _multi_sequence_stream(
     image_paths: Sequence[PathLike],
     transforms=None,
-    loader=None,
     channels="CZYX",
     ind_dict=None,
-    npz_key=None,
+    **kwargs,
 ) -> Iterable[MetaTensor]:
     """
     Lazily yield preprocessed image samples.
@@ -732,10 +874,9 @@ def _multi_sequence_stream(
         yield _load_and_preprocess(
             p,
             transforms=transforms,
-            loader=loader,
             channels=channels,
             ind_dict=ind_dict,
-            npz_key=npz_key,
+            **kwargs,
         )
 
 # %% ../nbs/010_io.ipynb #050e2bb0
@@ -743,10 +884,9 @@ def _multi_sequence_stream_dict(
     objs: Sequence[dict],
     keys: str | Iterable[str],
     transforms=None,
-    loader=None,
     channels: str = "CZYX",
     ind_dict=None,
-    npz_key=None,
+    **kwargs,
 ) -> Iterable[dict]:
     """
     Lazily yield dictionary samples with loaded and preprocessed MetaTensor objects.
@@ -926,13 +1066,12 @@ def image_reader(
     lazy: bool = False,                                 # Whether to use lazy loading (streaming) for multi-image inputs. If True, returns an iterable of MetaTensors instead of a single stacked tensor.
     output: str = "tensor",                             # The desired output format. Options: "nparray", "nparray+meta", "tensor", "tensor+meta", "metatensor"
     transforms: Callable|list[Callable]|None = None,    # Optional transforms to apply to the loaded image(s). Can be a single callable or a list of callables.
-    loader: Callable|None = None,                       # Optional custom reader to use for loading the image. If None, the loader will be selected based on file format.
     channels: str ="CZYX",                              # The desired channel layout for the output tensor. Should be compatible with the input data and the loader used.
     ind_dict: dict|None = None,                         # Optional dictionary indicating specific channels or slices to load. Keys should correspond to axes in the channel layout (e.g., {"Y": slice(0, 10)}).
-    npz_key: str|None = None,                           # The key to use for loading data from .npz files.
     dtype=torch.float32,                                # The desired data type for the output tensor. Only applicable if output includes tensor formats.
     squeeze: bool = False,                              # Whether to squeeze singleton dimensions from the input tensors before stacking.
     stack_axis: str = "C",                              # The axis along which to stack multi-image inputs. Should be one of the characters in the channel layout (e.g., "C", "S") or a new axis if not present in the layout.
+    **kwargs,                                           # Additional keyword arguments to pass to the image loader (e.g., npz_key for .npz files, loader for bioio_loader, etc.)
 ) -> (                                                  # The type of the returned value depends on the `output` parameter.
     MetaTensor
     | np.ndarray
@@ -993,10 +1132,9 @@ def image_reader(
         return _load_and_preprocess(
             p,
             transforms=transforms,
-            loader=loader,
             channels=channels,
             ind_dict=ind_dict,
-            npz_key=npz_key,
+            **kwargs,
         )
 
     def _iter_multi():
@@ -1004,10 +1142,9 @@ def image_reader(
             return _multi_sequence_stream(
                 file_path,
                 transforms=transforms,
-                loader=loader,
                 channels=channels,
                 ind_dict=ind_dict,
-                npz_key=npz_key,
+                **kwargs,
             )
         return [_load(p) for p in file_path]
 
@@ -1082,14 +1219,12 @@ def image_reader_dict(
     keys: str | Iterable[str],
     lazy: bool = False,
     transforms: Callable | list[Callable] | None = None,
-    loader: Callable | None = None,
     channels: str = "CZYX",
     ind_dict: dict | None = None,
-    npz_key: str | None = None,
     dtype=torch.float32,                                
     squeeze: bool = False,                              
-    stack_axis: str = "C",                              
-
+    stack_axis: str = "C",       
+    **kwargs,
 ):
     """
     Load images from paths stored inside dictionary keys.
@@ -1130,10 +1265,9 @@ def image_reader_dict(
             obj=obj,
             keys=keys,
             transforms=transforms,
-            loader=loader,
             channels=channels,
             ind_dict=ind_dict,
-            npz_key=npz_key,
+            **kwargs,
         )
 
     def _iter_multi():
@@ -1142,10 +1276,9 @@ def image_reader_dict(
                 objs=data,
                 keys=keys,
                 transforms=transforms,
-                loader=loader,
                 channels=channels,
                 ind_dict=ind_dict,
-                npz_key=npz_key,
+                **kwargs,
             )
 
         return [_load(obj) for obj in data]
