@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="DataBlocks and DataLoaders">
+
+<title>Data Loaders – bioMONAI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-4d9afe2b8d18ee9fa5d0d57b5ed4214d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d5c81d1cbf0cd7cb9d71a6d332560fd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-895230afb54969f2597e9a5fd1967c6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-d5c81d1cbf0cd7cb9d71a6d332560fd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<meta property="og:title" content="Data Loaders – bioMONAI">
+<meta property="og:description" content="DataBlocks and DataLoaders">
+<meta property="og:site_name" content="bioMONAI">
+<meta name="twitter:title" content="Data Loaders – bioMONAI">
+<meta name="twitter:description" content="DataBlocks and DataLoaders">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">bioMONAI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://deepclem.github.io"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Resources</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
+        <li>
+    <a class="dropdown-item" href="https://monai.io/"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">monai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://docs.fast.ai"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fast.ai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastcore.fast.ai"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastcore</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastxtend</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://nbdev.fast.ai"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">nbdev</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues"><i class="bi bi-bug" role="img">
+</i> 
+ <span class="dropdown-text">Report an Issue</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/"> <i class="bi bi-twitter" role="img" aria-label="Twitter">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./data.load.html">Data Loaders</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./images/logo_bioMONAI_full.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="./images/logo_bioMONAI_full.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./io.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">I/O</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.load.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Data Loaders</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.tfms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Transformations</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./transforms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transforms</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./losses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Loss functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Networks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metrics</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./optimizers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimizers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./engines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engines</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inference &amp; Evaluation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datasets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datasets</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./visualize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualizations</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Benchmarks</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification - bioMONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification - MONAI/Pytorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial - bioMONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial - MONAI/Ignite</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in bioMONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/tutorial_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Classification 2D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/tutorial_classification3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Classification 3D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/tutorial_denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Denoising</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/tutorial_histopathology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Histopathology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Tutorials/tutorial_segmentation3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Segmentation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#biodatablocks" id="toc-biodatablocks" class="nav-link active" data-scroll-target="#biodatablocks">BioDataBlocks</a>
+  <ul>
+  <li><a href="#bioimageblock" id="toc-bioimageblock" class="nav-link" data-scroll-target="#bioimageblock">BioImageBlock</a></li>
+  <li><a href="#biodatablock" id="toc-biodatablock" class="nav-link" data-scroll-target="#biodatablock">BioDataBlock</a></li>
+  </ul></li>
+  <li><a href="#biodataloaders-unified-method" id="toc-biodataloaders-unified-method" class="nav-link" data-scroll-target="#biodataloaders-unified-method">BioDataloaders: unified method</a>
+  <ul>
+  <li><a href="#registries" id="toc-registries" class="nav-link" data-scroll-target="#registries">Registries</a></li>
+  <li><a href="#register_task" id="toc-register_task" class="nav-link" data-scroll-target="#register_task">register_task</a></li>
+  <li><a href="#register_loader" id="toc-register_loader" class="nav-link" data-scroll-target="#register_loader">register_loader</a></li>
+  <li><a href="#register_dataset" id="toc-register_dataset" class="nav-link" data-scroll-target="#register_dataset">register_dataset</a></li>
+  <li><a href="#register_source" id="toc-register_source" class="nav-link" data-scroll-target="#register_source">register_source</a></li>
+  <li><a href="#utility-functions" id="toc-utility-functions" class="nav-link" data-scroll-target="#utility-functions">Utility Functions</a></li>
+  <li><a href="#split_prefixed_kwargs" id="toc-split_prefixed_kwargs" class="nav-link" data-scroll-target="#split_prefixed_kwargs">split_prefixed_kwargs</a></li>
+  <li><a href="#readdictdataset" id="toc-readdictdataset" class="nav-link" data-scroll-target="#readdictdataset">ReadDictDataset</a></li>
+  <li><a href="#source-detection" id="toc-source-detection" class="nav-link" data-scroll-target="#source-detection">Source Detection</a></li>
+  <li><a href="#detect_source" id="toc-detect_source" class="nav-link" data-scroll-target="#detect_source">detect_source</a></li>
+  <li><a href="#build_source" id="toc-build_source" class="nav-link" data-scroll-target="#build_source">build_source</a></li>
+  <li><a href="#sources" id="toc-sources" class="nav-link" data-scroll-target="#sources">Sources</a></li>
+  <li><a href="#basesource" id="toc-basesource" class="nav-link" data-scroll-target="#basesource">BaseSource</a></li>
+  <li><a href="#dictsource" id="toc-dictsource" class="nav-link" data-scroll-target="#dictsource">DictSource</a></li>
+  <li><a href="#dataframesource" id="toc-dataframesource" class="nav-link" data-scroll-target="#dataframesource">DataFrameSource</a></li>
+  <li><a href="#csvsource" id="toc-csvsource" class="nav-link" data-scroll-target="#csvsource">CSVSource</a></li>
+  <li><a href="#foldersource" id="toc-foldersource" class="nav-link" data-scroll-target="#foldersource">FolderSource</a></li>
+  <li><a href="#listsource" id="toc-listsource" class="nav-link" data-scroll-target="#listsource">ListSource</a></li>
+  <li><a href="#callablesource" id="toc-callablesource" class="nav-link" data-scroll-target="#callablesource">CallableSource</a></li>
+  <li><a href="#datasets" id="toc-datasets" class="nav-link" data-scroll-target="#datasets">Datasets</a></li>
+  <li><a href="#datasplitmixin" id="toc-datasplitmixin" class="nav-link" data-scroll-target="#datasplitmixin">DataSplitMixin</a></li>
+  <li><a href="#monaitransformmixin" id="toc-monaitransformmixin" class="nav-link" data-scroll-target="#monaitransformmixin">MonaiTransformMixin</a></li>
+  <li><a href="#datablockbuilder" id="toc-datablockbuilder" class="nav-link" data-scroll-target="#datablockbuilder">DataBlockBuilder</a></li>
+  <li><a href="#monaidatasetbuilder" id="toc-monaidatasetbuilder" class="nav-link" data-scroll-target="#monaidatasetbuilder">MonaiDatasetBuilder</a></li>
+  <li><a href="#cachedatasetbuilder" id="toc-cachedatasetbuilder" class="nav-link" data-scroll-target="#cachedatasetbuilder">CacheDatasetBuilder</a></li>
+  <li><a href="#loader-builder" id="toc-loader-builder" class="nav-link" data-scroll-target="#loader-builder">Loader Builder</a></li>
+  <li><a href="#fastailoader" id="toc-fastailoader" class="nav-link" data-scroll-target="#fastailoader">FastaiLoader</a></li>
+  <li><a href="#monailoader" id="toc-monailoader" class="nav-link" data-scroll-target="#monailoader">MonaiLoader</a></li>
+  <li><a href="#task-objects" id="toc-task-objects" class="nav-link" data-scroll-target="#task-objects">Task Objects</a></li>
+  <li><a href="#main-dataloaders-creator" id="toc-main-dataloaders-creator" class="nav-link" data-scroll-target="#main-dataloaders-creator">Main DataLoaders Creator</a></li>
+  <li><a href="#biodataloaders" id="toc-biodataloaders" class="nav-link" data-scroll-target="#biodataloaders">BioDataLoaders</a></li>
+  <li><a href="#biodataloaders.create" id="toc-biodataloaders.create" class="nav-link" data-scroll-target="#biodataloaders.create">BioDataLoaders.create</a></li>
+  </ul></li>
+  <li><a href="#biodataloaders-specialized-methods" id="toc-biodataloaders-specialized-methods" class="nav-link" data-scroll-target="#biodataloaders-specialized-methods">BioDataLoaders: specialized methods</a>
+  <ul>
+  <li><a href="#from_yaml" id="toc-from_yaml" class="nav-link" data-scroll-target="#from_yaml">from_yaml</a></li>
+  <li><a href="#class_from_lists" id="toc-class_from_lists" class="nav-link" data-scroll-target="#class_from_lists">class_from_lists</a></li>
+  <li><a href="#class_from_csv" id="toc-class_from_csv" class="nav-link" data-scroll-target="#class_from_csv">class_from_csv</a></li>
+  <li><a href="#class_from_df" id="toc-class_from_df" class="nav-link" data-scroll-target="#class_from_df">class_from_df</a></li>
+  <li><a href="#class_from_path_re" id="toc-class_from_path_re" class="nav-link" data-scroll-target="#class_from_path_re">class_from_path_re</a></li>
+  <li><a href="#class_from_path_func" id="toc-class_from_path_func" class="nav-link" data-scroll-target="#class_from_path_func">class_from_path_func</a></li>
+  <li><a href="#class_from_folder" id="toc-class_from_folder" class="nav-link" data-scroll-target="#class_from_folder">class_from_folder</a></li>
+  <li><a href="#from_csv" id="toc-from_csv" class="nav-link" data-scroll-target="#from_csv">from_csv</a></li>
+  <li><a href="#from_df" id="toc-from_df" class="nav-link" data-scroll-target="#from_df">from_df</a></li>
+  <li><a href="#from_folder" id="toc-from_folder" class="nav-link" data-scroll-target="#from_folder">from_folder</a></li>
+  <li><a href="#from_source" id="toc-from_source" class="nav-link" data-scroll-target="#from_source">from_source</a></li>
+  <li><a href="#loading-monai-datasets" id="toc-loading-monai-datasets" class="nav-link" data-scroll-target="#loading-monai-datasets">Loading Monai Datasets</a></li>
+  <li><a href="#from_monai" id="toc-from_monai" class="nav-link" data-scroll-target="#from_monai">from_monai</a></li>
+  <li><a href="#from_monai_ds" id="toc-from_monai_ds" class="nav-link" data-scroll-target="#from_monai_ds">from_monai_ds</a></li>
+  </ul></li>
+  <li><a href="#test-datasets" id="toc-test-datasets" class="nav-link" data-scroll-target="#test-datasets">Test Datasets</a>
+  <ul>
+  <li><a href="#test_biodataloader" id="toc-test_biodataloader" class="nav-link" data-scroll-target="#test_biodataloader">test_biodataloader</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Loaders</h1>
+</div>
+
+<div>
+  <div class="description">
+    DataBlocks and DataLoaders
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+<script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="biodatablocks" class="level2">
+<h2 class="anchored" data-anchor-id="biodatablocks">BioDataBlocks</h2>
+<p><strong>BioImageBlock</strong> Creates a new type of TransformBlock specifically for bioimaging data aside from other types like ImageBlock, CategoryBlock and TextBlock.</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L78" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="bioimageblock" class="level3">
+<h3 class="anchored" data-anchor-id="bioimageblock">BioImageBlock</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImageBlock(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    cls:BioImageBase<span class="op">=</span>BioImage</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>A <code>TransformBlock</code> tailored for bioimaging data, <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#bioimageblock"><code>BioImageBlock</code></a> facilitates the creation of data processing pipelines, including transformations and augmentations specific to bioimaging.</em></p>
+<p>The <strong>BioDataBlock</strong> class is built on top of the DataBlock’s class which is provided by the fastai library and is used to build datasets and dataloaders from blocks specifically for biomedical data, offering additionally the option to use BioImageBlock as TransformBlock.</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L83" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodatablock" class="level3">
+<h3 class="anchored" data-anchor-id="biodatablock">BioDataBlock</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioDataBlock(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    blocks:<span class="bu">list</span><span class="op">=</span>(<span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x76da5be62550</span><span class="op">&gt;</span>, <span class="op">&lt;</span>fastai.data.block.TransformBlock <span class="bu">object</span> at <span class="bn">0x76d7b97bc4d0</span><span class="op">&gt;</span>), <span class="co"># One or more `TransformBlock`s</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    dl_type:TfmdDL<span class="op">=</span><span class="va">None</span>, <span class="co"># Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    get_items:function<span class="op">=</span>get_image_files, get_y:NoneType<span class="op">=</span><span class="va">None</span>, get_x:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    getters:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Getter functions applied to results of `get_items`</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    n_inp:<span class="bu">int</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Number of inputs</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    item_tfms:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># `ItemTransform`s, applied on an item</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    batch_tfms:<span class="bu">list</span><span class="op">=</span><span class="va">None</span>, <span class="co"># `Transform`s or `RandTransform`s, applied by batch</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    splitter:NoneType<span class="op">=</span><span class="va">None</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#biodatablock"><code>BioDataBlock</code></a> class serves as a generic container to build <code>Datasets</code> and <code>DataLoaders</code> efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.</em></p>
+</section>
+</section>
+<section id="biodataloaders-unified-method" class="level2">
+<h2 class="anchored" data-anchor-id="biodataloaders-unified-method">BioDataloaders: unified method</h2>
+<p>The module offers classes to construct data loaders for fastTrainer supporting different dataset backends.</p>
+<section id="registries" class="level3">
+<h3 class="anchored" data-anchor-id="registries">Registries</h3>
+<p>These allow adding new components without changing core code.</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L139" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="register_task" class="level3">
+<h3 class="anchored" data-anchor-id="register_task">register_task</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> register_task(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    name</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L133" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="register_loader" class="level3">
+<h3 class="anchored" data-anchor-id="register_loader">register_loader</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> register_loader(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    name</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L126" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="register_dataset" class="level3">
+<h3 class="anchored" data-anchor-id="register_dataset">register_dataset</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> register_dataset(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    name, backend</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L119" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="register_source" class="level3">
+<h3 class="anchored" data-anchor-id="register_source">register_source</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> register_source(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    name</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="utility-functions" class="level3">
+<h3 class="anchored" data-anchor-id="utility-functions">Utility Functions</h3>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L146" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="split_prefixed_kwargs" class="level3">
+<h3 class="anchored" data-anchor-id="split_prefixed_kwargs">split_prefixed_kwargs</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_prefixed_kwargs(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    kwargs, prefixes:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train_'</span>, <span class="st">'val_'</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Split a dictionary of kwargs into multiple groups based on prefixes.</em></p>
+<p>Example: kwargs = { “batch_size”: 32, “train_cache_rate”: 1.0, “val_cache_rate”: 0.5 }</p>
+<pre><code>split_prefixed_kwargs(kwargs)
+-&gt; {
+     "train": {"cache_rate": 1.0, "batch_size": 32},
+     "val": {"cache_rate": 0.5, "batch_size": 32}
+   }</code></pre>
+<p>Rules: - Keys starting with prefix go to that group (prefix removed) - All keys also appear in each group as defaults if no prefix exists</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L184" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="readdictdataset" class="level3">
+<h3 class="anchored" data-anchor-id="readdictdataset">ReadDictDataset</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ReadDictDataset(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    ds, x_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, y_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'label'</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>An abstract class representing a :class:<code>Dataset</code>.</em></p>
+<p>All datasets that represent a map from keys to data samples should subclass it. All subclasses should overwrite :meth:<code>__getitem__</code>, supporting fetching a data sample for a given key. Subclasses could also optionally overwrite :meth:<code>__len__</code>, which is expected to return the size of the dataset by many :class:<code>~torch.utils.data.Sampler</code> implementations and the default options of :class:<code>~torch.utils.data.DataLoader</code>. Subclasses could also optionally implement :meth:<code>__getitems__</code>, for speedup batched samples loading. This method accepts list of indices of samples of batch and returns list of samples.</p>
+<p>.. note:: :class:<code>~torch.utils.data.DataLoader</code> by default constructs an index sampler that yields integral indices. To make it work with a map-style dataset with non-integral indices/keys, a custom sampler must be provided.</p>
+</section>
+<section id="source-detection" class="level3">
+<h3 class="anchored" data-anchor-id="source-detection">Source Detection</h3>
+<p>Automatically choose source.</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L444" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="detect_source" class="level3">
+<h3 class="anchored" data-anchor-id="detect_source">detect_source</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> detect_source(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    data</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="8f34955d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>test_eq(detect_source(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pd.DataFrame({</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">"filename"</span>: [<span class="st">"img001"</span>, <span class="st">"img002"</span>, <span class="st">"img003"</span>],</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">"mask"</span>: [<span class="st">"mask001"</span>, <span class="st">"mask002"</span>, <span class="st">"mask003"</span>]</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    })), </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'dataframe'</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>test_eq(detect_source([<span class="st">"folder1"</span>, <span class="st">"folder2"</span>]), <span class="st">'list'</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>test_eq(detect_source(<span class="st">"train.csv"</span>), <span class="st">'csv'</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>test_eq(detect_source(<span class="st">'.'</span>), <span class="st">'folder'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L479" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="build_source" class="level3">
+<h3 class="anchored" data-anchor-id="build_source">build_source</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_source(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    data, kwargs:VAR_KEYWORD</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="sources" class="level3">
+<h3 class="anchored" data-anchor-id="sources">Sources</h3>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L488" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="basesource" class="level3">
+<h3 class="anchored" data-anchor-id="basesource">BaseSource</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BaseSource(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    data, kwargs:VAR_KEYWORD</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L501" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="dictsource" class="level3">
+<h3 class="anchored" data-anchor-id="dictsource">DictSource</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DictSource(</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    data, colmap:NoneType<span class="op">=</span><span class="va">None</span>, base_path:NoneType<span class="op">=</span><span class="va">None</span>, folders:NoneType<span class="op">=</span><span class="va">None</span>, suffixes:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    keep_original:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L569" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="dataframesource" class="level3">
+<h3 class="anchored" data-anchor-id="dataframesource">DataFrameSource</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DataFrameSource(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    df, colmap:NoneType<span class="op">=</span><span class="va">None</span>, base_path:NoneType<span class="op">=</span><span class="va">None</span>, folders:NoneType<span class="op">=</span><span class="va">None</span>, suffixes:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    keep_original:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="9b11e4a5" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example DataFrame</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"channel1"</span>: [<span class="st">"img001_ch1"</span>, <span class="st">"img002_ch1"</span>],</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"channel2"</span>: [<span class="st">"img001_ch2"</span>, <span class="st">"img002_ch2"</span>],</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mask"</span>: [<span class="st">"mask001"</span>, <span class="st">"mask002"</span>]</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Configure DataFrameSource</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> DataFrameSource(</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    colmap<span class="op">=</span>{<span class="st">"image"</span>: [<span class="st">"channel1"</span>, <span class="st">"channel2"</span>], <span class="st">"label"</span>: <span class="st">"mask"</span>},</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    base_path<span class="op">=</span><span class="st">"data"</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    folders<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"images"</span>, <span class="st">"label"</span>: <span class="st">"masks"</span>},</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    suffixes<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">".png"</span>, <span class="st">"label"</span>: <span class="st">".nii.gz"</span>}</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>dict_out <span class="op">=</span> source.load()</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>expected_dict <span class="op">=</span> [</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    {<span class="st">'image'</span>: [<span class="st">'data/images/img001_ch1.png'</span>, <span class="st">'data/images/img001_ch2.png'</span>],</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">'label'</span>: <span class="st">'data/masks/mask001.nii.gz'</span>},</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    {<span class="st">'image'</span>: [<span class="st">'data/images/img002_ch1.png'</span>, <span class="st">'data/images/img002_ch2.png'</span>],</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'label'</span>: <span class="st">'data/masks/mask002.nii.gz'</span>}</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>test_eq(</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    dict_out,</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    expected_dict</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="9efa0325" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example DataFrame</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"filename"</span>: [<span class="st">"img001"</span>, <span class="st">"img002"</span>],</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"labels"</span>: [<span class="st">"categoryA"</span>, <span class="st">"categoryB"</span>]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Configure DataFrameSource</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> DataFrameSource(</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    colmap<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"filename"</span>},</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    base_path<span class="op">=</span><span class="st">"data"</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    folders<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"images"</span>},</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    suffixes<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">".nii.gz"</span>}</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Test 1: dataframe output ---</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>dict_out <span class="op">=</span> source.load()</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>df_out_expected <span class="op">=</span> [{<span class="st">'labels'</span>: <span class="st">'categoryA'</span>, <span class="st">'image'</span>: <span class="st">'data/images/img001.nii.gz'</span>},</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a> {<span class="st">'labels'</span>: <span class="st">'categoryB'</span>, <span class="st">'image'</span>: <span class="st">'data/images/img002.nii.gz'</span>}]</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>test_eq(dict_out, df_out_expected)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="1bbe0db7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example DataFrame</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"filename"</span>: [<span class="st">"img001"</span>, <span class="st">"img002"</span>],</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mask"</span>: [<span class="st">"mask001"</span>, <span class="st">"mask002"</span>]</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Configure DataFrameSource</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> DataFrameSource(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    colmap<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"filename"</span>, <span class="st">"label"</span>: <span class="st">"mask"</span>},</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    base_path<span class="op">=</span><span class="st">"data"</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    folders<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"images"</span>, <span class="st">"label"</span>: <span class="st">"masks"</span>},</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    suffixes<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">".nii.gz"</span>, <span class="st">"label"</span>: <span class="st">".nii.gz"</span>}</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Test 1: dataframe output ---</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>dict_out <span class="op">=</span> source.load()</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>expected_dict <span class="op">=</span> [</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    {<span class="st">'image'</span>: <span class="st">'data/images/img001.nii.gz'</span>, <span class="st">'label'</span>: <span class="st">'data/masks/mask001.nii.gz'</span>},</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    {<span class="st">'image'</span>: <span class="st">'data/images/img002.nii.gz'</span>, <span class="st">'label'</span>: <span class="st">'data/masks/mask002.nii.gz'</span>}</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>test_eq(</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    dict_out,</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    expected_dict</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>test_eq(</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    dict_out,</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    expected_dict</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Test 2: single column mapping with dataframes ---</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Example DataFrame</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"filename"</span>: [<span class="st">"img001"</span>, <span class="st">"img002"</span>],</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"labels"</span>: [<span class="dv">0</span>, <span class="dv">1</span>]</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>source_single <span class="op">=</span> DataFrameSource(</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>    colmap<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"filename"</span>},</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>    base_path<span class="op">=</span><span class="st">"data"</span>,</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    folders<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"images"</span>},</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>    suffixes<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">".nii.gz"</span>}</span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>df_single <span class="op">=</span> source_single.load_as_df()</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>expected_single <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>    <span class="st">"labels"</span>: [<span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>    <span class="st">"image"</span>: [</span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>        <span class="st">"data/images/img001.nii.gz"</span>,</span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>        <span class="st">"data/images/img002.nii.gz"</span></span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>test_eq(</span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>    df_single.reset_index(drop<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>    expected_single</span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Test 3: pass df as-is ---</span></span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>source_single <span class="op">=</span> DataFrameSource(</span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a>    colmap<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>    base_path<span class="op">=</span><span class="st">"data"</span>,</span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a>    folders<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"images"</span>},</span>
+<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>    suffixes<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">".nii.gz"</span>}</span>
+<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a>df_as_is <span class="op">=</span> source_single.load()</span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a>test_eq(</span>
+<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>    df_as_is,</span>
+<span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a>    data.to_dict(orient<span class="op">=</span><span class="st">"records"</span>)</span>
+<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L596" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="csvsource" class="level3">
+<h3 class="anchored" data-anchor-id="csvsource">CSVSource</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CSVSource(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    path, colmap:NoneType<span class="op">=</span><span class="va">None</span>, base_path:NoneType<span class="op">=</span><span class="va">None</span>, folders:NoneType<span class="op">=</span><span class="va">None</span>, suffixes:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    keep_original:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L613" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="foldersource" class="level3">
+<h3 class="anchored" data-anchor-id="foldersource">FolderSource</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FolderSource(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    root, colmap</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="742c7ec0" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="268321ad" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_foldersource():</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        root <span class="op">=</span> Path(tmp)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create dataset structure</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        (root <span class="op">/</span> <span class="st">"images"</span>).mkdir()</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        (root <span class="op">/</span> <span class="st">"masks"</span>).mkdir()</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>        (root <span class="op">/</span> <span class="st">"images"</span> <span class="op">/</span> <span class="st">"img001.nii.gz"</span>).touch()</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>        (root <span class="op">/</span> <span class="st">"images"</span> <span class="op">/</span> <span class="st">"img002.nii.gz"</span>).touch()</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>        (root <span class="op">/</span> <span class="st">"masks"</span> <span class="op">/</span> <span class="st">"img001.nii.gz"</span>).touch()</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        (root <span class="op">/</span> <span class="st">"masks"</span> <span class="op">/</span> <span class="st">"img002.nii.gz"</span>).touch()</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>        source <span class="op">=</span> FolderSource(</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>            root,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>            colmap<span class="op">=</span>{</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>                <span class="st">"image"</span>: <span class="st">"images"</span>,</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>                <span class="st">"label"</span>: <span class="st">"masks"</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>            },</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> source.load()</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>        expected <span class="op">=</span> [</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>            {</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>                <span class="st">"image"</span>: <span class="bu">str</span>(root <span class="op">/</span> <span class="st">"images"</span> <span class="op">/</span> <span class="st">"img001.nii.gz"</span>),</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>                <span class="st">"label"</span>: <span class="bu">str</span>(root <span class="op">/</span> <span class="st">"masks"</span> <span class="op">/</span> <span class="st">"img001.nii.gz"</span>),</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>            },</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>            {</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>                <span class="st">"image"</span>: <span class="bu">str</span>(root <span class="op">/</span> <span class="st">"images"</span> <span class="op">/</span> <span class="st">"img002.nii.gz"</span>),</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>                <span class="st">"label"</span>: <span class="bu">str</span>(root <span class="op">/</span> <span class="st">"masks"</span> <span class="op">/</span> <span class="st">"img002.nii.gz"</span>),</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>            },</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>        test_eq(df, expected)</span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>  <span class="st">"FolderSource tests passed"</span></span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>test_eq(test_foldersource(), <span class="st">"FolderSource tests passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L648" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="listsource" class="level3">
+<h3 class="anchored" data-anchor-id="listsource">ListSource</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ListSource(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    items, colmap:NoneType<span class="op">=</span><span class="va">None</span>, base_path:<span class="bu">str</span><span class="op">=</span><span class="st">'.'</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="120755d2" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> [</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"img"</span>: <span class="st">"img1"</span>, <span class="st">"mask"</span>: <span class="st">"mask1"</span>},</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"img"</span>: <span class="st">"img2"</span>, <span class="st">"mask"</span>: <span class="st">"mask2"</span>}</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> ListSource(</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    items,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    colmap<span class="op">=</span>{<span class="st">"image"</span>: <span class="st">"img"</span>, <span class="st">"label"</span>: <span class="st">"mask"</span>},</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    base_path<span class="op">=</span><span class="st">"data"</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> source.load()</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"image"</span>: [<span class="st">"data/img1"</span>, <span class="st">"data/img2"</span>],</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: [<span class="st">"data/mask1"</span>, <span class="st">"data/mask2"</span>]</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>test_eq(data, expected.to_dict(orient<span class="op">=</span><span class="st">"records"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L699" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="callablesource" class="level3">
+<h3 class="anchored" data-anchor-id="callablesource">CallableSource</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CallableSource(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    items_fn, target_fn:NoneType<span class="op">=</span><span class="va">None</span>, x_key:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, y_key:<span class="bu">str</span><span class="op">=</span><span class="st">'label'</span>, colmap:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    base_path:NoneType<span class="op">=</span><span class="va">None</span>, folders:NoneType<span class="op">=</span><span class="va">None</span>, suffixes:NoneType<span class="op">=</span><span class="va">None</span>, keep_original:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="d211ae61" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> items_fn():</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="st">"img1"</span>, <span class="st">"img2"</span>]</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> target_fn(x):</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x.replace(<span class="st">"img"</span>, <span class="st">"mask"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> CallableSource(items_fn, target_fn)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> source.load()</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"image"</span>: [<span class="st">"img1"</span>, <span class="st">"img2"</span>],</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: [<span class="st">"mask1"</span>, <span class="st">"mask2"</span>]</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>test_eq(data, expected.to_dict(orient<span class="op">=</span><span class="st">"records"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="datasets" class="level3">
+<h3 class="anchored" data-anchor-id="datasets">Datasets</h3>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L751" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="datasplitmixin" class="level3">
+<h3 class="anchored" data-anchor-id="datasplitmixin">DataSplitMixin</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DataSplitMixin(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    args:VAR_POSITIONAL, kwargs:VAR_KEYWORD</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Shared logic for splitting datalists into index-based splits.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L790" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="monaitransformmixin" class="level3">
+<h3 class="anchored" data-anchor-id="monaitransformmixin">MonaiTransformMixin</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MonaiTransformMixin(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    args:VAR_POSITIONAL, kwargs:VAR_KEYWORD</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Shared MONAI transform helpers.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L850" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="datablockbuilder" class="level3">
+<h3 class="anchored" data-anchor-id="datablockbuilder">DataBlockBuilder</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DataBlockBuilder(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    blocks:NoneType<span class="op">=</span><span class="va">None</span>, dl_type:NoneType<span class="op">=</span><span class="va">None</span>, get_items:NoneType<span class="op">=</span><span class="va">None</span>, get_x:NoneType<span class="op">=</span><span class="va">None</span>, get_y:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    getters:NoneType<span class="op">=</span><span class="va">None</span>, n_inp:NoneType<span class="op">=</span><span class="va">None</span>, item_transforms:NoneType<span class="op">=</span><span class="va">None</span>, val_item_transforms:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    transforms:NoneType<span class="op">=</span><span class="va">None</span>, val_transforms:NoneType<span class="op">=</span><span class="va">None</span>, splitter:NoneType<span class="op">=</span><span class="va">None</span>, valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    seed:NoneType<span class="op">=</span><span class="va">None</span>, stratify:NoneType<span class="op">=</span><span class="va">None</span>, train_fraction:NoneType<span class="op">=</span><span class="va">None</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    valid_col:<span class="bu">str</span><span class="op">=</span><span class="st">'is_valid'</span>, x_keys:NoneType<span class="op">=</span><span class="va">None</span>, y_keys:NoneType<span class="op">=</span><span class="va">None</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Shared logic for splitting datalists into index-based splits.</em></p>
+<div id="d17982b3" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_new_biodatablock():</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> [{<span class="st">'image'</span>: <span class="st">'img1.nii.gz'</span>, <span class="st">'label'</span>: <span class="st">'mask1.nii.gz'</span>, <span class="st">'is_valid'</span>: <span class="dv">0</span>},</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'image'</span>: <span class="st">'img2.nii.gz'</span>, <span class="st">'label'</span>: <span class="st">'mask2.nii.gz'</span>, <span class="st">'is_valid'</span>: <span class="dv">0</span>},</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'image'</span>: <span class="st">'img3.nii.gz'</span>, <span class="st">'label'</span>: <span class="st">'mask3.nii.gz'</span>, <span class="st">'is_valid'</span>: <span class="dv">1</span>},</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'image'</span>: <span class="st">'img4.nii.gz'</span>, <span class="st">'label'</span>: <span class="st">'mask4.nii.gz'</span>, <span class="st">'is_valid'</span>: <span class="dv">1</span>}</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    builder <span class="op">=</span> DataBlockBuilder()</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    datablock, out_data <span class="op">=</span> builder.build(data)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(datablock, DataBlock)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> out_data <span class="op">==</span> data</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    x_col, y_col <span class="op">=</span> builder._infer_columns(data)</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> x_col <span class="op">==</span> <span class="st">"image"</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> y_col <span class="op">==</span> <span class="st">"label"</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>    splitter <span class="op">=</span> builder._resolve_splitter(data)</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>    train_idx, valid_idx <span class="op">=</span> splitter(data) <span class="co"># splitters want dataframes as inputs</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">set</span>(train_idx) <span class="op">==</span> {<span class="dv">0</span>, <span class="dv">1</span>}</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">set</span>(valid_idx) <span class="op">==</span> {<span class="dv">2</span>, <span class="dv">3</span>}</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"All tests passed"</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>test_eq(test_new_biodatablock(), <span class="st">"All tests passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L945" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="monaidatasetbuilder" class="level3">
+<h3 class="anchored" data-anchor-id="monaidatasetbuilder">MonaiDatasetBuilder</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MonaiDatasetBuilder(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    blocks:NoneType<span class="op">=</span><span class="va">None</span>, get_items:NoneType<span class="op">=</span><span class="va">None</span>, get_x:NoneType<span class="op">=</span><span class="va">None</span>, get_y:NoneType<span class="op">=</span><span class="va">None</span>, getters:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    n_inp:NoneType<span class="op">=</span><span class="va">None</span>, item_transforms:NoneType<span class="op">=</span><span class="va">None</span>, val_item_transforms:NoneType<span class="op">=</span><span class="va">None</span>, transforms:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    val_transforms:NoneType<span class="op">=</span><span class="va">None</span>, splitter:NoneType<span class="op">=</span><span class="va">None</span>, valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, seed:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    stratify:NoneType<span class="op">=</span><span class="va">None</span>, train_fraction:NoneType<span class="op">=</span><span class="va">None</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, valid_col:<span class="bu">str</span><span class="op">=</span><span class="st">'is_valid'</span>,</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    x_keys:NoneType<span class="op">=</span><span class="va">None</span>, y_keys:NoneType<span class="op">=</span><span class="va">None</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Shared logic for splitting datalists into index-based splits.</em></p>
+<div id="524b0061" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_monai_datasetbuilder():</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Sample DataFrame ---</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"image"</span>: [<span class="st">"img1.nii.gz"</span>, <span class="st">"img2.nii.gz"</span>, <span class="st">"img3.nii.gz"</span>, <span class="st">"img4.nii.gz"</span>],</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"label"</span>: [<span class="st">"mask1.nii.gz"</span>, <span class="st">"mask2.nii.gz"</span>, <span class="st">"mask3.nii.gz"</span>, <span class="st">"mask4.nii.gz"</span>],</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"is_valid"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    }).to_dict(orient<span class="op">=</span><span class="st">"records"</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Test 1: default split using valid_col ---</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    builder <span class="op">=</span> MonaiDatasetBuilder(transforms<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    train_ds, valid_ds <span class="op">=</span> builder.build(df)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(train_ds, MonaiDataset), <span class="st">"train_ds should be MONAI Dataset"</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(valid_ds, MonaiDataset), <span class="st">"valid_ds should be MONAI Dataset"</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(train_ds) <span class="op">==</span> <span class="dv">2</span>, <span class="st">"train_ds should contain 2 items"</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(valid_ds) <span class="op">==</span> <span class="dv">2</span>, <span class="st">"valid_ds should contain 2 items"</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Test 2: custom val_ kwargs ---</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    builder2 <span class="op">=</span> MonaiDatasetBuilder(transforms<span class="op">=</span><span class="va">None</span>, val_transforms<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    train_ds2, valid_ds2 <span class="op">=</span> builder2.build(df)</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># MONAI Dataset stores kwargs internally; test a basic attribute</span></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> train_ds2[<span class="dv">0</span>][<span class="st">"image"</span>] <span class="op">==</span> df[<span class="dv">0</span>][<span class="st">"image"</span>], <span class="st">"train_ds first item image should match df"</span></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> valid_ds2[<span class="dv">0</span>][<span class="st">"image"</span>] <span class="op">==</span> df[<span class="dv">1</span>][<span class="st">"image"</span>], <span class="st">"valid_ds first item image should match df"</span></span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Test 3: split dataframe ---</span></span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>    datalist_train, datalist_valid <span class="op">=</span> builder._split_data(df)</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(datalist_train, <span class="bu">list</span>)</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(datalist_valid, <span class="bu">list</span>)</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(datalist_train) <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(datalist_valid) <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Test 4: custom splitter ---</span></span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>    custom_splitter <span class="op">=</span> RandomSplitter(valid_fraction<span class="op">=</span><span class="fl">0.5</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>    builder3 <span class="op">=</span> MonaiDatasetBuilder(transforms<span class="op">=</span><span class="va">None</span>, splitter<span class="op">=</span>custom_splitter)</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>    train_ds3, valid_ds3 <span class="op">=</span> builder3.build(df)</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(train_ds3) <span class="op">==</span> <span class="dv">2</span> <span class="kw">and</span> <span class="bu">len</span>(valid_ds3) <span class="op">==</span> <span class="dv">2</span>, <span class="st">"RandomSplitter with 50</span><span class="sc">% s</span><span class="st">hould split evenly"</span></span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"All MonaiDatasetBuilder tests passed"</span></span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the test</span></span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>test_eq(test_monai_datasetbuilder(), <span class="st">"All MonaiDatasetBuilder tests passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1002" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="cachedatasetbuilder" class="level3">
+<h3 class="anchored" data-anchor-id="cachedatasetbuilder">CacheDatasetBuilder</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CacheDatasetBuilder(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    blocks:NoneType<span class="op">=</span><span class="va">None</span>, get_items:NoneType<span class="op">=</span><span class="va">None</span>, get_x:NoneType<span class="op">=</span><span class="va">None</span>, get_y:NoneType<span class="op">=</span><span class="va">None</span>, getters:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    n_inp:NoneType<span class="op">=</span><span class="va">None</span>, item_transforms:NoneType<span class="op">=</span><span class="va">None</span>, val_item_transforms:NoneType<span class="op">=</span><span class="va">None</span>, transforms:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    val_transforms:NoneType<span class="op">=</span><span class="va">None</span>, splitter:NoneType<span class="op">=</span><span class="va">None</span>, valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, seed:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    stratify:NoneType<span class="op">=</span><span class="va">None</span>, train_fraction:NoneType<span class="op">=</span><span class="va">None</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, valid_col:<span class="bu">str</span><span class="op">=</span><span class="st">'is_valid'</span>,</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    x_keys:NoneType<span class="op">=</span><span class="va">None</span>, y_keys:NoneType<span class="op">=</span><span class="va">None</span>, cache_num:<span class="bu">int</span><span class="op">=</span><span class="dv">9223372036854775807</span>, cache_rate:<span class="bu">float</span><span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    num_workers:<span class="bu">int</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="dv">1</span>, progress:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, copy_cache:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, as_contiguous:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    hash_as_key:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, hash_func:Callable[..., <span class="bu">bytes</span>]<span class="op">=</span>pickle_hashing,</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    runtime_cache:<span class="bu">bool</span> <span class="op">|</span> <span class="bu">str</span> <span class="op">|</span> <span class="bu">list</span> <span class="op">|</span> ListProxy<span class="op">=</span><span class="va">False</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Shared logic for splitting datalists into index-based splits.</em></p>
+<div id="575cb804" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_cache_datasetbuilder():</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Sample DataFrame ---</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"image"</span>: [<span class="st">"img1.nii.gz"</span>, <span class="st">"img2.nii.gz"</span>, <span class="st">"img3.nii.gz"</span>, <span class="st">"img4.nii.gz"</span>],</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"label"</span>: [<span class="st">"mask1.nii.gz"</span>, <span class="st">"mask2.nii.gz"</span>, <span class="st">"mask3.nii.gz"</span>, <span class="st">"mask4.nii.gz"</span>],</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"is_valid"</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    }).to_dict(orient<span class="op">=</span><span class="st">"records"</span>)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Test 1: default split using valid_col ---</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    builder <span class="op">=</span> CacheDatasetBuilder(transforms<span class="op">=</span><span class="va">None</span>, cache_rate<span class="op">=</span><span class="fl">0.0</span>)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    train_ds, valid_ds <span class="op">=</span> builder.build(df)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(train_ds, CacheDataset), <span class="st">"train_ds should be CacheDataset"</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(valid_ds, CacheDataset), <span class="st">"valid_ds should be CacheDataset"</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(train_ds) <span class="op">==</span> <span class="dv">2</span>, <span class="st">"train_ds should contain 2 items"</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(valid_ds) <span class="op">==</span> <span class="dv">2</span>, <span class="st">"valid_ds should contain 2 items"</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Test 2: val_ prefixed kwargs ---</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>    builder2 <span class="op">=</span> CacheDatasetBuilder(transforms<span class="op">=</span><span class="va">None</span>, num_workers<span class="op">=</span><span class="dv">1</span>, val_num_workers<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>    train_ds2, valid_ds2 <span class="op">=</span> builder2.build(df)</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Train uses train cache_rate</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> train_ds2.num_workers <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Valid uses val_cache_rate</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> valid_ds2.num_workers <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Test 3: custom splitter ---</span></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>    custom_splitter <span class="op">=</span> RandomSplitter(valid_fraction<span class="op">=</span><span class="fl">0.5</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>    builder3 <span class="op">=</span> CacheDatasetBuilder(transforms<span class="op">=</span><span class="va">None</span>, cache_rate<span class="op">=</span><span class="fl">0.0</span>, splitter<span class="op">=</span>custom_splitter)</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>    train_ds3, valid_ds3 <span class="op">=</span> builder3.build(df)</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(train_ds3) <span class="op">==</span> <span class="dv">2</span> <span class="kw">and</span> <span class="bu">len</span>(valid_ds3) <span class="op">==</span> <span class="dv">2</span>, <span class="st">"RandomSplitter with 50</span><span class="sc">% s</span><span class="st">hould split evenly"</span></span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"All CacheDatasetBuilder tests passed"</span></span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the test</span></span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>test_eq(test_cache_datasetbuilder(), <span class="st">"All CacheDatasetBuilder tests passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading dataset: 100%|██████████| 2/2 [00:00&lt;00:00, 37957.50it/s]
+Loading dataset: 100%|██████████| 2/2 [00:00&lt;00:00, 34663.67it/s]</code></pre>
+</div>
+</div>
+</section>
+<section id="loader-builder" class="level3">
+<h3 class="anchored" data-anchor-id="loader-builder">Loader Builder</h3>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1069" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="fastailoader" class="level3">
+<h3 class="anchored" data-anchor-id="fastailoader">FastaiLoader</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FastaiLoader(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    batch_size:<span class="bu">int</span><span class="op">=</span><span class="dv">64</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Shuffle training dataset</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    num_workers:<span class="bu">int</span><span class="op">=</span><span class="dv">0</span>, <span class="co"># Number of worker processes</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    device:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Target device</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    drop_last:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Drop last incomplete batch</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    pin_memory:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Use pinned memory</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    persistent_workers:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Keep workers alive between epochs</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>FastAI-style DataLoader wrapper.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1138" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="monailoader" class="level3">
+<h3 class="anchored" data-anchor-id="monailoader">MonaiLoader</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MonaiLoader(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    batch_size:<span class="bu">int</span><span class="op">=</span><span class="dv">4</span>, <span class="co"># Training batch size</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    val_batch_size:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Validation batch size (defaults to batch_size)</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    num_workers:<span class="bu">int</span><span class="op">=</span><span class="dv">4</span>, <span class="co"># Number of workers for train DataLoader</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    val_num_workers:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Number of workers for valid DataLoader (defaults to num_workers)</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether to shuffle train DataLoader</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    val_shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Whether to shuffle valid DataLoader</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    x_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, y_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'label'</span>, show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, vocab:NoneType<span class="op">=</span><span class="va">None</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>MONAI DataLoader wrapper for train/valid datasets.</em></p>
+</section>
+<section id="task-objects" class="level3">
+<h3 class="anchored" data-anchor-id="task-objects">Task Objects</h3>
+<p>A task defines:</p>
+<ul>
+<li>default dataset</li>
+<li>default transforms</li>
+<li>dataset keys</li>
+<li>possible loader tweaks</li>
+</ul>
+<div id="d0121f4b" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Task:</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    default_dataset <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> transforms(<span class="va">self</span>):</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> dataset_config(<span class="va">self</span>):</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {}</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> loader_config(<span class="va">self</span>):</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="856f5729" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># @register_task("segmentation")</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># class SegmentationTask(Task):</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     default_dataset = "cache"</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     def transforms(self):</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="co">#         return [</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="co">#             LoadImaged(keys=["image", "label"]),</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="co">#             EnsureChannelFirstd(keys=["image", "label"]),</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="co">#             ScaleIntensityd(keys="image"),</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="co">#         ]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="419fe705" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># @register_task("classification")</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co"># class ClassificationTask(Task):</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     default_dataset = "monaidataset"</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     def transforms(self):</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="co">#         return [</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="co">#             LoadImaged(keys=["image"]),</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="co">#             EnsureChannelFirstd(keys=["image"]),</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="co">#             ScaleIntensityd(keys="image"),</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="co">#         ]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="main-dataloaders-creator" class="level3">
+<h3 class="anchored" data-anchor-id="main-dataloaders-creator">Main DataLoaders Creator</h3>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1251" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders">BioDataLoaders</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioDataLoaders(</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    loaders:VAR_POSITIONAL, <span class="co"># `DataLoader` objects to wrap</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span> <span class="op">|</span> Path<span class="op">=</span><span class="st">'.'</span>, <span class="co"># Path to store export objects</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    device:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Device to put `DataLoaders`</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Unified factory for building training, validation, and test DataLoaders.</em></p>
+<p>This class orchestrates the full pipeline: data → source → dataframe → dataset builder → loader</p>
+<p>It supports: - Task-based defaults (transforms, configs) - Multiple backends (fastai, MONAI, etc.) - Optional external validation datasets - Mode-based dataset construction (train / test)</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1434" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataloaders.create" class="level3">
+<h3 class="anchored" data-anchor-id="biodataloaders.create">BioDataLoaders.create</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create(</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    data, val_data:NoneType<span class="op">=</span><span class="va">None</span>, task:NoneType<span class="op">=</span><span class="va">None</span>, dataset:NoneType<span class="op">=</span><span class="va">None</span>, backend:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Build training + validation DataLoaders.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data</td>
+<td>Any</td>
+<td>—</td>
+<td>Training data</td>
+</tr>
+<tr class="even">
+<td>val_data</td>
+<td>Any</td>
+<td>None</td>
+<td>Optional validation data</td>
+</tr>
+<tr class="odd">
+<td>task</td>
+<td>str</td>
+<td>None</td>
+<td>Task name</td>
+</tr>
+<tr class="even">
+<td>dataset</td>
+<td>str</td>
+<td>None</td>
+<td>Dataset builder</td>
+</tr>
+<tr class="odd">
+<td>backend</td>
+<td>str</td>
+<td>None</td>
+<td>Loader backend</td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td>dict</td>
+<td>{}</td>
+<td>Additional parameters</td>
+</tr>
+</tbody>
+</table>
+<div id="4375d43d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_load_dataframe():</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">class</span> DummySource:</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data, <span class="op">**</span>kwargs):</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.data <span class="op">=</span> data</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> load(<span class="va">self</span>):</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="bu">list</span>(<span class="va">self</span>.data)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>    SOURCE_REGISTRY[<span class="st">"dummy"</span>] <span class="op">=</span> DummySource</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fake_detect_source(data):</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"dummy"</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>    BioDataLoaders._orig_detect_source <span class="op">=</span> detect_source</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">globals</span>()[<span class="st">"detect_source"</span>] <span class="op">=</span> fake_detect_source</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>        train_data <span class="op">=</span> [</span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"image"</span>: <span class="st">"a.png"</span>, <span class="st">"label"</span>: <span class="dv">0</span>},</span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"image"</span>: <span class="st">"b.png"</span>, <span class="st">"label"</span>: <span class="dv">1</span>},</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>        val_data <span class="op">=</span> [</span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"image"</span>: <span class="st">"c.png"</span>, <span class="st">"label"</span>: <span class="dv">0</span>},</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>        kwargs <span class="op">=</span> {<span class="st">"colmap"</span>: {}}</span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> BioDataLoaders._load_data(</span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a>            train_data,</span>
+<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a>            kwargs,</span>
+<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a>            val_data<span class="op">=</span>val_data</span>
+<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ---------------------------</span></span>
+<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># core invariants</span></span>
+<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ---------------------------</span></span>
+<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">isinstance</span>(data, <span class="bu">list</span>)</span>
+<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">len</span>(data) <span class="op">==</span> <span class="dv">3</span></span>
+<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># validity logic</span></span>
+<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> data[<span class="dv">0</span>][<span class="st">"is_valid"</span>] <span class="kw">is</span> <span class="va">False</span></span>
+<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> data[<span class="dv">1</span>][<span class="st">"is_valid"</span>] <span class="kw">is</span> <span class="va">False</span></span>
+<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> data[<span class="dv">2</span>][<span class="st">"is_valid"</span>] <span class="kw">is</span> <span class="va">True</span></span>
+<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># schema preservation</span></span>
+<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> d <span class="kw">in</span> data:</span>
+<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a>            <span class="cf">assert</span> <span class="bu">isinstance</span>(d, <span class="bu">dict</span>)</span>
+<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a>            <span class="cf">assert</span> <span class="st">"image"</span> <span class="kw">in</span> d</span>
+<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a>            <span class="cf">assert</span> <span class="st">"label"</span> <span class="kw">in</span> d</span>
+<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a>            <span class="cf">assert</span> <span class="st">"is_valid"</span> <span class="kw">in</span> d</span>
+<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"load_dataframe test passed"</span></span>
+<span id="cb43-56"><a href="#cb43-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-57"><a href="#cb43-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb43-58"><a href="#cb43-58" aria-hidden="true" tabindex="-1"></a>        <span class="bu">globals</span>()[<span class="st">"detect_source"</span>] <span class="op">=</span> BioDataLoaders._orig_detect_source</span>
+<span id="cb43-59"><a href="#cb43-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-60"><a href="#cb43-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-61"><a href="#cb43-61" aria-hidden="true" tabindex="-1"></a>test_eq(test_load_dataframe(), <span class="st">"load_dataframe test passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="biodataloaders-specialized-methods" class="level2">
+<h2 class="anchored" data-anchor-id="biodataloaders-specialized-methods">BioDataLoaders: specialized methods</h2>
+<p>The module offers classes to construct data blocks and data loaders, streamlining the preparation of datasets for machine learning models.</p>
+<p>The <strong>BioDataLoaders</strong> class is built on top of fastai’s DataLoaders class, and wraps various data loading methods as well as the use of BioImageBlock as TransformBlock</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1744" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="from_yaml" class="level3">
+<h3 class="anchored" data-anchor-id="from_yaml">from_yaml</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_yaml(</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    cls, data_source, yaml_path, show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from <code>yaml_path</code> where <code>yaml_path</code> is a yaml file</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1728" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="class_from_lists" class="level3">
+<h3 class="anchored" data-anchor-id="class_from_lists">class_from_lists</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> class_from_lists(</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    cls, path, fnames, labels, valid_pct:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, seed:<span class="bu">int</span><span class="op">=</span><span class="va">None</span>, y_block:NoneType<span class="op">=</span><span class="va">None</span>, item_tfms:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    batch_tfms:NoneType<span class="op">=</span><span class="va">None</span>, img_cls:MetaResolver<span class="op">=</span>BioImage, kwargs:VAR_KEYWORD</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from list of <code>fnames</code> and <code>labels</code> in <code>path</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1722" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="class_from_csv" class="level3">
+<h3 class="anchored" data-anchor-id="class_from_csv">class_from_csv</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> class_from_csv(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    cls, path, csv_fname:<span class="bu">str</span><span class="op">=</span><span class="st">'labels.csv'</span>, header:<span class="bu">str</span><span class="op">=</span><span class="st">'infer'</span>, delimiter:NoneType<span class="op">=</span><span class="va">None</span>, quoting:<span class="bu">int</span><span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from <code>path/csv_fname</code> using <code>fn_col</code> and <code>label_col</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1692" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="class_from_df" class="level3">
+<h3 class="anchored" data-anchor-id="class_from_df">class_from_df</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> class_from_df(</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    cls, df, path:<span class="bu">str</span><span class="op">=</span><span class="st">'.'</span>, valid_pct:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, seed:NoneType<span class="op">=</span><span class="va">None</span>, fn_col:<span class="bu">str</span><span class="op">=</span><span class="st">'filename'</span>, folder:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    suff:<span class="bu">str</span><span class="op">=</span><span class="st">''</span>, label_col:<span class="bu">str</span><span class="op">=</span><span class="st">'label'</span>, label_delim:NoneType<span class="op">=</span><span class="va">None</span>, y_block:NoneType<span class="op">=</span><span class="va">None</span>, valid_col:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    item_tfms:NoneType<span class="op">=</span><span class="va">None</span>, batch_tfms:NoneType<span class="op">=</span><span class="va">None</span>, img_cls:MetaResolver<span class="op">=</span>BioImage, kwargs:VAR_KEYWORD</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from <code>df</code> using <code>fn_col</code> and <code>label_col</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1687" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="class_from_path_re" class="level3">
+<h3 class="anchored" data-anchor-id="class_from_path_re">class_from_path_re</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> class_from_path_re(</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    cls, path, fnames, pat, kwargs:VAR_KEYWORD</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from list of <code>fnames</code> in <code>path</code>s with re expression <code>pat</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1673" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="class_from_path_func" class="level3">
+<h3 class="anchored" data-anchor-id="class_from_path_func">class_from_path_func</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> class_from_path_func(</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    cls, path, fnames, label_func, valid_pct:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, seed:NoneType<span class="op">=</span><span class="va">None</span>, item_tfms:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    batch_tfms:NoneType<span class="op">=</span><span class="va">None</span>, img_cls:MetaResolver<span class="op">=</span>BioImage, kwargs:VAR_KEYWORD</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from list of <code>fnames</code> in <code>path</code>s with <code>label_func</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1656" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="class_from_folder" class="level3">
+<h3 class="anchored" data-anchor-id="class_from_folder">class_from_folder</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> class_from_folder(</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    cls, path, train:<span class="bu">str</span><span class="op">=</span><span class="st">'train'</span>, valid:<span class="bu">str</span><span class="op">=</span><span class="st">'valid'</span>, valid_pct:NoneType<span class="op">=</span><span class="va">None</span>, seed:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    vocab:NoneType<span class="op">=</span><span class="va">None</span>, item_tfms:NoneType<span class="op">=</span><span class="va">None</span>, batch_tfms:NoneType<span class="op">=</span><span class="va">None</span>, img_cls:MetaResolver<span class="op">=</span>BioImage,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from dataset in <code>path</code> with <code>train</code> and <code>valid</code> subfolders (or provide <code>valid_pct</code>)</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1650" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="from_csv" class="level3">
+<h3 class="anchored" data-anchor-id="from_csv">from_csv</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_csv(</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    cls, path, csv_fname:<span class="bu">str</span><span class="op">=</span><span class="st">'train.csv'</span>, header:<span class="bu">str</span><span class="op">=</span><span class="st">'infer'</span>, delimiter:NoneType<span class="op">=</span><span class="va">None</span>, quoting:<span class="bu">int</span><span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from <code>path/csv_fname</code> using <code>fn_col</code> and <code>target_col</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1615" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="from_df" class="level3">
+<h3 class="anchored" data-anchor-id="from_df">from_df</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_df(</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>    cls, df, path:<span class="bu">str</span><span class="op">=</span><span class="st">'.'</span>, valid_pct:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, seed:NoneType<span class="op">=</span><span class="va">None</span>, fn_col:<span class="bu">int</span><span class="op">=</span><span class="dv">0</span>, folder:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    pref:NoneType<span class="op">=</span><span class="va">None</span>, suff:<span class="bu">str</span><span class="op">=</span><span class="st">''</span>, target_col:<span class="bu">int</span><span class="op">=</span><span class="dv">1</span>, target_folder:NoneType<span class="op">=</span><span class="va">None</span>, target_suff:<span class="bu">str</span><span class="op">=</span><span class="st">''</span>,</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    valid_col:NoneType<span class="op">=</span><span class="va">None</span>, item_tfms:NoneType<span class="op">=</span><span class="va">None</span>, batch_tfms:NoneType<span class="op">=</span><span class="va">None</span>, img_cls:MetaResolver<span class="op">=</span>BioImage,</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>    target_img_cls:MetaResolver<span class="op">=</span>BioImage, kwargs:VAR_KEYWORD</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from <code>df</code> using <code>fn_col</code> and <code>target_col</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1597" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="from_folder" class="level3">
+<h3 class="anchored" data-anchor-id="from_folder">from_folder</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_folder(</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    cls, path, get_target_fn, train:<span class="bu">str</span><span class="op">=</span><span class="st">'train'</span>, valid:<span class="bu">str</span><span class="op">=</span><span class="st">'valid'</span>, valid_pct:NoneType<span class="op">=</span><span class="va">None</span>, seed:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    item_tfms:NoneType<span class="op">=</span><span class="va">None</span>, batch_tfms:NoneType<span class="op">=</span><span class="va">None</span>, img_cls:MetaResolver<span class="op">=</span>BioImage,</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>    target_img_cls:MetaResolver<span class="op">=</span>BioImage, get_items:NoneType<span class="op">=</span><span class="va">None</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create from dataset in <code>path</code> with <code>train</code> and <code>valid</code> subfolders (or provide <code>valid_pct</code>)</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1562" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="from_source" class="level3">
+<h3 class="anchored" data-anchor-id="from_source">from_source</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_source(</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    cls,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    data_source, <span class="co"># The source of the data to be loaded by the dataloader. This can be any type that is compatible with the dataloading method specified in kwargs (e.g., paths, datasets).</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># If True, print a summary of the BioDataBlock after creation.</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create and return a DataLoader from a BioDataBlock using provided keyword arguments.</em></p>
+<p>Returns a DataLoader: A PyTorch DataLoader object populated with the data from the BioDataBlock. If show_summary is True, it also prints a summary of the datablock after creation.</p>
+</section>
+<section id="loading-monai-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="loading-monai-datasets">Loading Monai Datasets</h3>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1856" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="from_monai" class="level3">
+<h3 class="anchored" data-anchor-id="from_monai">from_monai</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_monai(</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    cls, train_ds, <span class="co"># MONAI training dataset</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    val_ds:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># MONAI validation dataset</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>    x_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, <span class="co"># Key(s) used as model inputs</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>    y_keys:<span class="bu">str</span><span class="op">=</span><span class="st">'label'</span>, <span class="co"># Key(s) used as targets</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>    bs:<span class="bu">int</span><span class="op">=</span><span class="dv">64</span>, <span class="co"># Training batch size</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>    val_bs:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Validation batch size (overrides automatic scaling)</span></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>    val_bs_factor:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Multiplier applied to bs when val_bs is None</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>    shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Shuffle training dataset</span></span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>    val_shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Shuffle validation dataset (defaults to False)</span></span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>    show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Print basic dataloader summary</span></span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>    vocab:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional class names for classification tasks</span></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>    dl_kwargs:VAR_KEYWORD</span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create fastai-compatible <code>DataLoaders</code> from MONAI dictionary datasets.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L1989" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="from_monai_ds" class="level3">
+<h3 class="anchored" data-anchor-id="from_monai_ds">from_monai_ds</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> from_monai_ds(</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    cls, dataset_cls, <span class="co"># MONAI dataset class (Dataset, CacheDataset, etc.)</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    train_data, <span class="co"># Training datalist</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    train_transform:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Training transform pipeline</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    val_data:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Optional validation datalist</span></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    val_transform:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Validation transforms</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>    dataset_kwargs:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Extra args for dataset constructor</span></span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>    val_dataset_kwargs:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Validation dataset overrides</span></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>    dl_kwargs:VAR_KEYWORD</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Build <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#biodataloaders"><code>BioDataLoaders</code></a> from any MONAI dataset class.</em></p>
+</section>
+</section>
+<section id="test-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="test-datasets">Test Datasets</h2>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/load.py#L2117" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="test_biodataloader" class="level3">
+<h3 class="anchored" data-anchor-id="test_biodataloader">test_biodataloader</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_biodataloader(</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    dls:DataLoaders, test_data:<span class="bu">str</span> <span class="op">|</span> pathlib.Path <span class="op">|</span> pandas.DataFrame <span class="op">|</span> monai.data.dataset.Dataset,</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>    with_labels:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, csv_header:<span class="bu">str</span><span class="op">=</span><span class="st">'infer'</span>, csv_delimiter:NoneType<span class="op">=</span><span class="va">None</span>, csv_quoting:<span class="bu">int</span><span class="op">=</span><span class="dv">0</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Test a <code>DataLoader</code> on a set of <code>test_files</code> and return the results as a list of tuples containing the file name and the corresponding input and target tensors.</em></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright © 2024 Biagio Mandracchia, MIT License</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

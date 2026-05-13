@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-480c2803ffe5ab5d6b0bfe6db136e446.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d5c81d1cbf0cd7cb9d71a6d332560fd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-895230afb54969f2597e9a5fd1967c6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-d5c81d1cbf0cd7cb9d71a6d332560fd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -449,8 +449,20 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./data.html" class="sidebar-item-text sidebar-link">
+  <a href="./data.core.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.load.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Loaders</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.tfms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Transformations</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -650,7 +662,6 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#fourier-ring-correlation-1" id="toc-fourier-ring-correlation-1" class="nav-link" data-scroll-target="#fourier-ring-correlation-1">Fourier ring correlation</a></li>
   </ul></li>
-  <li><a href="#get_fourier_ring_correlations" id="toc-get_fourier_ring_correlations" class="nav-link" data-scroll-target="#get_fourier_ring_correlations">get_fourier_ring_correlations</a></li>
   <li><a href="#frcmetric" id="toc-frcmetric" class="nav-link" data-scroll-target="#frcmetric">FRCMetric</a></li>
   </ul></li>
   </ul>
@@ -900,7 +911,7 @@ window.Quarto = {
 <section id="radial-mask" class="level4">
 <h4 class="anchored" data-anchor-id="radial-mask">Radial mask</h4>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/metrics.py#L445" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L71" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="radial_mask" class="level3">
 <h3 class="anchored" data-anchor-id="radial_mask">radial_mask</h3>
@@ -935,29 +946,14 @@ window.Quarto = {
 <p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/metrics.py#L508" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 </section>
-<section id="get_fourier_ring_correlations" class="level3">
-<h3 class="anchored" data-anchor-id="get_fourier_ring_correlations">get_fourier_ring_correlations</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_fourier_ring_correlations(</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    image1, <span class="co"># First input image</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    image2, <span class="co"># Second input image</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Compute Fourier Ring Correlation (FRC) between two images.</em></p>
-<p>Returns: tuple: A tuple containing: - torch.Tensor: Fourier Ring Correlation values. - torch.Tensor: Array of spatial frequencies.</p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/metrics.py#L576" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
 <section id="frcmetric" class="level3">
 <h3 class="anchored" data-anchor-id="frcmetric">FRCMetric</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FRCMetric(</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    image1, <span class="co"># First input image</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    image2, <span class="co"># Second input image</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Compute the area under the Fourier Ring Correlation (FRC) curve between two images.</em></p>
-<p>Returns: - float: The area under the FRC curve.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FRCMetric(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    image1, image2</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Metric derived from loss.</em></p>
 <hr>
 
 

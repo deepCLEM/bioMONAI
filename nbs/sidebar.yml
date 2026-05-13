@@ -4,7 +4,9 @@ website:
       - index.ipynb
       - 000_utils.ipynb
       - 010_io.ipynb
-      - 020_data.ipynb
+      - 021_data.core.ipynb
+      - 022_data.load.ipynb
+      - 023_data.tfms.ipynb
       - 030_transforms.ipynb
       - 040_losses.ipynb
       - 050_nets.ipynb

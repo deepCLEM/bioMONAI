@@ -56,9 +56,9 @@ website:
   sidebar:
     style: floating
     collapse-level: 1
-    logo: images/logo_bioMONAI_full.png
+    logo: images/logo_bioMONAI_full6.png
   page-footer:
-    left: "Copyright © 2024 Biagio Mandracchia, MIT License"
+    left: "Copyright © 2024 onward Biagio Mandracchia, MIT License"
     right:
       - icon: github
         href: https://github.com/deepCLEM/bioMONAI/

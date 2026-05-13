@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-480c2803ffe5ab5d6b0bfe6db136e446.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d5c81d1cbf0cd7cb9d71a6d332560fd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-895230afb54969f2597e9a5fd1967c6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-d5c81d1cbf0cd7cb9d71a6d332560fd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -112,10 +112,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <meta property="og:title" content="Loss functions – bioMONAI">
 <meta property="og:description" content="A set of custom loss functions">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/040_losses_files/figure-html/cell-10-output-2.png">
 <meta property="og:site_name" content="bioMONAI">
+<meta property="og:image:height" content="390">
+<meta property="og:image:width" content="590">
 <meta name="twitter:title" content="Loss functions – bioMONAI">
 <meta name="twitter:description" content="A set of custom loss functions">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/040_losses_files/figure-html/cell-10-output-2.png">
+<meta name="twitter:image-height" content="390">
+<meta name="twitter:image-width" content="590">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -400,8 +406,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./data.html" class="sidebar-item-text sidebar-link">
+  <a href="./data.core.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.load.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Loaders</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.tfms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Transformations</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -574,10 +592,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#mseloss" id="toc-mseloss" class="nav-link active" data-scroll-target="#mseloss">MSELoss</a></li>
+  <li><a href="#reconstruction-losses" id="toc-reconstruction-losses" class="nav-link active" data-scroll-target="#reconstruction-losses">Reconstruction losses</a>
+  <ul>
+  <li><a href="#mseloss" id="toc-mseloss" class="nav-link" data-scroll-target="#mseloss">MSELoss</a></li>
   <li><a href="#l1loss" id="toc-l1loss" class="nav-link" data-scroll-target="#l1loss">L1Loss</a></li>
   <li><a href="#ssimloss" id="toc-ssimloss" class="nav-link" data-scroll-target="#ssimloss">SSIMLoss</a></li>
-  <li><a href="#combined-losses" id="toc-combined-losses" class="nav-link" data-scroll-target="#combined-losses">Combined Losses</a></li>
+  <li><a href="#perceptualloss" id="toc-perceptualloss" class="nav-link" data-scroll-target="#perceptualloss">PerceptualLoss</a></li>
+  <li><a href="#fourier-ring-correlation" id="toc-fourier-ring-correlation" class="nav-link" data-scroll-target="#fourier-ring-correlation">Fourier Ring Correlation</a></li>
+  <li><a href="#radial_mask" id="toc-radial_mask" class="nav-link" data-scroll-target="#radial_mask">radial_mask</a></li>
+  <li><a href="#get_fourier_ring_correlations" id="toc-get_fourier_ring_correlations" class="nav-link" data-scroll-target="#get_fourier_ring_correlations">get_fourier_ring_correlations</a></li>
+  <li><a href="#fcrcutoff" id="toc-fcrcutoff" class="nav-link" data-scroll-target="#fcrcutoff">FCRCutoff</a></li>
+  <li><a href="#frcloss" id="toc-frcloss" class="nav-link" data-scroll-target="#frcloss">FRCLoss</a></li>
+  </ul></li>
+  <li><a href="#combined-losses" id="toc-combined-losses" class="nav-link" data-scroll-target="#combined-losses">Combined Losses</a>
+  <ul>
   <li><a href="#combinedloss" id="toc-combinedloss" class="nav-link" data-scroll-target="#combinedloss">CombinedLoss</a></li>
   <li><a href="#msssimloss" id="toc-msssimloss" class="nav-link" data-scroll-target="#msssimloss">MSSSIMLoss</a></li>
   <li><a href="#msssiml1loss" id="toc-msssiml1loss" class="nav-link" data-scroll-target="#msssiml1loss">MSSSIML1Loss</a></li>
@@ -585,14 +613,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#cellloss" id="toc-cellloss" class="nav-link" data-scroll-target="#cellloss">CellLoss</a></li>
   <li><a href="#instancesegloss" id="toc-instancesegloss" class="nav-link" data-scroll-target="#instancesegloss">InstanceSegLoss</a></li>
   <li><a href="#dicebceloss" id="toc-dicebceloss" class="nav-link" data-scroll-target="#dicebceloss">DiceBCELoss</a></li>
-  <li><a href="#crossentropy-and-dice-loss" id="toc-crossentropy-and-dice-loss" class="nav-link" data-scroll-target="#crossentropy-and-dice-loss">CrossEntropy and Dice Loss</a></li>
+  </ul></li>
+  <li><a href="#segmentation-losses" id="toc-segmentation-losses" class="nav-link" data-scroll-target="#segmentation-losses">Segmentation losses</a>
+  <ul>
   <li><a href="#activation" id="toc-activation" class="nav-link" data-scroll-target="#activation">activation</a></li>
   <li><a href="#crossentropylossflat3d" id="toc-crossentropylossflat3d" class="nav-link" data-scroll-target="#crossentropylossflat3d">CrossEntropyLossFlat3D</a></li>
   <li><a href="#bceloss" id="toc-bceloss" class="nav-link" data-scroll-target="#bceloss">BCELoss</a></li>
   <li><a href="#diceloss" id="toc-diceloss" class="nav-link" data-scroll-target="#diceloss">DiceLoss</a></li>
-  <li><a href="#fourier-ring-correlation" id="toc-fourier-ring-correlation" class="nav-link" data-scroll-target="#fourier-ring-correlation">Fourier Ring Correlation</a></li>
-  <li><a href="#frcloss" id="toc-frcloss" class="nav-link" data-scroll-target="#frcloss">FRCLoss</a></li>
-  <li><a href="#fcrcutoff" id="toc-fcrcutoff" class="nav-link" data-scroll-target="#fcrcutoff">FCRCutoff</a></li>
+  </ul></li>
+  <li><a href="#registration-losses" id="toc-registration-losses" class="nav-link" data-scroll-target="#registration-losses">Registration losses</a>
+  <ul>
+  <li><a href="#bendingenergyloss" id="toc-bendingenergyloss" class="nav-link" data-scroll-target="#bendingenergyloss">BendingEnergyLoss</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -625,8 +657,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="reconstruction-losses" class="level2">
+<h2 class="anchored" data-anchor-id="reconstruction-losses">Reconstruction losses</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L49" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="mseloss" class="level3">
 <h3 class="anchored" data-anchor-id="mseloss">MSELoss</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -635,7 +669,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Tensor:</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L58" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L57" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="l1loss" class="level3">
 <h3 class="anchored" data-anchor-id="l1loss">L1Loss</h3>
@@ -657,132 +691,260 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><em>Compute the loss function based on the Structural Similarity Index Measure (SSIM) Metric.</em></p>
 <p>For more info, visit https://vicuesoft.com/glossary/term/ssim-ms-ssim/</p>
 <p>SSIM reference paper: Wang, Zhou, et al.&nbsp;“Image quality assessment: from error visibility to structural similarity.” IEEE transactions on image processing 13.4 (2004): 600-612.</p>
-</section>
-<section id="combined-losses" class="level3">
-<h3 class="anchored" data-anchor-id="combined-losses">Combined Losses</h3>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L66" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="combinedloss" class="level3">
-<h3 class="anchored" data-anchor-id="combinedloss">CombinedLoss</h3>
+<section id="perceptualloss" class="level3">
+<h3 class="anchored" data-anchor-id="perceptualloss">PerceptualLoss</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CombinedLoss(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions (2 for 2D images, 3 for 3D images)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    mse_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">0.33</span>, <span class="co"># Weight for the MSE loss component</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    mae_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">0.33</span>, <span class="co"># Weight for the MAE loss component</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> PerceptualLoss(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span>, network_type:<span class="bu">str</span><span class="op">=</span>alex, is_fake_3d:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, fake_3d_ratio:<span class="bu">float</span><span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    cache_dir:<span class="bu">str</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, pretrained:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, pretrained_path:<span class="bu">str</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    pretrained_state_dict_key:<span class="bu">str</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, channel_wise:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Perceptual loss using features from pretrained deep neural networks trained. The function supports networks</em> pretrained on: ImageNet that use the LPIPS approach from Zhang, et al.&nbsp;“The unreasonable effectiveness of deep features as a perceptual metric.” https://arxiv.org/abs/1801.03924 ; RadImagenet from Mei, et al.&nbsp;“RadImageNet: An Open Radiologic Deep Learning Research Dataset for Effective Transfer Learning” https://pubs.rsna.org/doi/full/10.1148/ryai.210315 ; MedicalNet from Chen et al.&nbsp;“Med3D: Transfer Learning for 3D Medical Image Analysis” https://arxiv.org/abs/1904.00625 ; and ResNet50 from Torchvision: https://pytorch.org/vision/main/models/generated/torchvision.models.resnet50.html .</p>
+<p>The fake 3D implementation is based on a 2.5D approach where we calculate the 2D perceptual loss on slices from all three axes and average. The full 3D approach uses a 3D network to calculate the perceptual loss. MedicalNet networks are only compatible with 3D inputs and support channel-wise loss.</p>
+<p>Args: spatial_dims: number of spatial dimensions. network_type: {<code>"alex"</code>, <code>"vgg"</code>, <code>"squeeze"</code>, <code>"radimagenet_resnet50"</code>, <code>"medicalnet_resnet10_23datasets"</code>, <code>"medicalnet_resnet50_23datasets"</code>, <code>"resnet50"</code>} Specifies the network architecture to use. Defaults to <code>"alex"</code>. is_fake_3d: if True use 2.5D approach for a 3D perceptual loss. fake_3d_ratio: ratio of how many slices per axis are used in the 2.5D approach. cache_dir: path to cache directory to save the pretrained network weights. pretrained: whether to load pretrained weights. This argument only works when using networks from LIPIS or Torchvision. Defaults to <code>"True"</code>. pretrained_path: if <code>pretrained</code> is <code>True</code>, users can specify a weights file to be loaded via using this argument. This argument only works when <code>"network_type"</code> is “resnet50”. Defaults to <code>None</code>. pretrained_state_dict_key: if <code>pretrained_path</code> is not <code>None</code>, this argument is used to extract the expected state dict. This argument only works when <code>"network_type"</code> is “resnet50”. Defaults to <code>None</code>. channel_wise: if True, the loss is returned per channel. Otherwise the loss is averaged over the channels. Defaults to <code>False</code>.</p>
+</section>
+<section id="fourier-ring-correlation" class="level3">
+<h3 class="anchored" data-anchor-id="fourier-ring-correlation">Fourier Ring Correlation</h3>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L71" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="radial_mask" class="level3">
+<h3 class="anchored" data-anchor-id="radial_mask">radial_mask</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> radial_mask(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    r, cx, cy, sx, sy, delta:<span class="bu">int</span><span class="op">=</span><span class="dv">1</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Create a radial ring mask.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L89" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_fourier_ring_correlations" class="level3">
+<h3 class="anchored" data-anchor-id="get_fourier_ring_correlations">get_fourier_ring_correlations</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_fourier_ring_correlations(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    image1, image2</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Compute Fourier Ring Correlation curve.</em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L146" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="fcrcutoff" class="level3">
+<h3 class="anchored" data-anchor-id="fcrcutoff">FCRCutoff</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FCRCutoff(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    image1, image2, threshold:<span class="bu">float</span><span class="op">=</span><span class="fl">0.14285714285714285</span>, plot:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Frequency where FRC drops below a threshold.</em></p>
+<p>Args: image1: First input image.</p>
+<pre><code>image2:
+    Second input image.
+
+threshold:
+    FRC cutoff threshold.
+
+plot:
+    If True, plots the FRC curve and cutoff point.</code></pre>
+<p>Returns: float: Cutoff frequency.</p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L220" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="frcloss" class="level3">
+<h3 class="anchored" data-anchor-id="frcloss">FRCLoss</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FRCLoss(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    image1, image2</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>FRC loss defined as:</em> 1 - mean correlation over frequencies</p>
+<div id="61cceca0" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_frc():</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Simple sanity test for FRC + FRCLoss.</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Create synthetic images</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    size <span class="op">=</span> <span class="dv">128</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> torch.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, size)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> torch.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, size)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    xx, yy <span class="op">=</span> torch.meshgrid(x, y, indexing<span class="op">=</span><span class="st">"xy"</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Base image: smooth Gaussian</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    img1 <span class="op">=</span> torch.exp(<span class="op">-</span>(xx<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> yy<span class="op">**</span><span class="dv">2</span>))</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Slightly degraded version (blur + noise)</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    noise <span class="op">=</span> <span class="fl">0.05</span> <span class="op">*</span> torch.randn_like(img1)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    img2 <span class="op">=</span> torch.exp(<span class="op">-</span>(xx<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> yy<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> <span class="fl">1.2</span>) <span class="op">+</span> noise</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    img1 <span class="op">=</span> img1.<span class="bu">float</span>()</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    img2 <span class="op">=</span> img2.<span class="bu">float</span>()</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Compute FRC</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    frc, freq <span class="op">=</span> get_fourier_ring_correlations(img1, img2)</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Compute loss</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    loss <span class="op">=</span> FRCLoss(img1, img2)</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"FRC Loss: </span><span class="sc">{</span>loss<span class="sc">.</span>item()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    test_eq(loss, <span class="fl">1.0</span> <span class="op">-</span> frc.mean())</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. Plot</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---------------------------------</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>    FCRCutoff(img1, img2, threshold<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">7</span>, plot<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Run test</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>test_frc()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>FRC Loss: 0.8165</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="040_losses_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="combined-losses" class="level2">
+<h2 class="anchored" data-anchor-id="combined-losses">Combined Losses</h2>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L232" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="combinedloss" class="level3">
+<h3 class="anchored" data-anchor-id="combinedloss">CombinedLoss</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CombinedLoss(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions (2 for 2D images, 3 for 3D images)</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    mse_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">0.33</span>, <span class="co"># Weight for the MSE loss component</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    mae_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">0.33</span>, <span class="co"># Weight for the MAE loss component</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>CombinedLoss computes a weighted combination of SSIM, MSE, and MAE losses.</em></p>
 <p>This class allows for the combination of three different loss functions: Structural Similarity Index (SSIM), Mean Squared Error (MSE), and Mean Absolute Error (MAE). The weights for MSE and MAE can be adjusted, and the weight for SSIM is automatically calculated as the remaining weight.</p>
 <p>CombinedLoss reference paper: Shah, Z. H., Müller, M., Hammer, B., Huser, T., &amp; Schenck, W. (2022, July). Impact of different loss functions on denoising of microscopic images. In 2022 International Joint Conference on Neural Networks (IJCNN) (pp.&nbsp;1-10). IEEE.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L97" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L263" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="msssimloss" class="level3">
 <h3 class="anchored" data-anchor-id="msssimloss">MSSSIMLoss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MSSSIMLoss(</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions (2 for 2D images, 3 for 3D images).</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    window_size:<span class="bu">int</span><span class="op">=</span><span class="dv">8</span>, <span class="co"># Size of the Gaussian filter for SSIM.</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    sigma:<span class="bu">float</span><span class="op">=</span><span class="fl">1.5</span>, <span class="co"># Standard deviation of the Gaussian filter.</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>, <span class="co"># Specifies the reduction to apply to the output ('mean', 'sum', or 'none').</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    levels:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span>, <span class="co"># Number of scales to use for MS-SSIM.</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    weights:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Weights to apply to each scale. If None, default values are used.</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MSSSIMLoss(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions (2 for 2D images, 3 for 3D images).</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    window_size:<span class="bu">int</span><span class="op">=</span><span class="dv">8</span>, <span class="co"># Size of the Gaussian filter for SSIM.</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    sigma:<span class="bu">float</span><span class="op">=</span><span class="fl">1.5</span>, <span class="co"># Standard deviation of the Gaussian filter.</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>, <span class="co"># Specifies the reduction to apply to the output ('mean', 'sum', or 'none').</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    levels:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span>, <span class="co"># Number of scales to use for MS-SSIM.</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    weights:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Weights to apply to each scale. If None, default values are used.</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Multi-Scale Structural Similarity (MSSSIM) Loss using MONAI’s SSIMLoss as the base.</em></p>
 <div id="0801f13b" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test MSSSIMLoss &amp; SSIMLoss</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>batch_size, channels, height, width <span class="op">=</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>input_tensor <span class="op">=</span> torch.randn(batch_size, channels, height, width)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>target_tensor <span class="op">=</span> torch.randn(batch_size, channels, height, width)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>msssim_loss <span class="op">=</span> MSSSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>, levels<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ssim_loss <span class="op">=</span> SSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>loss_msssim <span class="op">=</span> msssim_loss(input_tensor, target_tensor)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>loss_ssim <span class="op">=</span> ssim_loss(input_tensor, target_tensor)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Both should return scalar tensors</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>test_is(loss_msssim.dim(), <span class="dv">0</span>) <span class="co"># MS-SSIM loss should return a scalar</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>test_is(loss_ssim.dim(), <span class="dv">0</span>) <span class="co">#SSIM loss should return a scalar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test MSSSIMLoss &amp; SSIMLoss</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>batch_size, channels, height, width <span class="op">=</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>input_tensor <span class="op">=</span> torch.randn(batch_size, channels, height, width)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>target_tensor <span class="op">=</span> torch.randn(batch_size, channels, height, width)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>msssim_loss <span class="op">=</span> MSSSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>, levels<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>ssim_loss <span class="op">=</span> SSIMLoss(spatial_dims<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>loss_msssim <span class="op">=</span> msssim_loss(input_tensor, target_tensor)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>loss_ssim <span class="op">=</span> ssim_loss(input_tensor, target_tensor)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Both should return scalar tensors</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>test_is(loss_msssim.dim(), <span class="dv">0</span>) <span class="co"># MS-SSIM loss should return a scalar</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>test_is(loss_ssim.dim(), <span class="dv">0</span>) <span class="co">#SSIM loss should return a scalar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L154" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L320" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="msssiml1loss" class="level3">
 <h3 class="anchored" data-anchor-id="msssiml1loss">MSSSIML1Loss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MSSSIML1Loss(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions.</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    alpha:<span class="bu">float</span><span class="op">=</span><span class="fl">0.025</span>, <span class="co"># Weighting factor between MS-SSIM and L1 loss.</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    window_size:<span class="bu">int</span><span class="op">=</span><span class="dv">8</span>, <span class="co"># Size of the Gaussian filter for SSIM.</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    sigma:<span class="bu">float</span><span class="op">=</span><span class="fl">1.5</span>, <span class="co"># Standard deviation of the Gaussian filter.</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>, <span class="co"># Specifies the reduction to apply to the output ('mean', 'sum', or 'none').</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    levels:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span>, <span class="co"># Number of scales to use for MS-SSIM.</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    weights:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Weights to apply to each scale. If None, default values are used.</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MSSSIML1Loss(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions.</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    alpha:<span class="bu">float</span><span class="op">=</span><span class="fl">0.025</span>, <span class="co"># Weighting factor between MS-SSIM and L1 loss.</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    window_size:<span class="bu">int</span><span class="op">=</span><span class="dv">8</span>, <span class="co"># Size of the Gaussian filter for SSIM.</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    sigma:<span class="bu">float</span><span class="op">=</span><span class="fl">1.5</span>, <span class="co"># Standard deviation of the Gaussian filter.</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>, <span class="co"># Specifies the reduction to apply to the output ('mean', 'sum', or 'none').</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    levels:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span>, <span class="co"># Number of scales to use for MS-SSIM.</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    weights:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Weights to apply to each scale. If None, default values are used.</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Multi-Scale Structural Similarity (MSSSIM) with Gaussian-weighted L1 Loss.</em></p>
 <p>Reference paper: Zhao, H., Gallo, O., Frosio, I., &amp; Kautz, J. (2016). Loss functions for image restoration with neural networks. IEEE Transactions on computational imaging, 3(1), 47-57.</p>
 <div id="10417fd8" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>msssiml1_loss <span class="op">=</span> MSSSIML1Loss(alpha<span class="op">=</span><span class="fl">0.025</span>, window_size<span class="op">=</span><span class="dv">11</span>, sigma<span class="op">=</span><span class="fl">1.5</span>, levels<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>input_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)  <span class="co"># Batch of 4 grayscale images (1 channel)</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>target_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute MSSSIM + Gaussian-weighted L1 loss</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssiml1_loss(input_image, target_image)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>loss2 <span class="op">=</span> ssim_loss(input_image, target_image)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ms-ssim: "</span>, loss, <span class="st">'</span><span class="ch">\n</span><span class="st">ssim: '</span>, loss2)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>test_is(loss.dim(), <span class="dv">0</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>test_is(loss2.dim(), <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>msssiml1_loss <span class="op">=</span> MSSSIML1Loss(alpha<span class="op">=</span><span class="fl">0.025</span>, window_size<span class="op">=</span><span class="dv">11</span>, sigma<span class="op">=</span><span class="fl">1.5</span>, levels<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>input_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)  <span class="co"># Batch of 4 grayscale images (1 channel)</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>target_image <span class="op">=</span> torch.randn(<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">128</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute MSSSIM + Gaussian-weighted L1 loss</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssiml1_loss(input_image, target_image)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>loss2 <span class="op">=</span> ssim_loss(input_image, target_image)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ms-ssim: "</span>, loss, <span class="st">'</span><span class="ch">\n</span><span class="st">ssim: '</span>, loss2)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>test_is(loss.dim(), <span class="dv">0</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>test_is(loss2.dim(), <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>ms-ssim:  tensor(0.0248) 
-ssim:  tensor(0.9930)</code></pre>
+<pre><code>ms-ssim:  tensor(0.0247) 
+ssim:  tensor(0.9954)</code></pre>
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L244" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L410" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="msssiml2loss" class="level3">
 <h3 class="anchored" data-anchor-id="msssiml2loss">MSSSIML2Loss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MSSSIML2Loss(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions.</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    alpha:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>, <span class="co"># Weighting factor between MS-SSIM and L2 loss.</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    window_size:<span class="bu">int</span><span class="op">=</span><span class="dv">11</span>, <span class="co"># Size of the Gaussian window for SSIM.</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    sigma:<span class="bu">float</span><span class="op">=</span><span class="fl">1.5</span>, <span class="co"># Standard deviation of the Gaussian.</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>, <span class="co"># Specifies the reduction to apply to the output ('mean', 'sum', or 'none').</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    levels:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span>, <span class="co"># Number of scales to use for MS-SSIM.</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    weights:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Weights to apply to each scale. If None, default values are used.</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> MSSSIML2Loss(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions.</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    alpha:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>, <span class="co"># Weighting factor between MS-SSIM and L2 loss.</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    window_size:<span class="bu">int</span><span class="op">=</span><span class="dv">11</span>, <span class="co"># Size of the Gaussian window for SSIM.</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    sigma:<span class="bu">float</span><span class="op">=</span><span class="fl">1.5</span>, <span class="co"># Standard deviation of the Gaussian.</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>, <span class="co"># Specifies the reduction to apply to the output ('mean', 'sum', or 'none').</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    levels:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span>, <span class="co"># Number of scales to use for MS-SSIM.</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    weights:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># Weights to apply to each scale. If None, default values are used.</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Multi-Scale Structural Similarity (MSSSIM) with Gaussian-weighted L2 Loss.</em></p>
 <p>Reference paper: Zhao, H., Gallo, O., Frosio, I., &amp; Kautz, J. (2016). Loss functions for image restoration with neural networks. IEEE Transactions on computational imaging, 3(1), 47-57.</p>
 <div id="e786e8d2" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>msssim_l2_loss <span class="op">=</span> MSSSIML2Loss()</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> torch.device(<span class="st">'cuda'</span> <span class="cf">if</span> torch.cuda.is_available() <span class="cf">else</span> <span class="st">'cpu'</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).to(device)  <span class="co"># Example output with even dimensions</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).to(device)  <span class="co"># Example target with even dimensions</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssim_l2_loss(output, target)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(loss)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>test_is(loss.dim(), <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>msssim_l2_loss <span class="op">=</span> MSSSIML2Loss()</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> torch.device(<span class="st">'cuda'</span> <span class="cf">if</span> torch.cuda.is_available() <span class="cf">else</span> <span class="st">'cpu'</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).to(device)  <span class="co"># Example output with even dimensions</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> torch.rand(<span class="dv">10</span>, <span class="dv">3</span>, <span class="dv">64</span>, <span class="dv">64</span>).to(device)  <span class="co"># Example target with even dimensions</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> msssim_l2_loss(output, target)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(loss)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>test_is(loss.dim(), <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tensor(0.0944, device='cuda:0')</code></pre>
+<pre><code>tensor(0.0935, device='cuda:0')</code></pre>
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L333" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L499" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="cellloss" class="level3">
 <h3 class="anchored" data-anchor-id="cellloss">CellLoss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CellLoss(</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CellLoss(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Combined classification and regression loss for cell prediction tasks.</em></p>
 <p>The first column of <code>pred</code>/<code>targ</code> is treated as a binary classification logit (cell presence), while the remaining columns are treated as continuous regression targets.</p>
 <p>The total loss is computed as:</p>
@@ -791,18 +953,18 @@ BCEWithLogitsLoss(pred[:, 0], targ[:, 0])</code></pre>
 <p>Attributes: MSE_loss (nn.MSELoss): Mean squared error loss for regression targets. BCE_loss (nn.BCEWithLogitsLoss): Binary cross-entropy loss with logits for cell presence prediction.</p>
 <p>Reference paper: Stringer, C., Wang, T., Michaelos, M., &amp; Pachitariu, M. (2021). Cellpose: a generalist algorithm for cellular segmentation. Nature methods, 18(1), 100-106.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L372" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L538" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="instancesegloss" class="level3">
 <h3 class="anchored" data-anchor-id="instancesegloss">InstanceSegLoss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> InstanceSegLoss(</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    mse_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">0.5</span>, <span class="co"># Weight applied to the MSE component</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    ssim_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">1.0</span>, <span class="co"># Weight applied to the SSIM component</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions (2 for 2D, 3 for 3D)</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    logits:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether to apply sigmoid to logits before computing loss</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> InstanceSegLoss(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    mse_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">0.5</span>, <span class="co"># Weight applied to the MSE component</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    ssim_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">1.0</span>, <span class="co"># Weight applied to the SSIM component</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    spatial_dims:<span class="bu">int</span><span class="op">=</span><span class="dv">2</span>, <span class="co"># Number of spatial dimensions (2 for 2D, 3 for 3D)</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    logits:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether to apply sigmoid to logits before computing loss</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Combined Binary Cross-Entropy and Mean Squared Error loss</em> for multi-channel instance segmentation tasks.</p>
 <p>All channels of <code>pred</code>/<code>targ</code> are treated as independent binary instance masks. Each channel represents one object instance.</p>
 <p>The total loss is computed as:</p>
@@ -813,16 +975,16 @@ ssim_weight * SSIMLoss(pred, targ)</code></pre>
 <p>Attributes: BCE_loss (nn.BCEWithLogitsLoss): Binary cross-entropy loss with logits. MSE_loss (nn.MSELoss): Mean squared error loss applied to probabilities. mse_weight (float): Weight applied to the MSE component.</p>
 <p>This is a variation on CellLoss proposed in: Stringer, C., Wang, T., Michaelos, M., &amp; Pachitariu, M. (2021). Cellpose: a generalist algorithm for cellular segmentation. Nature methods, 18(1), 100-106.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L433" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L599" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dicebceloss" class="level3">
 <h3 class="anchored" data-anchor-id="dicebceloss">DiceBCELoss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DiceBCELoss(</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    dice_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">1.0</span>, <span class="co"># Weight applied to Dice component</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    smooth:<span class="bu">float</span><span class="op">=</span><span class="fl">1e-06</span>, <span class="co"># Smoothing constant for Dice stability</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DiceBCELoss(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    dice_weight:<span class="bu">float</span><span class="op">=</span><span class="fl">1.0</span>, <span class="co"># Weight applied to Dice component</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    smooth:<span class="bu">float</span><span class="op">=</span><span class="fl">1e-06</span>, <span class="co"># Smoothing constant for Dice stability</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Hybrid Binary Cross-Entropy + Dice loss for multi-channel instance segmentation.</em></p>
 <p>All channels of <code>pred</code>/<code>targ</code> are treated as independent binary instance masks. Each channel represents one object instance.</p>
 <p>The total loss is computed as:</p>
@@ -833,43 +995,60 @@ dice_weight * DiceLoss(sigmoid(pred), targ)</code></pre>
 <p>This formulation improves stability (BCE) while directly optimizing overlap quality (Dice), which is particularly beneficial for imbalanced foreground/background segmentation tasks.</p>
 <p>Attributes: BCE_loss (nn.BCEWithLogitsLoss): Binary cross-entropy loss with logits. dice_weight (float): Weight applied to the Dice loss component. smooth (float): Smoothing constant to avoid division by zero.</p>
 </section>
-<section id="crossentropy-and-dice-loss" class="level3">
-<h3 class="anchored" data-anchor-id="crossentropy-and-dice-loss">CrossEntropy and Dice Loss</h3>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L490" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
+<section id="segmentation-losses" class="level2">
+<h2 class="anchored" data-anchor-id="segmentation-losses">Segmentation losses</h2>
+<div id="f9437987" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>DiceLoss <span class="op">=</span> ml.DiceLoss</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>MaskedDiceLoss <span class="op">=</span> ml.MaskedDiceLoss</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>GeneralizedDiceLoss <span class="op">=</span> ml.GeneralizedDiceLoss</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>GeneralizedWassersteinDiceLoss <span class="op">=</span> ml.GeneralizedWassersteinDiceLoss</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>DiceCELoss <span class="op">=</span> ml.DiceCELoss</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>DiceFocalLoss <span class="op">=</span> ml.DiceFocalLoss</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>GeneralizedDiceFocalLoss <span class="op">=</span> ml.GeneralizedDiceFocalLoss</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>FocalLoss <span class="op">=</span> ml.FocalLoss</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>TverskyLoss <span class="op">=</span> ml.TverskyLoss</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>ContrastiveLoss <span class="op">=</span> ml.ContrastiveLoss</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L656" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="activation" class="level3">
 <h3 class="anchored" data-anchor-id="activation">activation</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> activation(</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    x</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> activation(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    x</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L494" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L660" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="crossentropylossflat3d" class="level3">
 <h3 class="anchored" data-anchor-id="crossentropylossflat3d">CrossEntropyLossFlat3D</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CrossEntropyLossFlat3D(</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    args:VAR_POSITIONAL, axis:<span class="bu">int</span><span class="op">=-</span><span class="dv">1</span>, <span class="co"># Class axis</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    weight:NoneType<span class="op">=</span><span class="va">None</span>, ignore_index:<span class="bu">int</span><span class="op">=-</span><span class="dv">100</span>, reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    flatten:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Flatten `inp` and `targ` before calculating loss</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    floatify:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Convert `targ` to `float`</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    is_2d:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether `flatten` keeps one or two channels when applied</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CrossEntropyLossFlat3D(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    args:VAR_POSITIONAL, axis:<span class="bu">int</span><span class="op">=-</span><span class="dv">1</span>, <span class="co"># Class axis</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    weight:NoneType<span class="op">=</span><span class="va">None</span>, ignore_index:<span class="bu">int</span><span class="op">=-</span><span class="dv">100</span>, reduction:<span class="bu">str</span><span class="op">=</span><span class="st">'mean'</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    flatten:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Flatten `inp` and `targ` before calculating loss</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    floatify:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Convert `targ` to `float`</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    is_2d:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether `flatten` keeps one or two channels when applied</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Same as <code>nn.CrossEntropyLoss</code>, but flattens input and target for 3D inputs.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L510" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L676" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bceloss" class="level3">
 <h3 class="anchored" data-anchor-id="bceloss">BCELoss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BCELoss(</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BCELoss(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Multi-channel binary instance segmentation loss.</em></p>
 <p>All channels of <code>pred</code>/<code>targ</code> are treated as independent binary instance masks. Each channel represents one object instance and is trained using Binary Cross-Entropy with Logits.</p>
 <p>The total loss is computed as:</p>
@@ -877,70 +1056,57 @@ dice_weight * DiceLoss(sigmoid(pred), targ)</code></pre>
 <p>This formulation is appropriate for multi-label instance segmentation where instances may overlap and predictions are raw logits.</p>
 <p>Attributes: BCE_loss (nn.BCEWithLogitsLoss): Binary cross-entropy loss with logits applied independently across all channels and pixels.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L542" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L708" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="diceloss" class="level3">
 <h3 class="anchored" data-anchor-id="diceloss">DiceLoss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DiceLoss(</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    smooth:<span class="bu">int</span><span class="op">=</span><span class="dv">1</span>, <span class="co"># Smoothing factor to avoid division by zero</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DiceLoss(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    smooth:<span class="bu">int</span><span class="op">=</span><span class="dv">1</span>, <span class="co"># Smoothing factor to avoid division by zero</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>DiceLoss computes the Sørensen–Dice coefficient loss, which is often used </em> for evaluating the performance of image segmentation algorithms.</p>
 <p>The Dice coefficient is a measure of overlap between two samples. It ranges from 0 (no overlap) to 1 (perfect overlap). The Dice loss is computed as 1 - Dice coefficient, so it ranges from 1 (no overlap) to 0 (perfect overlap).</p>
 <p>Attributes: smooth (float): A smoothing factor to avoid division by zero and ensure numerical stability.</p>
 <p>Methods: forward(inputs, targets): Computes the Dice loss between the predicted probabilities (inputs) and the ground truth (targets).</p>
 <div id="51c3d2e0" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inputs and targets must be equally dimensional tensors</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> randn, randint</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inputs and targets must be equally dimensional tensors</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> randn, randint</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="785f1269" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> randn((<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>))  <span class="co"># Input</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>targets <span class="op">=</span> randint(<span class="dv">0</span>, <span class="dv">2</span>, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>)).<span class="bu">float</span>()  <span class="co"># Ground Truth</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>dice_loss <span class="op">=</span> DiceLoss()</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute loss</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> dice_loss(inputs, targets)</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Dice Loss:'</span>, loss.item())</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>test_is(loss.dim(), <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> randn((<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>))  <span class="co"># Input</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>targets <span class="op">=</span> randint(<span class="dv">0</span>, <span class="dv">2</span>, (<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">256</span>, <span class="dv">256</span>)).<span class="bu">float</span>()  <span class="co"># Ground Truth</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>dice_loss <span class="op">=</span> DiceLoss()</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute loss</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> dice_loss(inputs, targets)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Dice Loss:'</span>, loss.item())</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>test_is(loss.dim(), <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Dice Loss: 0.49867671728134155</code></pre>
+<pre><code>Dice Loss: 0.49998021125793457</code></pre>
 </div>
 </div>
 </section>
-<section id="fourier-ring-correlation" class="level3">
-<h3 class="anchored" data-anchor-id="fourier-ring-correlation">Fourier Ring Correlation</h3>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L592" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="frcloss" class="level3">
-<h3 class="anchored" data-anchor-id="frcloss">FRCLoss</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FRCLoss(</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    image1, <span class="co"># The first input image.</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    image2, <span class="co"># The second input image.</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Compute the Fourier Ring Correlation (FRC) loss between two images.</em></p>
-<p>Returns: - torch.Tensor: The FRC loss.</p>
+<section id="registration-losses" class="level2">
+<h2 class="anchored" data-anchor-id="registration-losses">Registration losses</h2>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/losses.py#L607" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="fcrcutoff" class="level3">
-<h3 class="anchored" data-anchor-id="fcrcutoff">FCRCutoff</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FCRCutoff(</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    image1, <span class="co"># The first input image.</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    image2, <span class="co"># The second input image.</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Calculate the cutoff frequency at when Fourier ring correlation drops to 1/7.</em></p>
-<p>Returns: - float: The cutoff frequency.</p>
+<section id="bendingenergyloss" class="level3">
+<h3 class="anchored" data-anchor-id="bendingenergyloss">BendingEnergyLoss</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BendingEnergyLoss(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    normalize:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, reduction:LossReduction <span class="op">|</span> <span class="bu">str</span><span class="op">=</span>mean</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Calculate the bending energy based on second-order differentiation of <code>pred</code> using central finite difference.</em></p>
+<p>For more information, see https://github.com/Project-MONAI/tutorials/blob/main/modules/bending_energy_diffusion_loss_notes.ipynb.</p>
+<p>Adapted from: DeepReg (https://github.com/DeepRegNet/DeepReg)</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
