@@ -4,16 +4,18 @@
 
 # %% auto #0
 __all__ = ['ShortEpochCallback', 'GradientAccumulation', 'EarlyStoppingCallback', 'SaveModelCallback', 'ReduceLROnPlateau',
-           'ShowGraphCallback', 'CSVLogger', 'ParamScheduler', 'SchedCos', 'SchedExp', 'SchedLin', 'SchedNo',
-           'MeanLossGraphCallback']
+           'CSVLogger', 'ParamScheduler', 'SchedCos', 'SchedExp', 'SchedLin', 'SchedNo', 'MeanLossGraphCallback',
+           'ShowGraphCallback']
 
 # %% ../nbs/080_callbacks.ipynb #5f3a7bf7
 from fastai.callback.training import ShortEpochCallback, GradientAccumulation
-from fastai.callback.tracker import  EarlyStoppingCallback, SaveModelCallback, ReduceLROnPlateau, ShowGraphCallback
+from fastai.callback.tracker import  EarlyStoppingCallback, SaveModelCallback, ReduceLROnPlateau, ShowGraphCallback as FastaiShowGraphCallback
 from fastai.callback.schedule import ParamScheduler, SchedCos, SchedExp, SchedLin, SchedNo
 from fastai.callback.core import Callback, range_of, Tensor
 from fastai.vision.all import CSVLogger
 import matplotlib.pyplot as plt
+
+from .visualize import biomonai_style, colorlist
 
 
 # %% ../nbs/080_callbacks.ipynb #80514f91
@@ -58,8 +60,19 @@ SaveModelCallback = SaveModelCallback
 # %% ../nbs/080_callbacks.ipynb #1b5eb715
 ReduceLROnPlateau = ReduceLROnPlateau
 
-# %% ../nbs/080_callbacks.ipynb #e43980c9
-ShowGraphCallback = ShowGraphCallback
+# %% ../nbs/080_callbacks.ipynb #fc3c851b
+class ShowGraphCallback(FastaiShowGraphCallback):
+
+    def __init__(self, *args, style=biomonai_style, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.style = style
+
+    def __call__(self, *args, **kwargs):
+
+        ctx = plt.rc_context(self.style) if self.style else nullcontext()
+
+        with ctx:
+            return super().__call__(*args, **kwargs)
 
 # %% ../nbs/080_callbacks.ipynb #30b9de34
 CSVLogger = CSVLogger
