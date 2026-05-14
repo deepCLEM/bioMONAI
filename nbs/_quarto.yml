@@ -56,7 +56,7 @@ website:
   sidebar:
     style: floating
     collapse-level: 1
-    logo: images/logo_bioMONAI_full6.png
+    # logo: images/logo_bioMONAI_full6.png
   page-footer:
     left: "Copyright © 2024 onward Biagio Mandracchia, MIT License"
     right:

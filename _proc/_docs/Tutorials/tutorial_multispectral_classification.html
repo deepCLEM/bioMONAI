@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Tutorial multispectral classification">
+
+<title>Multispectral Classification – bioMONAI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-4d9afe2b8d18ee9fa5d0d57b5ed4214d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-70e2e9cdb1bd0c57f008707e889e6c29.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<meta property="og:title" content="Multispectral Classification – bioMONAI">
+<meta property="og:description" content="Tutorial multispectral classification">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/904_tutorial_multispectral_classification_files/figure-html/cell-11-output-1.png">
+<meta property="og:site_name" content="bioMONAI">
+<meta property="og:image:height" content="426">
+<meta property="og:image:width" content="950">
+<meta name="twitter:title" content="Multispectral Classification – bioMONAI">
+<meta name="twitter:description" content="Tutorial multispectral classification">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/Tutorials/904_tutorial_multispectral_classification_files/figure-html/cell-11-output-1.png">
+<meta name="twitter:image-height" content="426">
+<meta name="twitter:image-width" content="950">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">bioMONAI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://deepclem.github.io"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-resources" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Resources</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-resources">    
+        <li>
+    <a class="dropdown-item" href="https://monai.io/"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">monai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://docs.fast.ai"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fast.ai</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastcore.fast.ai"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastcore</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://fastxtend.benjaminwarner.dev"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">fastxtend</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://nbdev.fast.ai"><i class="bi bi-link" role="img">
+</i> 
+ <span class="dropdown-text">nbdev</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/deepCLEM/bioMONAI/issues"><i class="bi bi-bug" role="img">
+</i> 
+ <span class="dropdown-text">Report an Issue</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/"> <i class="bi bi-twitter" role="img" aria-label="Twitter">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Tutorials/tutorial_classification.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../Tutorials/tutorial_multispectral_classification.html">Multispectral Classification</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      <img src="../images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="../images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utilities</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../io.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">I/O</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data.core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data.load.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Loaders</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data.tfms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Transformations</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../transforms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transforms</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../losses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Loss functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../nets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Networks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metrics</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../optimizers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimizers</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../engines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engines</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../callbacks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Callbacks</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inference &amp; Evaluation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../datasets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datasets</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../visualize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualizations</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Benchmarks</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/mednist_tutorial_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification - bioMONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/mednist_tutorial_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Medical Image Classification - MONAI/Pytorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/monai_101_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial - bioMONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/monai_101_ignite.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MONAI 101 tutorial - MONAI/Ignite</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/image_restoration_biomonai.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in bioMONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/image_restoration_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Restoration with Restormer in MONAI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Benchmarks/multispectral_microscopy_pytorch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multispectral Classification - MONAI/pytorch</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/tutorial_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Classification 2D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/tutorial_classification3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Classification 3D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/tutorial_denoising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Denoising</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Multispectral Classification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/tutorial_histopathology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Histopathology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Tutorials/tutorial_segmentation3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3D Segmentation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup-imports" id="toc-setup-imports" class="nav-link active" data-scroll-target="#setup-imports">Setup imports</a></li>
+  <li><a href="#download-dataset" id="toc-download-dataset" class="nav-link" data-scroll-target="#download-dataset">Download dataset</a></li>
+  <li><a href="#prepare-image-paths-and-update-metadata" id="toc-prepare-image-paths-and-update-metadata" class="nav-link" data-scroll-target="#prepare-image-paths-and-update-metadata">Prepare Image Paths and Update Metadata</a></li>
+  <li><a href="#split-dataset-into-train-validation-and-test-sets" id="toc-split-dataset-into-train-validation-and-test-sets" class="nav-link" data-scroll-target="#split-dataset-into-train-validation-and-test-sets">Split Dataset into Train, Validation, and Test Sets</a></li>
+  <li><a href="#data-augmentation-and-dataloader-preparation" id="toc-data-augmentation-and-dataloader-preparation" class="nav-link" data-scroll-target="#data-augmentation-and-dataloader-preparation">Data Augmentation and DataLoader Preparation</a></li>
+  <li><a href="#visualize-data-batch" id="toc-visualize-data-batch" class="nav-link" data-scroll-target="#visualize-data-batch">Visualize Data Batch</a></li>
+  <li><a href="#visualize-a-specific-image" id="toc-visualize-a-specific-image" class="nav-link" data-scroll-target="#visualize-a-specific-image">Visualize a Specific Image</a></li>
+  <li><a href="#define-and-train-the-model" id="toc-define-and-train-the-model" class="nav-link" data-scroll-target="#define-and-train-the-model">Define and Train the Model</a></li>
+  <li><a href="#save-the-trained-model" id="toc-save-the-trained-model" class="nav-link" data-scroll-target="#save-the-trained-model">Save the Trained Model</a></li>
+  <li><a href="#evaluate-the-model-on-test-data" id="toc-evaluate-the-model-on-test-data" class="nav-link" data-scroll-target="#evaluate-the-model-on-test-data">Evaluate the Model on Test Data</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../Tutorials/tutorial_classification.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../Tutorials/tutorial_multispectral_classification.html">Multispectral Classification</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Multispectral Classification</h1>
+</div>
+
+<div>
+  <div class="description">
+    Tutorial multispectral classification
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+<script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="setup-imports" class="level3">
+<h3 class="anchored" data-anchor-id="setup-imports">Setup imports</h3>
+<div id="570ba1be" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.data <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.transforms <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.core <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.core <span class="im">import</span> Path, set_determinism</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.data <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.losses <span class="im">import</span> CrossEntropyLossFlat</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.metrics <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.datasets <span class="im">import</span> download_file</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.vision.<span class="bu">all</span> <span class="im">import</span> accuracy, OptimWrapper</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.transforms <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.optim <span class="im">import</span> Adam</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="282e152e" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="1cdf3823" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> get_device()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(device)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cuda</code></pre>
+</div>
+</div>
+<div id="b07d067a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>set_determinism(<span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="download-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="download-dataset">Download dataset</h2>
+<p>In the next cell, we will download a subset of the RXRX1 dataset from the MONAI repository. This dataset contains multispectral images that we will use for our classification task. The <a href="https://deepCLEM.github.io/bioMONAI/datasets.html#download_file"><code>download_file</code></a> function is used to download and extract the dataset to a specified directory.</p>
+<ul>
+<li>The dataset URL is specified, and a hash is provided to ensure data integrity.</li>
+<li>The <code>extract</code> parameter is set to <code>True</code> to automatically extract the downloaded zip file.</li>
+<li>The <code>extract_dir</code> parameter is left empty, meaning the contents will be extracted to the specified directory.</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>You can change the <code>url</code> variable to point to a different dataset if needed.</li>
+<li>Modify the <code>extract_dir</code> parameter to specify a different extraction directory.</li>
+<li>Ensure that the <code>hash</code> value matches the dataset you are downloading to avoid data corruption issues.</li>
+</ul>
+</blockquote>
+<div id="69c0af1c" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the base URL for the dataset</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://github.com/Project-MONAI/MONAI-extra-test-data/releases/download/0.8.1/rxrx1_subset_monai.zip"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>download_file(url, <span class="st">"../_data"</span>, extract<span class="op">=</span><span class="va">True</span>, <span class="bu">hash</span><span class="op">=</span><span class="st">'e80db433db641bb390ade991b81f98814a26c7de30e0da6f20e8abddf7a84538'</span>, extract_dir<span class="op">=</span><span class="st">''</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The file has been downloaded and saved to: /home/bm/Documents/bioMONAI/nbs/_data</code></pre>
+</div>
+</div>
+</section>
+<section id="prepare-image-paths-and-update-metadata" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-image-paths-and-update-metadata">Prepare Image Paths and Update Metadata</h2>
+<p>In the next cell, we will prepare the image paths for each channel and update the metadata CSV file with these paths. This step is crucial for organizing the dataset and ensuring that each image is correctly associated with its corresponding metadata.</p>
+<ul>
+<li>We will read the metadata CSV file and extract the site IDs.</li>
+<li>For each site ID, we will generate the paths for the six channels of images.</li>
+<li>These paths will be stored in a dictionary and added as new columns to the metadata CSV file.</li>
+<li>A new CSV file will be created to avoid overwriting the original metadata file.</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>You can modify the <code>data_folder</code> and <code>csv_file</code> variables to point to a different dataset or metadata file.</li>
+<li>If your dataset contains a different number of channels, adjust the range in the <code>channel_list</code> generation accordingly.</li>
+<li>Ensure that the directory structure and file naming conventions match those expected by the code.</li>
+</ul>
+</blockquote>
+<div id="5e7c958a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data_folder <span class="op">=</span> <span class="st">'../_data/rxrx1_subset_monai/'</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>csv_file <span class="op">=</span> os.path.join(data_folder, <span class="st">'metadata.csv'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(csv_file)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create label mapping from cell_type</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>class_map <span class="op">=</span> {c: idx <span class="cf">for</span> idx, c <span class="kw">in</span> <span class="bu">enumerate</span>(df[<span class="st">'cell_type'</span>].unique())}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Build datalist with channels + label</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>datalist <span class="op">=</span> []</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx, row <span class="kw">in</span> df.iterrows():</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    item <span class="op">=</span> {}</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># build file paths for 6 channels</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> c <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">7</span>):</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        subpath <span class="op">=</span> os.path.join(<span class="st">"images"</span>, row.experiment, <span class="ss">f"Plate</span><span class="sc">{</span>row<span class="sc">.</span>plate<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        fn <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>row<span class="sc">.</span>well<span class="sc">}</span><span class="ss">_s</span><span class="sc">{</span>row<span class="sc">.</span>site<span class="sc">}</span><span class="ss">_w</span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">.png"</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        item[<span class="ss">f"channel </span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">"</span>] <span class="op">=</span> os.path.join(data_folder, subpath, fn)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># add label</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    item[<span class="st">"label"</span>] <span class="op">=</span> class_map[row.cell_type]</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    datalist.append(item)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's create a new csv file to avoid overwriting the original one, and add the image paths to it in new columns</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>datalist_df <span class="op">=</span> pd.DataFrame(datalist)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>new_csv_file <span class="op">=</span> data_folder <span class="op">+</span> <span class="st">'metadata_updated.csv'</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>add_columns_to_csv(csv_file, datalist_df, new_csv_file)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Columns ['channel 1', 'channel 2', 'channel 3', 'channel 4', 'channel 5', 'channel 6', 'label'] added successfully. Updated file saved to '../_data/rxrx1_subset_monai/metadata_updated.csv'</code></pre>
+</div>
+</div>
+</section>
+<section id="split-dataset-into-train-validation-and-test-sets" class="level2">
+<h2 class="anchored" data-anchor-id="split-dataset-into-train-validation-and-test-sets">Split Dataset into Train, Validation, and Test Sets</h2>
+<p>In the next cell, we will split the updated metadata CSV file into training, validation, and test sets. This step is essential for training and evaluating our classification model. The <a href="https://deepCLEM.github.io/bioMONAI/data.tfms.html#split_dataframe"><code>split_dataframe</code></a> function is used to perform the split based on the specified fractions.</p>
+<ul>
+<li>The <code>train_fraction</code> parameter determines the proportion of the dataset to be used for training.</li>
+<li>The <code>valid_fraction</code> parameter determines the proportion of the dataset to be used for validation.</li>
+<li>The <code>split_column</code> parameter specifies the column to be used for splitting the dataset. Using this parameter is alternative to ‘train_fraction’ and ‘valid_fraction’ parameters.</li>
+<li>The <code>add_is_valid</code> parameter adds a column to indicate whether a sample belongs to the validation set.</li>
+<li>The <code>train_path</code>, <code>test_path</code>, and <code>valid_path</code> parameters specify the file paths for the resulting CSV files.</li>
+<li>The <code>data_save_path</code> parameter specifies the directory where the CSV files will be saved.</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>You can adjust the <code>train_fraction</code> and <code>valid_fraction</code> parameters to change the proportions of the splits.</li>
+<li>Modify the <code>split_column</code> parameter if you want to use a different column for splitting.</li>
+<li>Ensure that the <code>data_save_path</code> directory exists and has write permissions.</li>
+</ul>
+</blockquote>
+<div id="92c9e245" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data based on 'split_column' values in csv file</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>split_dataframe(new_csv_file, </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                split_column<span class="op">=</span><span class="st">'dataset'</span>, </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                add_is_valid<span class="op">=</span><span class="va">True</span>, </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                train_path<span class="op">=</span><span class="st">"train.csv"</span>, </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                test_path<span class="op">=</span><span class="st">"test.csv"</span>, </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                valid_fraction<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                shuffle<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                data_save_path<span class="op">=</span>data_folder</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Using predefined dataset split
+'is_valid' column added to train dataframe for validation samples.
+Datasets saved to %s ../_data/rxrx1_subset_monai/</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>(     original_row_index           site_id         well_id cell_type dataset  \
+ 0                 45589  HEPG2-01_3_C15_2  HEPG2-01_3_C15     HEPG2   train   
+ 1                 59951  HEPG2-07_2_H02_2  HEPG2-07_2_H02     HEPG2   train   
+ 2                 48708  HEPG2-02_4_D13_1  HEPG2-02_4_D13     HEPG2   train   
+ 3                 46896  HEPG2-02_1_E09_1  HEPG2-02_1_E09     HEPG2   train   
+ 4                 60402  HEPG2-07_3_D09_1  HEPG2-07_3_D09     HEPG2   train   
+ ..                  ...               ...             ...       ...     ...   
+ 995              123921   U2OS-03_2_G21_2   U2OS-03_2_G21      U2OS   train   
+ 996              121453   U2OS-02_2_G19_2   U2OS-02_2_G19      U2OS   train   
+ 997              119034   U2OS-01_2_H20_1   U2OS-01_2_H20      U2OS   train   
+ 998              118168   U2OS-01_1_C05_1   U2OS-01_1_C05      U2OS   train   
+ 999              123966   U2OS-03_2_H22_1   U2OS-03_2_H22      U2OS   train   
+ 
+     experiment  plate well  site         well_type    sirna  sirna_id  \
+ 0     HEPG2-01      3  C15     2  positive_control   s15652      1114   
+ 1     HEPG2-07      2  H02     2         treatment  s195435       683   
+ 2     HEPG2-02      4  D13     1         treatment   s20197        85   
+ 3     HEPG2-02      1  E09     1         treatment   s27069       313   
+ 4     HEPG2-07      3  D09     1         treatment   s18250       405   
+ ..         ...    ...  ...   ...               ...      ...       ...   
+ 995    U2OS-03      2  G21     2         treatment   s37346      1046   
+ 996    U2OS-02      2  G19     2         treatment   s38759       164   
+ 997    U2OS-01      2  H20     1         treatment   s21714       785   
+ 998    U2OS-01      1  C05     1         treatment   s19455       999   
+ 999    U2OS-03      2  H22     1  positive_control  s502431      1133   
+ 
+                                                             channel 1  \
+ 0    ../_data/rxrx1_subset_monai/images/HEPG2-01/Plate3/C15_s2_w1.png   
+ 1    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate2/H02_s2_w1.png   
+ 2    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate4/D13_s1_w1.png   
+ 3    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate1/E09_s1_w1.png   
+ 4    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate3/D09_s1_w1.png   
+ ..                                                                ...   
+ 995   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/G21_s2_w1.png   
+ 996   ../_data/rxrx1_subset_monai/images/U2OS-02/Plate2/G19_s2_w1.png   
+ 997   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate2/H20_s1_w1.png   
+ 998   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate1/C05_s1_w1.png   
+ 999   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/H22_s1_w1.png   
+ 
+                                                             channel 2  \
+ 0    ../_data/rxrx1_subset_monai/images/HEPG2-01/Plate3/C15_s2_w2.png   
+ 1    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate2/H02_s2_w2.png   
+ 2    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate4/D13_s1_w2.png   
+ 3    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate1/E09_s1_w2.png   
+ 4    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate3/D09_s1_w2.png   
+ ..                                                                ...   
+ 995   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/G21_s2_w2.png   
+ 996   ../_data/rxrx1_subset_monai/images/U2OS-02/Plate2/G19_s2_w2.png   
+ 997   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate2/H20_s1_w2.png   
+ 998   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate1/C05_s1_w2.png   
+ 999   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/H22_s1_w2.png   
+ 
+                                                             channel 3  \
+ 0    ../_data/rxrx1_subset_monai/images/HEPG2-01/Plate3/C15_s2_w3.png   
+ 1    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate2/H02_s2_w3.png   
+ 2    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate4/D13_s1_w3.png   
+ 3    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate1/E09_s1_w3.png   
+ 4    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate3/D09_s1_w3.png   
+ ..                                                                ...   
+ 995   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/G21_s2_w3.png   
+ 996   ../_data/rxrx1_subset_monai/images/U2OS-02/Plate2/G19_s2_w3.png   
+ 997   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate2/H20_s1_w3.png   
+ 998   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate1/C05_s1_w3.png   
+ 999   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/H22_s1_w3.png   
+ 
+                                                             channel 4  \
+ 0    ../_data/rxrx1_subset_monai/images/HEPG2-01/Plate3/C15_s2_w4.png   
+ 1    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate2/H02_s2_w4.png   
+ 2    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate4/D13_s1_w4.png   
+ 3    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate1/E09_s1_w4.png   
+ 4    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate3/D09_s1_w4.png   
+ ..                                                                ...   
+ 995   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/G21_s2_w4.png   
+ 996   ../_data/rxrx1_subset_monai/images/U2OS-02/Plate2/G19_s2_w4.png   
+ 997   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate2/H20_s1_w4.png   
+ 998   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate1/C05_s1_w4.png   
+ 999   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/H22_s1_w4.png   
+ 
+                                                             channel 5  \
+ 0    ../_data/rxrx1_subset_monai/images/HEPG2-01/Plate3/C15_s2_w5.png   
+ 1    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate2/H02_s2_w5.png   
+ 2    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate4/D13_s1_w5.png   
+ 3    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate1/E09_s1_w5.png   
+ 4    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate3/D09_s1_w5.png   
+ ..                                                                ...   
+ 995   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/G21_s2_w5.png   
+ 996   ../_data/rxrx1_subset_monai/images/U2OS-02/Plate2/G19_s2_w5.png   
+ 997   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate2/H20_s1_w5.png   
+ 998   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate1/C05_s1_w5.png   
+ 999   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/H22_s1_w5.png   
+ 
+                                                             channel 6  label  \
+ 0    ../_data/rxrx1_subset_monai/images/HEPG2-01/Plate3/C15_s2_w6.png      0   
+ 1    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate2/H02_s2_w6.png      0   
+ 2    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate4/D13_s1_w6.png      0   
+ 3    ../_data/rxrx1_subset_monai/images/HEPG2-02/Plate1/E09_s1_w6.png      0   
+ 4    ../_data/rxrx1_subset_monai/images/HEPG2-07/Plate3/D09_s1_w6.png      0   
+ ..                                                                ...    ...   
+ 995   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/G21_s2_w6.png      3   
+ 996   ../_data/rxrx1_subset_monai/images/U2OS-02/Plate2/G19_s2_w6.png      3   
+ 997   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate2/H20_s1_w6.png      3   
+ 998   ../_data/rxrx1_subset_monai/images/U2OS-01/Plate1/C05_s1_w6.png      3   
+ 999   ../_data/rxrx1_subset_monai/images/U2OS-03/Plate2/H22_s1_w6.png      3   
+ 
+      is_valid  
+ 0           0  
+ 1           1  
+ 2           0  
+ 3           0  
+ 4           0  
+ ..        ...  
+ 995         0  
+ 996         1  
+ 997         0  
+ 998         0  
+ 999         0  
+ 
+ [1000 rows x 20 columns],
+       original_row_index           site_id         well_id cell_type dataset  \
+ 1000                8483  HEPG2-11_2_L21_2  HEPG2-11_2_L21     HEPG2    test   
+ 1001                4658  HEPG2-09_4_I22_1  HEPG2-09_4_I22     HEPG2    test   
+ 1002                6863  HEPG2-10_4_D02_2  HEPG2-10_4_D02     HEPG2    test   
+ 1003                 578  HEPG2-08_1_O05_1  HEPG2-08_1_O05     HEPG2    test   
+ 1004                9121  HEPG2-11_3_M10_2  HEPG2-11_3_M10     HEPG2    test   
+ ...                  ...               ...             ...       ...     ...   
+ 1195               42150   U2OS-05_1_I03_1   U2OS-05_1_I03      U2OS    test   
+ 1196               43423   U2OS-05_3_J08_2   U2OS-05_3_J08      U2OS    test   
+ 1197               40260   U2OS-04_2_G23_1   U2OS-04_2_G23      U2OS    test   
+ 1198               40225   U2OS-04_2_G05_2   U2OS-04_2_G05      U2OS    test   
+ 1199               42214   U2OS-05_1_J13_1   U2OS-05_1_J13      U2OS    test   
+ 
+      experiment  plate well  site  well_type   sirna  sirna_id  \
+ 1000   HEPG2-11      2  L21     2  treatment  s38490       232   
+ 1001   HEPG2-09      4  I22     1  treatment  s36698       923   
+ 1002   HEPG2-10      4  D02     2  treatment  s20919       139   
+ 1003   HEPG2-08      1  O05     1  treatment  s21433       531   
+ 1004   HEPG2-11      3  M10     2  treatment  s19088       546   
+ ...         ...    ...  ...   ...        ...     ...       ...   
+ 1195    U2OS-05      1  I03     1  treatment  s20132       850   
+ 1196    U2OS-05      3  J08     2  treatment  s38090        43   
+ 1197    U2OS-04      2  G23     1  treatment  s18019       940   
+ 1198    U2OS-04      2  G05     2  treatment  s18863       151   
+ 1199    U2OS-05      1  J13     1  treatment  s21662       596   
+ 
+                                                              channel 1  \
+ 1000  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate2/L21_s2_w1.png   
+ 1001  ../_data/rxrx1_subset_monai/images/HEPG2-09/Plate4/I22_s1_w1.png   
+ 1002  ../_data/rxrx1_subset_monai/images/HEPG2-10/Plate4/D02_s2_w1.png   
+ 1003  ../_data/rxrx1_subset_monai/images/HEPG2-08/Plate1/O05_s1_w1.png   
+ 1004  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate3/M10_s2_w1.png   
+ ...                                                                ...   
+ 1195   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/I03_s1_w1.png   
+ 1196   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate3/J08_s2_w1.png   
+ 1197   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G23_s1_w1.png   
+ 1198   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G05_s2_w1.png   
+ 1199   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/J13_s1_w1.png   
+ 
+                                                              channel 2  \
+ 1000  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate2/L21_s2_w2.png   
+ 1001  ../_data/rxrx1_subset_monai/images/HEPG2-09/Plate4/I22_s1_w2.png   
+ 1002  ../_data/rxrx1_subset_monai/images/HEPG2-10/Plate4/D02_s2_w2.png   
+ 1003  ../_data/rxrx1_subset_monai/images/HEPG2-08/Plate1/O05_s1_w2.png   
+ 1004  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate3/M10_s2_w2.png   
+ ...                                                                ...   
+ 1195   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/I03_s1_w2.png   
+ 1196   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate3/J08_s2_w2.png   
+ 1197   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G23_s1_w2.png   
+ 1198   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G05_s2_w2.png   
+ 1199   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/J13_s1_w2.png   
+ 
+                                                              channel 3  \
+ 1000  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate2/L21_s2_w3.png   
+ 1001  ../_data/rxrx1_subset_monai/images/HEPG2-09/Plate4/I22_s1_w3.png   
+ 1002  ../_data/rxrx1_subset_monai/images/HEPG2-10/Plate4/D02_s2_w3.png   
+ 1003  ../_data/rxrx1_subset_monai/images/HEPG2-08/Plate1/O05_s1_w3.png   
+ 1004  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate3/M10_s2_w3.png   
+ ...                                                                ...   
+ 1195   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/I03_s1_w3.png   
+ 1196   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate3/J08_s2_w3.png   
+ 1197   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G23_s1_w3.png   
+ 1198   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G05_s2_w3.png   
+ 1199   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/J13_s1_w3.png   
+ 
+                                                              channel 4  \
+ 1000  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate2/L21_s2_w4.png   
+ 1001  ../_data/rxrx1_subset_monai/images/HEPG2-09/Plate4/I22_s1_w4.png   
+ 1002  ../_data/rxrx1_subset_monai/images/HEPG2-10/Plate4/D02_s2_w4.png   
+ 1003  ../_data/rxrx1_subset_monai/images/HEPG2-08/Plate1/O05_s1_w4.png   
+ 1004  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate3/M10_s2_w4.png   
+ ...                                                                ...   
+ 1195   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/I03_s1_w4.png   
+ 1196   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate3/J08_s2_w4.png   
+ 1197   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G23_s1_w4.png   
+ 1198   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G05_s2_w4.png   
+ 1199   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/J13_s1_w4.png   
+ 
+                                                              channel 5  \
+ 1000  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate2/L21_s2_w5.png   
+ 1001  ../_data/rxrx1_subset_monai/images/HEPG2-09/Plate4/I22_s1_w5.png   
+ 1002  ../_data/rxrx1_subset_monai/images/HEPG2-10/Plate4/D02_s2_w5.png   
+ 1003  ../_data/rxrx1_subset_monai/images/HEPG2-08/Plate1/O05_s1_w5.png   
+ 1004  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate3/M10_s2_w5.png   
+ ...                                                                ...   
+ 1195   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/I03_s1_w5.png   
+ 1196   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate3/J08_s2_w5.png   
+ 1197   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G23_s1_w5.png   
+ 1198   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G05_s2_w5.png   
+ 1199   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/J13_s1_w5.png   
+ 
+                                                              channel 6  label  
+ 1000  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate2/L21_s2_w6.png      0  
+ 1001  ../_data/rxrx1_subset_monai/images/HEPG2-09/Plate4/I22_s1_w6.png      0  
+ 1002  ../_data/rxrx1_subset_monai/images/HEPG2-10/Plate4/D02_s2_w6.png      0  
+ 1003  ../_data/rxrx1_subset_monai/images/HEPG2-08/Plate1/O05_s1_w6.png      0  
+ 1004  ../_data/rxrx1_subset_monai/images/HEPG2-11/Plate3/M10_s2_w6.png      0  
+ ...                                                                ...    ...  
+ 1195   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/I03_s1_w6.png      3  
+ 1196   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate3/J08_s2_w6.png      3  
+ 1197   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G23_s1_w6.png      3  
+ 1198   ../_data/rxrx1_subset_monai/images/U2OS-04/Plate2/G05_s2_w6.png      3  
+ 1199   ../_data/rxrx1_subset_monai/images/U2OS-05/Plate1/J13_s1_w6.png      3  
+ 
+ [200 rows x 19 columns],
+ None)</code></pre>
+</div>
+</div>
+</section>
+<section id="data-augmentation-and-dataloader-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-augmentation-and-dataloader-preparation">Data Augmentation and DataLoader Preparation</h2>
+<p>In the next cell, we will define the data augmentation techniques and prepare the data loaders for training and validation. Data augmentation is crucial for improving the generalization of our model by artificially increasing the diversity of the training dataset. We will use a combination of intensity scaling, random cropping, rotation, and flipping transformations.</p>
+<ul>
+<li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#scaleintensityrangepercentiles"><code>ScaleIntensityRangePercentiles</code></a> transformation scales the intensity values of the images based on the specified percentiles.</li>
+<li>The <code>RandomResizedCrop</code> transformation randomly crops the images to the specified size with a random scale.</li>
+<li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#randrot90"><code>RandRot90</code></a> transformation randomly rotates the images by 90 degrees with the specified probability.</li>
+<li>The <a href="https://deepCLEM.github.io/bioMONAI/transforms.html#randflip"><code>RandFlip</code></a> transformation randomly flips the images horizontally or vertically with the specified probability.</li>
+<li>The <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#biodataloaders.create"><code>BioDataLoaders.create</code></a> function is used to create the data loaders from the CSV file containing the image paths and labels.</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>You can adjust the <code>bs</code> variable to change the batch size.</li>
+<li>Modify the parameters of the transformations to experiment with different augmentation techniques.</li>
+<li>Ensure that the <code>fn_col</code> and <code>label_col</code> parameters match the columns in your CSV file.</li>
+<li>Set <code>show_summary</code> to <code>True</code> to display a summary of the data loaders.</li>
+</ul>
+</blockquote>
+<div id="dbb61a7a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>channels <span class="op">=</span> [<span class="st">'channel 1'</span>, <span class="st">'channel 2'</span>, <span class="st">'channel 3'</span>, <span class="st">'channel 4'</span>, <span class="st">'channel 5'</span>, <span class="st">'channel 6'</span>]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>transforms_train <span class="op">=</span> [</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        LoadImaged(keys<span class="op">=</span>channels, image_only<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        EnsureChannelFirstd(keys<span class="op">=</span>channels),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        ScaleIntensityRangePercentilesd(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>            keys<span class="op">=</span>channels, lower<span class="op">=</span><span class="fl">1.0</span>, upper<span class="op">=</span><span class="fl">99.0</span>, b_min<span class="op">=</span><span class="fl">0.0</span>, b_max<span class="op">=</span><span class="fl">1.0</span>, clip<span class="op">=</span><span class="va">True</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        ConcatItemsd(keys<span class="op">=</span>channels, name<span class="op">=</span><span class="st">"image"</span>, dim<span class="op">=</span><span class="dv">0</span>),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        EnsureTyped(keys<span class="op">=</span>[<span class="st">"image"</span>, <span class="st">"label"</span>], track_meta<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        RandRotate90d(keys<span class="op">=</span>channels, prob<span class="op">=</span><span class="fl">0.75</span>),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        RandFlipd(keys<span class="op">=</span>channels, spatial_axis<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">1</span>], prob<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        RandZoomd(keys<span class="op">=</span>channels, min_zoom<span class="op">=</span><span class="fl">0.9</span>, max_zoom<span class="op">=</span><span class="fl">1.1</span>, prob<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>transforms_val <span class="op">=</span> [</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        LoadImaged(keys<span class="op">=</span>channels, image_only<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        EnsureChannelFirstd(keys<span class="op">=</span>channels),</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>        ScaleIntensityRangePercentilesd(</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>            keys<span class="op">=</span>channels, lower<span class="op">=</span><span class="fl">1.0</span>, upper<span class="op">=</span><span class="fl">99.0</span>, b_min<span class="op">=</span><span class="fl">0.0</span>, b_max<span class="op">=</span><span class="fl">1.0</span>, clip<span class="op">=</span><span class="va">True</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>        ConcatItemsd(keys<span class="op">=</span>channels, name<span class="op">=</span><span class="st">"image"</span>, dim<span class="op">=</span><span class="dv">0</span>),</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    ]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="57f26bb7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>data_ops <span class="op">=</span> {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'x_keys'</span>: <span class="st">"image"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'y_keys'</span>: <span class="st">"label"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'transforms'</span>: transforms_train,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'val_transforms'</span>: transforms_val,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'vocab'</span>: <span class="bu">list</span>(class_map.keys()),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'seed'</span>: <span class="dv">42</span>, </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'batch_size'</span>: <span class="dv">8</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'val_batch_size'</span>: <span class="dv">32</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'num_workers'</span>: <span class="dv">16</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'show_summary'</span>: <span class="va">True</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> BioDataLoaders.create(</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    data_folder <span class="op">+</span> <span class="st">'train.csv'</span>,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    dataset<span class="op">=</span><span class="st">'cache'</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading dataset: 100%|██████████| 889/889 [00:16&lt;00:00, 53.68it/s]
+Loading dataset: 100%|██████████| 111/111 [00:01&lt;00:00, 56.02it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Train DataLoader
+----------------
+Dataset size : 889
+Batch size   : 8
+Batches      : 112
+Classes      : ['HEPG2', 'HUVEC', 'RPE', 'U2OS']</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Batch structure:
+  [0] shape=(8, 6, 512, 512) dtype=torch.float32 ~48.00 MB
+  [1] shape=(8,) dtype=torch.int64 ~0.00 MB
+Approx batch memory: 48.00 MB
+
+Valid DataLoader
+----------------
+Dataset size : 111
+Batch size   : 32
+Batches      : 4
+Classes      : ['HEPG2', 'HUVEC', 'RPE', 'U2OS']
+
+Batch structure:
+  [0] shape=(32, 6, 512, 512) dtype=torch.float32 ~192.00 MB
+  [1] shape=(32,) dtype=torch.int64 ~0.00 MB
+Approx batch memory: 192.00 MB</code></pre>
+</div>
+</div>
+</section>
+<section id="visualize-data-batch" class="level2">
+<h2 class="anchored" data-anchor-id="visualize-data-batch">Visualize Data Batch</h2>
+<p>In the next cell, we will visualize a batch of images from the training dataset. This step is essential for verifying that the data augmentation techniques are applied correctly and that the images are loaded as expected. The <a href="https://deepCLEM.github.io/bioMONAI/data.tfms.html#show_batch"><code>show_batch</code></a> method of the <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#biodataloaders"><code>BioDataLoaders</code></a> class is used to display a batch of images with their corresponding labels.</p>
+<ul>
+<li>The <code>max_slices</code> parameter specifies the maximum number of slices to display for each image.</li>
+<li>The <code>layout</code> parameter determines the layout of the displayed images. The ‘multirow’ layout arranges the images in multiple rows.</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>You can adjust the <code>max_slices</code> parameter to display more or fewer slices per image.</li>
+<li>Modify the <code>layout</code> parameter to experiment with different layouts, such as ‘single’ or ‘grid’.</li>
+<li>Ensure that the data loaders are correctly defined and contain the expected images and labels.</li>
+</ul>
+</blockquote>
+<div id="8e37681d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>data.show_batch(max_slices<span class="op">=</span><span class="dv">6</span>, layout<span class="op">=</span><span class="st">'multirow'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="visualize-a-specific-image" class="level2">
+<h2 class="anchored" data-anchor-id="visualize-a-specific-image">Visualize a Specific Image</h2>
+<p>In the next cell, we will visualize a specific image from the dataset using its index. This step is useful for inspecting individual images and verifying their quality and labels. The <code>do_item</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#biodataloaders"><code>BioDataLoaders</code></a> class is used to retrieve the image and its label, and the <code>show</code> method is used to display the image.</p>
+<div id="1ffbbe39" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.visualize <span class="im">import</span> mosaic_image_3d</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>mosaic_image_3d(data.do_item(<span class="dv">100</span>)[<span class="dv">0</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="define-and-train-the-model" class="level2">
+<h2 class="anchored" data-anchor-id="define-and-train-the-model">Define and Train the Model</h2>
+<p>In the next cell, we will define and train a DenseNet169 model for our multispectral classification task. The model is initialized with the following parameters: - <code>spatial_dims=2</code>: Specifies that the input images are 2D. - <code>in_channels=6</code>: Specifies the number of input channels, which corresponds to the six multispectral channels. - <code>out_channels=data.c</code>: Specifies the number of output channels, which corresponds to the number of classes in our dataset. - <code>pretrained=True</code>: Initializes the model with pretrained weights.</p>
+<p>We will also define the metrics to evaluate the model’s performance during training. The <code>RocAuc</code> and <code>accuracy</code> metrics are used to measure the model’s performance.</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/engines.html#fasttrainer"><code>fastTrainer</code></a> class is used to train the model with the specified data loaders and metrics. The <code>fine_tune</code> method is called to fine-tune the model for a specified number of epochs, with an initial phase of freezing the pretrained layers.</p>
+<blockquote class="blockquote">
+<ul>
+<li>You can experiment with different model architectures by replacing <code>DenseNet169</code> with other models from the <code>monai.networks.nets</code> module.</li>
+<li>Adjust the <code>in_channels</code> parameter if your dataset contains a different number of channels.</li>
+<li>Modify the <code>out_channels</code> parameter if your dataset has a different number of classes.</li>
+<li>Experiment with different metrics by adding or removing metrics from the <code>metrics</code> list.</li>
+<li>Adjust the number of epochs and the <code>freeze_epochs</code> parameter to control the training process.</li>
+</ul>
+</blockquote>
+<div id="dbf571c6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>torch.cuda.empty_cache()</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>torch.cuda.reset_peak_memory_stats()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="c3b4096a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> DenseNet169</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> DenseNet169(spatial_dims<span class="op">=</span><span class="dv">2</span>, in_channels<span class="op">=</span><span class="dv">6</span>, out_channels<span class="op">=</span><span class="bu">len</span>(data.vocab), pretrained<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="36b9bf63" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> [accuracy]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> OptimWrapper(opt<span class="op">=</span>Adam(model.parameters(), <span class="fl">1e-5</span>))</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>loss_fn<span class="op">=</span>CrossEntropyLossFlat()</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer(data, model, loss_fn<span class="op">=</span>loss_fn, metrics<span class="op">=</span>metrics, show_summary<span class="op">=</span><span class="va">False</span>, lr<span class="op">=</span><span class="fl">1e-5</span>, show_graph<span class="op">=</span><span class="va">True</span>, optimizer<span class="op">=</span>optimizer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="e2ed66a6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.837345</td>
+<td>0.467119</td>
+<td>0.945946</td>
+<td>00:14</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.437473</td>
+<td>0.215604</td>
+<td>0.972973</td>
+<td>00:13</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>0.278245</td>
+<td>0.099553</td>
+<td>0.981982</td>
+<td>00:12</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0.238789</td>
+<td>0.070104</td>
+<td>0.981982</td>
+<td>00:13</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-16-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="21bcceae" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>torch.cuda.max_memory_allocated() <span class="op">/</span> <span class="dv">1024</span><span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>6561.15576171875</code></pre>
+</div>
+</div>
+</section>
+<section id="save-the-trained-model" class="level2">
+<h2 class="anchored" data-anchor-id="save-the-trained-model">Save the Trained Model</h2>
+<p>In the next cell, we will save the trained model to a file. This step is crucial for preserving the model’s state after training, allowing us to load and use the model later without retraining. The <code>save</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/engines.html#fasttrainer"><code>fastTrainer</code></a> class is used to save the model to the specified file path.</p>
+<ul>
+<li>The <code>save</code> method takes the file name as an argument and saves the model’s state dictionary to a file with the <code>.pth</code> extension.</li>
+<li>The saved model can be loaded later using the <code>load</code> method of the <a href="https://deepCLEM.github.io/bioMONAI/engines.html#fasttrainer"><code>fastTrainer</code></a> class.</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>You can change the file name to save the model with a different name.</li>
+<li>Ensure that the directory where the model is saved exists and has write permissions.</li>
+<li>Consider saving multiple versions of the model during training to keep track of different checkpoints.</li>
+</ul>
+</blockquote>
+<div id="0e3c4e44" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.save('multispectral-classification-model')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="evaluate-the-model-on-test-data" class="level2">
+<h2 class="anchored" data-anchor-id="evaluate-the-model-on-test-data">Evaluate the Model on Test Data</h2>
+<p>In the next cell, we will evaluate the trained model on the test dataset. This step is crucial for assessing the model’s performance on unseen data and understanding its generalization capabilities. The <code>BioDataLoaders.class_from_csv</code> function is used to create the data loader for the test dataset, and the <a href="https://deepCLEM.github.io/bioMONAI/inference.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function is used to compute the evaluation metrics.</p>
+<ul>
+<li>The <code>fn_col</code> parameter specifies the columns containing the file paths for the multispectral channels.</li>
+<li>The <code>label_col</code> parameter specifies the column containing the labels.</li>
+<li>The <code>valid_pct</code> parameter is set to 0, indicating that no validation split is needed for the test dataset.</li>
+<li>The <code>item_tfms</code> parameter applies the <code>ScaleIntensityPercentiles</code> transformation to the test images.</li>
+<li>The <code>batch_tfms</code> parameter applies any batch-level transformations (if defined).</li>
+<li>The <code>bs</code> parameter specifies the batch size for loading the test data.</li>
+<li>The <a href="https://deepCLEM.github.io/bioMONAI/inference.html#evaluate_classification_model"><code>evaluate_classification_model</code></a> function takes the trained model, test data loader, and evaluation metrics as inputs and returns the computed scores.</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>You can adjust the <code>bs</code> variable to change the batch size for loading the test data.</li>
+<li>Modify the <code>fn_col</code> and <code>label_col</code> parameters to match the columns in your test CSV file.</li>
+<li>Add or remove transformations in the <code>item_tfms</code> and <code>batch_tfms</code> lists to experiment with different preprocessing techniques.</li>
+<li>Set <code>show_graph</code> to <code>True</code> to visualize the evaluation results.</li>
+</ul>
+</blockquote>
+<div id="61d8f86c" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>test_dl <span class="op">=</span> BioDataLoaders.test_dl(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    data_folder <span class="op">+</span> <span class="st">'test.csv'</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    dataset<span class="op">=</span><span class="st">'cache'</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_ops,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading dataset: 100%|██████████| 200/200 [00:03&lt;00:00, 55.22it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Train DataLoader
+----------------
+Dataset size : 200
+Batch size   : 8
+Batches      : 25
+Classes      : ['HEPG2', 'HUVEC', 'RPE', 'U2OS']</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Batch structure:
+  [0] shape=(8, 6, 512, 512) dtype=torch.float32 ~48.00 MB
+  [1] shape=(8,) dtype=torch.int64 ~0.00 MB
+Approx batch memory: 48.00 MB</code></pre>
+</div>
+</div>
+<div id="93103d85" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>evaluate_classification_model(trainer, test_data<span class="op">=</span>test_dl, metrics<span class="op">=</span>accuracy, show_graph<span class="op">=</span><span class="va">True</span>, show_results<span class="op">=</span><span class="va">True</span>)<span class="op">;</span> <span class="co"># type:ignore</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              precision    recall  f1-score   support
+
+       HEPG2       1.00      0.91      0.95        22
+       HUVEC       0.97      1.00      0.99        34
+         RPE       1.00      1.00      1.00        27
+        U2OS       0.97      1.00      0.98        28
+
+    accuracy                           0.98       111
+   macro avg       0.98      0.98      0.98       111
+weighted avg       0.98      0.98      0.98       111
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Most Confused Classes:</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Actual Class</th>
+<th data-quarto-table-cell-role="th">Predicted Class</th>
+<th data-quarto-table-cell-role="th">Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>HEPG2</td>
+<td>HUVEC</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>HEPG2</td>
+<td>U2OS</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-16.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-17.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-18.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">CrossEntropyLossFlat</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Mean</th>
+<td>0.785330</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Median</th>
+<td>0.754829</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Standard Deviation</th>
+<td>0.103166</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Min</th>
+<td>0.744105</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Max</th>
+<td>1.411858</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Q1</th>
+<td>0.748401</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Q3</th>
+<td>0.765274</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="904_tutorial_multispectral_classification_files/figure-html/cell-20-output-20.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Mean</th>
+<td>0.981982</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Median</th>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Standard Deviation</th>
+<td>0.133016</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Min</th>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Max</th>
+<td>1.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Q1</th>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Q3</th>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/deepCLEM\.github\.io\/bioMONAI");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright © 2024 onward Biagio Mandracchia, MIT License</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/deepCLEM/bioMONAI/">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -46,6 +46,11 @@ $card-border-radius: 20px;
 
 /*-- scss:rules --*/
 
+// Logo
+.logo-dark {
+  display: none;
+}
+
 // Navbar and Footer
 .navbar {
   font-family: $font-family-text;
