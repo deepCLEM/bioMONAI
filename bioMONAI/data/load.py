@@ -19,7 +19,8 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
 import os
 import types
 from inspect import signature, _empty
-# from plum import dispatch
+from pathlib import Path
+import pandas as pd
 
 # =================================
 # PyTorch
@@ -437,10 +438,6 @@ def _show_summary(train_dl, val_dl=None):
         _describe_dl(val_dl, "Valid")
 
 # %% ../../nbs/022_data.load.ipynb #d8e838b9
-from pathlib import Path
-import pandas as pd
-
-
 def detect_source(data):
 
     if callable(data):
