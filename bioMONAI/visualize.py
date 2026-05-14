@@ -5,7 +5,8 @@
 # %% auto #0
 __all__ = ['colorlist', 'biomonai_style', 'show_image', 'show_multichannel', 'show_mosaic', 'show_images_grid', 'show_plane',
            'show_slices', 'slice_explorer', 'show_volume', 'show_biodata', 'show_gif', 'plot_metrics',
-           'plot_intensity_histogram', 'format_sig', 'plot_histogram_and_kde', 'display_statistics_table', 'plot_dist']
+           'plot_intensity_histogram', 'plot_roc_curve_with_std', 'plot_roc_curve_with_std_interactive', 'format_sig',
+           'plot_histogram_and_kde', 'display_statistics_table', 'plot_dist']
 
 # %% ../nbs/110_visualize.ipynb #b19af8ae
 # =================================
@@ -936,6 +937,233 @@ def plot_intensity_histogram(
 
         plt.tight_layout()
         plt.show()
+
+# %% ../nbs/110_visualize.ipynb #a56835d7
+def plot_roc_curve_with_std(
+    y_probs_folds,
+    y_true_folds,
+    n_points=200,
+    show_folds=False,
+    title="ROC curve with cross-validation"
+):
+    """
+    Plot ROC curves across CV folds with mean ROC and ±1 std band.
+
+    Parameters
+    ----------
+    y_probs_folds : list of array-like
+        Predicted probabilities for the positive class per fold.
+    y_true_folds : list of array-like
+        Ground truth labels per fold.
+    n_points : int
+        Resolution of interpolated ROC curve.
+    show_folds : bool
+        Whether to display individual fold curves.
+    title : str
+        Plot title.
+    """
+
+    fpr_grid = np.linspace(0, 1, n_points)
+
+    tprs = []
+    aucs = []
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+
+    # ---------------------------------------------------------------------
+    # Per-fold ROC
+    # ---------------------------------------------------------------------
+    for fold, (y_prob, y_true) in enumerate(zip(y_probs_folds, y_true_folds)):
+
+        roc = RocCurveDisplay.from_predictions(
+            y_true,
+            y_prob,
+            ax=ax,
+            curve_kwargs={
+                "alpha": 0.25 if show_folds else 0.0,
+                "lw": 1
+            }
+        )
+
+        # Interpolate TPR onto common grid
+        tpr_interp = np.interp(fpr_grid, roc.fpr, roc.tpr)
+        tpr_interp[0] = 0.0
+
+        tprs.append(tpr_interp)
+        aucs.append(roc.roc_auc)
+
+        # Hide legend entries if not requested
+        if not show_folds:
+            roc.line_.set_label("_nolegend_")
+
+    # ---------------------------------------------------------------------
+    # Aggregate statistics
+    # ---------------------------------------------------------------------
+    tprs = np.array(tprs)
+
+    mean_tpr = tprs.mean(axis=0)
+    mean_tpr[-1] = 1.0
+
+    std_tpr = tprs.std(axis=0)
+
+    mean_auc = np.mean(aucs)
+    std_auc = np.std(aucs)
+
+    # ---------------------------------------------------------------------
+    # Mean ROC curve
+    # ---------------------------------------------------------------------
+    ax.plot(
+        fpr_grid,
+        mean_tpr,
+        color="red",
+        lw=2,
+        label=f"Mean ROC (AUC = {mean_auc:.2f} ± {std_auc:.2f})"
+    )
+
+    # ---------------------------------------------------------------------
+    # Confidence band
+    # ---------------------------------------------------------------------
+    ax.fill_between(
+        fpr_grid,
+        np.maximum(mean_tpr - std_tpr, 0),
+        np.minimum(mean_tpr + std_tpr, 1),
+        color="grey",
+        alpha=0.2,
+        label="±1 std. dev."
+    )
+
+    # ---------------------------------------------------------------------
+    # Final styling
+    # ---------------------------------------------------------------------
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.set_title(title)
+    ax.legend(loc="lower right")
+
+    plt.show()
+
+# %% ../nbs/110_visualize.ipynb #c46921a5
+def plot_roc_curve_with_std_interactive(
+    y_probs_folds,
+    y_true_folds,
+    n_points=200,
+    show_folds=True,
+    title="ROC curve with cross-validation"
+):
+
+    fpr_grid = np.linspace(0, 1, n_points)
+
+    tprs = []
+    aucs = []
+
+    fig = go.Figure()
+
+    # ------------------------------------------------------------
+    # Per-fold ROC
+    # ------------------------------------------------------------
+    for i, (y_prob, y_true) in enumerate(zip(y_probs_folds, y_true_folds)):
+
+        fpr, tpr, _ = roc_curve(y_true, y_prob)
+        roc_auc = auc(fpr, tpr)
+
+        tpr_interp = np.interp(fpr_grid, fpr, tpr)
+        tpr_interp[0] = 0.0
+
+        tprs.append(tpr_interp)
+        aucs.append(roc_auc)
+
+        if show_folds:
+            fig.add_trace(go.Scatter(
+                x=fpr,
+                y=tpr,
+                mode="lines",
+                name=f"Fold {i+1} (AUC={roc_auc:.2f})",
+                opacity=0.4
+            ))
+
+    tprs = np.array(tprs)
+
+    # ------------------------------------------------------------
+    # Mean + std
+    # ------------------------------------------------------------
+    mean_tpr = tprs.mean(axis=0)
+    mean_tpr[-1] = 1.0
+
+    std_tpr = tprs.std(axis=0)
+
+    mean_auc = np.mean(aucs)
+    std_auc = np.std(aucs)
+
+    upper = np.minimum(mean_tpr + std_tpr, 1)
+    lower = np.maximum(mean_tpr - std_tpr, 0)
+
+    # Mean ROC
+    fig.add_trace(go.Scatter(
+        x=fpr_grid,
+        y=mean_tpr,
+        mode="lines",
+        name=f"Mean ROC (AUC={mean_auc:.2f} ± {std_auc:.2f})",
+        line=dict(width=3, color="red")
+    ))
+
+    # Std band
+    fig.add_trace(go.Scatter(
+        x=np.concatenate([fpr_grid, fpr_grid[::-1]]),
+        y=np.concatenate([upper, lower[::-1]]),
+        fill="toself",
+        fillcolor="rgba(128,128,128,0.2)",
+        line=dict(color="rgba(255,255,255,0)"),
+        hoverinfo="skip",
+        name="±1 std. dev."
+    ))
+
+    # Chance line
+    fig.add_trace(go.Scatter(
+        x=[0, 1],
+        y=[0, 1],
+        mode="lines",
+        line=dict(dash="dash", color="gray"),
+        name="Chance"
+    ))
+
+    # ------------------------------------------------------------
+    # Styling: black axes + centered title
+    # ------------------------------------------------------------
+    fig.update_layout(
+        title=dict(
+            text=title,
+            x=0.5,              # center title
+            xanchor="center"
+        ),
+            xaxis=dict(
+            range=[0, 1],
+            autorange=False,
+            title="False Positive Rate",
+            showline=True,
+            linecolor="black",
+            mirror=True,
+            ticks="outside",
+            scaleanchor="y",
+            scaleratio=1
+        ),
+        yaxis=dict(
+            range=[0, 1],
+            autorange=False,
+            title="True Positive Rate",
+            showline=True,
+            linecolor="black",
+            mirror=True,
+            ticks="outside"
+        ),
+        width=700,
+        height=700,
+        template="plotly_white",
+        legend=dict(orientation="v")
+    )
+
+    fig.show()
+
+    return fig
 
 # %% ../nbs/110_visualize.ipynb #44771418
 def format_sig(value):
