@@ -767,15 +767,15 @@ class DataSplitMixin:
         if isinstance(data, pd.DataFrame):
             data = data.to_dict("records")
 
-        if isinstance(data, list) and data and self.valid_col in data[0]:
-            return ColSplitter(self.valid_col)
+        if isinstance(data, list) and data and 'is_valid' in data[0]:
+            return ColSplitter()
+        
+        if isinstance(data, list) and data and 'split_name' in data[0]:
+            return NameSplitter()
 
         return TrainTestSplitter(
             test_fraction=self.valid_fraction,
             random_state=self.seed,
-            stratify=self.stratify,
-            train_fraction=self.train_fraction,
-            shuffle=self.shuffle,
         )
 
     # --------------------------------------------------
@@ -798,9 +798,15 @@ class MonaiTransformMixin:
     """Shared MONAI transform helpers."""
 
     # --------------------------------------------------
-    def _prepare_transform(self, transform):
+    def _prepare_transform(self, transform, loader=None):
+        
+        if loader:
+            # put loader as first transform
+            transform = [loader] + list((transform or []))
+
         if transform is None:
             return None
+
         if isinstance(transform, (list, tuple)):
             return Compose(transform)
         return transform
@@ -861,13 +867,11 @@ class DataBlockBuilder(DataSplitMixin):
 
     def __init__(
         self,
-        blocks=None,
-        dl_type=None,
+        x_class=BioImage,
+        y_class=BioImage,
         get_items=None,
         get_x=None,
         get_y=None,
-        getters=None,
-        n_inp=None,
         item_transforms=None,
         val_item_transforms=None,
         transforms=None,
@@ -875,15 +879,23 @@ class DataBlockBuilder(DataSplitMixin):
         splitter=None,
         valid_fraction=0.2,
         seed=None,
-        stratify=None,
-        train_fraction=None,
-        shuffle: bool = True,
-        valid_col="is_valid",
         x_keys=None,
         y_keys=None,
         **kwargs,
     ):
         store_attr()
+
+        self.n_inp = len(x_keys) if x_keys else 1
+
+        if "dl_type" in kwargs:
+            self.dl_type = kwargs.pop("dl_type")
+        else:
+            self.dl_type = None
+
+        if "getters" in kwargs:
+            self.getters = kwargs.pop("getters")
+        else:
+            self.getters = None
 
     # --------------------------------------------------
     def _infer_columns(self, data):
@@ -915,15 +927,12 @@ class DataBlockBuilder(DataSplitMixin):
         get_x = self.get_x or ColReader(x_col)
         get_y = self.get_y or (ColReader(y_col) if y_col else None)
 
-        blocks = self.blocks
-        if blocks is None:
-            blocks = (
-                (BioImageBlock(cls=BioImage), BioImageBlock(cls=BioImage))
-                if y_col else
-                (BioImageBlock(cls=BioImage),)
-            )
+        blocks = (
+            (BioImageBlock(cls=self.x_class), BioImageBlock(cls=self.y_class))
+            if y_col else
+            (BioImageBlock(cls=self.x_class),)
+        )
 
-        # IMPORTANT: pass raw list[dict], not DataFrame
         splitter = None if mode == "test" else self._resolve_splitter(data)
 
         item_tfms, val_item_tfms = self._wrap_pipeline(self.item_transforms, self.val_item_transforms)
@@ -953,8 +962,8 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     def __init__(
         self,
-        blocks=None,
-        get_items=None,
+        x_class=BioImage,
+        y_class=BioImage,
         get_x=None,
         get_y=None,
         getters=None,
@@ -966,10 +975,6 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         splitter=None,
         valid_fraction=0.2,
         seed=None,
-        stratify=None,
-        train_fraction=None,
-        shuffle: bool = True,
-        valid_col="is_valid",
         x_keys=None,
         y_keys=None,
         **kwargs,
@@ -981,12 +986,18 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
         datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
-        train_transform = self._prepare_transform(self.transforms)
+        if self.val_item_transforms is None:
+            self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
+
+        x_loader = self.x_class.load_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
+        y_loader = self.y_class.load_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
+
+        train_transform = self._prepare_transform(self.transforms, loader=x_loader)
 
         if self.val_transforms is None:
             valid_transform = self._make_deterministic_transforms(train_transform)
         else:
-            valid_transform = self._prepare_transform(self.val_transforms)
+            valid_transform = self._prepare_transform(self.val_transforms, loader=y_loader)
 
         if mode == "test":
             test_ds = MonaiDataset(datalist_valid, valid_transform)
@@ -1011,8 +1022,8 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
     @delegates(CacheDataset.__init__, but=['transform'])
     def __init__(
         self,
-        blocks=None,
-        get_items=None,
+        x_class=BioImage,
+        y_class=BioImage,
         get_x=None,
         get_y=None,
         getters=None,
@@ -1024,10 +1035,6 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         splitter=None,
         valid_fraction=0.2,
         seed=None,
-        stratify=None,
-        train_fraction=None,
-        shuffle: bool = True,
-        valid_col="is_valid",
         x_keys=None,
         y_keys=None,
         **kwargs,
@@ -1043,12 +1050,18 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
         datalist_train, datalist_valid = self._split_data(df, mode=mode)
 
-        self.train_transform = self._prepare_transform(self.transforms)
+        if self.val_item_transforms is None:
+            self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
+
+        x_loader = self.x_class.load_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
+        y_loader = self.y_class.load_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
+
+        self.train_transform = self._prepare_transform(self.transforms, loader=x_loader)
 
         if self.val_transforms is None:
             self.valid_transform = self._make_deterministic_transforms(self.train_transform)
         else:
-            self.valid_transform = self._prepare_transform(self.val_transforms)
+            self.valid_transform = self._prepare_transform(self.val_transforms, loader=y_loader)
 
         train_kwargs = route_kwargs(CacheDataset.__init__, self.train_kwargs)
         valid_kwargs = route_kwargs(CacheDataset.__init__, self.valid_kwargs)
@@ -1180,16 +1193,7 @@ class MonaiLoader:
             Additional DataLoader kwargs (train + val), e.g. pin_memory, prefetch_factor
             Validation-specific args can be prefixed with `val_`
         """
-        self.batch_size = batch_size
-        self.val_batch_size = val_batch_size or batch_size
-        self.num_workers = num_workers
-        self.val_num_workers = val_num_workers or num_workers
-        self.shuffle = shuffle
-        self.val_shuffle = val_shuffle
-        self.x_keys = x_keys
-        self.y_keys = y_keys
-        self.show_summary = show_summary
-        self.vocab = vocab
+        store_attr()
 
         split = split_prefixed_kwargs(kwargs, prefixes=("train_", "val_"))
         self.train_kwargs = split["train"]
@@ -1239,13 +1243,13 @@ class MonaiLoader:
         if valid_ds:
             valid_dl = torchDataLoader(
                 valid_ds,
-                batch_size=self.val_batch_size,
+                batch_size=self.val_batch_size or self.batch_size,
                 shuffle=self.val_shuffle,
-                num_workers=self.val_num_workers,
+                num_workers=self.val_num_workers or self.num_workers,
                 **valid_kwargs
             )
         
-        # ---- patch fastai compatibility ----
+        # ---- patch additional methods ----
         train_dl = _patch_dataloader(train_dl)
         if valid_dl is not None:
             valid_dl = _patch_dataloader(valid_dl)
@@ -1447,6 +1451,32 @@ class BioDataLoaders(DataLoaders):
                task=None,
                dataset=None,
                backend=None,
+               x_keys=None,
+               y_keys=None,
+               x_class=None,
+               y_class=None,
+               colmap=None,
+               base_path=None,
+               folders=None,
+               suffixes=None,
+               keep_original=False,
+               get_x=None,
+               get_y=None,
+               item_transforms=None,
+               val_item_transforms=None,
+               transforms=None,
+               val_transforms=None,
+               splitter=None,
+               valid_fraction=0.2,
+               seed=None,
+               shuffle: bool = True,
+               batch_size=64,
+               num_workers=0,
+               device=None,
+               drop_last=False,
+               pin_memory=False,
+               persistent_workers=False,
+               show_summary=False,
                **kwargs):
         """
         Build training + validation DataLoaders.
@@ -1458,6 +1488,8 @@ class BioDataLoaders(DataLoaders):
         | task | str | None | Task name |
         | dataset | str | None | Dataset builder |
         | backend | str | None | Loader backend |
+        | x_class | str | None | Input class |
+        | y_class | str | None | Target class |
         | kwargs | dict | {} | Additional parameters |
 
         Returns
@@ -1471,6 +1503,32 @@ class BioDataLoaders(DataLoaders):
             dataset=dataset,
             backend=backend,
             mode="train",
+            x_class=x_class,
+            y_class=y_class,
+            x_keys=x_keys,
+            y_keys=y_keys,
+            colmap=colmap,
+            base_path=base_path,
+            folders=folders,
+            suffixes=suffixes,
+            keep_original=keep_original,
+            get_x=get_x,
+            get_y=get_y,
+            item_transforms=item_transforms,
+            val_item_transforms=val_item_transforms,
+            transforms=transforms,
+            val_transforms=val_transforms,
+            splitter=splitter,
+            valid_fraction=valid_fraction,
+            seed=seed,
+            shuffle=shuffle,
+            batch_size=batch_size,
+            num_workers=num_workers,
+            device=device,
+            drop_last=drop_last,
+            pin_memory=pin_memory,
+            persistent_workers=persistent_workers,
+            show_summary=show_summary,
             **kwargs
         )
 

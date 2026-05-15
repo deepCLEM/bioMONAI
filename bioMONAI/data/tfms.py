@@ -1174,7 +1174,7 @@ def ProcessImageDataset(
     input_class=BioImageBase,
     target_class=BioImageBase,
     image_splitter=SlidingWindowSplitter,
-    splitter=RandomSplitter,
+    dataset_splitter=RandomSplitter,
     colmap=None,
     csv=True,
     csv_filename=None,
@@ -1213,7 +1213,7 @@ def ProcessImageDataset(
     # ------------------------------------------
     splits = _build_dataset_splits(
         df=df,
-        splitter=splitter,
+        splitter=dataset_splitter,
         **kwargs,
     )
 
