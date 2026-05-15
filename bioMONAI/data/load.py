@@ -504,6 +504,7 @@ class DictSource(BaseSource):
         folders=None,
         suffixes=None,
         keep_original=False,
+        **kwargs,
     ):
         if isinstance(data, dict):
             data = [data]
@@ -572,20 +573,21 @@ class DataFrameSource(BaseSource):
         folders=None,
         suffixes=None,
         keep_original=False,
+        **kwargs,
     ):
-        self.df = df
 
-        self.dict_source = DictSource(
+        self.source = DictSource(
             data=df.to_dict(orient="records"),
             colmap=colmap,
             base_path=base_path,
             folders=folders,
             suffixes=suffixes,
             keep_original=keep_original,
+            **kwargs
         )
 
     def load(self):
-        return self.dict_source.load()
+        return self.source.load()
     
 
 # %% ../../nbs/022_data.load.ipynb #a04d0f49
@@ -595,30 +597,21 @@ class CSVSource(BaseSource):
     @delegates(DataFrameSource.__init__)
     def __init__(self, path, **kwargs):
         self.path = path
-        self.kwargs = kwargs
+
+        df = pd.read_csv(path)
+        source = DataFrameSource(df, **kwargs)
+        self.source = source
 
     def load(self):
-
-        df = pd.read_csv(self.path)
-
-        source = DataFrameSource(df, **self.kwargs)
-
-        return source.load()
+        return self.source.load()
 
 # %% ../../nbs/022_data.load.ipynb #7111765f
 @register_source("folder")
 class FolderSource(BaseSource):
 
-    def __init__(self, root, colmap):
+    def __init__(self, root, colmap, **kwargs):
         self.root = Path(root)
         self.colmap = colmap
-
-    def _scan(self, folder):
-
-        path = self.root / folder
-        return sorted([f.name for f in path.iterdir()])
-
-    def load(self):
 
         scanned = {
             key: self._scan(folder)
@@ -630,24 +623,38 @@ class FolderSource(BaseSource):
             for values in zip(*scanned.values())
         ]
 
-        source = DictSource(
+        self.source = DictSource(
             records,
             colmap={k: k for k in scanned.keys()},
             base_path=self.root,
             folders=self.colmap,
             keep_original=True,
+            **kwargs,
         )
 
-        return source.load()
+    def _scan(self, folder):
+
+        path = self.root / folder
+        return sorted([f.name for f in path.iterdir()])
+
+    def load(self):
+        return self.source.load()
 
 # %% ../../nbs/022_data.load.ipynb #be11809c
 @register_source("list")
 class ListSource(BaseSource):
 
-    def __init__(self, items, colmap=None, base_path="."):
+    def __init__(self, 
+                 items, 
+                 colmap=None, 
+                 base_path=".",
+                 **kwargs,
+                 ):
+        
         self.items = items
         self.base_path = base_path
         self.colmap = colmap or {}
+        self.kwargs = kwargs
 
     def load(self):
 
@@ -687,6 +694,7 @@ class ListSource(BaseSource):
             colmap=colmap,
             base_path=self.base_path,
             keep_original=True,
+            **self.kwargs,
         )
 
         return source.load()
@@ -700,14 +708,14 @@ class CallableSource(BaseSource):
         self,
         items_fn,
         target_fn=None,
-        x_key="image",
-        y_key="label",
+        x_keys="image",
+        y_keys="label",
         **kwargs,
     ):
         self.items_fn = items_fn
         self.target_fn = target_fn
-        self.x_key = x_key
-        self.y_key = y_key
+        self.x_keys = x_keys
+        self.y_keys = y_keys
         self.kwargs = kwargs
 
     def load(self):
@@ -719,7 +727,9 @@ class CallableSource(BaseSource):
         # Case 1: items already dictionaries
         if isinstance(first, dict):
 
-            records = [dict(x) for x in items]
+            records = items
+            if self.target_fn:
+                 records = [dict(row, **{self.y_keys: self.target_fn(row[self.x_keys])}) for row in records]
 
         # Case 2: items are inputs only (paths, ids, etc.)
         else:
@@ -729,11 +739,11 @@ class CallableSource(BaseSource):
             for x in items:
 
                 row = {
-                    self.x_key: x
+                    self.x_keys: x
                 }
 
                 if self.target_fn:
-                    row[self.y_key] = self.target_fn(x)
+                    row[self.y_keys] = self.target_fn(x)
 
                 records.append(row)
 
@@ -1075,6 +1085,7 @@ class FastaiLoader:
         pin_memory=False,
         persistent_workers=False,
         show_summary=False,
+        **kwargs,
     ):
         """
         FastAI-style DataLoader wrapper.
@@ -1097,6 +1108,7 @@ class FastaiLoader:
             Keep workers alive between epochs
         """
         store_attr()
+        self.kwargs = kwargs
 
     # --------------------------------------------------
     def build(self, datablock, data_source):
@@ -1111,6 +1123,7 @@ class FastaiLoader:
             drop_last=self.drop_last,
             pin_memory=self.pin_memory,
             persistent_workers=self.persistent_workers,
+            **self.kwargs
         )
 
         # --------------------------------------------------
