@@ -5,12 +5,12 @@
 # %% auto #0
 __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNewMeta', 'DisplayedTransform', 'dataclass', 'field',
            'risinstance', 'typedispatch', 'MetaTensor', 'set_determinism', 'Callable', 'Iterable', 'Sequence',
-           'MutableSequence', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple', 'ensure_tuple_rep',
-           'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax', 'is_cuda_available',
-           'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor', 'route_kwargs', 'read_yaml',
-           'read_args_from_yaml', 'dictlist_to_funclist', 'dict2string', 'add_columns_to_csv', 'ColSplitter',
-           'TrainTestSplitter', 'FuncSplitter', 'NameSplitter', 'RandomSplitter', 'GrandparentSplitter',
-           'ParentSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
+           'MutableSequence', 'Mapping', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple',
+           'ensure_tuple_rep', 'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax',
+           'is_cuda_available', 'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor',
+           'route_kwargs', 'read_yaml', 'read_args_from_yaml', 'dictlist_to_funclist', 'dict2string',
+           'add_columns_to_csv', 'ColSplitter', 'TrainTestSplitter', 'FuncSplitter', 'NameSplitter', 'RandomSplitter',
+           'GrandparentSplitter', 'ParentSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
 
 # %% ../nbs/000_utils.ipynb #f6eab00d
 # =================================
@@ -50,7 +50,7 @@ from torch.cuda import is_available as is_cuda_available
 # =================================
 from monai.data import MetaTensor
 from monai.utils import set_determinism
-from collections.abc import Callable, Iterable, Sequence, MutableSequence
+from collections.abc import Callable, Iterable, Sequence, MutableSequence, Mapping
 from monai.config import PathLike
 from monai.utils.misc import ensure_tuple, ensure_tuple_rep
 
@@ -93,6 +93,7 @@ Callable = Callable
 Iterable = Iterable
 Sequence = Sequence
 MutableSequence = MutableSequence
+Mapping = Mapping
 Optional = Optional
 Union = Union
 

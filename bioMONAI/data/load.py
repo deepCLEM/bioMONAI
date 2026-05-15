@@ -859,7 +859,7 @@ class MonaiTransformMixin:
         return Compose(deterministic)
 
 # %% ../../nbs/022_data.load.ipynb #85a42e13
-@register_dataset("dataset", backend="fastai")
+@register_dataset("datablock", backend="fastai")
 class DataBlockBuilder(DataSplitMixin):
 
     DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
@@ -881,21 +881,13 @@ class DataBlockBuilder(DataSplitMixin):
         seed=None,
         x_keys=None,
         y_keys=None,
+        dl_type = None,
+        getters = None,
         **kwargs,
     ):
         store_attr()
 
         self.n_inp = len(x_keys) if x_keys else 1
-
-        if "dl_type" in kwargs:
-            self.dl_type = kwargs.pop("dl_type")
-        else:
-            self.dl_type = None
-
-        if "getters" in kwargs:
-            self.getters = kwargs.pop("getters")
-        else:
-            self.getters = None
 
     # --------------------------------------------------
     def _infer_columns(self, data):
@@ -957,7 +949,7 @@ class DataBlockBuilder(DataSplitMixin):
         return datablock, data
 
 # %% ../../nbs/022_data.load.ipynb #795e12ca
-@register_dataset("monaidataset", backend="monai")
+@register_dataset("dataset", backend="monai")
 class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     def __init__(
@@ -1278,22 +1270,25 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
-    def _apply_task_defaults(cls, task, dataset, kwargs):
+    def _apply_task_defaults(
+        cls,
+        task: Optional[str] = None,              # Registered task name
+        dataset: Optional[str] = None,           # Dataset builder name
+        **kwargs,                                # User-provided kwargs
+    ):
         """
-        Apply task-specific defaults (transforms, configs).
+        Apply task-specific defaults and configuration.
 
         | Parameter | Type | Default | Description |
-        |----------|------|--------|-------------|
+        |----------|------|----------|-------------|
         | task | str | None | Registered task name |
         | dataset | str | None | Dataset builder name |
-        | kwargs | dict | {} | User-provided arguments |
+        | kwargs | dict | None | User-provided keyword arguments |
 
         Returns
         -------
-        dataset : str
-            Resolved dataset name
-        kwargs : dict
-            Updated kwargs with task defaults applied
+        tuple[str, dict]
+            Resolved dataset name and updated kwargs.
         """
         if task is None:
             return dataset, kwargs
@@ -1318,7 +1313,27 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
-    def _load_data(cls, data, kwargs, val_data=None):
+    def _load_data(
+        cls,
+        data: Any,                                     # Training data source
+        val_data: Optional[Any] = None,                # Optional validation data
+        **kwargs,                                      # Source loading configuration
+    ):
+        """
+        Load and normalize training and validation data.
+
+        | Parameter | Type | Default | Description |
+        |----------|------|----------|-------------|
+        | data | Any | — | Training data source |
+        | val_data | Any | None | Optional validation dataset |
+        | kwargs | dict | None | Source loading configuration |
+
+        Returns
+        -------
+        list[dict]
+            Loaded records.
+        """
+
 
         source_name = detect_source(data)
         SourceClass = SOURCE_REGISTRY[source_name]
@@ -1349,22 +1364,31 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
-    def _build_dataset(cls, data, dataset, backend, kwargs, mode):
+    def _build_dataset(
+        cls,
+        data: Sequence[dict],                          # Input records
+        dataset: str,                                  # Dataset builder name
+        backend: Optional[str] = None,                 # Backend override
+        mode: str = "train",                           # train or test mode
+        **kwargs,                                      # Dataset builder kwargs
+    ):
         """
-        Build dataset(s) using the registered dataset builder.
+        Build dataset objects using a registered dataset builder.
 
         | Parameter | Type | Default | Description |
-        |----------|------|--------|-------------|
-        | data | list[dict] | — | Input data |
-        | dataset | str | — | Dataset builder name |
-        | backend | str | None | Backend (fastai, monai, etc.) |
-        | kwargs | dict | {} | Dataset builder kwargs |
-        | mode | str | "train" | Mode: train / test |
+        |----------|------|----------|-------------|
+        | data | list[dict] | — | Input records |
+        | dataset | str | — | Registered dataset builder |
+        | backend | str | None | Backend override |
+        | mode | str | "train" | Dataset mode ("train" or "test") |
+        | kwargs | dict | None | Dataset builder keyword arguments |
 
         Returns
         -------
-        (train_ds, valid_ds), backend
+        tuple
+            ((train_ds, valid_ds), backend)
         """
+
         DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
         backend = backend or inferred_backend
 
@@ -1375,21 +1399,28 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
-    def _build_loader(cls, train_ds, valid_ds, backend, kwargs):
+    def _build_loader(
+        cls,
+        train_ds: Any,                                 # Training dataset
+        valid_ds: Optional[Any] = None,                # Validation dataset
+        backend: Optional[str] = None,                 # Loader backend
+        **kwargs,                                      # Loader kwargs
+    ):
         """
         Build DataLoaders from datasets.
 
         | Parameter | Type | Default | Description |
-        |----------|------|--------|-------------|
+        |----------|------|----------|-------------|
         | train_ds | Any | — | Training dataset |
         | valid_ds | Any | None | Validation dataset |
-        | backend | str | — | Loader backend |
-        | kwargs | dict | {} | Loader kwargs |
+        | backend | str | None | Loader backend |
+        | kwargs | dict | None | Loader keyword arguments |
 
         Returns
         -------
         DataLoaders
         """
+
         LoaderClass = LOADER_REGISTRY[backend]
         loader_kwargs = route_kwargs(LoaderClass.__init__, kwargs)
 
@@ -1398,115 +1429,160 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
-    def _run_pipeline(cls,
-                      data,
-                      val_data=None,
-                      task=None,
-                      dataset=None,
-                      backend=None,
-                      mode="train",
-                      **kwargs):
+    def _run_pipeline(
+        cls,
+        data: Any,                                    # Input data source
+        task: Optional[str] = None,                   # Registered task name
+        dataset: Optional[str] = None,                # Dataset builder name
+        backend: Optional[str] = None,                # Backend override
+        val_data: Optional[Any] = None,               # Optional validation dataset
+        mode: str = "train",                          # train or test mode
+        **kwargs,                                     # Additional pipeline kwargs
+    ):
         """
-        Core pipeline orchestrator.
+        Execute the full data pipeline.
+
+        Pipeline stages:
+            data -> source -> dataset -> dataloader
 
         | Parameter | Type | Default | Description |
-        |----------|------|--------|-------------|
-        | data | Any | — | Input data |
-        | val_data | Any | None | Optional validation data |
-        | task | str | None | Task name |
-        | dataset | str | None | Dataset builder |
-        | backend | str | None | Loader backend |
-        | mode | str | "train" | train or test |
-        | kwargs | dict | {} | Additional parameters |
+        |----------|------|----------|-------------|
+        | data | Any | — | Input data source |
+        | task | str | None | Registered task name |
+        | dataset | str | None | Dataset builder name |
+        | backend | str | None | Loader backend override |
+        | val_data | Any | None | Optional validation dataset |
+        | mode | str | "train" | Pipeline mode ("train" or "test") |
+        | kwargs | dict | {} | Additional pipeline configuration |
 
         Returns
         -------
         DataLoaders or DataLoader
         """
         # ---- apply task defaults ----
-        dataset, kwargs = cls._apply_task_defaults(task, dataset, kwargs)
+        dataset, kwargs = cls._apply_task_defaults(task, dataset, **kwargs)
 
         # ---- load dataframe ----
-        data_dict = cls._load_data(data, kwargs, val_data)
+        data_dict = cls._load_data(data, val_data, **kwargs)
 
         # ---- build dataset ----
         (ds_train, ds_valid), backend = cls._build_dataset(
-            data_dict, dataset, backend, kwargs, mode
+            data_dict, dataset, backend, mode, **kwargs
         )
 
         # ---- test mode ----
         if mode == "test":
             ds = ds_valid if ds_valid is not None else ds_train
-            dls = cls._build_loader(ds, None, backend, kwargs)
+            dls = cls._build_loader(ds, None, backend, **kwargs)
             return dls.valid if hasattr(dls, "valid") else dls.train
 
         # ---- train mode ----
-        return cls._build_loader(ds_train, ds_valid, backend, kwargs)
+        return cls._build_loader(ds_train, ds_valid, backend, **kwargs)
 
     # --------------------------------------------------
     @classmethod
-    def create(cls,
-               data,
-               val_data=None,
-               task=None,
-               dataset=None,
-               backend=None,
-               x_keys=None,
-               y_keys=None,
-               x_class=None,
-               y_class=None,
-               colmap=None,
-               base_path=None,
-               folders=None,
-               suffixes=None,
-               keep_original=False,
-               get_x=None,
-               get_y=None,
-               item_transforms=None,
-               val_item_transforms=None,
-               transforms=None,
-               val_transforms=None,
-               splitter=None,
-               valid_fraction=0.2,
-               seed=None,
-               shuffle: bool = True,
-               batch_size=64,
-               num_workers=0,
-               device=None,
-               drop_last=False,
-               pin_memory=False,
-               persistent_workers=False,
-               show_summary=False,
-               **kwargs):
+    def create(
+        cls,
+        data: Any,                                                  # Training data source
+
+        task: Optional[str] = None,                                # Registered task name
+        dataset: Optional[str] = None,                             # Dataset builder name
+        backend: Optional[str] = None,                             # Backend override
+        val_data: Optional[Any] = None,                            # Optional validation data
+
+        x_keys: Optional[Sequence[str]] = None,                    # Input column keys
+        y_keys: Optional[Sequence[str]] = None,                    # Target column keys
+
+        x_class: Optional[str] = None,                             # Input object/type class
+        y_class: Optional[str] = None,                             # Target object/type class
+
+        colmap: Optional[Mapping[str, str]] = None,                # Column remapping dictionary
+        base_path: Optional[str] = None,                           # Base path for relative files
+        folders: Optional[Mapping[str, str]] = None,               # Folder mapping
+        suffixes: Optional[Mapping[str, str]] = None,              # File suffix mapping
+
+        keep_original: bool = False,                               # Preserve original samples
+
+        get_x: Optional[Callable] = None,                          # Custom input extractor
+        get_y: Optional[Callable] = None,                          # Custom target extractor
+
+        item_transforms: Optional[Sequence[Callable]] = None,      # Training item transforms
+        val_item_transforms: Optional[Sequence[Callable]] = None,  # Validation item transforms
+
+        transforms: Optional[Sequence[Callable]] = None,           # Training transforms
+        val_transforms: Optional[Sequence[Callable]] = None,       # Validation transforms
+
+        splitter: Optional[Callable] = None,                       # Dataset splitter
+
+        valid_fraction: float = 0.2,                               # Validation split fraction
+        seed: Optional[int] = None,                                # Random seed
+        shuffle: bool = True,                                      # Shuffle training data
+
+        batch_size: int = 64,                                      # Batch size
+        num_workers: int = 0,                                      # Number of workers
+        device: Optional[str] = None,                              # Device override
+
+        drop_last: bool = False,                                   # Drop incomplete last batch
+        pin_memory: bool = False,                                  # Pin memory in DataLoader
+        persistent_workers: bool = False,                          # Keep workers persistent
+
+        show_summary: bool = False,                                # Display dataset summary
+
+        **kwargs,                                                  # Additional pipeline kwargs
+    ):
         """
-        Build training + validation DataLoaders.
+        Create training and validation DataLoaders.
 
         | Parameter | Type | Default | Description |
-        |----------|------|--------|-------------|
-        | data | Any | — | Training data |
-        | val_data | Any | None | Optional validation data |
-        | task | str | None | Task name |
-        | dataset | str | None | Dataset builder |
-        | backend | str | None | Loader backend |
-        | x_class | str | None | Input class |
-        | y_class | str | None | Target class |
-        | kwargs | dict | {} | Additional parameters |
+        |----------|------|----------|-------------|
+        | data | Any | — | Training data source |
+        | task | str | None | Registered task name |
+        | dataset | str | None | Dataset builder name |
+        | backend | str | None | Backend override |
+        | val_data | Any | None | Optional validation dataset |
+        | x_keys | Sequence[str] | None | Input column keys |
+        | y_keys | Sequence[str] | None | Target column keys |
+        | x_class | str | None | Input object class |
+        | y_class | str | None | Target object class |
+        | colmap | Mapping[str, str] | None | Column remapping dictionary |
+        | base_path | str | None | Base path for relative files |
+        | folders | Mapping[str, str] | None | Folder mapping configuration |
+        | suffixes | Mapping[str, str] | None | File suffix mapping |
+        | keep_original | bool | False | Preserve original samples |
+        | get_x | callable | None | Custom input extractor |
+        | get_y | callable | None | Custom target extractor |
+        | item_transforms | Sequence[callable] | None | Training item transforms |
+        | val_item_transforms | Sequence[callable] | None | Validation item transforms |
+        | transforms | Sequence[callable] | None | Training transforms |
+        | val_transforms | Sequence[callable] | None | Validation transforms |
+        | splitter | callable | None | Dataset splitting function |
+        | valid_fraction | float | 0.2 | Validation split fraction |
+        | seed | int | None | Random seed |
+        | shuffle | bool | True | Shuffle training data |
+        | batch_size | int | 64 | Batch size |
+        | num_workers | int | 0 | Number of dataloader workers |
+        | device | str | None | Device override |
+        | drop_last | bool | False | Drop incomplete last batch |
+        | pin_memory | bool | False | Pin memory in DataLoader |
+        | persistent_workers | bool | False | Keep workers persistent |
+        | show_summary | bool | False | Display dataset summary |
+        | kwargs | dict | {} | Additional pipeline configuration |
 
         Returns
         -------
         DataLoaders
         """
+
         return cls._run_pipeline(
             data,
-            val_data=val_data,
             task=task,
             dataset=dataset,
             backend=backend,
-            mode="train",
-            x_class=x_class,
-            y_class=y_class,
+            val_data=val_data,
             x_keys=x_keys,
             y_keys=y_keys,
+            x_class=x_class,
+            y_class=y_class,
             colmap=colmap,
             base_path=base_path,
             folders=folders,
@@ -1529,18 +1605,25 @@ class BioDataLoaders(DataLoaders):
             pin_memory=pin_memory,
             persistent_workers=persistent_workers,
             show_summary=show_summary,
-            **kwargs
+            **kwargs,  
         )
 
     # --------------------------------------------------
     @classmethod
-    def create_from_yaml(cls, yaml_path):
+    def create_from_yaml(
+        cls,
+        yaml_path: str,                               # YAML configuration file path
+    ):
         """
-        Build training + validation DataLoaders from a YAML configuration file.
+        Create training and validation DataLoaders from YAML configuration.
 
-        The YAML file may include the same arguments as ``BioDataLoaders.create``:
-        ``data``, ``val_data``, ``task``, ``dataset``, ``backend``, plus any
-        additional keyword arguments that should be forwarded through the pipeline.
+        | Parameter | Type | Default | Description |
+        |----------|------|----------|-------------|
+        | yaml_path | str | — | YAML configuration file path |
+
+        Returns
+        -------
+        DataLoaders
         """
         config = read_yaml(yaml_path) or {}
         config = {key: (None if value == "None" else value) for key, value in config.items()}
@@ -1565,29 +1648,33 @@ class BioDataLoaders(DataLoaders):
     
     # --------------------------------------------------
     @classmethod
-    def test_dl(cls,
-                data,
-                task=None,
-                dataset=None,
-                backend=None,
-                **kwargs):
+    def test_dl(
+        cls,
+        data: Any,                                    # Test data source
+        task: Optional[str] = None,                  # Registered task name
+        dataset: Optional[str] = None,               # Dataset builder name
+        backend: Optional[str] = None,               # Backend override
+        **kwargs,                                    # Additional pipeline kwargs
+    ):
         """
-        Build a test DataLoader.
+        Create a test DataLoader.
 
-        Uses validation transforms and disables splitting.
+        Validation transforms are automatically applied and dataset
+        splitting is disabled.
 
         | Parameter | Type | Default | Description |
-        |----------|------|--------|-------------|
-        | data | Any | — | Test data |
-        | task | str | None | Task name |
-        | dataset | str | None | Dataset builder |
-        | backend | str | None | Loader backend |
-        | kwargs | dict | {} | Additional parameters |
+        |----------|------|----------|-------------|
+        | data | Any | — | Test data source |
+        | task | str | None | Registered task name |
+        | dataset | str | None | Dataset builder name |
+        | backend | str | None | Backend override |
+        | kwargs | dict | {} | Additional pipeline configuration |
 
         Returns
         -------
         DataLoader
         """
+
         return cls._run_pipeline(
             data,
             task=task,
@@ -1599,14 +1686,22 @@ class BioDataLoaders(DataLoaders):
     
     # --------------------------------------------------
     @classmethod
-    def test_dl_from_yaml(cls, yaml_path):
+    def test_dl_from_yaml(
+        cls,
+        yaml_path: str,                               # YAML configuration file path
+    ):
         """
-        Build a test DataLoader from a YAML configuration file.
+        Create a test DataLoader from YAML configuration.
 
-        The YAML file may include the same arguments as ``BioDataLoaders.test_dl``:
-        ``data``, ``task``, ``dataset``, ``backend``, plus any additional
-        keyword arguments that should be forwarded through the pipeline.
+        | Parameter | Type | Default | Description |
+        |----------|------|----------|-------------|
+        | yaml_path | str | — | YAML configuration file path |
+
+        Returns
+        -------
+        DataLoader
         """
+        
         config = read_yaml(yaml_path) or {}
         config = {key: (None if value == "None" else value) for key, value in config.items()}
 

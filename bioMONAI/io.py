@@ -29,6 +29,7 @@ from bioio import Writer as writer
 from bioio_tifffile import Reader as TiffReader
 from bioio_ome_tiff import Reader as OmeTiffReader
 from bioio_czi import Reader as CziReader
+from bioio_imageio import Reader as IOReader
 
 # =================================
 # Medical imaging
@@ -608,24 +609,18 @@ def _load_default(path, ind_dict=None, loader=None, channels="CZYX", **kwargs):
 
 # %% ../nbs/010_io.ipynb #039b0cf5
 @LOADER_REGISTRY.register(".jpg", ".jpeg")
-def _load_jpeg(path, ind_dict=None, loader=None, channels="CZYX", **kwargs):
+def _load_jpeg(path, ind_dict=None, channels="CZYX", **kwargs):
     """
     Load JPG/JPEG images.
 
-    bioio only accepts `.jpg`, so `.jpeg` paths are internally
-    converted before calling the default loader.
     """
 
     path_str = str(path)
 
-    # bioio expects .jpg
-    if path_str.lower().endswith(".jpeg"):
-        path_str = path_str[:-5] + ".jpg"
-
     return _load_default(
         path_str,
         ind_dict=ind_dict,
-        loader=loader,
+        loader=IOReader,
         channels=channels,
         **kwargs,
     )
