@@ -644,60 +644,49 @@ class FolderSource(BaseSource):
 @register_source("list")
 class ListSource(BaseSource):
 
-    def __init__(self, 
-                 items, 
-                 colmap=None, 
-                 base_path=".",
-                 **kwargs,
-                 ):
-        
+    def __init__(
+        self,
+        items,
+        colmap=None,
+        base_path=".",
+        keep_original=True,
+        **kwargs,
+    ):
         self.items = items
+        self.colmap = colmap
         self.base_path = base_path
-        self.colmap = colmap or {}
+        self.keep_original = keep_original
         self.kwargs = kwargs
 
     def load(self):
 
+        if not self.items:
+            raise ValueError("`items` cannot be empty.")
+
         first = self.items[0]
 
-        # case 1: list of paths
+        # List of paths
         if isinstance(first, (str, Path)):
-
             records = [{"image": str(x)} for x in self.items]
             colmap = {"image": "image"}
 
-        # case 2: list of dicts
-        else:
-
+        # List of dict-like records
+        elif isinstance(first, dict):
             records = [dict(x) for x in self.items]
+            colmap = self.colmap
 
-            if self.colmap:
+        else:
+            raise TypeError(
+                "`items` must be a list of paths or dictionaries."
+            )
 
-                records = [
-                    {
-                        dst: row[src]
-                        for dst, src in self.colmap.items()
-                    }
-                    for row in records
-                ]
-
-                colmap = {k: k for k in self.colmap.keys()}
-
-            else:
-                colmap = {
-                    k: k
-                    for k in records[0].keys()
-                }
-
-        source = DictSource(
+        return DictSource(
             records,
             colmap=colmap,
             base_path=self.base_path,
-            keep_original=True,
+            keep_original=self.keep_original,
             **self.kwargs,
-        )
-
-        return source.load()
+        ).load()
 
 # %% ../../nbs/022_data.load.ipynb #57918c64
 @register_source("callable")

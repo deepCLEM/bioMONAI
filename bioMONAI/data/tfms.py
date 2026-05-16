@@ -568,302 +568,214 @@ def _add_column(
     return df
 
 
-def _save_separate(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    valid_df: Optional[pd.DataFrame],
-    save_dir: str,
-    train_path: str,
-    test_path: str,
-    valid_path: str,
-) -> None:
+# def _save_separate(
+#     train_df: pd.DataFrame,
+#     test_df: pd.DataFrame,
+#     valid_df: Optional[pd.DataFrame],
+#     save_dir: str,
+#     train_path: str,
+#     test_path: str,
+#     valid_path: str,
+# ) -> None:
 
-    _save_csv(train_df, os.path.join(save_dir, train_path))
-    _save_csv(test_df, os.path.join(save_dir, test_path))
+#     _save_csv(train_df, os.path.join(save_dir, train_path))
+#     _save_csv(test_df, os.path.join(save_dir, test_path))
 
-    if valid_df is not None:
-        _save_csv(valid_df, os.path.join(save_dir, valid_path))
-
-
-def _save_single(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    valid_df: Optional[pd.DataFrame],
-    save_dir: str,
-    combined_path: str,
-    split_column: str,
-) -> None:
-
-    dfs = [
-        _add_column(train_df, split_column, "train"),
-        _add_column(test_df, split_column, "test"),
-    ]
-
-    if valid_df is not None:
-        dfs.append(
-            _add_column(valid_df, split_column, "valid")
-        )
-
-    combined_df = pd.concat(dfs, ignore_index=True)
-
-    _save_csv(
-        combined_df,
-        os.path.join(save_dir, combined_path),
-    )
+#     if valid_df is not None:
+#         _save_csv(valid_df, os.path.join(save_dir, valid_path))
 
 
-def _save_train_valid_together(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    valid_df: Optional[pd.DataFrame],
-    save_dir: str,
-    test_path: str,
-    train_valid_path: str,
-    is_valid_column: str,
-) -> None:
+# def _save_single(
+#     train_df: pd.DataFrame,
+#     test_df: pd.DataFrame,
+#     valid_df: Optional[pd.DataFrame],
+#     save_dir: str,
+#     combined_path: str,
+#     split_column: str,
+# ) -> None:
 
-    # Save test separately
-    _save_csv(
-        test_df,
-        os.path.join(save_dir, test_path),
-    )
+#     dfs = [
+#         _add_column(train_df, split_column, "train"),
+#         _add_column(test_df, split_column, "test"),
+#     ]
 
-    dfs = [
-        _add_column(
-            train_df,
-            is_valid_column,
-            False,
-        )
-    ]
+#     if valid_df is not None:
+#         dfs.append(
+#             _add_column(valid_df, split_column, "valid")
+#         )
 
-    if valid_df is not None:
-        dfs.append(
-            _add_column(
-                valid_df,
-                is_valid_column,
-                True,
-            )
-        )
+#     combined_df = pd.concat(dfs, ignore_index=True)
 
-    train_valid_df = pd.concat(dfs, ignore_index=True)
-
-    _save_csv(
-        train_valid_df,
-        os.path.join(save_dir, train_valid_path),
-    )
+#     _save_csv(
+#         combined_df,
+#         os.path.join(save_dir, combined_path),
+#     )
 
 
-# %% ../../nbs/023_data.tfms.ipynb #26b3ab24
+# def _save_train_valid_together(
+#     train_df: pd.DataFrame,
+#     test_df: pd.DataFrame,
+#     valid_df: Optional[pd.DataFrame],
+#     save_dir: str,
+#     test_path: str,
+#     train_valid_path: str,
+#     is_valid_column: str,
+# ) -> None:
+
+#     # Save test separately
+#     _save_csv(
+#         test_df,
+#         os.path.join(save_dir, test_path),
+#     )
+
+#     dfs = [
+#         _add_column(
+#             train_df,
+#             is_valid_column,
+#             False,
+#         )
+#     ]
+
+#     if valid_df is not None:
+#         dfs.append(
+#             _add_column(
+#                 valid_df,
+#                 is_valid_column,
+#                 True,
+#             )
+#         )
+
+#     train_valid_df = pd.concat(dfs, ignore_index=True)
+
+#     _save_csv(
+#         train_valid_df,
+#         os.path.join(save_dir, train_valid_path),
+#     )
+
+
+# %% ../../nbs/023_data.tfms.ipynb #fbe95804
 def split_dataframe(
-    input_data: Union[str, pd.DataFrame],
-    splitter: Callable = RandomSplitter,
-    save_mode: str = "separate",
-    split_column: str = "split",
-    is_valid_column: str = "is_valid",
-    train_path: str = "train.csv",
-    test_path: str = "test.csv",
-    valid_path: str = "valid.csv",
-    combined_path: str = "dataset.csv",
-    train_valid_path: str = "train_valid.csv",
-    data_save_path: Optional[str] = None,
-    **kwargs,
-) -> tuple:
+    df,
+    splitter=None,
+    return_single=False,
+    split_column="split",
+    save_dir=None,
+    csv_kwargs=None,
+    filter_mask=None,
+    overwrite=False,
+    **splitter_kwargs,
+):
     """
-    Split a dataset into multiple subsets.
+    Split dataframe with optional filtering and safe merge.
 
-    The input dataset can be provided either as a pandas DataFrame
-    or as a path to a CSV file. The splitting logic is delegated to
-    the provided ``splitter`` callable.
-
-    The splitter may return either:
-
-    - ``(train_df, valid_df)``
-    - ``(train_df, valid_df, test_df)``
-
-    The resulting datasets can optionally be saved in different formats:
-
-    - ``"separate"``
-        Save each split as an individual CSV file.
-
-    - ``"single"``
-        Save all splits into a single CSV file with an additional
-        column identifying the split name.
-
-    - ``"train_valid_together"``
-        Save the test set separately while combining train and
-        validation datasets into one CSV file with an ``is_valid``
-        boolean column.
-
-    Args:
-        input_data:
-            Input dataset as either a pandas DataFrame or a CSV file path.
-
-        splitter:
-            Callable responsible for splitting the dataset.
-
-        save_mode:
-            Saving strategy for output datasets.
-            One of:
-            ``"separate"``,
-            ``"single"``,
-            ``"train_valid_together"``.
-
-        split_column:
-            Column name used when ``save_mode="single"``.
-
-        is_valid_column:
-            Column name used when
-            ``save_mode="train_valid_together"``.
-
-        train_path:
-            Filename for the train dataset.
-
-        test_path:
-            Filename for the test dataset.
-
-        valid_path:
-            Filename for the validation dataset.
-
-        combined_path:
-            Filename used when saving all splits into one file.
-
-        train_valid_path:
-            Filename used when saving combined
-            train + validation data.
-
-        data_save_path:
-            Directory where datasets will be saved.
-            If ``None``, datasets are not saved.
-
-        **kwargs:
-            Additional keyword arguments passed to the splitter.
-
-    Returns:
-        tuple:
-            Split datasets returned by the splitter.
-
-    Raises:
-        TypeError:
-            If ``input_data`` is neither a DataFrame nor a file path.
-
-        ValueError:
-            If ``save_mode`` is invalid or the splitter
-            returns an unsupported number of outputs.
+    Key behavior:
+    - Only masked rows are split
+    - Unmasked rows are never modified
+    - Existing split_column values are preserved unless overwrite=True
     """
 
-    # ---------------------------------
-    # Load dataset
-    # ---------------------------------
-    if isinstance(input_data, str):
-        df = pd.read_csv(input_data)
+    csv_kwargs = csv_kwargs or {}
 
-    elif isinstance(input_data, pd.DataFrame):
-        df = input_data.copy()
+    if splitter is None:
+        splitter = RandomSplitter(**splitter_kwargs)
 
+    # ------------------------------------------
+    # Resolve mask
+    # ------------------------------------------
+    if filter_mask is None:
+        mask = pd.Series(True, index=df.index)
     else:
-        raise TypeError(
-            "input_data must be a file path "
-            "or pandas DataFrame"
-        )
+        mask = filter_mask(df) if callable(filter_mask) else filter_mask
 
-    print("Splitting dataset...")
+    work_df = df[mask].copy()
 
-    splits = splitter(**kwargs)(df)
+    # ------------------------------------------
+    # Run splitter only on subset
+    # ------------------------------------------
+    splits = splitter(work_df)
 
-    if not isinstance(splits, (tuple, list)):
-        raise ValueError(
-            "splitter must return a tuple/list"
-        )
-
-    if len(splits) == 2:
-        train_df, test_df = splits
-        valid_df = None
-
-    elif len(splits) == 3:
-        train_df, valid_df, test_df = splits
-
+    # Normalize output
+    if isinstance(splits, dict):
+        split_dict = {
+            name: (
+                split.copy()
+                if isinstance(split, pd.DataFrame)
+                else work_df.loc[split].copy()
+            )
+            for name, split in splits.items()
+        }
     else:
-        raise ValueError(
-            "splitter must return either "
-            "(train, valid) or "
-            "(train, valid, test)"
+        split_names = getattr(
+            splitter,
+            "split_names",
+            [f"split_{i}" for i in range(len(splits))]
         )
 
-    # ---------------------------------
-    # Save datasets
-    # ---------------------------------
-    if data_save_path:
-
-        os.makedirs(data_save_path, exist_ok=True)
-
-        save_handlers = {
-            "separate": lambda: _save_separate(
-                train_df=train_df,
-                test_df=test_df,
-                valid_df=valid_df,
-                save_dir=data_save_path,
-                train_path=train_path,
-                test_path=test_path,
-                valid_path=valid_path,
-            ),
-
-            "single": lambda: _save_single(
-                train_df=train_df,
-                test_df=test_df,
-                valid_df=valid_df,
-                save_dir=data_save_path,
-                combined_path=combined_path,
-                split_column=split_column,
-            ),
-
-            "train_valid_together": lambda:
-                _save_train_valid_together(
-                    train_df=train_df,
-                    test_df=test_df,
-                    valid_df=valid_df,
-                    save_dir=data_save_path,
-                    test_path=test_path,
-                    train_valid_path=train_valid_path,
-                    is_valid_column=is_valid_column,
-                ),
+        split_dict = {
+            name: (
+                split.copy()
+                if isinstance(split, pd.DataFrame)
+                else work_df.loc[split].copy()
+            )
+            for name, split in zip(split_names, splits)
         }
 
-        if save_mode not in save_handlers:
-            raise ValueError(
-                "save_mode must be one of: "
-                "'separate', "
-                "'single', "
-                "'train_valid_together'"
-            )
+    # ------------------------------------------
+    # Save CSVs
+    # ------------------------------------------
+    if save_dir is not None:
+        save_dir = Path(save_dir)
+        save_dir.mkdir(parents=True, exist_ok=True)
 
-        save_handlers[save_mode]()
+        for name, split_df in split_dict.items():
+            split_df.to_csv(save_dir / f"{name}.csv", index=False, **csv_kwargs)
 
-        print(f"Datasets saved to {data_save_path}")
+    # ------------------------------------------
+    # Return full dataframe
+    # ------------------------------------------
+    if return_single:
 
-    return splits
+        full = df.copy()
+
+        # preserve existing column if not overwrite
+        if split_column not in full.columns:
+            full[split_column] = None
+        elif overwrite:
+            full.loc[mask, split_column] = None
+
+        # assign only processed rows
+        for name, split_df in split_dict.items():
+            idx = split_df.index
+
+            if overwrite:
+                full.loc[idx, split_column] = name
+            else:
+                # only fill missing values
+                missing = full.loc[idx, split_column].isna()
+                full.loc[idx[missing], split_column] = name.values if hasattr(name, "values") else name
+
+        return full
+
+    return split_dict
 
 # %% ../../nbs/023_data.tfms.ipynb #1e42b2d6
 def build_df(
-    filenames: Union[list[str|Path], L],                 # List of file names to process
-    *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
-    function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
-    filename_col: str = "filename",                            # Column name for the input filenames.
-    output_csv: Optional[str|Path] = None,               # If provided, saves the full dataframe to this CSV path.
-    split: bool = False,                            # If True, applies split_dataframe to the generated dataframe.
-    split_kwargs: Optional[dict] = None,            # Keyword arguments passed to split_dataframe.
-) -> Union[
-    pd.DataFrame,
-    tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]
-]:
-    
+    filenames: Union[list[str | Path], L],
+    *functions: Callable[[str], str],
+    function_names: Optional[Union[List[str], L]] = None,
+    filename_col: str = "filename",
+    output_csv: Optional[str | Path] = None,
+    split: bool = False,
+    split_kwargs: Optional[dict] = None,
+):
     """
-    Create a DataFrame from filenames and one or more transformation functions.
+    Create a DataFrame from filenames and transformation functions.
     """
 
     if function_names and len(function_names) != len(functions):
         raise ValueError("Length of function_names must match number of functions.")
 
-    # Determine column names
+    # Column names
     if function_names is None:
         column_names = [
             f.__name__ if hasattr(f, "__name__") else f"func_{i}"
@@ -880,42 +792,50 @@ def build_df(
 
     df = pd.DataFrame(data)
 
-    # Save full dataset if requested
+    # Save full dataset
     if output_csv:
         df.to_csv(output_csv, index=False)
 
-    # Apply splitting if requested
+    # Split if requested
     if split:
         split_kwargs = split_kwargs or {}
+
+        # IMPORTANT: splitter must already be callable
+        # default handled inside split_dataframe
         return split_dataframe(df, **split_kwargs)
 
     return df
 
 # %% ../../nbs/023_data.tfms.ipynb #02b16df9
 def build_df_from_folder(
-    path: str|Path,
-    *functions: Callable[[str], str],               # One or more functions that take a filename and return a string (e.g., for generating target paths).
-    function_names: Optional[Union[List[str], L]] = None,     # Optional column names for the function outputs. If None, function.__name__ is used.
-    output_csv: Optional[str|Path] = None,               # If provided, saves the full dataframe to this CSV path.
-    subfolders: str|list[str]|None = None,
+    path: str | Path,
+    *functions: Callable[[str], str],
+    function_names: Optional[Union[List[str], L]] = None,
+    output_csv: Optional[str | Path] = None,
+    subfolders: str | list[str] | None = None,
     recurse: bool = True,
-    filename_filter: str|re.Pattern|Callable[[str], bool]|None = None,
-    split: bool = False,                            # If True, applies split_dataframe to the generated dataframe.
-    split_kwargs: Optional[dict] = None,            # Keyword arguments passed to split_dataframe.
-) -> Union[
-    pd.DataFrame,
-    tuple[pd.DataFrame, pd.DataFrame, Optional[pd.DataFrame]]
-]:
+    filename_filter: str | re.Pattern | Callable[[str], bool] | None = None,
+    split: bool = False,
+    split_kwargs: Optional[dict] = None,
+):
     """
-    Create a DataFrame from filenames and one or more transformation functions.
+    Create a DataFrame from filenames and transformation functions.
     """
 
     filenames = get_images(path, subfolders, recurse, filename_filter)
-    return build_df(filenames, *functions, 
-                    function_names=function_names,
-                    output_csv=output_csv, 
-                    split=split, 
-                    split_kwargs=split_kwargs)
+
+    df = build_df(
+        filenames,
+        *functions,
+        function_names=function_names,
+        output_csv=output_csv,
+    )
+
+    if split:
+        split_kwargs = split_kwargs or {}
+        return split_dataframe(df, **split_kwargs)
+
+    return df
 
 # %% ../../nbs/023_data.tfms.ipynb #fd1ae9aa
 SlidingWindowSplitter = SlidingWindowSplitter
@@ -971,7 +891,6 @@ def _process_single_image(
     split_name,
     input_key,
     target_key,
-    patch_size,
     image_splitter,
     image_transforms,
     patch_transforms,
@@ -983,6 +902,7 @@ def _process_single_image(
 ):
 
     image_name = _get_image_name(row[input_key])
+    patch_size = image_splitter.patch_size
 
     # --------------------------------------------------
     # Load images
@@ -1012,12 +932,9 @@ def _process_single_image(
         gt_patch_size = patch_size
 
     # --------------------------------------------------
-    # Create splitter
+    # Create patches
     # --------------------------------------------------
-    splitter_kwargs = route_kwargs(image_splitter, kwargs)
-    splitter = image_splitter(patch_size=patch_size, **splitter_kwargs)
-
-    patches = splitter(data_img)
+    patches = image_splitter(data_img)
 
     # --------------------------------------------------
     # Create HDF5 groups
@@ -1035,7 +952,7 @@ def _process_single_image(
     # --------------------------------------------------
     for idx, (data_patch, loc) in enumerate(patches):
 
-        gt_patch = splitter._get_patch(
+        gt_patch = image_splitter._get_patch(
             gt_img, location=loc, patch_size=gt_patch_size
         )
 
@@ -1076,7 +993,7 @@ def _load_dataset_dataframe(
     return pd.DataFrame(
         BioDataLoaders._load_data(
             data_paths,
-            {'colmap': colmap},
+            colmap=colmap,
         )
     )
 
@@ -1087,58 +1004,38 @@ def _build_dataset_splits(
     **kwargs,
 ):
     """
-    Build dataset splits from splitter indices.
+    Build dataset splits from splitter.
 
     Returns:
-        dict:
-            Mapping of split name -> DataFrame
+        dict[str, pd.DataFrame]
     """
 
     if splitter is None:
         return {"all": df}
 
     # ------------------------------------------
-    # Get split indices
+    # Delegate fully to split_dataframe
     # ------------------------------------------
-    split_idxs = split_dataframe(
+    splits = split_dataframe(
         df,
         splitter=splitter,
         **kwargs,
     )
 
-    split_names = getattr(
-        splitter(**kwargs),
-        "split_names",
-        None,
-    )
+    # If return_single=True, normalize back to dict
+    if isinstance(splits, pd.DataFrame):
+        split_col = kwargs.get("split_column", "split")
 
-    # ------------------------------------------
-    # Default split names
-    # ------------------------------------------
-    if split_names is None:
+        return {
+            name: group.drop(columns=[split_col]).reset_index(drop=True)
+            for name, group in splits.groupby(split_col)
+        }
 
-        split_names = (
-            ("train", "valid")
-            if len(split_idxs) == 2
-            else ("train", "valid", "test")
-        )
-
-    # ------------------------------------------
-    # Convert idxs -> DataFrames
-    # ------------------------------------------
-    splits = {}
-
-    for name, idxs in zip(
-        split_names,
-        split_idxs,
-    ):
-
-        splits[name] = (
-            df.iloc[idxs]
-            .reset_index(drop=True)
-        )
-
-    return splits
+    # Already dict[str, DataFrame]
+    return {
+        name: split.reset_index(drop=True)
+        for name, split in splits.items()
+    }
 
 
 def _save_patch_csv(
@@ -1170,11 +1067,10 @@ def ProcessImageDataset(
     data_paths,
     output_folder,
     output_filename,
-    patch_size,
     input_class=BioImageBase,
     target_class=BioImageBase,
-    image_splitter=SlidingWindowSplitter,
-    dataset_splitter=RandomSplitter,
+    image_splitter=SlidingWindowSplitter((64,64)),
+    dataset_splitter=RandomSplitter(),
     colmap=None,
     csv=True,
     csv_filename=None,
@@ -1243,7 +1139,6 @@ def ProcessImageDataset(
                     split_name=split_name,
                     input_key=input_key,
                     target_key=target_key,
-                    patch_size=patch_size,
                     patch_list=all_patches,
                     image_splitter=image_splitter,
                     image_transforms=image_transforms,

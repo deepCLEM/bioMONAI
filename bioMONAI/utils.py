@@ -25,6 +25,7 @@ from typing import Any, List, Optional, Union
 import inspect
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
+import pandas as pd
 
 # =================================
 # Imaging
