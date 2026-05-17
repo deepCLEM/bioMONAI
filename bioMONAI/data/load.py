@@ -542,14 +542,20 @@ class DictSource(BaseSource):
 
             for new_col, src_col in self.colmap.items():
 
-                if isinstance(src_col, list):
+                if isinstance(src_col, str):
+                    item[new_col] = self._build_path(item.get(src_col), new_col)
+                    cols_to_drop.add(src_col)
+                
+                elif isinstance(src_col, list):
                     values = [item.get(c) for c in src_col]
                     item[new_col] = self._build_paths(values, new_col)
                     cols_to_drop.update(src_col)
 
+                elif isinstance(src_col, Callable):
+                    item[new_col] = src_col(item)
+
                 else:
-                    item[new_col] = self._build_path(item.get(src_col), new_col)
-                    cols_to_drop.add(src_col)
+                    raise ValueError(f"Invalid src_col type for {new_col}: {type(src_col)}")                    
 
             if not self.keep_original:
                 for c in cols_to_drop:
@@ -945,9 +951,9 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         self,
         x_class=BioImage,
         y_class=BioImage,
+        get_items=None,
         get_x=None,
         get_y=None,
-        getters=None,
         n_inp=None,
         item_transforms=None,
         val_item_transforms=None,
@@ -964,6 +970,9 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     # --------------------------------------------------
     def build(self, data, mode="train"):
+
+        if self.get_items is not None:
+            data = self.get_items(data)
 
         datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
@@ -1005,9 +1014,9 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         self,
         x_class=BioImage,
         y_class=BioImage,
+        get_items=None,
         get_x=None,
         get_y=None,
-        getters=None,
         n_inp=None,
         item_transforms=None,
         val_item_transforms=None,
@@ -1028,6 +1037,9 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     # --------------------------------------------------
     def build(self, df, mode="train"):
+
+        if self.get_items is not None:
+            data = self.get_items(data)
 
         datalist_train, datalist_valid = self._split_data(df, mode=mode)
 
@@ -1492,6 +1504,7 @@ class BioDataLoaders(DataLoaders):
 
         keep_original: bool = False,                               # Preserve original samples
 
+        get_items: Optional[Callable] = None,                      # Custom item extractor
         get_x: Optional[Callable] = None,                          # Custom input extractor
         get_y: Optional[Callable] = None,                          # Custom target extractor
 
@@ -1538,6 +1551,7 @@ class BioDataLoaders(DataLoaders):
         | folders | Mapping[str, str] | None | Folder mapping configuration |
         | suffixes | Mapping[str, str] | None | File suffix mapping |
         | keep_original | bool | False | Preserve original samples |
+        | get_items | callable | None | Custom item extractor |
         | get_x | callable | None | Custom input extractor |
         | get_y | callable | None | Custom target extractor |
         | item_transforms | Sequence[callable] | None | Training item transforms |
@@ -1577,6 +1591,7 @@ class BioDataLoaders(DataLoaders):
             folders=folders,
             suffixes=suffixes,
             keep_original=keep_original,
+            get_items=get_items,
             get_x=get_x,
             get_y=get_y,
             item_transforms=item_transforms,
