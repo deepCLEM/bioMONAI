@@ -476,7 +476,6 @@ def _preprocess(obj, transforms=None):
         transforms = [transforms]
 
     obj.meta['size_original'] = obj.shape
-    obj.meta['transforms'] = {}
 
     for t in transforms:
         start = time.time()
@@ -488,6 +487,7 @@ def _preprocess(obj, transforms=None):
         raw_params = getattr(t, "__dict__", {})
         safe_params = _sanitize(raw_params)
 
+        obj.meta.setdefault('transforms', {})
         obj.meta['transforms'][name] = {
             'time': time.time() - start,
             'params': safe_params,
@@ -759,6 +759,7 @@ def _load_and_preprocess(
     transforms: Callable|Iterable[Callable]|None =None,
     channels: str ="CZYX",
     ind_dict: dict|None =None,
+    dtype: torch.dtype = torch.float32,
     **kwargs,
 ) -> MetaTensor:
     """
@@ -769,7 +770,7 @@ def _load_and_preprocess(
     path = Path(file_path)
 
     image_loader = _get_loader(path)
-    metatensor = image_loader(path, channels=channels, ind_dict=ind_dict, **kwargs)
+    metatensor = image_loader(path, channels=channels, ind_dict=ind_dict, **kwargs).to(dtype)
 
     # store path
     metatensor.meta["filepath"] = str(path)
@@ -851,6 +852,7 @@ def _multi_sequence_stream(
     transforms=None,
     channels="CZYX",
     ind_dict=None,
+    dtype: torch.dtype = torch.float32,
     **kwargs,
 ) -> Iterable[MetaTensor]:
     """
@@ -871,6 +873,7 @@ def _multi_sequence_stream(
             transforms=transforms,
             channels=channels,
             ind_dict=ind_dict,
+            dtype=dtype,
             **kwargs,
         )
 
@@ -928,7 +931,6 @@ def _stack(
     input_metatensors: Sequence[MetaTensor],
     stack_axis: str = "C",
     channels: str = "CZYX",
-    dtype: torch.dtype = torch.float32,
     squeeze: bool = True,
 ) -> torch.Tensor:
     """
@@ -938,7 +940,6 @@ def _stack(
         input_metatensors: Sequence of MetaTensors to stack.
         stack_axis: Axis along which to stack (e.g., "S" for sequence).
         channels: Desired channel order for output (e.g., "CZYX").
-        dtype: Data type for output tensor.
         squeeze: Whether to squeeze singleton dimensions before stacking.
     
     Returns:
@@ -955,9 +956,9 @@ def _stack(
     if not channels or not all(c in "SCZYX" for c in channels):
         raise ValueError(f"channels must contain valid axis labels, got {channels!r}")
     
-    # Preprocess tensors: squeeze and convert dtype
+    # Squeeze tensors
     processed = [
-        t.squeeze().to(dtype) if squeeze else t.to(dtype)
+        t.squeeze() if squeeze else t
         for t in input_metatensors
     ]
     
@@ -1129,6 +1130,7 @@ def image_reader(
             transforms=transforms,
             channels=channels,
             ind_dict=ind_dict,
+            dtype=dtype,
             **kwargs,
         )
 
@@ -1139,6 +1141,7 @@ def image_reader(
                 transforms=transforms,
                 channels=channels,
                 ind_dict=ind_dict,
+                dtype=dtype,
                 **kwargs,
             )
         return [_load(p) for p in file_path]
@@ -1159,7 +1162,7 @@ def image_reader(
     # =====================================================
     if is_multi:
         metatensors = _iter_multi()
-        metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, dtype=dtype, squeeze=squeeze)
+        metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
         metatensor.meta.update(_meta_from_layout(metatensor.shape, metatensor.meta['layout']))
 
         if output == "metatensor":
@@ -1189,7 +1192,7 @@ def image_reader(
     if squeeze:
         metatensor = metatensor.squeeze()
 
-    metatensor = metatensor.to(dtype)
+    metatensor = metatensor
 
     if output == "metatensor":
         return metatensor
@@ -1299,7 +1302,7 @@ def image_reader_dict(
 
         for key in keys:
             metatensors = [d[key] for d in d_list]
-            metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, dtype=dtype, squeeze=squeeze)
+            metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
             metatensor.meta.update(_meta_from_layout(metatensor.shape, metatensor.meta['layout']))
 
             out[key] = metatensor
