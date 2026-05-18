@@ -774,7 +774,8 @@ def _load_and_preprocess(
 
     # store path
     metatensor.meta["filepath"] = str(path)
-    
+    metatensor.meta["transforms"] = {}
+
     metatensor = _preprocess(metatensor, transforms)
 
     # format extraction
@@ -920,10 +921,9 @@ def _multi_sequence_stream_dict(
             obj=obj.copy(),
             keys=keys,
             transforms=transforms,
-            loader=loader,
             channels=channels,
             ind_dict=ind_dict,
-            npz_key=npz_key,
+            **kwargs,
         )
 
 # %% ../nbs/010_io.ipynb #c4fc78a7
@@ -932,7 +932,7 @@ def _stack(
     stack_axis: str = "C",
     channels: str = "CZYX",
     squeeze: bool = True,
-) -> torch.Tensor:
+) -> MetaTensor:
     """
     Stack a sequence of MetaTensors into a single tensor.
     
@@ -1060,7 +1060,7 @@ def _meta_from_layout(shape: tuple[int, ...],           # The shape of the image
 def image_reader(
     file_path: PathLike | Sequence[PathLike],           # The file path(s) to the image(s) to be read. Can be a single path or a sequence of paths for multi-image loading.
     lazy: bool = False,                                 # Whether to use lazy loading (streaming) for multi-image inputs. If True, returns an iterable of MetaTensors instead of a single stacked tensor.
-    output: str = "tensor",                             # The desired output format. Options: "nparray", "nparray+meta", "tensor", "tensor+meta", "metatensor"
+    output: str = "metatensor",                             # The desired output format. Options: "nparray", "nparray+meta", "tensor", "tensor+meta", "metatensor"
     transforms: Callable|list[Callable]|None = None,    # Optional transforms to apply to the loaded image(s). Can be a single callable or a list of callables.
     channels: str ="CZYX",                              # The desired channel layout for the output tensor. Should be compatible with the input data and the loader used.
     ind_dict: dict|None = None,                         # Optional dictionary indicating specific channels or slices to load. Keys should correspond to axes in the channel layout (e.g., {"Y": slice(0, 10)}).
@@ -1229,7 +1229,6 @@ def image_reader_dict(
 
     Supports:
         - single dictionary input
-        - sequence of dictionaries
         - eager or lazy execution
 
     The specified keys are replaced with loaded/preprocessed MetaTensor
@@ -1268,10 +1267,10 @@ def image_reader_dict(
             **kwargs,
         )
 
-    def _iter_multi():
+    def _iter_multi(dict_list):
         if lazy:
             return _multi_sequence_stream_dict(
-                objs=data,
+                objs=dict_list,
                 keys=keys,
                 transforms=transforms,
                 channels=channels,
@@ -1279,7 +1278,7 @@ def image_reader_dict(
                 **kwargs,
             )
 
-        return [_load(obj) for obj in data]
+        return [_load(obj) for obj in dict_list]
 
     
     if not keys: 
@@ -1288,37 +1287,39 @@ def image_reader_dict(
     if isinstance(keys, str):
         keys = [keys]
 
-    is_multi = (
-        isinstance(data, Sequence)
-        and not isinstance(data, dict)
-    )
+    for k in keys:
+        if k in data:
 
-    # -------------------------------------------------
-    # MULTI CASE
-    # -------------------------------------------------
-    if is_multi:
-        d_list = _iter_multi()
-        out = d_list[0]
+            obj = data[k]
+
+            is_multi = (
+                isinstance(obj, Sequence)
+                and not isinstance(obj, str)
+            )
+
+            # -------------------------------------------------
+            # MULTI CASE
+            # -------------------------------------------------
+            if is_multi:
+
+                dict_list = [{k: p} for p in obj]
+                
+                image_list = _iter_multi(dict_list)
+                obj = _stack(image_list, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
+                obj.meta.update(_meta_from_layout(obj.shape, obj.meta['layout']))
+
+                data[k] = obj
+
+            # -------------------------------------------------
+            # SINGLE CASE
+            # -------------------------------------------------
+            else:
+                data[k] = _load(obj)
 
         for key in keys:
-            metatensors = [d[key] for d in d_list]
-            metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
-            metatensor.meta.update(_meta_from_layout(metatensor.shape, metatensor.meta['layout']))
+            data[key].meta.update(_meta_from_layout(data[key].shape, channels))
 
-            out[key] = metatensor
-
-
-        return out
-
-    # -------------------------------------------------
-    # SINGLE CASE
-    # -------------------------------------------------
-    out = _load(data)
-
-    for key in keys:
-        out[key].meta.update(_meta_from_layout(out[key].shape, channels))
-
-    return out
+        return data
 
 # %% ../nbs/010_io.ipynb #514dacd9
 LoadImage = LoadImage
