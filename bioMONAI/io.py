@@ -792,6 +792,7 @@ def _load_and_preprocess_dict(
     transforms: Callable | Iterable[Callable] | None = None,
     channels: str = "CZYX",
     ind_dict: dict | None = None,
+    dtype: torch.dtype = torch.float32,
     **kwargs,
 ) -> dict:
     """
@@ -829,7 +830,7 @@ def _load_and_preprocess_dict(
             channels=channels,
             ind_dict=ind_dict,
             **kwargs
-        )
+        ).to(dtype)
 
         # store path
         obj[key].meta["filepath"] = str(path)
@@ -885,6 +886,7 @@ def _multi_sequence_stream_dict(
     transforms=None,
     channels: str = "CZYX",
     ind_dict=None,
+    dtype: torch.dtype = torch.float32,
     **kwargs,
 ) -> Iterable[dict]:
     """
@@ -923,6 +925,7 @@ def _multi_sequence_stream_dict(
             transforms=transforms,
             channels=channels,
             ind_dict=ind_dict,
+            dtype=dtype,
             **kwargs,
         )
 
@@ -1219,9 +1222,9 @@ def image_reader_dict(
     transforms: Callable | list[Callable] | None = None,
     channels: str = "CZYX",
     ind_dict: dict | None = None,
-    dtype=torch.float32,                                
-    squeeze: bool = False,                              
-    stack_axis: str = "C",       
+    dtype: torch.dtype = torch.float32,
+    squeeze: bool = False,
+    stack_axis: str = "C",
     **kwargs,
 ):
     """
@@ -1264,6 +1267,7 @@ def image_reader_dict(
             transforms=transforms,
             channels=channels,
             ind_dict=ind_dict,
+            dtype=dtype,
             **kwargs,
         )
 
@@ -1275,6 +1279,7 @@ def image_reader_dict(
                 transforms=transforms,
                 channels=channels,
                 ind_dict=ind_dict,
+                dtype=dtype,
                 **kwargs,
             )
 
@@ -1304,7 +1309,8 @@ def image_reader_dict(
 
                 dict_list = [{k: p} for p in obj]
                 
-                image_list = _iter_multi(dict_list)
+                dict_list = _iter_multi(dict_list)
+                image_list = [d[k] for d in dict_list]
                 obj = _stack(image_list, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
                 obj.meta.update(_meta_from_layout(obj.shape, obj.meta['layout']))
 
@@ -1315,15 +1321,9 @@ def image_reader_dict(
             # -------------------------------------------------
             else:
                 data[k] = _load(obj)
+                data[k].meta.update(_meta_from_layout(data[k].shape, channels))
 
-        for key in keys:
-            data[key].meta.update(_meta_from_layout(data[key].shape, channels))
-
-        return data
-
-# %% ../nbs/010_io.ipynb #514dacd9
-LoadImage = LoadImage
-LoadImaged = LoadImaged
+    return data
 
 # %% ../nbs/010_io.ipynb #5a78f57f
 class BioImageReader(ImageReader):
@@ -1397,3 +1397,7 @@ class BioImageReader(ImageReader):
         return tuple(
             v for v in (m.get("width"), m.get("height"), m.get("depth")) if v is not None
         )
+
+# %% ../nbs/010_io.ipynb #49b7b1f2
+LoadImage = LoadImage
+LoadImaged = LoadImaged
