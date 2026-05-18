@@ -4,14 +4,15 @@
 
 # %% auto #0
 __all__ = ['Blur', 'RandBlur', 'FunctionTransform', 'MonaiTransform', 'RandMonaiTransform', 'ApplyTo', 'Resample', 'Resize',
-           'CropND', 'RandCameraNoise', 'GaussianSmooth', 'MedianSmooth', 'SavitzkyGolaySmooth', 'GaussianSharpen',
-           'RandGaussianSmooth', 'RandGaussianSharpen', 'RandGaussianNoise', 'ScaleImage', 'ScaleImagePercentiles',
-           'ScaleImageVariance', 'ScaleIntensity', 'ScaleIntensityFixedMean', 'ScaleIntensityRange',
-           'ScaleIntensityRangePercentiles', 'NormalizeIntensity', 'HistogramNormalize', 'RelabelInstances',
-           'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity', 'MaskIntensity', 'ForegroundMask',
-           'RGB2HED', 'HED2RGB', 'RandCrop2D', 'RandCropND', 'RandFlip', 'RandRot90', 'RandRotate', 'RandZoom',
-           'ShiftIntensity', 'StdShiftIntensity', 'RandShiftIntensity', 'RandStdShiftIntensity', 'AdjustContrast',
-           'RandAdjustContrast']
+           'Crop', 'SpatialCrop', 'CenterSpatialCrop', 'CropForeground', 'BoundingRect', 'CenterScaleCrop', 'CropND',
+           'Rotate', 'Zoom', 'Flip', 'GridPatch', 'GridSplit', 'GaussianSmooth', 'MedianSmooth', 'SavitzkyGolaySmooth',
+           'GaussianSharpen', 'RandGaussianSmooth', 'RandGaussianSharpen', 'RandGaussianNoise', 'ScaleImage',
+           'ScaleImagePercentiles', 'ScaleImageVariance', 'ScaleIntensity', 'ScaleIntensityFixedMean',
+           'ScaleIntensityRange', 'ScaleIntensityRangePercentiles', 'NormalizeIntensity', 'HistogramNormalize',
+           'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity', 'MaskIntensity',
+           'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop2D', 'RandCropND', 'RandRotate', 'RandFlip', 'RandRot90',
+           'RandRotation', 'RandZoom', 'RandCameraNoise', 'ShiftIntensity', 'StdShiftIntensity', 'RandShiftIntensity',
+           'RandStdShiftIntensity', 'AdjustContrast', 'RandAdjustContrast']
 
 # %% ../nbs/030_transforms.ipynb #56ab9960
 # =================================
@@ -94,7 +95,7 @@ class MonaiTransform(DisplayedTransform):
         self,
         monai_transform,
         dict_transform=None,
-        keys=None,              # <-- NEW
+        keys=None,            
         has_channels=True,
         **kwargs,
     ):
@@ -346,7 +347,6 @@ class Resample(MonaiTransform):
         self,
         sampling=None,        # isotropic factor OR pixdim fallback
         has_channels=True,
-        dict_transform=None,
         keys=None,
         **kwargs
     ):
@@ -362,7 +362,7 @@ class Resample(MonaiTransform):
 
         super().__init__(
             monai_transform=tfms.Spacing,
-            dict_transform=dict_transform,
+            dict_transform=tfms.SpacingD,
             keys=keys,
             has_channels=has_channels,
             **kwargs
@@ -384,7 +384,6 @@ class Resize(MonaiTransform):
         self,
         size=None,
         has_channels=True,
-        dict_transform=None,
         keys=None,
         **kwargs,
     ):
@@ -398,10 +397,203 @@ class Resize(MonaiTransform):
 
         super().__init__(
             monai_transform=tfms.Resize,
-            dict_transform=dict_transform,
+            dict_transform=tfms.ResizeD,
             keys=keys,
             has_channels=has_channels,
             spatial_size=size,   # MONAI expects this arg
+            **kwargs,
+        )
+
+# %% ../nbs/030_transforms.ipynb #bb51abb4
+class Crop(MonaiTransform):
+    """
+    MONAI Crop wrapper using MonaiTransform.
+
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (Crop*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        roi_size=None,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+        """
+        roi_size:
+            - int → broadcast to all spatial dims
+            - tuple/list → target spatial size
+        """
+
+        self.roi_size = roi_size
+
+        super().__init__(
+            monai_transform=tfms.Crop,
+            dict_transform=tfms.CropD,
+            keys=keys,
+            has_channels=has_channels,
+            roi_size=roi_size,   # MONAI expects this arg
+            **kwargs,
+        )
+
+# %% ../nbs/030_transforms.ipynb #9cceb4af
+class SpatialCrop(MonaiTransform):
+    """
+    MONAI SpatialCrop wrapper using MonaiTransform.
+
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (SpatialCrop*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        roi_size=None,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+        """
+        roi_size:
+            - int → broadcast to all spatial dims
+            - tuple/list → target spatial size
+        """
+
+        self.roi_size = roi_size
+
+        super().__init__(
+            monai_transform=tfms.SpatialCrop,
+            dict_transform=tfms.SpatialCropD,
+            keys=keys,
+            has_channels=has_channels,
+            roi_size=roi_size,   # MONAI expects this arg
+            **kwargs,
+        )
+
+# %% ../nbs/030_transforms.ipynb #89d29c18
+class CenterSpatialCrop(MonaiTransform):
+    """
+    MONAI CenterSpatialCrop wrapper using MonaiTransform.
+
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (CenterSpatialCrop*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        roi_size=None,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+        """
+        roi_size:
+            - int → broadcast to all spatial dims
+            - tuple/list → target spatial size
+        """
+
+        self.roi_size = roi_size
+
+        super().__init__(
+            monai_transform=tfms.CenterSpatialCrop,
+            dict_transform=tfms.CenterSpatialCropD,
+            keys=keys,
+            has_channels=has_channels,
+            roi_size=roi_size,   # MONAI expects this arg
+            **kwargs,
+        )
+
+# %% ../nbs/030_transforms.ipynb #9877db6d
+class CropForeground(MonaiTransform):
+    """
+    MONAI CropForeground wrapper using MonaiTransform.
+
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (CropForeground*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+
+        super().__init__(
+            monai_transform=tfms.CropForeground,
+            dict_transform=tfms.CropForegroundD,
+            keys=keys,
+            has_channels=has_channels,
+            **kwargs,
+        )
+
+# %% ../nbs/030_transforms.ipynb #8c0506ba
+class BoundingRect(MonaiTransform):
+    """
+    MONAI BoundingRect wrapper using MonaiTransform.
+
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (BoundingRect*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+
+        super().__init__(
+            monai_transform=tfms.BoundingRect,
+            dict_transform=tfms.BoundingRectD,
+            keys=keys,
+            has_channels=has_channels,
+            **kwargs,
+        )
+
+# %% ../nbs/030_transforms.ipynb #cdeac873
+class CenterScaleCrop(MonaiTransform):
+    """
+    MONAI CenterScaleCrop wrapper using MonaiTransform.
+
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (CenterScaleCrop*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        roi_scale=1.0,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+
+        self.roi_scale = roi_scale
+
+        super().__init__(
+            monai_transform=tfms.CenterScaleCrop,
+            dict_transform=tfms.CenterScaleCropD,
+            keys=keys,
+            has_channels=has_channels,
+            roi_scale=roi_scale, 
             **kwargs,
         )
 
@@ -447,125 +639,160 @@ class CropND(Transform):
                     slices[dim] = s
         return x[tuple(slices)]
 
-# %% ../nbs/030_transforms.ipynb #01606d8a
-class RandCameraNoise(RandTransform):
+# %% ../nbs/030_transforms.ipynb #17fea3a1
+class Rotate(MonaiTransform):
     """
-    Simulates camera noise with typedispatch support:
-    - MetaTensor (kept in tensor domain)
-    - dict (image key-based pipeline)
-    - BioImageBase (type preserved)
+    MONAI Rotate wrapper using MonaiTransform.
+
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (Rotate*d auto-inferred)
+    - BioImageBase
     - NumPy arrays
     """
 
     def __init__(
         self,
-        p: float = 1.0,
-        damp=1e-2,
-        qe=0.7,
-        gain=2,
-        offset=100,
-        exp_time=0.1,
-        dark_current=0.6,
-        readout=1.5,
-        bitdepth=16,
-        seed=42,
-        simulation=False,
-        camera='cmos',
-        gain_variance=0.1,
-        offset_variance=5,
-        keys=None,  # <-- for dict support
+        angle=0.0,
+        has_channels=True,
+        keys=None,
+        **kwargs,
     ):
-        store_attr()
-        self.rs = np.random.RandomState(seed=seed)
 
-    # -------------------------
-    # CORE NOISE FUNCTION 
-    # -------------------------
-    def _apply_noise(self, x, rs):
-        max_adu = float(2**self.bitdepth - 1)
+        self.angle = angle
 
-        # normalize input
-        if x.min() >= 0.0 and x.max() <= 1.0:
-            x = (x * max_adu).astype(np.uint16 if self.bitdepth > 8 else np.uint8)
+        super().__init__(
+            monai_transform=tfms.Rotate,
+            dict_transform=tfms.RotateD,
+            keys=keys,
+            has_channels=has_channels,
+            angle=angle, 
+            **kwargs,
+        )
 
-        # photon model
-        if not self.simulation:
-            photons = x / self.gain / self.qe * self.damp
-        else:
-            photons = x
+# %% ../nbs/030_transforms.ipynb #97b35d62
+class Zoom(MonaiTransform):
+    """
+    MONAI Zoom wrapper using MonaiTransform.
 
-        photons = rs.poisson(photons, size=photons.shape)
-        electrons = self.qe * photons
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (Zoom*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
 
-        # dark current
-        electrons += rs.poisson(self.dark_current * self.exp_time, size=electrons.shape)
+    def __init__(
+        self,
+        zoom=1.0,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
 
-        # read noise (FIX: std should NOT be squared)
-        electrons += rs.normal(scale=self.readout, size=electrons.shape) * (self.bitdepth / 16)
+        self.zoom = zoom
 
-        gain = np.broadcast_to(self.gain, electrons.shape).astype(np.float32).copy()
-        offset = np.broadcast_to(self.offset, electrons.shape).astype(np.float32).copy()
+        super().__init__(
+            monai_transform=tfms.Zoom,
+            dict_transform=tfms.ZoomD,
+            keys=keys,
+            has_channels=has_channels,
+            zoom=zoom, 
+            **kwargs,
+        )
 
-        if self.camera == 'cmos':
-            gain_noise = rs.normal(scale=self.gain_variance, size=electrons.shape)
-            offset_noise = (
-                rs.normal(scale=self.offset_variance, size=electrons.shape)
-                + rs.normal(scale=self.offset_variance, size=(electrons.shape[0],))
-            )
+# %% ../nbs/030_transforms.ipynb #c305ce78
+class Flip(MonaiTransform):
+    """
+    MONAI Flip wrapper using MonaiTransform.
 
-            gain = gain + gain_noise
-            offset = offset + offset_noise
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (Flip*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
 
-        adu = electrons * gain + offset
-        adu = np.clip(adu, 0, max_adu)
+    def __init__(
+        self,
+        spatial_axes=None,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
 
-        return adu
+        self.spatial_axes = spatial_axes
 
-    # -------------------------
-    # MetaTensor
-    # -------------------------
-    def encodes(self, x: "MetaTensor"):
-        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
-        out = self._apply_noise(x, rs)
-        return type(x)(out)
+        super().__init__(
+            monai_transform=tfms.Flip,
+            dict_transform=tfms.FlipD,
+            keys=keys,
+            has_channels=has_channels,
+            spatial_axes=spatial_axes, 
+            **kwargs,
+        )
 
-    # -------------------------
-    # torch.Tensor
-    # -------------------------
-    def encodes(self, x: torchTensor):
-        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
-        out = self._apply_noise(x.numpy(), rs)
-        return torch.as_tensor(out)
+# %% ../nbs/030_transforms.ipynb #4a5925ac
+class GridPatch(MonaiTransform):
+    """
+    MONAI GridPatch wrapper using MonaiTransform.
 
-    # -------------------------
-    # dict (MONAI-style)
-    # -------------------------
-    def encodes(self, x: dict):
-        if self.keys is None:
-            raise ValueError("keys must be provided for dict input")
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (GridPatch*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
 
-        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+    def __init__(
+        self,
+        patch_size=None,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
 
-        x = dict(x)  # avoid mutation
-        for k in self.keys:
-            x[k] = self._apply_noise(x[k], rs)
+        self.patch_size = patch_size
 
-        return x
+        super().__init__(
+            monai_transform=tfms.GridPatch,
+            dict_transform=tfms.GridPatchD,
+            keys=keys,
+            has_channels=has_channels,
+            patch_size=patch_size, 
+            **kwargs,
+        )
 
-    # -------------------------
-    # BioImageBase
-    # -------------------------
-    def encodes(self, x: BioImageBase):
-        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
-        out = self._apply_noise(x, rs)
-        return type(x)(out)
+# %% ../nbs/030_transforms.ipynb #2019a57c
+class GridSplit(MonaiTransform):
+    """
+    MONAI GridSplit wrapper using MonaiTransform.
 
-    # -------------------------
-    # NumPy
-    # -------------------------
-    def encodes(self, x: np.ndarray):
-        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
-        return self._apply_noise(x, rs)
+    Supports:
+    - MetaTensor (preserves spatial metadata)
+    - dict (GridSplit*d auto-inferred)
+    - BioImageBase
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        grid=(2, 2),
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+
+        self.grid = grid
+
+        super().__init__(
+            monai_transform=tfms.GridSplit,
+            dict_transform=tfms.GridSplitD,
+            keys=keys,
+            has_channels=has_channels,
+            grid=grid, 
+            **kwargs,
+        )
 
 # %% ../nbs/030_transforms.ipynb #db4c0435
 class GaussianSmooth(MonaiTransform):
@@ -583,6 +810,7 @@ class GaussianSmooth(MonaiTransform):
     def __init__(self, sigma=1.0, approx="erf", **kwargs):
         super().__init__(
             tfms.GaussianSmooth,
+            tfms.GaussianSmoothD,
             has_channels=True,
             sigma=sigma,
             approx=approx,
@@ -603,6 +831,7 @@ class MedianSmooth(MonaiTransform):
     def __init__(self, radius=1, **kwargs):
         super().__init__(
             tfms.MedianSmooth,
+            tfms.MedianSmoothD,
             has_channels=True,
             radius=radius,
             **kwargs
@@ -628,6 +857,7 @@ class SavitzkyGolaySmooth(MonaiTransform):
     def __init__(self, window_length, order, axis=1, mode="zeros", **kwargs):
         super().__init__(
             tfms.SavitzkyGolaySmooth,
+            tfms.SavitzkyGolaySmoothD,
             has_channels=True,
             window_length=window_length,
             order=order,
@@ -659,6 +889,7 @@ class GaussianSharpen(MonaiTransform):
     def __init__(self, sigma1=3.0, sigma2=1.0, alpha=30.0, approx="erf", **kwargs):
         super().__init__(
             tfms.GaussianSharpen,
+            tfms.GaussianSharpenD,
             has_channels=True,
             sigma1=sigma1,
             sigma2=sigma2,
@@ -1427,6 +1658,33 @@ class RandCropND(RandTransform):
         return x[slices]
     
 
+# %% ../nbs/030_transforms.ipynb #7ab9b3bd
+class RandRotate(RandMonaiTransform):
+    """
+    Randomly rotate an image by a specified angle range.
+
+    This transform randomly rotates an image by an angle sampled from a specified range during training and applies no rotation during validation.
+    """
+
+    split_idx,order = None,1
+
+    def __init__(self, 
+                 degrees: float | tuple, # Range of degrees to select from. If degrees is a single number instead of a tuple like (min, max), the range will be (-degrees, +degrees).
+                 has_channels=True,     # Whether the input image has a channel dimension.
+                 **kwargs):
+        if isinstance(degrees, (int, float)):
+            degrees = (-degrees, degrees)
+        store_attr()
+        super().__init__(
+            tfms.Rotate,
+            prob=1.0,
+            param_sampler=None,
+            has_channels=has_channels,
+            mode="bilinear",
+            padding_mode="zeros",
+            **kwargs
+        )
+
 # %% ../nbs/030_transforms.ipynb #c0f5f953
 class RandFlip(RandTransform):
     """
@@ -1503,7 +1761,7 @@ class RandRot90(RandTransform):
         return np.rot90(x, self.k, axes=self.spatial_axes)
 
 # %% ../nbs/030_transforms.ipynb #697116d4
-class RandRotate(RandTransform):
+class RandRotation(RandTransform):
     """
     Randomly rotate the input arrays.
 
@@ -1615,6 +1873,126 @@ class RandZoom(RandTransform):
             img = np.expand_dims(img, axis=0)  # Add channel dimension if not present
         tensor_img = Tensor2BioImage()(torchTensor(img))
         return self._process(tensor_img).numpy()
+
+# %% ../nbs/030_transforms.ipynb #14c19a89
+class RandCameraNoise(RandTransform):
+    """
+    Simulates camera noise with typedispatch support:
+    - MetaTensor (kept in tensor domain)
+    - dict (image key-based pipeline)
+    - BioImageBase (type preserved)
+    - NumPy arrays
+    """
+
+    def __init__(
+        self,
+        p: float = 1.0,
+        damp=1e-2,
+        qe=0.7,
+        gain=2,
+        offset=100,
+        exp_time=0.1,
+        dark_current=0.6,
+        readout=1.5,
+        bitdepth=16,
+        seed=42,
+        simulation=False,
+        camera='cmos',
+        gain_variance=0.1,
+        offset_variance=5,
+        keys=None,  # <-- for dict support
+    ):
+        store_attr()
+        self.rs = np.random.RandomState(seed=seed)
+
+    # -------------------------
+    # CORE NOISE FUNCTION 
+    # -------------------------
+    def _apply_noise(self, x, rs):
+        max_adu = float(2**self.bitdepth - 1)
+
+        # normalize input
+        if x.min() >= 0.0 and x.max() <= 1.0:
+            x = (x * max_adu).astype(np.uint16 if self.bitdepth > 8 else np.uint8)
+
+        # photon model
+        if not self.simulation:
+            photons = x / self.gain / self.qe * self.damp
+        else:
+            photons = x
+
+        photons = rs.poisson(photons, size=photons.shape)
+        electrons = self.qe * photons
+
+        # dark current
+        electrons += rs.poisson(self.dark_current * self.exp_time, size=electrons.shape)
+
+        # read noise (FIX: std should NOT be squared)
+        electrons += rs.normal(scale=self.readout, size=electrons.shape) * (self.bitdepth / 16)
+
+        gain = np.broadcast_to(self.gain, electrons.shape).astype(np.float32).copy()
+        offset = np.broadcast_to(self.offset, electrons.shape).astype(np.float32).copy()
+
+        if self.camera == 'cmos':
+            gain_noise = rs.normal(scale=self.gain_variance, size=electrons.shape)
+            offset_noise = (
+                rs.normal(scale=self.offset_variance, size=electrons.shape)
+                + rs.normal(scale=self.offset_variance, size=(electrons.shape[0],))
+            )
+
+            gain = gain + gain_noise
+            offset = offset + offset_noise
+
+        adu = electrons * gain + offset
+        adu = np.clip(adu, 0, max_adu)
+
+        return adu
+
+    # -------------------------
+    # MetaTensor
+    # -------------------------
+    def encodes(self, x: "MetaTensor"):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        out = self._apply_noise(x, rs)
+        return type(x)(out)
+
+    # -------------------------
+    # torch.Tensor
+    # -------------------------
+    def encodes(self, x: torchTensor):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        out = self._apply_noise(x.numpy(), rs)
+        return torch.as_tensor(out)
+
+    # -------------------------
+    # dict (MONAI-style)
+    # -------------------------
+    def encodes(self, x: dict):
+        if self.keys is None:
+            raise ValueError("keys must be provided for dict input")
+
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+
+        x = dict(x)  # avoid mutation
+        for k in self.keys:
+            x[k] = self._apply_noise(x[k], rs)
+
+        return x
+
+    # -------------------------
+    # BioImageBase
+    # -------------------------
+    def encodes(self, x: BioImageBase):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        out = self._apply_noise(x, rs)
+        return type(x)(out)
+
+    # -------------------------
+    # NumPy
+    # -------------------------
+    def encodes(self, x: np.ndarray):
+        rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
+        return self._apply_noise(x, rs)
 
 # %% ../nbs/030_transforms.ipynb #ac04d76e
 class ShiftIntensity(MonaiTransform):
