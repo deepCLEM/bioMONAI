@@ -556,7 +556,6 @@ def _preprocess_dict(
 
             processed_keys.add(key)
 
-            tensor.meta.setdefault("size_original", tensor.shape)
             tensor.meta.setdefault("transforms", {})
 
             raw_params = getattr(t, "__dict__", {})
@@ -820,29 +819,36 @@ def _load_and_preprocess_dict(
         keys = [keys]
 
     # load images into dict first
+    path_dict = {}
+    size_dict = {}
     for key in keys:
-        path = Path(obj[key])
+        path_dict[key] = Path(obj[key])
 
-        image_loader = _get_loader(path)
+        image_loader = _get_loader(path_dict[key])
 
         obj[key] = image_loader(
-            path,
+            path_dict[key],
             channels=channels,
             ind_dict=ind_dict,
             **kwargs
         ).to(dtype)
 
-        # store path
-        obj[key].meta["filepath"] = str(path)
-        obj[key].meta["size_original"] = obj[key].shape
+        # check default metadata
+        obj[key].meta.setdefault("filepath", '')
+        obj[key].meta.setdefault("size_original", None)
         obj[key].meta.setdefault("transforms", {})
         obj[key].meta.setdefault("size_after_tfms", None)
+
+        # store size
+        size_dict[key] = obj[key].shape
 
     # apply dict-aware preprocessing (handles metadata internally)
     obj = _preprocess_dict(obj, transforms)
 
     # attach non-transform metadata
     for key in keys:
+        obj[key].meta["size_original"] = size_dict[key]
+        obj[key].meta["filepath"] = str(path_dict[key])
         obj[key].meta["format"] = extract_formats(Path(obj[key].meta["filepath"]))[0]
         obj[key].meta["layout"] = channels
 
@@ -1285,17 +1291,18 @@ def image_reader_dict(
 
         return [_load(obj) for obj in dict_list]
 
+    out = data.copy() 
     
     if not keys: 
-        return data
+        return out
     
     if isinstance(keys, str):
         keys = [keys]
 
     for k in keys:
-        if k in data:
+        if k in out:
 
-            obj = data[k]
+            obj = out[k]
 
             is_multi = (
                 isinstance(obj, Sequence)
@@ -1314,16 +1321,16 @@ def image_reader_dict(
                 obj = _stack(image_list, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
                 obj.meta.update(_meta_from_layout(obj.shape, obj.meta['layout']))
 
-                data[k] = obj
+                out[k] = obj
 
             # -------------------------------------------------
             # SINGLE CASE
             # -------------------------------------------------
             else:
-                data[k] = _load(obj)
-                data[k].meta.update(_meta_from_layout(data[k].shape, channels))
+                out[k] = _load(obj)
+                out[k].meta.update(_meta_from_layout(out[k].shape, channels))
 
-    return data
+    return out
 
 # %% ../nbs/010_io.ipynb #5a78f57f
 class BioImageReader(ImageReader):
