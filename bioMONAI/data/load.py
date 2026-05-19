@@ -49,7 +49,7 @@ from fastai.vision.all import (
 # =================================
 from monai.data import Dataset as MonaiDataset, CacheDataset, PersistentDataset, SmartCacheDataset
 # from monai.data.utils import pickle_hashing
-from monai.transforms import Compose, CenterSpatialCrop, CenterScaleCrop
+from monai.transforms import Compose
 from monai.transforms.transform import Randomizable
 
 # =================================
@@ -57,6 +57,7 @@ from monai.transforms.transform import Randomizable
 # =================================
 from ..utils import *
 from .core import *
+from ..transforms import RandMonaiTransform, RandTransform
 
 # =================================
 # fasttransform patch
@@ -807,8 +808,14 @@ class MonaiTransformMixin:
         return transform
 
     # --------------------------------------------------
+    # make this more general to detect any random transform, not just MONAI's
     def _is_random(self, t):
-        return isinstance(t, Randomizable)
+        is_rnd = (hasattr(t, "prob") or     
+                  isinstance(t, RandTransform) or
+                  isinstance(t, RandMonaiTransform) or
+                  isinstance(t, Randomizable) or 
+                  getattr(t, "_is_random", False))
+        return is_rnd
 
     # --------------------------------------------------
     def _make_deterministic_transforms(self, transforms):
@@ -825,24 +832,14 @@ class MonaiTransformMixin:
 
         deterministic = []
 
-        # Mapping of random -> deterministic replacements
-        replacements = {
-            "RandSpatialCrop": lambda t: CenterSpatialCrop(
-                roi_size=t.roi_size,
-                lazy=getattr(t, "lazy", False),
-            ),
-            "RandScaleCrop": lambda t: CenterScaleCrop(
-                roi_scale=t.roi_scale,
-                lazy=getattr(t, "lazy", False),
-            ),
-        }
-
         for t in transforms:
-            name = t.__class__.__name__
+            val_t = getattr(t, "_val_transform", None)
 
-            # Replace known random transforms with deterministic versions
-            if name in replacements:
-                deterministic.append(replacements[name](t))
+            # Replace random transforms with deterministic versions, when available
+            if val_t:
+                keys = getattr(t, "keys", None)
+                kw = getattr(t, "det_kwargs", {})
+                deterministic.append(val_t(keys=keys, **kw))
                 continue
 
             # Skip other random transforms
