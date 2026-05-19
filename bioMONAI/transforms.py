@@ -12,9 +12,9 @@ __all__ = ['Blur', 'RandBlur', 'FunctionTransform', 'MonaiTransform', 'RandMonai
            'ScaleIntensity', 'ScaleIntensityFixedMean', 'ScaleIntensityRange', 'ScaleIntensityRangePercentiles',
            'NormalizeIntensity', 'HistogramNormalize', 'AdjustContrast', 'RelabelInstances',
            'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity', 'MaskIntensity', 'ForegroundMask',
-           'RGB2HED', 'HED2RGB', 'RandCrop2D', 'RandCropND', 'RandRotate', 'RandFlip', 'RandRot90', 'RandRotation',
-           'RandZoom', 'RandCameraNoise', 'RandGaussianNoise', 'RandGaussianSmooth', 'RandGaussianSharpen',
-           'RandShiftIntensity', 'RandStdShiftIntensity', 'RandAdjustContrast']
+           'RGB2HED', 'HED2RGB', 'RandCrop2D', 'RandCropND', 'RandFlip', 'RandRot90', 'RandRotation', 'RandZoom',
+           'RandCameraNoise', 'RandGaussianNoise', 'RandGaussianSmooth', 'RandGaussianSharpen', 'RandShiftIntensity',
+           'RandStdShiftIntensity', 'RandAdjustContrast']
 
 # %% ../nbs/030_transforms.ipynb #56ab9960
 # =================================
@@ -192,148 +192,332 @@ class MonaiTransform(DisplayedTransform):
             x = np.expand_dims(x, axis=0)
 
         tensor = MetaTensor(x)
-
         out = self.transform(tensor)
 
-        if isinstance(out, torch.Tensor):
-            return out.detach().cpu().numpy()
+        return out.detach().cpu().numpy()
 
-        return np.asarray(out)
+
+# %% ../nbs/030_transforms.ipynb #9f052222
+def _uniform_sampler(v):
+
+    # range sampling
+    if isinstance(v, (tuple, list)) and len(v) == 2:
+
+        a, b = v
+
+        if isinstance(a, int) and isinstance(b, int):
+            return np.random.randint(a, b + 1)
+
+        if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+            return np.random.uniform(a, b)
+
+        return v
+
+    return v
 
 # %% ../nbs/030_transforms.ipynb #ee7925d5
 class RandMonaiTransform(RandTransform):
     """
-    MONAI RandTransform wrapper with:
-    - Lazy instantiation
-    - Auto-selection of Rand vs Rand*d
-    - Typedispatch-aware execution
+    Wrapper for MONAI random transforms with:
+
+    - typedispatch support
+    - automatic Rand↔Det transform inference
+    - deterministic fallback for BioImageBase
+    - argument aliasing
+    - deterministic parameter filtering
+
+    MONAI-native types:
+    - MetaTensor
+    - Tensor
+    - dict
+    - ndarray
+
+    use MONAI random transforms directly.
+
+    BioImageBase:
+    - uses sampled params from before_call()
+    - applies deterministic transform
     """
 
     split_idx = None
 
+    # ---------------------------------------------------------
+    # MONAI transforms
+    # ---------------------------------------------------------
+
+    _monai_rand_transform = None
+    _monai_det_transform = None
+
+    # Deterministic transform to be used during validation / inference
+    # If None, no transform will be used at all
+    _val_transform = None
+
+    # Explicit dict transform
+    _dict_transform = None
+
+    # parameters to sample
+    _rand_kwargs = {}
+    _default_kwargs = {}
+
+    # ---------------------------------------------------------
+    # Init
+    # ---------------------------------------------------------
+
     def __init__(
         self,
-        monai_transform,
         prob=0.1,
-        param_sampler=None,
-        dict_transform=None,
+        param_sampler=_uniform_sampler,
         keys=None,
         has_channels=True,
-        **kwargs
+        **kwargs,
     ):
         store_attr()
+
         self.p = prob
-        self.kwargs = kwargs
+
+        # infer transforms
+        self._infer_transforms()
+        self._infer_dict_transform(self._monai_rand_transform)
+
+        # kwargs
+        self.kwargs = {
+            **self._default_kwargs,
+            **kwargs,
+            'prob': prob,
+        }
+
+        # kwargs usable by deterministic transform
+        self.det_kwargs = self._filter_kwargs(
+            self._monai_det_transform,
+            kwargs,
+        )
+
+        self._rand_transform = None
+        self._dict_rand_transform = None
+
         super().__init__()
 
-    # -------------------------
-    # Helpers
-    # -------------------------
-    def _infer_dict_transform(self, base_cls):
-        name = base_cls.__name__
-        module = importlib.import_module(base_cls.__module__)
+    # ---------------------------------------------------------
+    # Transform inference
+    # ---------------------------------------------------------
 
-        # RandXxx -> RandXxxd / RandXxxD
+    def _infer_transforms(self):
+
+        rand_cls = self._monai_rand_transform
+        det_cls = self._monai_det_transform
+
+        # Infer RandTfm from Tfm
+        if rand_cls is None and det_cls is not None:
+
+            candidate = "Rand" + det_cls.__name__
+            if hasattr(tfms, candidate):
+                rand_cls = getattr(tfms, candidate)
+
+        # Infer Tfm from RandTfm
+        if det_cls is None and rand_cls is not None:
+
+            name = rand_cls.__name__
+
+            if name.startswith("Rand"):
+
+                candidate = name[4:]
+                if hasattr(tfms, candidate):
+                    det_cls = getattr(tfms, candidate)
+
+        if rand_cls is None:
+            raise ValueError(
+                f"Could not infer random transform for "
+                f"{self.__class__.__name__}"
+            )
+
+        if det_cls is None:
+            raise ValueError(
+                f"Could not infer deterministic transform for "
+                f"{self.__class__.__name__}"
+            )
+
+        self._monai_rand_transform = rand_cls
+        self._monai_det_transform = det_cls
+
+    # ---------------------------------------------------------
+    # Dict transform inference
+    # ---------------------------------------------------------
+
+    def _infer_dict_transform(self, base_cls):
+
+        name = base_cls.__name__
+
         for suffix in ("d", "D"):
+
             candidate = name + suffix
-            if hasattr(module, candidate):
-                return getattr(module, candidate)
+
+            if hasattr(tfms, candidate):
+                return getattr(tfms, candidate)
 
         return None
 
-    # -------------------------
+    # ---------------------------------------------------------
+    # Signature filtering
+    # ---------------------------------------------------------
+
+    def _filter_kwargs(self, cls, kwargs):
+
+        sig = inspect.signature(cls.__init__)
+
+        valid = set(sig.parameters)
+
+        return {
+            k: v
+            for k, v in kwargs.items()
+            if k in valid
+        }
+    
+    # ---------------------------------------------------------
     # Sampling
-    # -------------------------
-    def before_call(self, b, split_idx: int):
+    # ---------------------------------------------------------
+
+    def before_call(self, b=None, split_idx=0):
+
         super().before_call(b, split_idx)
 
-        sampled = self.param_sampler() if self.param_sampler else {}
-        self._params = {**self.kwargs, **sampled}
+        self.sampled_kwargs = {}
 
-        self._process = None
-        self._process_dict = None
+        for out_key, spec in self._rand_kwargs.items():
 
-    # -------------------------
-    # Lazy tensor builder (Rand*)
-    # -------------------------
-    def _build_tensor(self, rand=True):
-        cls = self.monai_transform
-        if not rand:
-            # strip Rand prefix → deterministic version
-            name = cls.__name__
-            if name.startswith("Rand"):
-                base_name = name[4:]
-                module = importlib.import_module(cls.__module__)
-                cls = getattr(module, base_name)
+            # -----------------------------------------
+            # single source key
+            # -----------------------------------------
+            if isinstance(spec, str):
 
-        self._process = cls(**self._params)
+                raw = self.kwargs[spec]
 
-    # -------------------------
-    # Lazy dict builder (Rand*d)
-    # -------------------------
-    def _build_dict(self):
-        dict_cls = self.dict_transform or self._infer_dict_transform(self.monai_transform)
+                self.sampled_kwargs[out_key] = _uniform_sampler(raw)
+
+            # -----------------------------------------
+            # multiple source keys → tuple output
+            # -----------------------------------------
+            elif isinstance(spec, (list, tuple)):
+
+                raw_vals = [
+                    self.kwargs[k] for k in spec
+                ]
+
+                self.sampled_kwargs[out_key] = tuple(
+                    _uniform_sampler(v) for v in raw_vals
+                )
+
+            else:
+                raise TypeError(
+                    "`rand_kwargs` values must be str or list[str]"
+                )
+
+        # merge sampled into deterministic params
+        self.sampled_kwargs = {
+            **self.det_kwargs,
+            **self.sampled_kwargs,
+        }
+
+    # ---------------------------------------------------------
+    # Lazy builders
+    # ---------------------------------------------------------
+
+    def _build_rand_transform(self):
+
+        self._rand_transform = self._monai_rand_transform(**self.kwargs)
+
+
+    def _build_dict_transform(self):
+
+        dict_cls = self._dict_transform
+
+        if dict_cls is None:
+
+            dict_cls = self._infer_dict_transform(
+                self._monai_rand_transform
+            )
 
         if dict_cls is None:
             raise ValueError(
-                f"No dict transform found for {self.monai_transform.__name__}"
+                f"No dict transform found for "
+                f"{self._monai_rand_transform.__name__}"
             )
 
         if self.keys is None:
-            raise ValueError("`keys` must be provided for dict transforms")
+            raise ValueError(
+                "`keys` must be provided "
+                "for dict transforms"
+            )
 
-        self._process_dict = dict_cls(keys=self.keys, **self._params)
+        self._dict_rand_transform = dict_cls(
+            keys=self.keys,
+            **self.kwargs,
+        )
 
-    # -------------------------
-    # MetaTensor → Rand*
-    # -------------------------
-    def encodes(self, x: "MetaTensor"):
-        if self._process is None:
-            self._build_tensor()
-        return self._process(x)
+    # ---------------------------------------------------------
+    # MetaTensor
+    # ---------------------------------------------------------
 
-    # -------------------------
-    # torch.Tensor → Rand*
-    # -------------------------
+    def encodes(self, x: MetaTensor):
+
+        if self._rand_transform is None:
+            self._build_rand_transform()
+
+        return self._rand_transform(x)
+
+    # ---------------------------------------------------------
+    # torch.Tensor
+    # ---------------------------------------------------------
+
     def encodes(self, x: torch.Tensor):
-        if self._process is None:
-            self._build_tensor()
-        return self._process(x)
 
-    # -------------------------
-    # dict → Rand*d
-    # -------------------------
+        if self._rand_transform is None:
+            self._build_rand_transform()
+
+        return self._rand_transform(x)
+
+    # ---------------------------------------------------------
+    # dict
+    # ---------------------------------------------------------
+
     def encodes(self, x: dict):
-        if self._process_dict is None:
-            self._build_dict()
-        return self._process_dict(x)
 
-    # -------------------------
-    # BioImageBase 
-    # -------------------------
+        if self._dict_rand_transform is None:
+            self._build_dict_transform()
+
+        return self._dict_rand_transform(x)
+
+    # ---------------------------------------------------------
+    # BioImageBase
+    # ---------------------------------------------------------
+
     def encodes(self, x: BioImageBase):
-        if self._process is None:
-            self._build_tensor(rand=False)
 
-        out = self._process(x.as_tensor())
-        return type(x)(x=out, meta=x.meta)
+        tfm = self._monai_det_transform(**self.sampled_kwargs)
 
-    # -------------------------
+        out = tfm(x)
+
+        return type(x)(
+            x=out,
+            meta=x.meta,
+        )
+
+    # ---------------------------------------------------------
     # NumPy
-    # -------------------------
+    # ---------------------------------------------------------
+
     def encodes(self, x: np.ndarray):
-        if self._process is None:
-            self._build_tensor(rand=False)
+
+        if self._rand_transform is None:
+            self._build_rand_transform()
 
         if not self.has_channels:
             x = np.expand_dims(x, axis=0)
 
-        tensor = torch.as_tensor(x)
-        out = self._process(tensor)
+        tensor = MetaTensor(x)
 
-        if isinstance(out, torch.Tensor):
-            return out.detach().cpu().numpy()
-        return np.asarray(out)
+        out = self._rand_transform(tensor)
+
+        return out.detach().cpu().numpy()
 
 # %% ../nbs/030_transforms.ipynb #83011f10
 class ApplyTo(Transform):
@@ -1568,10 +1752,10 @@ class ThresholdIntensity(MonaiTransform):
     cval : float
         Fill value for filtered pixels.
     """
+    _monai_transform = tfms.ThresholdIntensity
 
     def __init__(self, threshold, above=True, cval=0.0, **kwargs):
         super().__init__(
-            tfms.ThresholdIntensity,
             threshold=threshold,
             above=above,
             cval=cval,
@@ -1593,10 +1777,10 @@ class MaskIntensity(MonaiTransform):
     select_fn : callable, optional
         Function defining valid mask values.
     """
+    _monai_transform = tfms.MaskIntensity
 
     def __init__(self, mask_data=None, select_fn=None, **kwargs):
         super().__init__(
-            tfms.MaskIntensity,
             mask_data=mask_data,
             select_fn=select_fn,
             has_channels=True,
@@ -1617,10 +1801,10 @@ class ForegroundMask(MonaiTransform):
     invert : bool
         Invert image before thresholding.
     """
+    _monai_transform=tfms.ForegroundMask
 
     def __init__(self, threshold="otsu", hsv_threshold=None, invert=False, **kwargs):
         super().__init__(
-            tfms.ForegroundMask,
             threshold=threshold,
             hsv_threshold=hsv_threshold,
             invert=invert,
@@ -1768,33 +1952,6 @@ class RandCropND(RandTransform):
         slices = tuple(slice(t, b) for t, b in zip(self.tl, self.br))
         return x[slices]
     
-
-# %% ../nbs/030_transforms.ipynb #7ab9b3bd
-class RandRotate(RandMonaiTransform):
-    """
-    Randomly rotate an image by a specified angle range.
-
-    This transform randomly rotates an image by an angle sampled from a specified range during training and applies no rotation during validation.
-    """
-
-    split_idx,order = None,1
-
-    def __init__(self, 
-                 degrees: float | tuple, # Range of degrees to select from. If degrees is a single number instead of a tuple like (min, max), the range will be (-degrees, +degrees).
-                 has_channels=True,     # Whether the input image has a channel dimension.
-                 **kwargs):
-        if isinstance(degrees, (int, float)):
-            degrees = (-degrees, degrees)
-        store_attr()
-        super().__init__(
-            tfms.Rotate,
-            prob=1.0,
-            param_sampler=None,
-            has_channels=has_channels,
-            mode="bilinear",
-            padding_mode="zeros",
-            **kwargs
-        )
 
 # %% ../nbs/030_transforms.ipynb #c0f5f953
 class RandFlip(RandTransform):
