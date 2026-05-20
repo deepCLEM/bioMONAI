@@ -1540,6 +1540,7 @@ class ScaleIntensityRangePercentiles(MonaiTransform):
     """
 
     _monai_transform = tfms.ScaleIntensityRangePercentiles
+    _dict_transform = tfms.ScaleIntensityRangePercentilesD
 
     def __init__(self, lower, upper, b_min, b_max, clip=False, relative=False, channel_wise=False, dtype=np.float32, **kwargs):
         super().__init__(
