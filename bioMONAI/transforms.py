@@ -5,16 +5,16 @@
 # %% auto #0
 __all__ = ['Blur', 'RandSpatialCrop', 'RandBlur', 'FunctionTransform', 'MonaiTransform', 'RandMonaiTransform', 'ApplyTo',
            'Resample', 'Spacing', 'Resize', 'Crop', 'SpatialCrop', 'CenterSpatialCrop', 'CropForeground',
-           'BoundingRect', 'CenterScaleCrop', 'CropND', 'Pad', 'SpatialPad', 'BorderPad', 'DivisiblePad', 'Rotate',
-           'Rotate90', 'Zoom', 'Flip', 'GridPatch', 'GridSplit', 'SpatialResample', 'ResampleToMatch', 'Orientation',
-           'Affine', 'AffineGrid', 'GridDistortion', 'GaussianSmooth', 'MedianSmooth', 'SavitzkyGolaySmooth',
-           'GaussianSharpen', 'ShiftIntensity', 'StdShiftIntensity', 'ScaleImage', 'ScaleImagePercentiles',
-           'ScaleImageVariance', 'ScaleIntensity', 'ScaleIntensityFixedMean', 'ScaleIntensityRange',
-           'ScaleIntensityRangePercentiles', 'NormalizeIntensity', 'HistogramNormalize', 'AdjustContrast',
-           'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity', 'MaskIntensity',
-           'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop', 'RandCrop2D', 'RandCropND', 'RandFlip', 'RandRot90',
-           'RandRotation', 'RandZoom', 'RandCameraNoise', 'RandGaussianNoise', 'RandGaussianSmooth',
-           'RandGaussianSharpen', 'RandShiftIntensity', 'RandStdShiftIntensity', 'RandAdjustContrast']
+           'BoundingRect', 'CenterScaleCrop', 'CropND', 'Pad', 'SpatialPad', 'BorderPad', 'DivisiblePad',
+           'ResizeWithPadOrCrop', 'Rotate', 'Rotate90', 'Zoom', 'Flip', 'GridPatch', 'GridSplit', 'SpatialResample',
+           'ResampleToMatch', 'Orientation', 'Affine', 'AffineGrid', 'GridDistortion', 'GaussianSmooth', 'MedianSmooth',
+           'SavitzkyGolaySmooth', 'GaussianSharpen', 'ShiftIntensity', 'StdShiftIntensity', 'ScaleImage',
+           'ScaleImagePercentiles', 'ScaleImageVariance', 'ScaleIntensity', 'ScaleIntensityFixedMean',
+           'ScaleIntensityRange', 'ScaleIntensityRangePercentiles', 'NormalizeIntensity', 'HistogramNormalize',
+           'AdjustContrast', 'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity',
+           'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop', 'RandCrop2D', 'RandCropND', 'RandFlip',
+           'RandZoom', 'RandCameraNoise', 'RandGaussianNoise', 'RandGaussianSmooth', 'RandGaussianSharpen',
+           'RandShiftIntensity', 'RandStdShiftIntensity', 'RandAdjustContrast']
 
 # %% ../nbs/030_transforms.ipynb #56ab9960
 # =================================
@@ -886,12 +886,32 @@ class DivisiblePad(MonaiTransform):
         keys=None,
         **kwargs,
     ):
-        self.spatial_size = k
 
         super().__init__(
             keys=keys,
             has_channels=has_channels,
             k=k, 
+            **kwargs,
+        )
+
+# %% ../nbs/030_transforms.ipynb #6136faa1
+class ResizeWithPadOrCrop(MonaiTransform):
+
+    _monai_transform = tfms.ResizeWithPadOrCrop
+
+    def __init__(
+        self,
+        spatial_size,
+        has_channels=True,
+        keys=None,
+        **kwargs,
+    ):
+        self.spatial_size = spatial_size
+
+        super().__init__(
+            keys=keys,
+            has_channels=has_channels,
+            spatial_size=spatial_size,
             **kwargs,
         )
 
@@ -1890,7 +1910,12 @@ class RandCrop(RandMonaiTransform):
 
     _val_transform = CenterSpatialCrop
 
-    def __init__(self, roi_size, has_channels=True, keys=None, isometric_roi=False, **kwargs):
+    def __init__(self, roi_size, 
+                 has_channels=True, 
+                 keys=None, 
+                 isometric_roi=False, # only available for BioImageBase type
+                 **kwargs
+                 ):
         self.roi_size = roi_size
         self.isometric_roi = isometric_roi
 
@@ -2044,193 +2069,70 @@ class RandCropND(RandTransform):
     
 
 # %% ../nbs/030_transforms.ipynb #c0f5f953
-class RandFlip(RandTransform):
+class RandFlip(RandMonaiTransform):
     """
     Randomly flips an ND image over a specified axis.
     Works with both NumPy arrays and BioImageBase objects.
     """
-
-    split_idx, order = None, 1
-
-    def __init__(self, 
-                 prob=0.1,            # Probability of flipping
-                 spatial_axis=None,   # Axes to flip. Default is None (random selection)
-                 ndim=2,              # Number of spatial dimensions
-                 lazy=False,          # Flag for lazy execution (for BioImageBase)
-                 **kwargs):
-        store_attr()
-        self.p = prob  # Will be set in `before_call`
-
-    def before_call(self, b=None, split_idx: int = 0):
-        """Determine whether to apply flipping and choose random axes if needed."""
-        super().before_call(b, split_idx)
-
-        # If no specific axis is given, randomly select axes to flip
-        if self.spatial_axis is None:
-            self.spatial_axis = np.random.choice(
-                np.arange(self.ndim), 
-                size=np.random.randint(1, self.ndim + 1), 
-                replace=False
-            )
-
-    def encodes(self, x: BioImageBase):
-        """Applies flipping to a  BioImageBase object."""
-        bioimagetype = type(x)
-        return bioimagetype(tfms.Flip(spatial_axis=self.spatial_axis, lazy=self.lazy)(x))
-
-    def encodes(self, x: np.ndarray):
-        """Applies flipping to a NumPy array object."""
-        for axis in np.atleast_1d(self.spatial_axis):
-            x = np.flip(x, axis=axis)
-        return x
+    _monai_rand_transform = tfms.RandFlip
+    _monai_det_transform = tfms.Flip
         
-
-# %% ../nbs/030_transforms.ipynb #38824529
-class RandRot90(RandTransform):
-    """
-    Randomly rotate an ND image by 90 degrees in the plane specified by axes.
-
-    """
-
-    split_idx,order = None,1
-        
-    def __init__(self, 
-                 prob = 0.1,            # Probability of rotating
-                 k = None,                 # Number of times to rotate by 90 degrees. If k is None, it will be set randomly in `before_call`.
-                 max_k = 3,             # Max number of times to rotate by 90 degrees
-                 spatial_axes = (0, 1), # Spatial axes that define the plane around which to rotate. Default: (0, 1), this are the first two axis in spatial dimensions.
-                 ndim = 2,              # Number of spatial dimensions
-                 lazy = False,          # Flag to indicate whether this transform should execute lazily or not. Defaults to False
-                 **kwargs):
-        store_attr()
-        self.p = prob 
-        super().__init__(**kwargs)
-
-    def before_call(self, b, split_idx: int):
-        super().before_call(b, split_idx)
-        if self.k is None:
-            self.k = 1 + np.random.randint(self.max_k)
-          
-    def encodes(self, x:BioImageBase):
-        bioimagetype = type(x)
-        return bioimagetype(tfms.Rotate90(k=self.k, spatial_axes=self.spatial_axes, lazy=self.lazy)(x))
-    
-    def encodes(self, x: np.ndarray):
-        return np.rot90(x, self.k, axes=self.spatial_axes)
-
-# %% ../nbs/030_transforms.ipynb #697116d4
-class RandRotation(RandTransform):
-    """
-    Randomly rotate the input arrays.
-
-    """
-
-    split_idx = None
-        
-    def __init__(self, 
-                 prob = 0.1,            # Probability of rotating
-                 range_x=None,
-                 range_y=None, 
-                 range_z=None,
-                 ndim=2,
-                 has_channels=True,
-                 keep_size=True, 
-                 mode=GridSampleMode.BILINEAR, 
-                 padding_mode=GridSamplePadMode.BORDER, 
-                 align_corners=False, 
-                 dtype=torch.float32, 
-                 lazy = False,          # Flag to indicate whether this transform should execute lazily or not. Defaults to False
-                 **kwargs):
-        store_attr()
-        self.p = prob 
-        super().__init__(**kwargs)
-
-    def _sample_range(self, r):
-        """Sample a value from a float or (min,max) range."""
-        if r is None:
-            return 0.0
-        if np.iterable(r):
-            return np.random.uniform(r[0], r[1])
-        return np.random.uniform(-r, r)
-
-
-    def sample_rotation(self, range_x, range_y=None, range_z=None, ndim=2):
-        """
-        Sample rotation angle(s) in radians.
-        
-        Returns
-        -------
-        float for 2D
-        tuple(float,float,float) for 3D
-        """
-        
-        if ndim == 2:
-            return self._sample_range(range_x)
-
-        if ndim == 3:
-            ax = self._sample_range(range_x)
-            ay = self._sample_range(range_y)
-            az = self._sample_range(range_z)
-            return (ax, ay, az)
-
-        raise ValueError("ndim must be 2 or 3")
-
-    def before_call(self, b, split_idx: int):
-        super().before_call(b, split_idx)
-        self.angle = self.sample_rotation(range_x=self.range_x, range_y=self.range_y, range_z=self.range_z, ndim=self.ndim)
-        self._process = tfms.Rotate(self.angle, keep_size=self.keep_size, mode=self.mode, padding_mode=self.padding_mode, align_corners=self.align_corners, dtype=self.dtype, lazy=self.lazy)
-      
-    def encodes(self, x:BioImageBase):
-        bioimagetype = type(x)
-        return bioimagetype(self._process(x))
-    
-    def encodes(self, img: np.ndarray):
-        """Transforms a NumPy array to BioImage and applies Rotate."""
-        if not self.has_channels:
-            img = np.expand_dims(img, axis=0)  # Add channel dimension if not present
-        tensor_img = Tensor2BioImage()(torchTensor(img))
-        return self._process(tensor_img).numpy()
 
 # %% ../nbs/030_transforms.ipynb #74e4a03d
-class RandZoom(RandTransform):
+class RandZoom(RandMonaiTransform):
     """
     Randomly zoom the input arrays with given probability within given zoom range.
 
     """
 
-    split_idx = None
-        
-    def __init__(self, 
-                 prob = 0.1,            # Probability of the transform
+    _monai_rand_transform = tfms.RandZoom
+    _monai_det_transform = tfms.Zoom
+
+    def __init__(self,
+                 prob=0.1,
                  min_zoom=0.9, 
                  max_zoom=1.1,
-                 has_channels=True,
-                 keep_size=True, 
-                 mode=InterpolateMode.AREA, 
-                 padding_mode=NumpyPadMode.EDGE, 
-                 align_corners=None, 
-                 dtype=torch.float32, 
-                 lazy = False,          # Flag to indicate whether this transform should execute lazily or not. Defaults to False
-                 **kwargs):
-        store_attr()
-        self.p = prob 
-        super().__init__(**kwargs)
+                 has_channels=True, 
+                 keys=None, 
+                 **kwargs
+                 ):
 
-    def before_call(self, b, split_idx: int):
+        super().__init__(
+            keys=keys,
+            has_channels=has_channels,
+            prob=0.1,
+            min_zoom=0.9, 
+            max_zoom=1.1,
+            **kwargs,
+        )
+
+    @dispatch
+    def before_call(self, b:BioImageBase, split_idx=0):
+
         super().before_call(b, split_idx)
-        self.zoom = np.random.uniform(self.min_zoom, self.max_zoom)
-        self._process = tfms.Zoom(self.zoom, keep_size=self.keep_size, mode=self.mode, padding_mode=self.padding_mode, align_corners=self.align_corners, dtype=self.dtype, lazy=self.lazy)
-      
-    def encodes(self, x:BioImageBase):
-        bioimagetype = type(x)
-        return bioimagetype(self._process(x))
-    
-    def encodes(self, img: np.ndarray):
-        """Transforms a NumPy array to BioImage and applies Rotate."""
-        if not self.has_channels:
-            img = np.expand_dims(img, axis=0)  # Add channel dimension if not present
-        tensor_img = Tensor2BioImage()(torchTensor(img))
-        return self._process(tensor_img).numpy()
+
+        min_zoom = self.kwargs["min_zoom"]
+        max_zoom = self.kwargs["max_zoom"]
+
+        if isinstance(min_zoom, Sequence):
+            zoom_pairs = [
+                (min_z,max_z) 
+                for min_z,max_z in zip(
+                    min_zoom, max_zoom
+                    )
+                ]
+            sampled_zoom = tuple(
+                self.param_sampler(v) for v in zoom_pairs
+            )
+            self.sampled_kwargs["zoom"] = sampled_zoom
+        else:
+            self.sampled_kwargs["zoom"] = self.param_sampler((min_zoom,max_zoom))
+
+        # merge sampled into deterministic params
+        self.sampled_kwargs = {
+            **self.det_kwargs,
+            **self.sampled_kwargs,
+        }
 
 # %% ../nbs/030_transforms.ipynb #14c19a89
 class RandCameraNoise(RandTransform):
@@ -2357,61 +2259,19 @@ class RandGaussianNoise(RandMonaiTransform):
     """
     Add Gaussian noise to image.
     """
-
-    def __init__(self,
-                 mean=0.0, 
-                 std=0.1,
-                 prob=0.1,
-                 dtype=np.float32,
-                 has_channels=True):
-
-        super().__init__(
-            tfms.RandGaussianNoise,
-            prob=prob,
-            param_sampler=None,
-            has_channels=has_channels,
-            mean=mean, 
-            std=std,
-            dtype=dtype,
-        )
+    _monai_rand_transform = tfms.RandGaussianNoise
+    _monai_det_transform = tfms.RandGaussianNoise
 
 # %% ../nbs/030_transforms.ipynb #97c264d8
 class RandGaussianSmooth(RandMonaiTransform):
     """
     Apply Gaussian smoothing with randomly sampled sigma.
     """
+    _monai_rand_transform = tfms.RandGaussianSmooth
+    _monai_det_transform = tfms.GaussianSmooth
 
-    def __init__(self,
-                 sigma_x=(0.5,1.5),
-                 sigma_y=None,
-                 sigma_z=None,
-                 prob=0.1,
-                 approx="erf",
-                 has_channels=True):
-
-        def sample_sigma(r):
-            if r is None:
-                return None
-            if np.iterable(r):
-                return np.random.uniform(r[0], r[1])
-            return r
-
-        def param_sampler():
-            sigma = tuple(filter(None, [
-                sample_sigma(sigma_x),
-                sample_sigma(sigma_y),
-                sample_sigma(sigma_z)
-            ]))
-
-            return dict(sigma=sigma)
-
-        super().__init__(
-            tfms.GaussianSmooth,
-            prob=prob,
-            param_sampler=param_sampler,
-            has_channels=has_channels,
-            approx=approx
-        )
+    _rand_kwargs = {'sigma': ['sigma_x', 'sigma_y', 'sigma_z']}
+    _default_kwargs = {'sigma_x': (0.25, 1.5), 'sigma_y': (0.25, 1.5), 'sigma_z': (0.25, 1.5)}
 
 # %% ../nbs/030_transforms.ipynb #0cd57b2b
 RandBlur = RandGaussianSmooth
