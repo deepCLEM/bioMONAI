@@ -12,9 +12,9 @@ __all__ = ['Blur', 'RandSpatialCrop', 'RandBlur', 'FunctionTransform', 'MonaiTra
            'ScaleImagePercentiles', 'ScaleImageVariance', 'ScaleIntensity', 'ScaleIntensityFixedMean',
            'ScaleIntensityRange', 'ScaleIntensityRangePercentiles', 'NormalizeIntensity', 'HistogramNormalize',
            'AdjustContrast', 'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity',
-           'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop', 'RandCrop2D', 'RandCropND', 'RandFlip',
-           'RandZoom', 'RandCameraNoise', 'RandGaussianNoise', 'RandGaussianSmooth', 'RandGaussianSharpen',
-           'RandShiftIntensity', 'RandStdShiftIntensity', 'RandAdjustContrast']
+           'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop', 'RandCrop2D', 'RandCropND',
+           'RandRotate90', 'RandFlip', 'RandZoom', 'RandCameraNoise', 'RandGaussianNoise', 'RandGaussianSmooth',
+           'RandGaussianSharpen', 'RandShiftIntensity', 'RandStdShiftIntensity', 'RandAdjustContrast']
 
 # %% ../nbs/030_transforms.ipynb #56ab9960
 # =================================
@@ -2065,6 +2065,17 @@ class RandCropND(RandTransform):
         slices = tuple(slice(t, b) for t, b in zip(self.tl, self.br))
         return x[slices]
     
+
+# %% ../nbs/030_transforms.ipynb #f0512685
+class RandRotate90(RandMonaiTransform):
+    """
+    Randomly rotate an image by 90-degree increments.
+
+    This transform randomly rotates an image by 0, 90, 180, or 270 degrees during training and applies no rotation during validation.
+    """
+
+    _monai_rand_transform = tfms.RandRotate90
+    _monai_det_transform = tfms.Rotate90
 
 # %% ../nbs/030_transforms.ipynb #c0f5f953
 class RandFlip(RandMonaiTransform):
