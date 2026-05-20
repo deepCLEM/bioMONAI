@@ -375,8 +375,11 @@ class RandMonaiTransform(RandTransform):
     # ---------------------------------------------------------
     # Sampling
     # ---------------------------------------------------------
+    def before_call(self, b, split_idx=0):
+        pass
 
-    def before_call(self, b=None, split_idx=0):
+    @dispatch
+    def before_call(self, b:BioImageBase, split_idx=0):
 
         super().before_call(b, split_idx)
 
@@ -416,6 +419,10 @@ class RandMonaiTransform(RandTransform):
             **self.det_kwargs,
             **self.sampled_kwargs,
         }
+
+    # @dispatch
+    # def before_call(self, b:Union[torch.Tensor, MetaTensor, np.ndarray, dict], split_idx=0):
+    #     pass
 
     # ---------------------------------------------------------
     # Lazy builders
@@ -1849,7 +1856,7 @@ def _process_sz(size, ndim=3):
 
 def _get_sz(x):
     if isinstance(x, tuple): x = x[0]
-    if not isinstance(x, Tensor): return fastuple(x.size)
+    if not isinstance(x, Tensor): return fastuple(x.shape[1:])
     return fastuple(getattr(x, 'img_size', getattr(x, 'sz', (x.shape[1:])))) # maybe it should swap x and y axes 
 
 # %% ../nbs/030_transforms.ipynb #8ff2060d
@@ -1883,8 +1890,9 @@ class RandCrop(RandMonaiTransform):
 
     _val_transform = CenterSpatialCrop
 
-    def __init__(self, roi_size, has_channels=True, keys=None, **kwargs):
+    def __init__(self, roi_size, has_channels=True, keys=None, isometric_roi=False, **kwargs):
         self.roi_size = roi_size
+        self.isometric_roi = isometric_roi
 
         super().__init__(
             keys=keys,
@@ -1895,18 +1903,31 @@ class RandCrop(RandMonaiTransform):
 
         self.kwargs.pop("prob", None)  
 
-    def before_call(self, b=None, split_idx=0):
+    @dispatch
+    def before_call(self, b:BioImageBase, split_idx=0):
 
         super().before_call(b, split_idx)
 
         im_size = _get_sz(b)
 
-        if getattr(self.kwargs,"random_size", None) is not None:
-            print('ok')
-            roi_interval = (self.roi_size, getattr(self.kwargs,"max_roi_size", im_size) + 1)
-            self.sampled_kwargs["roi_size"] = self.param_sampler(roi_interval)
+        if self.kwargs.get("random_size", None) is not None:
+            max_roi_size = self.kwargs.get("max_roi_size", im_size)
+            roi_interval = [
+                (min_size,max_size+1) 
+                for min_size,max_size in zip(
+                    self.roi_size, max_roi_size
+                    )
+                ]
+            sampled_roi_size = tuple(
+                self.param_sampler(v) for v in roi_interval
+            )
+            if self.isometric_roi:
+                sampled_roi_size = (sampled_roi_size[0],)*len(im_size)
+            self.sampled_kwargs["roi_size"] = sampled_roi_size
+        else:
+            sampled_roi_size = self.roi_size
 
-        center_intervals = _compute_roi_intervals(im_size, self.roi_size)
+        center_intervals = _compute_roi_intervals(im_size, sampled_roi_size)
 
         self.sampled_kwargs["roi_center"] = tuple(
             self.param_sampler(v) for v in center_intervals
