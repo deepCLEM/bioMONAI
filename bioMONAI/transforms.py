@@ -295,8 +295,6 @@ class RandMonaiTransform(RandTransform):
         self._rand_transform = None
         self._dict_rand_transform = None
 
-        super().__init__()
-
     # ---------------------------------------------------------
     # Transform inference
     # ---------------------------------------------------------
@@ -1931,7 +1929,7 @@ class RandCrop(RandMonaiTransform):
     @dispatch
     def before_call(self, b:BioImageBase, split_idx=0):
 
-        super().before_call(b, split_idx)
+        self.sampled_kwargs = {}
 
         im_size = _get_sz(b)
 
@@ -2109,7 +2107,7 @@ class RandZoom(RandMonaiTransform):
     @dispatch
     def before_call(self, b:BioImageBase, split_idx=0):
 
-        super().before_call(b, split_idx)
+        self.sampled_kwargs = {}
 
         min_zoom = self.kwargs["min_zoom"]
         max_zoom = self.kwargs["max_zoom"]
@@ -2146,7 +2144,7 @@ class RandCameraNoise(RandTransform):
 
     def __init__(
         self,
-        p: float = 1.0,
+        prob: float = 1.0,
         damp=1e-2,
         qe=0.7,
         gain=2,
@@ -2163,6 +2161,7 @@ class RandCameraNoise(RandTransform):
         keys=None,  # <-- for dict support
     ):
         store_attr()
+        self.p = prob
         self.rs = np.random.RandomState(seed=seed)
 
     # -------------------------
@@ -2262,6 +2261,22 @@ class RandGaussianNoise(RandMonaiTransform):
     _monai_rand_transform = tfms.RandGaussianNoise
     _monai_det_transform = tfms.RandGaussianNoise
 
+    @dispatch
+    def before_call(self, b:BioImageBase, split_idx=0):
+        pass
+
+    def encodes(self, x: BioImageBase):
+
+        if self._rand_transform is None:
+            self._build_rand_transform()
+
+        out = self._rand_transform(x)
+
+        return type(x)(
+            x=out,
+            meta=x.meta,
+        )
+
 # %% ../nbs/030_transforms.ipynb #97c264d8
 class RandGaussianSmooth(RandMonaiTransform):
     """
@@ -2270,8 +2285,33 @@ class RandGaussianSmooth(RandMonaiTransform):
     _monai_rand_transform = tfms.RandGaussianSmooth
     _monai_det_transform = tfms.GaussianSmooth
 
-    _rand_kwargs = {'sigma': ['sigma_x', 'sigma_y', 'sigma_z']}
-    _default_kwargs = {'sigma_x': (0.25, 1.5), 'sigma_y': (0.25, 1.5), 'sigma_z': (0.25, 1.5)}
+    _rand_kwargs = {'sigma': ['sigma_x', 'sigma_y']}
+
+    def __init__(self, 
+                 sigma_x=(0.25, 1.5), 
+                 sigma_y=(0.25, 1.5), 
+                 sigma_z=(0.25, 1.5), 
+                 prob=0.1, 
+                 param_sampler=_uniform_sampler, 
+                 keys=None, 
+                 has_channels=True, 
+                 **kwargs
+                 ):
+        super().__init__(prob=prob, 
+                         param_sampler=param_sampler,
+                         keys=keys, 
+                         has_channels=has_channels,
+                         sigma_x=sigma_x,
+                         sigma_y= sigma_y,
+                         sigma_z=sigma_z, 
+                         **kwargs)
+
+    @dispatch
+    def before_call(self, b:BioImageBase, split_idx=0):
+        if len(_get_sz(b)) == 3:
+            self._rand_kwargs = {'sigma': ['sigma_x', 'sigma_y', 'sigma_z']}
+
+        super().before_call(b, split_idx)
 
 # %% ../nbs/030_transforms.ipynb #0cd57b2b
 RandBlur = RandGaussianSmooth
@@ -2282,33 +2322,41 @@ class RandGaussianSharpen(RandMonaiTransform):
     Randomly sharpen image using Gaussian kernels.
     """
 
-    def __init__(self,
-                 sigma1=(0.5,1.0),
-                 sigma2=(0.5,1.0),
-                 alpha=(10.0,30.0),
-                 prob=0.1,
-                 approx="erf",
-                 has_channels=True):
+    _monai_rand_transform = tfms.RandGaussianSharpen
+    _monai_det_transform = tfms.GaussianSharpen
 
-        def sample(r):
-            if np.iterable(r):
-                return np.random.uniform(r[0], r[1])
-            return r
+    _rand_kwargs = {'sigma1': ['sigma1_x', 'sigma1_y'],
+                    'sigma2': ['sigma2_x', 'sigma2_y']
+                    }
 
-        def param_sampler():
-            return dict(
-                sigma1=sample(sigma1),
-                sigma2=sample(sigma2),
-                alpha=sample(alpha)
-            )
+    def __init__(self, 
+                sigma1_x=(0.5, 1.0), 
+                sigma1_y=(0.5, 1.0), 
+                sigma1_z=(0.5, 1.0), 
+                sigma2_x=0.5, 
+                sigma2_y=0.5, 
+                sigma2_z=0.5,
+                alpha=(10.0,30.0),
+                **kwargs
+                ):
+        
+        super().__init__(sigma1_x=sigma1_x,
+                        sigma1_y= sigma1_y,
+                        sigma1_z=sigma1_z, 
+                        sigma2_x=sigma2_x, 
+                        sigma2_y=sigma2_y, 
+                        sigma2_z=sigma2_z,
+                        alpha=alpha,
+                        **kwargs)
 
-        super().__init__(
-            tfms.GaussianSharpen,
-            prob=prob,
-            param_sampler=param_sampler,
-            has_channels=has_channels,
-            approx=approx
-        )
+    @dispatch
+    def before_call(self, b:BioImageBase, split_idx=0):
+        if len(_get_sz(b)) == 3:
+            self._rand_kwargs = {'sigma1': ['sigma1_x', 'sigma1_y', 'sigma1_z'],
+                                'sigma2': ['sigma2_x', 'sigma2_y', 'sigma2_z']
+                                }
+
+        super().before_call(b, split_idx)
 
 # %% ../nbs/030_transforms.ipynb #fa3cb5cb
 class RandShiftIntensity(RandMonaiTransform):
@@ -2318,56 +2366,38 @@ class RandShiftIntensity(RandMonaiTransform):
     Equivalent to MONAI RandShiftIntensity but uses the deterministic
     ShiftIntensity transform internally.
     """
+    _monai_rand_transform = tfms.RandShiftIntensity
+    _monai_det_transform = tfms.ShiftIntensity
+
+    _rand_kwargs = {'offset': 'offsets'}
 
     def __init__(self,
                  offsets,
-                 prob=0.1,
-                 safe=False,
-                 has_channels=True):
-
-        def param_sampler():
-            if np.iterable(offsets):
-                offset = np.random.uniform(offsets[0], offsets[1])
-            else:
-                offset = np.random.uniform(-offsets, offsets)
-
-            return dict(offset=offset)
+                 **kwargs,
+                 ):
 
         super().__init__(
-            tfms.ShiftIntensity,
-            prob=prob,
-            param_sampler=param_sampler,
-            has_channels=has_channels,
-            safe=safe
+            offsets=offsets,
+            **kwargs,
         )
 
 class RandStdShiftIntensity(RandMonaiTransform):
     """
     Randomly shift intensity by a factor of the image standard deviation.
     """
+    _monai_rand_transform = tfms.RandStdShiftIntensity
+    _monai_det_transform = tfms.StdShiftIntensity
+
+    _rand_kwargs = {'factor': 'factors'}
 
     def __init__(self,
                  factors,
-                 prob=0.1,
-                 nonzero=False,
-                 channel_wise=False,
-                 has_channels=True):
-
-        def param_sampler():
-            if np.iterable(factors):
-                factor = np.random.uniform(factors[0], factors[1])
-            else:
-                factor = np.random.uniform(-factors, factors)
-
-            return dict(factor=factor)
+                 **kwargs,
+                 ):
 
         super().__init__(
-            tfms.StdShiftIntensity,
-            prob=prob,
-            param_sampler=param_sampler,
-            has_channels=has_channels,
-            nonzero=nonzero,
-            channel_wise=channel_wise
+            factors=factors,
+            **kwargs,
         )
 
 # %% ../nbs/030_transforms.ipynb #2d5ca9ca
@@ -2376,26 +2406,7 @@ class RandAdjustContrast(RandMonaiTransform):
     Randomly adjust image contrast using gamma correction.
     """
 
-    def __init__(self,
-                 gamma,
-                 prob=0.1,
-                 invert_image=False,
-                 retain_stats=False,
-                 has_channels=True):
+    _monai_rand_transform = tfms.RandAdjustContrast
+    _monai_det_transform = tfms.AdjustContrast
 
-        def param_sampler():
-            if np.iterable(gamma):
-                g = np.random.uniform(gamma[0], gamma[1])
-            else:
-                g = np.random.uniform(1-gamma, 1+gamma)
-
-            return dict(gamma=g)
-
-        super().__init__(
-            tfms.AdjustContrast,
-            prob=prob,
-            param_sampler=param_sampler,
-            has_channels=has_channels,
-            invert_image=invert_image,
-            retain_stats=retain_stats
-        )
+    _rand_kwargs = {'gamma': 'gamma'}
