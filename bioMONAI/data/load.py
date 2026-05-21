@@ -1351,7 +1351,7 @@ class BioDataLoaders(DataLoaders):
 
         val = SourceClass(val_data, **val_kwargs).load()
 
-        valid_col = kwargs.get("valid_col", "is_valid")
+        valid_col = kwargs.get("valid_col", "is_valid") # maybe it should be changed to follow NameSplitter logic
 
         for r in train:
             r[valid_col] = False
