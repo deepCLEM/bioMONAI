@@ -6,7 +6,7 @@
 __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNewMeta', 'DisplayedTransform', 'dataclass', 'field',
            'risinstance', 'typedispatch', 'MetaTensor', 'set_determinism', 'Callable', 'Iterable', 'Sequence',
            'MutableSequence', 'Mapping', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple',
-           'ensure_tuple_rep', 'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax',
+           'ensure_tuple_rep', 'noop', 'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze', 'torchmax',
            'is_cuda_available', 'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor',
            'route_kwargs', 'read_yaml', 'read_args_from_yaml', 'dictlist_to_funclist', 'dict2string',
            'add_columns_to_csv', 'ColSplitter', 'TrainTestSplitter', 'FuncSplitter', 'NameSplitter', 'RandomSplitter',
@@ -58,7 +58,7 @@ from monai.utils.misc import ensure_tuple, ensure_tuple_rep
 # =================================
 # fastai
 # =================================
-from fastai.data.all import delegates, hasattrs, L
+from fastai.data.all import delegates, hasattrs, L, noop, noops
 from fastai.vision.all import store_attr, BypassNewMeta, DisplayedTransform
 
 # =================================
@@ -104,6 +104,7 @@ PathLike = PathLike
 
 ensure_tuple = ensure_tuple
 ensure_tuple_rep = ensure_tuple_rep
+noop = noop
 
 torchTensor = torchTensor
 torch_from_numpy = torch_from_numpy

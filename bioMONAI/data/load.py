@@ -794,18 +794,23 @@ class MonaiTransformMixin:
     """Shared MONAI transform helpers."""
 
     # --------------------------------------------------
-    def _prepare_transform(self, transform, loader=None):
-        
-        if loader:
-            # put loader as first transform
-            transform = [loader] + list((transform or []))
+    def _prepare_transform(self, transforms, loaders=None):
 
-        if transform is None:
+        if isinstance(transforms, Callable):
+            transforms = [transforms]
+        
+        if loaders:
+            if isinstance(loaders, Callable):
+                loaders = [loaders]
+            # put loaders as first transforms
+            transforms = [*loaders, *(transforms or [])]
+
+        if transforms is None:
             return None
 
-        if isinstance(transform, (list, tuple)):
-            return Compose(transform)
-        return transform
+        if isinstance(transforms, (list, tuple)):
+            return Compose(transforms)
+        return transforms
 
     # --------------------------------------------------
     # make this more general to detect any random transform, not just MONAI's
@@ -949,8 +954,8 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         x_class=BioImage,
         y_class=BioImage,
         get_items=None,
-        get_x=None,
-        get_y=None,
+        get_x=noop,
+        get_y=noop,
         n_inp=None,
         item_transforms=None,
         val_item_transforms=None,
@@ -979,12 +984,12 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         x_loader = self.x_class.load_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
         y_loader = self.y_class.load_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
 
-        train_transform = self._prepare_transform(self.transforms, loader=x_loader)
+        train_transform = self._prepare_transform(self.transforms, loaders=[x_loader, y_loader])
 
         if self.val_transforms is None:
             valid_transform = self._make_deterministic_transforms(train_transform)
         else:
-            valid_transform = self._prepare_transform(self.val_transforms, loader=y_loader)
+            valid_transform = self._prepare_transform(self.val_transforms, loaders=[x_loader, y_loader])
 
         if mode == "test":
             test_ds = MonaiDataset(datalist_valid, valid_transform)
@@ -1046,12 +1051,12 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         x_loader = self.x_class.load_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
         y_loader = self.y_class.load_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
 
-        self.train_transform = self._prepare_transform(self.transforms, loader=x_loader)
+        self.train_transform = self._prepare_transform(self.transforms, loaders=x_loader)
 
         if self.val_transforms is None:
             self.valid_transform = self._make_deterministic_transforms(self.train_transform)
         else:
-            self.valid_transform = self._prepare_transform(self.val_transforms, loader=y_loader)
+            self.valid_transform = self._prepare_transform(self.val_transforms, loaders=y_loader)
 
         train_kwargs = route_kwargs(CacheDataset.__init__, self.train_kwargs)
         valid_kwargs = route_kwargs(CacheDataset.__init__, self.valid_kwargs)
