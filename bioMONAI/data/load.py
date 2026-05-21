@@ -491,8 +491,11 @@ class BaseSource:
     def load(self):
         raise NotImplementedError
 
-    def load_as_df(self):
+    def df(self):
         return pd.DataFrame(self.load())
+    
+    def peak(self):
+        return self.df().head()
 
 # %% ../../nbs/022_data.load.ipynb #20a3f90e
 @register_source("dict")
