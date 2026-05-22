@@ -17,7 +17,7 @@ from plum import dispatch
 # fastai
 # =================================
 from fastai.torch_core import TensorImage, TensorCategory, TensorMultiCategory
-from fastai.vision.all import TransformBlock
+from fastai.vision.all import TransformBlock, Categorize
 
 # =================================
 # bioMONAI
@@ -72,35 +72,40 @@ class BioDataClass(MetaTensor):
         return cls(x=x.data, meta=x.meta)
     
     # --------------------------------------------------
-    # TRANSFORMS CONFIG
+    # TRANSFORMS
     # --------------------------------------------------
     @classmethod
-    def item_preprocessing(cls, transforms):
+    def set_transforms(cls, transforms):
         cls._transforms = transforms
+    
+    # --------------------------------------------------
+    # GET DATA LOADERS
+    # --------------------------------------------------
+    @classmethod
+    def get_loader(cls,**kwargs) -> Callable:
+        raise NotImplementedError("Subclasses must implement the `get_loader` method to define how to load data.")
 
+    @classmethod
+    def get_dict_loader(cls, **kwargs) -> Callable:
+        raise NotImplementedError("Subclasses must implement the `get_dict_loader` method to define how to load data.")
+    
     # --------------------------------------------------
     # LOADING
     # --------------------------------------------------
     @classmethod
-    def create(cls, x, keys=None, **kwargs):
+    def from_source(cls, x, **kwargs):
         raise NotImplementedError("Subclasses must implement the `create` method to define how to instantiate from raw data.")
     
-    # --------------------------------------------------
-    # MONAI INTEGRATION
-    # --------------------------------------------------
     @classmethod
-    def load(cls,**kwargs) -> Callable:
-        raise NotImplementedError("Subclasses must implement the `load` method to define how to load data.")
-
-    @classmethod
-    def load_as_dict(cls, **kwargs) -> Callable:
-        raise NotImplementedError("Subclasses must implement the `load_dict` method to define how to load data.")
+    def from_dict(cls, x:dict, keys:str|Iterable[str]=None, **kwargs):
+        raise NotImplementedError("Subclasses must implement the `create` method to define how to instantiate from raw data.")
     
     # --------------------------------------------------
     # CREATE DATABLOCK (fastai integration)
     # --------------------------------------------------
-    def get_datablock(self):
-        return TransformBlock(type_tfms=[self.create])
+    @classmethod
+    def get_datablock(cls):
+        return TransformBlock(type_tfms=[cls.from_source])
 
     # --------------------------------------------------
     # REPR
@@ -131,31 +136,32 @@ class BioImageBase(BioDataClass, TensorImage, metaclass=MetaResolver):
     # LOADING
     # --------------------------------------------------
     @classmethod
-    def create(cls, x, keys=None, **kwargs):
-        if isinstance(x, dict):
-            if keys is None:
-                keys = []
-
-            metatensor_dict = cls.load_as_dict(keys=keys, **kwargs)(x)
-
-            if isinstance(keys, str):
-                keys = [keys]
-
-            for key in keys:
-                if key in metatensor_dict:
-                    x = metatensor_dict[key]
-                    metatensor_dict[key] = cls(x.data, meta=x.meta)
-
-            return metatensor_dict
-
-        metatensor = cls.load(**kwargs)(x)
+    def from_source(cls, x, **kwargs):
+        metatensor = cls.get_loader(**kwargs)(x)
         return cls(metatensor.data, meta=metatensor.meta)
+    
+    @classmethod
+    def from_dict(cls, x:dict, keys:str|Iterable[str]=None, **kwargs):
+        if keys is None:
+            keys = []
+
+        metatensor_dict = cls.get_dict_loader(keys=keys, **kwargs)(x)
+
+        if isinstance(keys, str):
+            keys = [keys]
+
+        for key in keys:
+            if key in metatensor_dict:
+                x = metatensor_dict[key]
+                metatensor_dict[key] = cls(x.data, meta=x.meta)
+
+        return metatensor_dict
     
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
-    def load(cls,**kwargs) -> Callable:
+    def get_loader(cls,**kwargs) -> Callable:
         def _load(x):
             if isinstance(x, torchTensor):
                 return cls.from_tensor(x)
@@ -173,7 +179,7 @@ class BioImageBase(BioDataClass, TensorImage, metaclass=MetaResolver):
         return _load
 
     @classmethod
-    def load_as_dict(cls, **kwargs) -> Callable:
+    def get_dict_loader(cls, **kwargs) -> Callable:
         def _load_dict(data: dict):
 
             local_kwargs = dict(kwargs)
@@ -298,7 +304,7 @@ class BioMultiChannel(BioImageBase):
             return tensor
     
     @classmethod
-    def create(
+    def from_source(
         cls,
         x: PathLike | Sequence[PathLike] | torchTensor,
         keys=None,
@@ -308,7 +314,7 @@ class BioMultiChannel(BioImageBase):
     ):
         kwargs.setdefault("channels", cls._channels)
 
-        out = super().create(x, keys=keys, **kwargs)
+        out = super().from_source(x, keys=keys, **kwargs)
 
         if isinstance(out, dict):
             return {k: cls._apply_mip(v, merge_cd=merge_cd, interleaved=interleaved, **kwargs) for k, v in out.items()}
@@ -333,57 +339,44 @@ class BioLabel(BioDataClass):
     # LOADING
     # --------------------------------------------------
     @classmethod
-    def create(cls, x, keys=None, **kwargs):
-        if isinstance(x, dict):
-            if keys is None:
-                keys = []
-
-            metatensor_dict = cls.load_as_dict(keys=keys, **kwargs)(x)
-
-            if isinstance(keys, str):
-                keys = [keys]
-
-            for key in keys:
-                if key in metatensor_dict:
-                    x = metatensor_dict[key]
-                    metatensor_dict[key] = cls(x.data, meta=x.meta)
-
-            return metatensor_dict
-
-        metatensor = cls.load(**kwargs)(x)
-        return cls(metatensor.data, meta=metatensor.meta)
+    def from_source(cls, x, **kwargs):
+        cat = cls.get_loader(**kwargs)
+        return cat(x)
+    
+    @classmethod
+    def from_dict(cls, x:dict, keys:str|Iterable[str]=None, **kwargs):
+        cat = cls.get_dict_loader(keys=keys, **kwargs)
+        return cat(x)
     
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
-    def load(cls,**kwargs) -> Callable:
-        def _load(fn):
-            if isinstance(fn, torchTensor):
-                return cls.from_tensor(fn)
+    def get_loader(cls,**kwargs) -> Callable:
 
-            local_kwargs = dict(kwargs)
-            local_kwargs.setdefault("transforms", cls._transforms)
+        vocab = kwargs.get('vocab', None)
+        sort = kwargs.get('sort', True)
+        add_na = kwargs.get('add_na', False)
 
-            return image_reader(
-                fn,
-                **local_kwargs,
-            )
+        cat = Categorize(vocab=vocab, sort=sort, add_na=add_na)
 
-        return _load
+        return cat
 
     @classmethod
-    def load_as_dict(cls, **kwargs) -> Callable:
+    def get_dict_loader(cls, **kwargs) -> Callable:
+
+        vocab = kwargs.get('vocab', None)
+        sort = kwargs.get('sort', True)
+        add_na = kwargs.get('add_na', False)
+        keys = kwargs.get("keys", cls._keys)
+
+        cat = Categorize(vocab=vocab, sort=sort, add_na=add_na)
+        
         def _load_dict(data: dict):
-
-            local_kwargs = dict(kwargs)
-            local_kwargs.setdefault("keys", cls._keys)
-            local_kwargs.setdefault("transforms", cls._transforms)
-
-            return image_reader_dict(
-                data,
-                **local_kwargs,
-            )
+            out = data.copy()
+            for key in keys:
+                out[key] = cat(data[key])
+            return out
 
         return _load_dict
     
