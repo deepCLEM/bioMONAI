@@ -82,7 +82,7 @@ class BioDataClass(MetaTensor):
     # LOADING
     # --------------------------------------------------
     @classmethod
-    def create(cls, x, **kwargs):
+    def create(cls, x, keys=None, **kwargs):
         raise NotImplementedError("Subclasses must implement the `create` method to define how to instantiate from raw data.")
     
     # --------------------------------------------------
@@ -93,7 +93,7 @@ class BioDataClass(MetaTensor):
         raise NotImplementedError("Subclasses must implement the `load` method to define how to load data.")
 
     @classmethod
-    def load_dict(cls, **kwargs) -> Callable:
+    def load_as_dict(cls, **kwargs) -> Callable:
         raise NotImplementedError("Subclasses must implement the `load_dict` method to define how to load data.")
     
     # --------------------------------------------------
@@ -107,30 +107,6 @@ class BioDataClass(MetaTensor):
     # --------------------------------------------------
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}{self.as_tensor().__repr__()[6:]}"
-
-# %% ../../nbs/021_data.core.ipynb #2ec695f1
-@dispatch
-def _create(cls, fn: dict, keys=None, **kwargs):
-    if keys is None:
-        keys = []
-
-    metatensor_dict = cls.load_dict(keys=keys, **kwargs)(fn)
-
-    if isinstance(keys, str):
-        keys = [keys]
-
-    for key in keys:
-        if key in metatensor_dict:
-            x = metatensor_dict[key]
-            metatensor_dict[key] = cls(x.data, meta=x.meta)
-
-    return metatensor_dict
-
-
-@dispatch
-def _create(cls, fn: object, **kwargs):
-    metatensor = cls.load(**kwargs)(fn)
-    return cls(metatensor.data, meta=metatensor.meta)
 
 # %% ../../nbs/021_data.core.ipynb #c04e0a04
 class BioImageBase(BioDataClass, TensorImage, metaclass=MetaResolver):
@@ -146,42 +122,63 @@ class BioImageBase(BioDataClass, TensorImage, metaclass=MetaResolver):
 
     _bypass_type = torchTensor
     _show_args = {"cmap": "gray"}
-    _channels="CZYX"
+    _channels = "CZYX"
+    _output = 'metatensor'
     _transforms = None
-    _keys = []
+    _keys = ['image']
 
     # --------------------------------------------------
     # LOADING
     # --------------------------------------------------
-    create = classmethod(_create)
+    @classmethod
+    def create(cls, x, keys=None, **kwargs):
+        if isinstance(x, dict):
+            if keys is None:
+                keys = []
+
+            metatensor_dict = cls.load_as_dict(keys=keys, **kwargs)(x)
+
+            if isinstance(keys, str):
+                keys = [keys]
+
+            for key in keys:
+                if key in metatensor_dict:
+                    x = metatensor_dict[key]
+                    metatensor_dict[key] = cls(x.data, meta=x.meta)
+
+            return metatensor_dict
+
+        metatensor = cls.load(**kwargs)(x)
+        return cls(metatensor.data, meta=metatensor.meta)
     
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
     def load(cls,**kwargs) -> Callable:
-        def _load(fn):
-            if isinstance(fn, torchTensor):
-                return cls.from_tensor(fn)
+        def _load(x):
+            if isinstance(x, torchTensor):
+                return cls.from_tensor(x)
 
             local_kwargs = dict(kwargs)
+            local_kwargs.setdefault("output", cls._output)
             local_kwargs.setdefault("channels", cls._channels)
             local_kwargs.setdefault("transforms", cls._transforms)
 
             return image_reader(
-                fn,
-                output="metatensor",
+                x,
                 **local_kwargs,
             )
 
         return _load
 
     @classmethod
-    def load_dict(cls, **kwargs) -> Callable:
-        def _load_dict(data: dict|Sequence[dict]):
+    def load_as_dict(cls, **kwargs) -> Callable:
+        def _load_dict(data: dict):
 
             local_kwargs = dict(kwargs)
             local_kwargs.setdefault("keys", cls._keys)
+            local_kwargs.setdefault("output", cls._output)
             local_kwargs.setdefault("channels", cls._channels)
             local_kwargs.setdefault("transforms", cls._transforms)
 
@@ -199,7 +196,7 @@ class BioImageBase(BioDataClass, TensorImage, metaclass=MetaResolver):
         return show_biodata(
             self,
             ctx=ctx,
-            title=[title],
+            title=title if title is not None else None,
             volume_mode='grid',
             figsize=figsize,
             **merge(self._show_args, kwargs),
@@ -214,54 +211,16 @@ class BioImage(BioImageBase):
 
     _channels = "CYX"
 
-    # --------------------------------------------------
-    # VISUALIZATION
-    # --------------------------------------------------
-    def show(self, ctx=None, **kwargs):
-        "Show image using `merge(self._show_args, kwargs)`"
-        return show_biodata(self, ctx=ctx, **merge(self._show_args, kwargs))
-
-    # --------------------------------------------------
-    # LOADER FACTORY
-    # --------------------------------------------------
-    @classmethod
-    def load(cls, **kwargs):
-        kwargs.setdefault("channels", cls._channels)
-        return super().load(**kwargs)
-
-    # --------------------------------------------------
-    # DICT LOADER
-    # --------------------------------------------------
-    @classmethod
-    def load_dict(cls, **kwargs):
-        kwargs.setdefault("channels", cls._channels)
-        return super().load_dict(**kwargs)
 
 # %% ../../nbs/021_data.core.ipynb #a32aa47a
 class BioVolume(BioImageBase):
     """
-    Tensor-backed bioimage loaded from disk.
+    Tensor-backed volume loaded from disk.
 
-    This is the class that:
-    - uses image_reader
-    - handles transforms
-    - returns MetaTensor-backed images
     """
 
     _channels="CZYX"
-    
-    # --------------------------------------------------
-    # MONAI INTEGRATION
-    # --------------------------------------------------
-    @classmethod
-    def load(cls, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load(**kwargs)
 
-    @classmethod
-    def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load_dict(keys, **kwargs)
 
 # %% ../../nbs/021_data.core.ipynb #b6cdac7d
 def _mip_transform(cls, img, layout):
@@ -275,51 +234,6 @@ def _mip_transform(cls, img, layout):
 
     return cls(x=mip, meta=meta)
 
-@dispatch
-def _create_mip(
-    cls,
-    fn: PathLike | Sequence[PathLike] | torchTensor,
-    **kwargs,
-):
-    kwargs.setdefault("channels", cls._channels)
-
-    img = super(cls, cls).create(fn, **kwargs)
-
-    layout = kwargs.get("channels")
-
-    return _mip_transform(cls, img, layout)
-
-@dispatch
-def _create_mip(
-    cls,
-    fn: dict | Sequence[dict],
-    keys=None,
-    **kwargs,
-):
-    kwargs.setdefault("channels", cls._channels)
-
-    out = super(cls, cls).create(
-        fn,
-        keys=keys,
-        **kwargs,
-    )
-
-    if keys is None:
-        keys = []
-
-    if isinstance(keys, str):
-        keys = [keys]
-
-    layout = kwargs.get("channels")
-
-    for key in keys:
-
-        img = out[key]
-
-        out[key] = _mip_transform(cls, img, layout)
-
-    return out
-
 # %% ../../nbs/021_data.core.ipynb #0febd1d1
 class BioVideo(BioImageBase):
     """
@@ -332,60 +246,39 @@ class BioVideo(BioImageBase):
     """
 
     _channels="CTYX"
-
-    # --------------------------------------------------
-    # LOADING
-    # --------------------------------------------------
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        **kwargs,
-    ):
-
-        kwargs.setdefault("channels", cls._channels)
-
-        return super().create(fn, **kwargs)
     
-    # --------------------------------------------------
-    # MONAI INTEGRATION
-    # --------------------------------------------------
-    @classmethod
-    def load(cls, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load(**kwargs)
-
-    @classmethod
-    def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load_dict(keys, **kwargs)
 
 # %% ../../nbs/021_data.core.ipynb #b484acfa
 class BioMultiChannel(BioImageBase):
     """
     Multi-channel 2D/3D image assuming CZYX layout.
     """
-    @classmethod
-    def create(
-        cls,
-        fn: PathLike | Sequence[PathLike] | torchTensor,
-        merge_cd: bool = True,
-        interleaved: bool = True,
-        **kwargs,
-    ):
-        kwargs.setdefault("channels", cls._channels)
-        tensor = super().create(fn, **kwargs)
-        layout = kwargs.get("layout") or tensor.meta.get("layout") or cls._channels
 
-        output_layout = layout
-        if merge_cd:
+    @classmethod
+    def _apply_mip(cls, tensor, merge_cd, interleaved, **kwargs):
+            layout = (
+                kwargs.get("layout")
+                or getattr(tensor, "meta", {}).get("layout")
+                or cls._channels
+            )
+
+            if not merge_cd:
+                if hasattr(tensor, "meta"):
+                    tensor.meta["layout"] = layout
+                    tensor.meta["size_output"] = tuple(tensor.shape)
+                return tensor
+
             if layout is None or "C" not in layout or "Z" not in layout:
-                raise ValueError(f"BioMultiChannel merge_cd requires C and Z axes, got {layout!r}")
+                raise ValueError(
+                    f"BioMultiChannel merge_cd requires C and Z axes, got {layout!r}"
+                )
 
             c_dim = layout.index("C")
             z_dim = layout.index("Z")
+
             c = tensor.shape[c_dim]
             d = tensor.shape[z_dim]
+
             spatial_dims = [i for i in range(tensor.ndim) if i not in (c_dim, z_dim)]
 
             if interleaved:
@@ -395,26 +288,34 @@ class BioMultiChannel(BioImageBase):
 
             tensor = tensor.permute(*permute_dims)
             tensor = tensor.reshape(c * d, *tensor.shape[2:])
+
             output_layout = layout.replace("Z", "")
 
-        tensor.meta["layout"] = output_layout
-        tensor.meta["size_output"] = tuple(tensor.shape)
+            if hasattr(tensor, "meta"):
+                tensor.meta["layout"] = output_layout
+                tensor.meta["size_output"] = tuple(tensor.shape)
 
-        return cls(x=tensor, meta=tensor.meta)
+            return tensor
+    
+    @classmethod
+    def create(
+        cls,
+        x: PathLike | Sequence[PathLike] | torchTensor,
+        keys=None,
+        merge_cd: bool = True,
+        interleaved: bool = True,
+        **kwargs,
+    ):
+        kwargs.setdefault("channels", cls._channels)
+
+        out = super().create(x, keys=keys, **kwargs)
+
+        if isinstance(out, dict):
+            return {k: cls._apply_mip(v, merge_cd=merge_cd, interleaved=interleaved, **kwargs) for k, v in out.items()}
+
+        return cls._apply_mip(out, merge_cd=merge_cd, interleaved=interleaved, **kwargs)
 
     def show(self, ctx=None, **kwargs):
         return show_multichannel(self, ctx=ctx, **merge(self._show_args, kwargs))
 
-    # --------------------------------------------------
-    # MONAI INTEGRATION
-    # --------------------------------------------------
-    @classmethod
-    def load(cls, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load(**kwargs)
-
-    @classmethod
-    def load_dict(cls, keys, **kwargs) -> Callable:
-        kwargs.setdefault("channels", cls._channels)
-        return super().load_dict(keys, **kwargs)
 

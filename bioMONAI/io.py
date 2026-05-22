@@ -1064,78 +1064,150 @@ def _meta_from_layout(shape: tuple[int, ...],           # The shape of the image
     return meta
 
 
+def _to_numpy(x):
+    return x.detach().cpu().numpy()
+
+
+def _extract_meta(
+    metatensor: MetaTensor,
+    metatensors: Sequence[MetaTensor] | None = None,
+):
+    if metatensors is None:
+        return metatensor.meta
+
+    return {
+        i: mt.meta
+        for i, mt in enumerate(metatensors)
+    }
+
+
+_OUTPUT_MODES = {
+    "metatensor",
+    "tensor",
+    "tensor+meta",
+    "nparray",
+    "nparray+meta",
+}
+
+
+def _format_output(
+    output: str,
+    metatensor: MetaTensor,
+    metatensors: Sequence[MetaTensor] | None = None,
+):
+    """
+    Convert MetaTensor outputs into the requested representation.
+    """
+    if output == "metatensor":
+        return metatensor
+
+    if output.startswith("tensor"):
+        data = metatensor.as_tensor()
+
+    elif output.startswith("nparray"):
+        data = _to_numpy(metatensor)
+
+    else:
+        raise ValueError(
+            f"Unknown output mode: {output}. "
+            f"Expected one of {_OUTPUT_MODES}"
+        )
+
+    if output.endswith("+meta"):
+        return data, _extract_meta(metatensor, metatensors)
+
+    return data
+
+
 
 # %% ../nbs/010_io.ipynb #f4177cc4
 def image_reader(
-    file_path: PathLike | Sequence[PathLike],           # The file path(s) to the image(s) to be read. Can be a single path or a sequence of paths for multi-image loading.
-    lazy: bool = False,                                 # Whether to use lazy loading (streaming) for multi-image inputs. If True, returns an iterable of MetaTensors instead of a single stacked tensor.
-    output: str = "metatensor",                             # The desired output format. Options: "nparray", "nparray+meta", "tensor", "tensor+meta", "metatensor"
-    transforms: Callable|list[Callable]|None = None,    # Optional transforms to apply to the loaded image(s). Can be a single callable or a list of callables.
-    channels: str ="CZYX",                              # The desired channel layout for the output tensor. Should be compatible with the input data and the loader used.
-    ind_dict: dict|None = None,                         # Optional dictionary indicating specific channels or slices to load. Keys should correspond to axes in the channel layout (e.g., {"Y": slice(0, 10)}).
-    dtype=torch.float32,                                # The desired data type for the output tensor. Only applicable if output includes tensor formats.
-    squeeze: bool = False,                              # Whether to squeeze singleton dimensions from the input tensors before stacking.
-    stack_axis: str = "C",                              # The axis along which to stack multi-image inputs. Should be one of the characters in the channel layout (e.g., "C", "S") or a new axis if not present in the layout.
-    **kwargs,                                           # Additional keyword arguments to pass to the image loader (e.g., npz_key for .npz files, loader for bioio_loader, etc.)
-) -> (                                                  # The type of the returned value depends on the `output` parameter.
+    file_path: PathLike | Sequence[PathLike],
+    lazy: bool = False,
+    output: str = "metatensor",
+    transforms: Callable | list[Callable] | None = None,
+    channels: str = "CZYX",
+    ind_dict: dict | None = None,
+    dtype=torch.float32,
+    squeeze: bool = False,
+    stack_axis: str = "C",
+    **kwargs,
+) -> (
     MetaTensor
     | np.ndarray
     | tuple[np.ndarray, dict]
     | torch.Tensor
     | tuple[torch.Tensor, dict]
-    | tuple[torch.Tensor, dict]                         
 ):
     """
-    Main entry point for medical image loading.
+    Main entry point for image loading.
 
-    ----------------------------------------------------------------------
-    OVERVIEW
-    ----------------------------------------------------------------------
     Supports:
-        - single image loading
-        - multi-image / multi-sequence loading
-        - lazy or eager execution
-        - scalar, NumPy, tensor, and MetaTensor outputs
-        - flexible axis control for multi-image stacking
+        - single-image loading
+        - multi-image loading
+        - lazy streaming
+        - tensor / numpy / MetaTensor outputs
+        - configurable stacking layouts
 
-    ----------------------------------------------------------------------
-    AXIS MODEL
-    ----------------------------------------------------------------------
-    Two concepts define tensor layout:
+    Parameters
+    ----------
+    file_path:
+        Single image path or sequence of image paths.
 
-    1. channels:
-        Defines per-image axis layout (e.g. "CZYX")
+    lazy:
+        If True and multiple paths are provided, images are streamed
+        lazily instead of eagerly loaded.
 
-    2. stack_axis:
-        Defines how multi-image inputs are injected.
+    output:
+        Output representation.
 
-    RULES:
+        Supported values:
+            - "metatensor"
+            - "tensor"
+            - "tensor+meta"
+            - "nparray"
+            - "nparray+meta"
 
-    CASE 1:
-        If stack_axis is IN channels:
-            → images are stacked along that axis (no new axis created)
-            → that axis becomes sequence dimension
+    transforms:
+        Optional preprocessing transforms.
 
-    CASE 2:
-        If stack_axis is NOT in channels:
-            → a new axis is created at stack_axis position
-            → sequence dimension is inserted
+    channels:
+        Axis layout string describing image dimensions.
 
-    ----------------------------------------------------------------------
-    OUTPUT MODES
-    ----------------------------------------------------------------------
-        "nparray"       -> np.ndarray
-        "nparray+meta"  -> (np.ndarray, Meta or list[Meta])
-        "tensor"        -> torch.Tensor
-        "tensor+meta"   -> (torch.Tensor, Meta or list[Meta])
-        "metatensor"    -> MetaTensor
+    ind_dict:
+        Optional indexing dictionary for partial loading.
 
-    ----------------------------------------------------------------------
+    dtype:
+        Output tensor dtype.
+
+    squeeze:
+        Remove singleton dimensions before returning.
+
+    stack_axis:
+        Axis used for stacking multi-image inputs.
+
+        If present in `channels`, stacking occurs along that axis.
+
+        Otherwise, a new axis is inserted.
+
+    **kwargs:
+        Additional loader-specific arguments.
     """
-    # loader
-    def _load(p):
+
+    if output not in _OUTPUT_MODES:
+        raise ValueError(
+            f"Unknown output mode: {output}. "
+            f"Expected one of {_OUTPUT_MODES}"
+        )
+
+    is_multi = (
+        isinstance(file_path, Sequence)
+        and not isinstance(file_path, (str, Path))
+    )
+
+    def _load(path):
         return _load_and_preprocess(
-            p,
+            path,
             transforms=transforms,
             channels=channels,
             ind_dict=ind_dict,
@@ -1143,9 +1215,14 @@ def image_reader(
             **kwargs,
         )
 
-    def _iter_multi():
+    # =====================================================
+    # MULTI-IMAGE CASE
+    # =====================================================
+
+    if is_multi:
+
         if lazy:
-            return _multi_sequence_stream(
+            metatensors = _multi_sequence_stream(
                 file_path,
                 transforms=transforms,
                 channels=channels,
@@ -1153,76 +1230,56 @@ def image_reader(
                 dtype=dtype,
                 **kwargs,
             )
-        return [_load(p) for p in file_path]
+        else:
+            metatensors = [_load(p) for p in file_path]
 
-    def _to_numpy(tensor):
-        return tensor.detach().cpu().numpy()
+        metatensor = _stack(
+            metatensors,
+            stack_axis=stack_axis,
+            channels=channels,
+            squeeze=squeeze,
+        )
 
-    # -------------------------------------------------
-    # detect multi
-    # -------------------------------------------------
+        metatensor.meta.update(
+            _meta_from_layout(
+                metatensor.shape,
+                metatensor.meta["layout"],
+            )
+        )
 
-    is_multi = isinstance(file_path, Sequence) and not isinstance(file_path, (str, Path))
-
-    # =====================================================
-    # MULTI CASE
-    # =====================================================
-    if is_multi:
-        metatensors = _iter_multi()
-        metatensor = _stack(metatensors, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
-        metatensor.meta.update(_meta_from_layout(metatensor.shape, metatensor.meta['layout']))
-
-        if output == "metatensor":
-            return metatensor
-
-        if output == "tensor":
-            return metatensor.as_tensor()
-
-        if output == "tensor+meta":
-            return metatensor.as_tensor(), {i:m.meta for i, m in enumerate(metatensors)}
-
-        if output == "nparray":
-            return _to_numpy(metatensor)
-        
-        if output == "nparray+meta":
-            return _to_numpy(metatensor), {i:m.meta for i, m in enumerate(metatensors)}
-
-
-        raise ValueError(f"Unknown output mode: {output}")
+        return _format_output(
+            output=output,
+            metatensor=metatensor,
+            metatensors=metatensors,
+        )
 
     # =====================================================
-    # SINGLE CASE
+    # SINGLE-IMAGE CASE
     # =====================================================
+
     metatensor = _load(file_path)
-    metatensor.meta.update(_meta_from_layout(metatensor.shape, channels))
 
     if squeeze:
         metatensor = metatensor.squeeze()
 
-    metatensor = metatensor
+    metatensor.meta.update(
+        _meta_from_layout(
+            metatensor.shape,
+            channels,
+        )
+    )
 
-    if output == "metatensor":
-        return metatensor
-    
-    if output == "tensor":
-        return Tensor(metatensor)
-
-    if output == "tensor+meta":
-        return Tensor(metatensor), metatensor.meta
-    
-    if output == "nparray":
-        return _to_numpy(metatensor)
-
-    if output == "nparray+meta":
-        return _to_numpy(metatensor), metatensor.meta
-
-    raise ValueError(f"Unknown output mode: {output}")
+    return _format_output(
+        output=output,
+        metatensor=metatensor,
+    )
 
 # %% ../nbs/010_io.ipynb #3135d535
 def image_reader_dict(
-    data: dict | Sequence[dict],
+    data: dict,
     keys: str | Iterable[str],
     lazy: bool = False,
+    output: str = "metatensor",
     transforms: Callable | list[Callable] | None = None,
     channels: str = "CZYX",
     ind_dict: dict | None = None,
@@ -1232,37 +1289,75 @@ def image_reader_dict(
     **kwargs,
 ):
     """
-    Load images from paths stored inside dictionary keys.
+    Load images from dictionary keys.
 
     Supports:
-        - single dictionary input
-        - eager or lazy execution
+        - single or multi-image entries
+        - eager or lazy loading
+        - tensor / numpy / MetaTensor outputs
+        - metadata preservation
 
-    The specified keys are replaced with loaded/preprocessed MetaTensor
-    objects while preserving the remaining dictionary structure.
+    Parameters
+    ----------
+    data:
+        Input dictionary containing image paths.
 
-    Args:
-        data:
-            Input dictionary or sequence of dictionaries.
-        keys:
-            Key or iterable of keys containing file paths.
-        lazy:
-            Whether to lazily stream sequence inputs.
-        transforms:
-            Optional dictionary-based transforms.
-        loader:
-            Optional custom loader.
-        channels:
-            Channel layout string.
-        ind_dict:
-            Optional indexing dictionary.
-        npz_key:
-            Optional NPZ key.
+    keys:
+        Dictionary keys containing image paths or sequences of paths.
 
-    Returns:
-        dict | list[dict] | Iterable[dict]:
-            Loaded dictionary sample(s).
+    lazy:
+        If True, multi-image sequences are streamed lazily.
+
+    output:
+        Output representation.
+
+        Supported values:
+            - "metatensor"
+            - "tensor"
+            - "tensor+meta"
+            - "nparray"
+            - "nparray+meta"
+
+    transforms:
+        Optional preprocessing transforms.
+
+    channels:
+        Axis layout string.
+
+    ind_dict:
+        Optional indexing dictionary.
+
+    dtype:
+        Output tensor dtype.
+
+    squeeze:
+        Remove singleton dimensions.
+
+    stack_axis:
+        Axis used when stacking multi-image inputs.
+
+    **kwargs:
+        Additional loader-specific arguments.
+
+    Returns
+    -------
+    dict
+        Dictionary with loaded image objects replacing file paths.
     """
+
+    if output not in _OUTPUT_MODES:
+        raise ValueError(
+            f"Unknown output mode: {output}. "
+            f"Expected one of {_OUTPUT_MODES}"
+        )
+
+    if not keys:
+        return data.copy()
+
+    if isinstance(keys, str):
+        keys = [keys]
+
+    out = data.copy()
 
     def _load(obj):
         return _load_and_preprocess_dict(
@@ -1276,6 +1371,7 @@ def image_reader_dict(
         )
 
     def _iter_multi(dict_list):
+
         if lazy:
             return _multi_sequence_stream_dict(
                 objs=dict_list,
@@ -1287,46 +1383,76 @@ def image_reader_dict(
                 **kwargs,
             )
 
-        return [_load(obj) for obj in dict_list]
-
-    out = data.copy() 
-    
-    if not keys: 
-        return out
-    
-    if isinstance(keys, str):
-        keys = [keys]
+        return [_load(d) for d in dict_list]
 
     for k in keys:
-        if k in out:
 
-            obj = out[k] # typically a path or a list of paths
+        if k not in out:
+            continue
 
-            is_multi = (
-                isinstance(obj, Sequence)
-                and not isinstance(obj, str)
+        obj = out[k]
+
+        is_multi = (
+            isinstance(obj, Sequence)
+            and not isinstance(obj, (str, Path))
+        )
+
+        # =====================================================
+        # MULTI-IMAGE CASE
+        # =====================================================
+
+        if is_multi:
+
+            dict_list = [{k: p} for p in obj]
+
+            loaded = _iter_multi(dict_list)
+
+            metatensors = [d[k] for d in loaded]
+
+            metatensor = _stack(
+                metatensors,
+                stack_axis=stack_axis,
+                channels=channels,
+                squeeze=squeeze,
             )
 
-            # -------------------------------------------------
-            # MULTI CASE
-            # -------------------------------------------------
-            if is_multi:
+            metatensor.meta.update(
+                _meta_from_layout(
+                    metatensor.shape,
+                    metatensor.meta["layout"],
+                )
+            )
 
-                dict_list = [{k: p} for p in obj]
-                
-                dict_list = _iter_multi(dict_list)
-                image_list = [d[k] for d in dict_list]
-                obj = _stack(image_list, stack_axis=stack_axis, channels=channels, squeeze=squeeze)
-                obj.meta.update(_meta_from_layout(obj.shape, obj.meta['layout']))
+            out[k] = _format_output(
+                output=output,
+                metatensor=metatensor,
+                metatensors=metatensors,
+            )
 
-                out[k] = obj
+        # =====================================================
+        # SINGLE-IMAGE CASE
+        # =====================================================
 
-            # -------------------------------------------------
-            # SINGLE CASE
-            # -------------------------------------------------
-            else:
-                out = _load(out)
-                out[k].meta.update(_meta_from_layout(out[k].shape, channels))
+        else:
+
+            loaded = _load({k: obj})
+
+            metatensor = loaded[k]
+
+            if squeeze:
+                metatensor = metatensor.squeeze()
+
+            metatensor.meta.update(
+                _meta_from_layout(
+                    metatensor.shape,
+                    channels,
+                )
+            )
+
+            out[k] = _format_output(
+                output=output,
+                metatensor=metatensor,
+            )
 
     return out
 
