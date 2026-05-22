@@ -87,7 +87,7 @@ class BioDataBlock(DataBlock):
     The `BioDataBlock` class serves as a generic container to build `Datasets` and `DataLoaders` efficiently. It integrates item and batch transformations, getters, and splitters, simplifying the setup of data pipelines for training and validation.
     """
     def __init__(self, 
-            blocks:list=(BioImageBlock(cls=BioImage), BioImageBlock(cls=BioImage)), # One or more `TransformBlock`s
+            blocks:list=(BioImage.get_datablock(), BioImage.get_datablock()),       # One or more `TransformBlock`s
             dl_type:TfmdDL=None,                                                    # Task specific `TfmdDL`, defaults to `block`'s dl_type or`TfmdDL`
             get_items=get_image_files,
             get_y=None,
@@ -919,10 +919,13 @@ class DataBlockBuilder(DataSplitMixin):
         get_x = self.get_x or ColReader(x_col)
         get_y = self.get_y or (ColReader(y_col) if y_col else None)
 
+        x_block = getattr(self.x_class, "get_datablock", lambda: self.x_class)()
+        y_block = getattr(self.y_class, "get_datablock", lambda: self.y_class)()
+
         blocks = (
-            (BioImageBlock(cls=self.x_class), BioImageBlock(cls=self.y_class))
+            (x_block, y_block)
             if y_col else
-            (BioImageBlock(cls=self.x_class),)
+            (x_block,)
         )
 
         splitter = None if mode == "test" else self._resolve_splitter(data)
