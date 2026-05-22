@@ -1155,8 +1155,6 @@ def image_reader(
             )
         return [_load(p) for p in file_path]
 
-    
-
     def _to_numpy(tensor):
         return tensor.detach().cpu().numpy()
 
@@ -1178,10 +1176,10 @@ def image_reader(
             return metatensor
 
         if output == "tensor":
-            return Tensor(metatensor)
+            return metatensor.as_tensor()
 
         if output == "tensor+meta":
-            return Tensor(metatensor), {i:m.meta for i, m in enumerate(metatensors)}
+            return metatensor.as_tensor(), {i:m.meta for i, m in enumerate(metatensors)}
 
         if output == "nparray":
             return _to_numpy(metatensor)
@@ -1302,7 +1300,7 @@ def image_reader_dict(
     for k in keys:
         if k in out:
 
-            obj = out[k]
+            obj = out[k] # typically a path or a list of paths
 
             is_multi = (
                 isinstance(obj, Sequence)
@@ -1327,7 +1325,7 @@ def image_reader_dict(
             # SINGLE CASE
             # -------------------------------------------------
             else:
-                out[k] = _load(obj)
+                out = _load(out)
                 out[k].meta.update(_meta_from_layout(out[k].shape, channels))
 
     return out
