@@ -987,8 +987,8 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         if self.val_item_transforms is None:
             self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
 
-        x_loader = self.x_class.load_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
-        y_loader = self.y_class.load_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
+        x_loader = self.x_class.load_as_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
+        y_loader = self.y_class.load_as_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
 
         train_transform = self._prepare_transform(self.transforms, loaders=[x_loader, y_loader])
 
@@ -1054,8 +1054,8 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         if self.val_item_transforms is None:
             self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
 
-        x_loader = self.x_class.load_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
-        y_loader = self.y_class.load_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
+        x_loader = self.x_class.load_as_dict(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
+        y_loader = self.y_class.load_as_dict(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
 
         self.train_transform = self._prepare_transform(self.transforms, loaders=x_loader)
 
