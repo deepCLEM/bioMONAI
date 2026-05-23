@@ -52,7 +52,7 @@ from fastai.vision.all import *
 # bioMONAI
 # =================================
 from .utils import *
-from .data import BioImageBase, BioVolume, Tensor2BioImage
+from .data import BioImageBase, BioVolume
 
 # %% ../nbs/030_transforms.ipynb #425f62e2
 class FunctionTransform(Transform):

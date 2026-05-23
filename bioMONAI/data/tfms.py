@@ -388,7 +388,7 @@ def show_batch(
         # Convert tensors → BioImage
         # -------------------------
         cls = BioImage if x[0].shape[0] == 1 else BioMultiChannel
-        x_bio = [Tensor2BioImage(cls)(t) for t in x]
+        x_bio = [cls.from_metatensor(t) for t in x]
 
         # -------------------------
         # Convert y to list
@@ -524,7 +524,7 @@ def show_results(dl: torchDataLoader,         # DataLoader containing the batch 
 
     # Choose the right BioImage class based on channels
     cls = BioImage if x[0].shape[0]==1 else BioMultiChannel
-    x_bio = [Tensor2BioImage(cls)(t) for t in x]
+    x_bio = [cls.from_metatensor(t) for t in x]
 
     # Convert predictions and labels to lists
     y_list = y.tolist()

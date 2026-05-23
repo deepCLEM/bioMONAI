@@ -334,6 +334,9 @@ class BioLabel(BioDataClass):
     """
 
     _keys = ['label']
+    _vocab = None
+    _sort = True
+    _add_na = False
 
     # --------------------------------------------------
     # LOADING
@@ -354,9 +357,9 @@ class BioLabel(BioDataClass):
     @classmethod
     def get_loader(cls,**kwargs) -> Callable:
 
-        vocab = kwargs.get('vocab', None)
-        sort = kwargs.get('sort', True)
-        add_na = kwargs.get('add_na', False)
+        vocab = kwargs.get('vocab', cls._vocab)
+        sort = kwargs.get('sort', cls._sort)
+        add_na = kwargs.get('add_na', cls._add_na)
 
         cat = Categorize(vocab=vocab, sort=sort, add_na=add_na)
 
@@ -365,9 +368,9 @@ class BioLabel(BioDataClass):
     @classmethod
     def get_dict_loader(cls, **kwargs) -> Callable:
 
-        vocab = kwargs.get('vocab', None)
-        sort = kwargs.get('sort', True)
-        add_na = kwargs.get('add_na', False)
+        vocab = kwargs.get('vocab', cls._vocab)
+        sort = kwargs.get('sort', cls._sort)
+        add_na = kwargs.get('add_na', cls._add_na)
         keys = kwargs.get("keys", cls._keys)
 
         cat = Categorize(vocab=vocab, sort=sort, add_na=add_na)
@@ -379,5 +382,6 @@ class BioLabel(BioDataClass):
             return out
 
         return _load_dict
+
     
     
