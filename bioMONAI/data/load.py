@@ -856,6 +856,49 @@ class MonaiTransformMixin:
             deterministic.append(t)
 
         return Compose(deterministic)
+    
+    def _build_transforms_and_loaders(self):
+        if self.val_item_transforms is None:
+            self.val_item_transforms = self._make_deterministic_transforms(
+                self.item_transforms
+            )
+
+        x_loader = (
+            self.x_class.get_dict_loader(
+                keys=self.x_keys,
+                transforms=self.item_transforms,
+                **self.kwargs,
+            )
+            if self.x_class
+            else self.get_x
+        )
+
+        y_loader = (
+            self.y_class.get_dict_loader(
+                keys=self.y_keys,
+                transforms=self.val_item_transforms,
+                **self.kwargs,
+            )
+            if self.y_class
+            else self.get_y
+        )
+
+        train_transform = self._prepare_transform(
+            self.transforms,
+            loaders=[x_loader, y_loader],
+        )
+
+        if self.val_transforms is None:
+            valid_transform = self._make_deterministic_transforms(
+                train_transform
+            )
+        else:
+            valid_transform = self._prepare_transform(
+                self.val_transforms,
+                loaders=[x_loader, y_loader],
+            )
+
+        return train_transform, valid_transform
 
 # %% ../../nbs/022_data.load.ipynb #85a42e13
 @register_dataset("datablock", backend="fastai")
@@ -984,31 +1027,25 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
         datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
-        if self.val_item_transforms is None:
-            self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
-
-        x_loader = self.x_class.get_dict_loader(keys=self.x_keys, transforms=self.item_transforms, **self.kwargs) if self.x_class else self.get_x
-        y_loader = self.y_class.get_dict_loader(keys=self.y_keys, transforms=self.val_item_transforms, **self.kwargs) if self.y_class else self.get_y
-
-        train_transform = self._prepare_transform(self.transforms, loaders=[x_loader, y_loader])
-
-        if self.val_transforms is None:
-            valid_transform = self._make_deterministic_transforms(train_transform)
-        else:
-            valid_transform = self._prepare_transform(self.val_transforms, loaders=[x_loader, y_loader])
+        train_transform, valid_transform = (
+            self._build_transforms_and_loaders()
+        )
 
         if mode == "test":
-            test_ds = MonaiDataset(datalist_valid, valid_transform)
+            test_ds = MonaiDataset(
+                datalist_valid,
+                transform=valid_transform,
+            )
             return test_ds, None
-    
+
         train_ds = MonaiDataset(
             datalist_train,
-            transform=train_transform
+            transform=train_transform,
         )
 
         valid_ds = MonaiDataset(
             datalist_valid,
-            transform=valid_transform
+            transform=valid_transform,
         )
 
         return train_ds, valid_ds
@@ -1052,36 +1089,38 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
         datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
-        if self.val_item_transforms is None:
-            self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
+        train_transform, valid_transform = (
+            self._build_transforms_and_loaders()
+        )
 
-        x_loader = self.x_class.get_dict_loader(keys=self.x_keys, transforms=self.item_transforms, **self.kwargs) if self.x_class else self.get_x
-        y_loader = self.y_class.get_dict_loader(keys=self.y_keys, transforms=self.val_item_transforms, **self.kwargs) if self.y_class else self.get_y
+        train_kwargs = route_kwargs(
+            CacheDataset.__init__,
+            self.train_kwargs,
+        )
 
-        self.train_transform = self._prepare_transform(self.transforms, loaders=x_loader)
-
-        if self.val_transforms is None:
-            self.valid_transform = self._make_deterministic_transforms(self.train_transform)
-        else:
-            self.valid_transform = self._prepare_transform(self.val_transforms, loaders=y_loader)
-
-        train_kwargs = route_kwargs(CacheDataset.__init__, self.train_kwargs)
-        valid_kwargs = route_kwargs(CacheDataset.__init__, self.valid_kwargs)
+        valid_kwargs = route_kwargs(
+            CacheDataset.__init__,
+            self.valid_kwargs,
+        )
 
         if mode == "test":
-            test_ds = CacheDataset(datalist_valid, transform=self.valid_transform, **valid_kwargs)
+            test_ds = CacheDataset(
+                datalist_valid,
+                transform=valid_transform,
+                **valid_kwargs,
+            )
             return test_ds, None
-        
+
         train_ds = CacheDataset(
             datalist_train,
-            transform=self.train_transform,
-            **train_kwargs
+            transform=train_transform,
+            **train_kwargs,
         )
 
         valid_ds = CacheDataset(
             datalist_valid,
-            transform=self.valid_transform,
-            **valid_kwargs
+            transform=valid_transform,
+            **valid_kwargs,
         )
 
         return train_ds, valid_ds
@@ -1281,13 +1320,13 @@ class BaseTask:
     def setup(self, ctx):
         return ctx
 
-    def after_load(self, ctx):
+    def before_load(self, ctx):
         return ctx
 
     def before_dataset(self, ctx):
         return ctx
 
-    def after_dataset(self, ctx):
+    def before_loader(self, ctx):
         return ctx
 
     def after_loader(self, ctx):
@@ -1311,13 +1350,14 @@ class ClassificationTask(BaseTask):
         RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
     ]
 
-    def after_load(self, ctx):
+    def before_dataset(self, ctx):
 
         vocab = list(dict.fromkeys(
             r["cell_type"] for r in ctx.records
         ))
 
-        ctx.config.setdefault("vocab", vocab)
+        # this replaces vocab if missing or None.
+        ctx.config["vocab"] = ctx.config.get("vocab") or vocab
 
         return ctx
 
@@ -1408,6 +1448,8 @@ class BioDataLoaders(DataLoaders):
             source_splits.get("val", source_splits["train"])
         )
 
+        # val_kwargs = source_splits.get("val", source_splits["train"])
+    
         val = SourceClass(ctx.val_data, **val_kwargs).load()
 
         valid_col = ctx.config.get("valid_col", "is_valid")
@@ -1432,12 +1474,12 @@ class BioDataLoaders(DataLoaders):
 
         ctx.backend = ctx.backend or inferred_backend
 
-        builder_kwargs = route_kwargs(
-            DatasetBuilderClass.__init__,
-            ctx.config
-        )
+        # builder_kwargs = route_kwargs(
+        #     DatasetBuilderClass.__init__,
+        #     ctx.config
+        # )
 
-        builder = DatasetBuilderClass(**builder_kwargs)
+        builder = DatasetBuilderClass(**ctx.config)
 
         (ctx.train_ds, ctx.valid_ds) = builder.build(
             ctx.records,
@@ -1493,10 +1535,10 @@ class BioDataLoaders(DataLoaders):
         ctx = cls._apply_task(ctx)
 
         # ---- load ----
-        ctx = cls._load_data(ctx)
-
         if hasattr(ctx, "task_obj"):
-            ctx = ctx.task_obj.after_load(ctx)
+            ctx = ctx.task_obj.before_load(ctx)
+        
+        ctx = cls._load_data(ctx)
 
         # ---- dataset ----
         if hasattr(ctx, "task_obj"):
@@ -1505,7 +1547,7 @@ class BioDataLoaders(DataLoaders):
         ctx = cls._build_dataset(ctx)
 
         if hasattr(ctx, "task_obj"):
-            ctx = ctx.task_obj.after_dataset(ctx)
+            ctx = ctx.task_obj.before_loader(ctx)
 
         # ---- test mode ----
         if mode == "test":
