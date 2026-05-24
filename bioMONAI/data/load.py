@@ -5,12 +5,12 @@
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'BioDataBlock', 'register_source',
            'register_dataset', 'register_loader', 'register_task', 'split_prefixed_kwargs', 'ReadDictDataset',
-           'detect_source', 'build_source', 'BaseSource', 'DictSource', 'DataFrameSource', 'CSVSource', 'FolderSource',
-           'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
-           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BaseTask',
-           'ClassificationTask', 'PipelineContext', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df',
-           'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df',
-           'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader']
+           'PipelineContext', 'detect_source', 'build_source', 'BaseSource', 'DictSource', 'DataFrameSource',
+           'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin',
+           'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BaseTask',
+           'ClassificationTask', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv',
+           'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv',
+           'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader']
 
 # %% ../../nbs/022_data.load.ipynb #7a8886ba
 # =================================
@@ -437,6 +437,34 @@ def _show_summary(train_dl, val_dl=None):
     if val_dl is not None:
         _describe_dl(val_dl, "Valid")
 
+# %% ../../nbs/022_data.load.ipynb #e78657d2
+@dataclass
+class PipelineContext:
+
+    # raw inputs
+    data: Any = None
+    val_data: Any = None
+
+    # task/config
+    task: Optional[str] = None
+    dataset_name: Optional[str] = None
+    backend: Optional[str] = None
+    mode: str = "train"
+
+    # loaded/intermediate state
+    records: Optional[list[dict]] = None
+
+    train_ds: Any = None
+    valid_ds: Any = None
+
+    dls: Any = None
+
+    # unified config
+    config: dict = field(default_factory=dict)
+
+    # runtime metadata
+    metadata: dict = field(default_factory=dict)
+
 # %% ../../nbs/022_data.load.ipynb #d8e838b9
 def detect_source(data):
 
@@ -502,7 +530,9 @@ class DictSource(BaseSource):
     def __init__(
         self,
         data,
-        colmap=None,
+        x_keys=None,
+        y_keys=None,
+        get_items=None,
         base_path=None,
         folders=None,
         suffixes=None,
@@ -513,7 +543,23 @@ class DictSource(BaseSource):
             data = [data]
 
         self.data = data
-        self.colmap = colmap or {}
+
+        # normalize get_items
+        self.get_items = dict(get_items or {})
+
+        for key in [x_keys, y_keys]:
+            if key is None:
+                continue
+
+            if isinstance(key, str):
+                if key not in self.get_items:
+                    self.get_items[key] = key
+
+            elif isinstance(key, (list, tuple)):
+                for k in key:
+                    if k not in self.get_items:
+                        self.get_items[k] = k
+
         self.base_path = Path(base_path) if base_path else Path()
         self.folders = folders or {}
         self.suffixes = suffixes or {}
@@ -540,29 +586,36 @@ class DictSource(BaseSource):
         out = []
 
         for row in self.data:
-            item = dict(row)
-            cols_to_drop = set()
 
-            for new_col, src_col in self.colmap.items():
+            item = dict(row) if self.keep_original else {}
+
+            for new_col, src_col in self.get_items.items():
 
                 if isinstance(src_col, str):
-                    item[new_col] = self._build_path(item.get(src_col), new_col)
-                    cols_to_drop.add(src_col)
-                
+                    value = row.get(src_col)
+
+                    has_path_config = (
+                        new_col in self.folders
+                        or new_col in self.suffixes
+                        or self.base_path != Path()
+                    )
+
+                    if has_path_config:
+                        item[new_col] = self._build_path(value, new_col)
+                    else:
+                        item[new_col] = value
+
                 elif isinstance(src_col, list):
-                    values = [item.get(c) for c in src_col]
+                    values = [row.get(c) for c in src_col]
                     item[new_col] = self._build_paths(values, new_col)
-                    cols_to_drop.update(src_col)
 
                 elif isinstance(src_col, Callable):
-                    item[new_col] = src_col(item)
+                    item[new_col] = src_col(row)
 
                 else:
-                    raise ValueError(f"Invalid src_col type for {new_col}: {type(src_col)}")                    
-
-            if not self.keep_original:
-                for c in cols_to_drop:
-                    item.pop(c, None)
+                    raise ValueError(
+                        f"Invalid src_col type for {new_col}: {type(src_col)}"
+                    )
 
             out.append(item)
 
@@ -577,7 +630,9 @@ class DataFrameSource(BaseSource):
     def __init__(
         self,
         df,
-        colmap=None,
+        x_keys=None,
+        y_keys=None,
+        get_items=None,
         base_path=None,
         folders=None,
         suffixes=None,
@@ -587,7 +642,9 @@ class DataFrameSource(BaseSource):
 
         self.source = DictSource(
             data=df.to_dict(orient="records"),
-            colmap=colmap,
+            x_keys=x_keys,
+            y_keys=y_keys,
+            get_items=get_items,
             base_path=base_path,
             folders=folders,
             suffixes=suffixes,
@@ -618,13 +675,13 @@ class CSVSource(BaseSource):
 @register_source("folder")
 class FolderSource(BaseSource):
 
-    def __init__(self, root, colmap, **kwargs):
+    def __init__(self, root, get_items, **kwargs):
         self.root = Path(root)
-        self.colmap = colmap
+        self.get_items = get_items
 
         scanned = {
             key: self._scan(folder)
-            for key, folder in self.colmap.items()
+            for key, folder in self.get_items.items()
         }
 
         records = [
@@ -634,9 +691,9 @@ class FolderSource(BaseSource):
 
         self.source = DictSource(
             records,
-            colmap={k: k for k in scanned.keys()},
+            get_items={k: k for k in scanned.keys()},
             base_path=self.root,
-            folders=self.colmap,
+            folders=self.get_items,
             keep_original=True,
             **kwargs,
         )
@@ -656,13 +713,13 @@ class ListSource(BaseSource):
     def __init__(
         self,
         items,
-        colmap=None,
+        get_items=None,
         base_path=".",
         keep_original=True,
         **kwargs,
     ):
         self.items = items
-        self.colmap = colmap
+        self.get_items = get_items
         self.base_path = base_path
         self.keep_original = keep_original
         self.kwargs = kwargs
@@ -677,12 +734,12 @@ class ListSource(BaseSource):
         # List of paths
         if isinstance(first, (str, Path)):
             records = [{"image": str(x)} for x in self.items]
-            colmap = {"image": "image"}
+            get_items = {"image": "image"}
 
         # List of dict-like records
         elif isinstance(first, dict):
             records = [dict(x) for x in self.items]
-            colmap = self.colmap
+            get_items = self.get_items
 
         else:
             raise TypeError(
@@ -691,7 +748,7 @@ class ListSource(BaseSource):
 
         return DictSource(
             records,
-            colmap=colmap,
+            get_items=get_items,
             base_path=self.base_path,
             keep_original=self.keep_original,
             **self.kwargs,
@@ -747,6 +804,8 @@ class CallableSource(BaseSource):
 
         source = DictSource(
             records,
+            x_keys=self.x_keys,
+            y_keys=self.y_keys,
             **self.kwargs,
         )
 
@@ -911,7 +970,6 @@ class DataBlockBuilder(DataSplitMixin):
         self,
         x_class=BioImage,
         y_class=BioImage,
-        get_items=None,
         get_x=None,
         get_y=None,
         item_transforms=None,
@@ -978,7 +1036,7 @@ class DataBlockBuilder(DataSplitMixin):
         datablock = DataBlock(
             blocks=blocks,
             dl_type=self.dl_type,
-            get_items=(lambda x: x) if self.get_items is None else self.get_items,
+            get_items=(lambda x: x),
             get_x=get_x,
             get_y=get_y,
             getters=self.getters,
@@ -1001,7 +1059,6 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         self,
         x_class=BioImage,
         y_class=BioImage,
-        get_items=None,
         get_x=noop,
         get_y=noop,
         n_inp=None,
@@ -1021,9 +1078,6 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     # --------------------------------------------------
     def build(self, data, mode="train"):
-
-        if self.get_items is not None:
-            data = self.get_items(data)
 
         datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
@@ -1059,7 +1113,6 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         self,
         x_class=BioImage,
         y_class=BioImage,
-        get_items=None,
         get_x=None,
         get_y=None,
         n_inp=None,
@@ -1083,9 +1136,6 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     # --------------------------------------------------
     def build(self, data, mode="train"):
-
-        if self.get_items is not None:
-            data = self.get_items(data)
 
         datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
@@ -1351,43 +1401,17 @@ class ClassificationTask(BaseTask):
     ]
 
     def before_dataset(self, ctx):
+        
+        y_key = ctx.config.get("y_keys", 'label')
 
         vocab = list(dict.fromkeys(
-            r["cell_type"] for r in ctx.records
+            r[y_key] for r in ctx.records
         ))
 
         # this replaces vocab if missing or None.
         ctx.config["vocab"] = ctx.config.get("vocab") or vocab
 
         return ctx
-
-# %% ../../nbs/022_data.load.ipynb #5e397df5
-@dataclass
-class PipelineContext:
-
-    # raw inputs
-    data: Any = None
-    val_data: Any = None
-
-    # task/config
-    task: Optional[str] = None
-    dataset_name: Optional[str] = None
-    backend: Optional[str] = None
-    mode: str = "train"
-
-    # loaded/intermediate state
-    records: Optional[list[dict]] = None
-
-    train_ds: Any = None
-    valid_ds: Any = None
-
-    dls: Any = None
-
-    # unified config
-    config: dict = field(default_factory=dict)
-
-    # runtime metadata
-    metadata: dict = field(default_factory=dict)
 
 # %% ../../nbs/022_data.load.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
@@ -1578,14 +1602,13 @@ class BioDataLoaders(DataLoaders):
         x_class: Optional[str] = None,                             # Input object/type class
         y_class: Optional[str] = None,                             # Target object/type class
 
-        colmap: Optional[Mapping[str, str]] = None,                # Column remapping dictionary
+        get_items: Optional[Mapping[str, str]] = None,             # Column remapping dictionary
         base_path: Optional[str] = None,                           # Base path for relative files
         folders: Optional[Mapping[str, str]] = None,               # Folder mapping
         suffixes: Optional[Mapping[str, str]] = None,              # File suffix mapping
 
         keep_original: bool = False,                               # Preserve original samples
 
-        get_items: Optional[Callable] = None,                      # Custom item extractor
         get_x: Optional[Callable] = None,                          # Custom input extractor
         get_y: Optional[Callable] = None,                          # Custom target extractor
 
@@ -1627,12 +1650,11 @@ class BioDataLoaders(DataLoaders):
         | y_keys | Sequence[str] | None | Target column keys |
         | x_class | str | None | Input object class |
         | y_class | str | None | Target object class |
-        | colmap | Mapping[str, str] | None | Column remapping dictionary |
+        | get_items | Mapping[str, str] | None | Column remapping dictionary for item extraction|
         | base_path | str | None | Base path for relative files |
         | folders | Mapping[str, str] | None | Folder mapping configuration |
         | suffixes | Mapping[str, str] | None | File suffix mapping |
         | keep_original | bool | False | Preserve original samples |
-        | get_items | callable | None | Custom item extractor |
         | get_x | callable | None | Custom input extractor |
         | get_y | callable | None | Custom target extractor |
         | item_transforms | Sequence[callable] | None | Training item transforms |
@@ -1667,12 +1689,11 @@ class BioDataLoaders(DataLoaders):
             y_keys=y_keys,
             x_class=x_class,
             y_class=y_class,
-            colmap=colmap,
+            get_items=get_items,
             base_path=base_path,
             folders=folders,
             suffixes=suffixes,
             keep_original=keep_original,
-            get_items=get_items,
             get_x=get_x,
             get_y=get_y,
             item_transforms=item_transforms,
