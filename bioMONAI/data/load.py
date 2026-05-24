@@ -7,10 +7,10 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'register_dataset', 'register_loader', 'register_task', 'split_prefixed_kwargs', 'ReadDictDataset',
            'detect_source', 'build_source', 'BaseSource', 'DictSource', 'DataFrameSource', 'CSVSource', 'FolderSource',
            'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
-           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BioDataLoaders', 'from_source',
-           'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
-           'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
-           'test_biodataloader']
+           'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BaseTask',
+           'ClassificationTask', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv',
+           'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv',
+           'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader']
 
 # %% ../../nbs/022_data.load.ipynb #7a8886ba
 # =================================
@@ -970,6 +970,7 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         **kwargs,
     ):
         store_attr()
+        self.kwargs = kwargs
 
     # --------------------------------------------------
     def build(self, data, mode="train"):
@@ -982,8 +983,8 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         if self.val_item_transforms is None:
             self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
 
-        x_loader = self.x_class.get_dict_loader(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
-        y_loader = self.y_class.get_dict_loader(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
+        x_loader = self.x_class.get_dict_loader(keys=self.x_keys, transforms=self.item_transforms, **self.kwargs) if self.x_class else self.get_x
+        y_loader = self.y_class.get_dict_loader(keys=self.y_keys, transforms=self.val_item_transforms, **self.kwargs) if self.y_class else self.get_y
 
         train_transform = self._prepare_transform(self.transforms, loaders=[x_loader, y_loader])
 
@@ -1033,24 +1034,25 @@ class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         **kwargs,
     ):
         store_attr()
+        self.kwargs = kwargs
         
         split = split_prefixed_kwargs(kwargs, prefixes=("train_", "val_"))
         self.train_kwargs = split["train"]
         self.valid_kwargs = split["val"] if "val" in split else split["train"]
 
     # --------------------------------------------------
-    def build(self, df, mode="train"):
+    def build(self, data, mode="train"):
 
         if self.get_items is not None:
             data = self.get_items(data)
 
-        datalist_train, datalist_valid = self._split_data(df, mode=mode)
+        datalist_train, datalist_valid = self._split_data(data, mode=mode)
 
         if self.val_item_transforms is None:
             self.val_item_transforms = self._make_deterministic_transforms(self.item_transforms)
 
-        x_loader = self.x_class.get_dict_loader(keys=self.x_keys, transforms=self.item_transforms) if self.x_class else self.get_x
-        y_loader = self.y_class.get_dict_loader(keys=self.y_keys, transforms=self.val_item_transforms) if self.y_class else self.get_y
+        x_loader = self.x_class.get_dict_loader(keys=self.x_keys, transforms=self.item_transforms, **self.kwargs) if self.x_class else self.get_x
+        y_loader = self.y_class.get_dict_loader(keys=self.y_keys, transforms=self.val_item_transforms, **self.kwargs) if self.y_class else self.get_y
 
         self.train_transform = self._prepare_transform(self.transforms, loaders=x_loader)
 
@@ -1257,6 +1259,49 @@ class MonaiLoader:
 
         return dls
 
+# %% ../../nbs/022_data.load.ipynb #d0121f4b
+class BaseTask:
+
+    default_dataset = None
+
+    def setup(self, ctx):
+        return ctx
+
+    def after_load(self, ctx):
+        return ctx
+
+    def before_dataset(self, ctx):
+        return ctx
+
+    def after_dataset(self, ctx):
+        return ctx
+
+    def after_loader(self, ctx):
+        return ctx
+
+# %% ../../nbs/022_data.load.ipynb #419fe705
+@register_task("classification")
+class ClassificationTask(BaseTask):
+
+    default_dataset = "cache"
+    default_transforms = [
+            ScaleIntensity(keys="image"),            
+            RandRotate90(keys='image', prob=0.75),
+            RandFlip(keys='image', spatial_axis=[0, 1], prob=0.5),
+            RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
+        ]
+
+    def after_load(self, ctx):
+
+        vocab = list(dict.fromkeys(
+            r["cell_type"] for r in ctx.records
+        ))
+
+        ctx.config.setdefault("vocab", vocab)
+        ctx.config.setdefault("transforms", self.default_transforms)
+
+        return ctx
+
 # %% ../../nbs/022_data.load.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
     """
@@ -1310,8 +1355,7 @@ class BioDataLoaders(DataLoaders):
         kwargs.setdefault("val_batch_transforms", task_obj.val_batch_transforms())
 
         # Merge configs (user kwargs take precedence)
-        task_conf = {**task_obj.dataset_config(), **task_obj.loader_config()}
-        kwargs = {**task_conf, **kwargs}
+        kwargs = {**task_obj.config(), **kwargs}
 
         return dataset, kwargs
 

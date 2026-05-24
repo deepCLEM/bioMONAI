@@ -373,13 +373,23 @@ class BioLabel(BioDataClass):
         add_na = kwargs.get('add_na', cls._add_na)
         keys = kwargs.get("keys", cls._keys)
 
+        if isinstance(keys, str):
+            keys = [keys]
+
         cat = Categorize(vocab=vocab, sort=sort, add_na=add_na)
-        
+
         def _load_dict(data: dict):
             out = data.copy()
             for key in keys:
                 out[key] = cat(data[key])
             return out
+
+        # attach attrs
+        _load_dict.vocab = vocab
+        _load_dict.sort = sort
+        _load_dict.add_na = add_na
+        _load_dict.keys = keys
+        _load_dict.cat = cat
 
         return _load_dict
 
