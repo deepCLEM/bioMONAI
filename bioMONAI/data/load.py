@@ -8,9 +8,9 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'detect_source', 'build_source', 'BaseSource', 'DictSource', 'DataFrameSource', 'CSVSource', 'FolderSource',
            'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder',
            'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BaseTask',
-           'ClassificationTask', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv',
-           'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv',
-           'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader']
+           'ClassificationTask', 'PipelineContext', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df',
+           'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df',
+           'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader']
 
 # %% ../../nbs/022_data.load.ipynb #7a8886ba
 # =================================
@@ -21,6 +21,10 @@ import types
 from inspect import signature, _empty
 from pathlib import Path
 import pandas as pd
+
+# for pipeline context
+from dataclasses import dataclass, field
+from typing import Any, Optional
 
 # =================================
 # PyTorch
@@ -1262,7 +1266,17 @@ class MonaiLoader:
 # %% ../../nbs/022_data.load.ipynb #d0121f4b
 class BaseTask:
 
-    default_dataset = None
+    default_dataset = 'cache'
+    default_transforms = None
+
+    def config(self):
+
+        cfg = {}
+
+        if self.default_transforms is not None:
+            cfg["transforms"] = self.default_transforms
+
+        return cfg
 
     def setup(self, ctx):
         return ctx
@@ -1283,13 +1297,19 @@ class BaseTask:
 @register_task("classification")
 class ClassificationTask(BaseTask):
 
-    default_dataset = "cache"
+    from bioMONAI.transforms import (
+        ScaleIntensity,
+        RandRotate90,
+        RandFlip,
+        RandZoom,
+    )
+
     default_transforms = [
-            ScaleIntensity(keys="image"),            
-            RandRotate90(keys='image', prob=0.75),
-            RandFlip(keys='image', spatial_axis=[0, 1], prob=0.5),
-            RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
-        ]
+        ScaleIntensity(keys="image"),
+        RandRotate90(keys='image', prob=0.75),
+        RandFlip(keys='image', spatial_axis=[0, 1], prob=0.5),
+        RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
+    ]
 
     def after_load(self, ctx):
 
@@ -1298,9 +1318,36 @@ class ClassificationTask(BaseTask):
         ))
 
         ctx.config.setdefault("vocab", vocab)
-        ctx.config.setdefault("transforms", self.default_transforms)
 
         return ctx
+
+# %% ../../nbs/022_data.load.ipynb #5e397df5
+@dataclass
+class PipelineContext:
+
+    # raw inputs
+    data: Any = None
+    val_data: Any = None
+
+    # task/config
+    task: Optional[str] = None
+    dataset_name: Optional[str] = None
+    backend: Optional[str] = None
+    mode: str = "train"
+
+    # loaded/intermediate state
+    records: Optional[list[dict]] = None
+
+    train_ds: Any = None
+    valid_ds: Any = None
+
+    dls: Any = None
+
+    # unified config
+    config: dict = field(default_factory=dict)
+
+    # runtime metadata
+    metadata: dict = field(default_factory=dict)
 
 # %% ../../nbs/022_data.load.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
@@ -1319,213 +1366,158 @@ class BioDataLoaders(DataLoaders):
 
     # --------------------------------------------------
     @classmethod
-    def _apply_task_defaults(
-        cls,
-        task: Optional[str] = None,              # Registered task name
-        dataset: Optional[str] = None,           # Dataset builder name
-        **kwargs,                                # User-provided kwargs
-    ):
-        """
-        Apply task-specific defaults and configuration.
+    def _apply_task(cls, ctx):
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | task | str | None | Registered task name |
-        | dataset | str | None | Dataset builder name |
-        | kwargs | dict | None | User-provided keyword arguments |
+        if ctx.task is None:
+            return ctx
 
-        Returns
-        -------
-        tuple[str, dict]
-            Resolved dataset name and updated kwargs.
-        """
-        if task is None:
-            return dataset, kwargs
+        TaskClass = TASK_REGISTRY[ctx.task]
+        task = TaskClass()
 
-        TaskClass = TASK_REGISTRY[task]
-        task_obj = TaskClass()
+        ctx.task_obj = task
 
-        if dataset is None:
-            dataset = task_obj.default_dataset
+        if ctx.dataset_name is None:
+            ctx.dataset_name = task.default_dataset
 
-        # Inject default transforms only if not provided
-        kwargs.setdefault("transforms", task_obj.transforms())
-        kwargs.setdefault("batch_transforms", task_obj.batch_transforms())
-        kwargs.setdefault("val_transforms", task_obj.val_transforms())
-        kwargs.setdefault("val_batch_transforms", task_obj.val_batch_transforms())
+        defaults = task.config()
 
-        # Merge configs (user kwargs take precedence)
-        kwargs = {**task_obj.config(), **kwargs}
+        for k, v in defaults.items():
+            ctx.config.setdefault(k, v)
 
-        return dataset, kwargs
+        return task.setup(ctx)
 
     # --------------------------------------------------
     @classmethod
-    def _load_data(
-        cls,
-        data: Any,                                     # Training data source
-        val_data: Optional[Any] = None,                # Optional validation data
-        **kwargs,                                      # Source loading configuration
-    ):
-        """
-        Load and normalize training and validation data.
+    def _load_data(cls, ctx):
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | data | Any | — | Training data source |
-        | val_data | Any | None | Optional validation dataset |
-        | kwargs | dict | None | Source loading configuration |
-
-        Returns
-        -------
-        list[dict]
-            Loaded records.
-        """
-
-
-        source_name = detect_source(data)
+        source_name = detect_source(ctx.data)
         SourceClass = SOURCE_REGISTRY[source_name]
 
-        source_splits = split_prefixed_kwargs(kwargs)
+        source_splits = split_prefixed_kwargs(ctx.config)
 
         train_kwargs = route_kwargs(SourceClass.__init__, source_splits["train"])
-        train = SourceClass(data, **train_kwargs).load()
 
-        if val_data is None:
-            return train
+        train = SourceClass(ctx.data, **train_kwargs).load()
+
+        if ctx.val_data is None:
+            ctx.records = train
+            return ctx
 
         val_kwargs = route_kwargs(
             SourceClass.__init__,
             source_splits.get("val", source_splits["train"])
         )
 
-        val = SourceClass(val_data, **val_kwargs).load()
+        val = SourceClass(ctx.val_data, **val_kwargs).load()
 
-        valid_col = kwargs.get("valid_col", "is_valid") # maybe it should be changed to follow NameSplitter logic
+        valid_col = ctx.config.get("valid_col", "is_valid")
 
         for r in train:
             r[valid_col] = False
+
         for r in val:
             r[valid_col] = True
 
-        return train + val
+        ctx.records = train + val
+
+        return ctx
 
     # --------------------------------------------------
     @classmethod
-    def _build_dataset(
-        cls,
-        data: Sequence[dict],                          # Input records
-        dataset: str,                                  # Dataset builder name
-        backend: Optional[str] = None,                 # Backend override
-        mode: str = "train",                           # train or test mode
-        **kwargs,                                      # Dataset builder kwargs
-    ):
-        """
-        Build dataset objects using a registered dataset builder.
+    def _build_dataset(cls, ctx):
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | data | list[dict] | — | Input records |
-        | dataset | str | — | Registered dataset builder |
-        | backend | str | None | Backend override |
-        | mode | str | "train" | Dataset mode ("train" or "test") |
-        | kwargs | dict | None | Dataset builder keyword arguments |
+        DatasetBuilderClass, inferred_backend = (
+            DATASET_REGISTRY[ctx.dataset_name]
+        )
 
-        Returns
-        -------
-        tuple
-            ((train_ds, valid_ds), backend)
-        """
+        ctx.backend = ctx.backend or inferred_backend
 
-        DatasetBuilderClass, inferred_backend = DATASET_REGISTRY[dataset]
-        backend = backend or inferred_backend
+        builder_kwargs = route_kwargs(
+            DatasetBuilderClass.__init__,
+            ctx.config
+        )
 
-        builder_kwargs = route_kwargs(DatasetBuilderClass.__init__, kwargs)
         builder = DatasetBuilderClass(**builder_kwargs)
 
-        return builder.build(data, mode=mode), backend
+        (ctx.train_ds, ctx.valid_ds) = builder.build(
+            ctx.records,
+            mode=ctx.mode
+        )
+
+        return ctx
 
     # --------------------------------------------------
     @classmethod
-    def _build_loader(
-        cls,
-        train_ds: Any,                                 # Training dataset
-        valid_ds: Optional[Any] = None,                # Validation dataset
-        backend: Optional[str] = None,                 # Loader backend
-        **kwargs,                                      # Loader kwargs
-    ):
-        """
-        Build DataLoaders from datasets.
+    def _build_loader(cls, ctx):
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | train_ds | Any | — | Training dataset |
-        | valid_ds | Any | None | Validation dataset |
-        | backend | str | None | Loader backend |
-        | kwargs | dict | None | Loader keyword arguments |
+        LoaderClass = LOADER_REGISTRY[ctx.backend]
 
-        Returns
-        -------
-        DataLoaders
-        """
-
-        LoaderClass = LOADER_REGISTRY[backend]
-        loader_kwargs = route_kwargs(LoaderClass.__init__, kwargs)
+        loader_kwargs = route_kwargs(
+            LoaderClass.__init__,
+            ctx.config
+        )
 
         loader = LoaderClass(**loader_kwargs)
-        return loader.build(train_ds, valid_ds)
+
+        ctx.dls = loader.build(
+            ctx.train_ds,
+            ctx.valid_ds
+        )
+
+        return ctx
 
     # --------------------------------------------------
     @classmethod
     def _run_pipeline(
         cls,
-        data: Any,                                    # Input data source
-        task: Optional[str] = None,                   # Registered task name
-        dataset: Optional[str] = None,                # Dataset builder name
-        backend: Optional[str] = None,                # Backend override
-        val_data: Optional[Any] = None,               # Optional validation dataset
-        mode: str = "train",                          # train or test mode
-        **kwargs,                                     # Additional pipeline kwargs
+        data,
+        task=None,
+        dataset=None,
+        backend=None,
+        val_data=None,
+        mode="train",
+        **kwargs,
     ):
-        """
-        Execute the full data pipeline.
 
-        Pipeline stages:
-            data -> source -> dataset -> dataloader
-
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | data | Any | — | Input data source |
-        | task | str | None | Registered task name |
-        | dataset | str | None | Dataset builder name |
-        | backend | str | None | Loader backend override |
-        | val_data | Any | None | Optional validation dataset |
-        | mode | str | "train" | Pipeline mode ("train" or "test") |
-        | kwargs | dict | {} | Additional pipeline configuration |
-
-        Returns
-        -------
-        DataLoaders or DataLoader
-        """
-        # ---- apply task defaults ----
-        dataset, kwargs = cls._apply_task_defaults(task, dataset, **kwargs)
-
-        # ---- load dataframe ----
-        data_dict = cls._load_data(data, val_data, **kwargs)
-
-        # ---- build dataset ----
-        (ds_train, ds_valid), backend = cls._build_dataset(
-            data_dict, dataset, backend, mode, **kwargs
+        ctx = PipelineContext(
+            data=data,
+            val_data=val_data,
+            task=task,
+            dataset_name=dataset,
+            backend=backend,
+            mode=mode,
+            config=kwargs,
         )
+
+        # ---- task defaults/setup ----
+        ctx = cls._apply_task(ctx)
+
+        # ---- load ----
+        ctx = cls._load_data(ctx)
+
+        if hasattr(ctx, "task_obj"):
+            ctx = ctx.task_obj.after_load(ctx)
+
+        # ---- dataset ----
+        if hasattr(ctx, "task_obj"):
+            ctx = ctx.task_obj.before_dataset(ctx)
+
+        ctx = cls._build_dataset(ctx)
+
+        if hasattr(ctx, "task_obj"):
+            ctx = ctx.task_obj.after_dataset(ctx)
 
         # ---- test mode ----
         if mode == "test":
-            ds = ds_valid if ds_valid is not None else ds_train
-            dls = cls._build_loader(ds, None, backend, **kwargs)
-            return dls.valid if hasattr(dls, "valid") else dls.train
+            ctx.valid_ds = None
 
-        # ---- train mode ----
-        return cls._build_loader(ds_train, ds_valid, backend, **kwargs)
+        # ---- loader ----
+        ctx = cls._build_loader(ctx)
+
+        if hasattr(ctx, "task_obj"):
+            ctx = ctx.task_obj.after_loader(ctx)
+
+        return ctx.dls
 
     # --------------------------------------------------
     @classmethod
