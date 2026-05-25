@@ -39,7 +39,7 @@ from skimage.transform import resize
 # =================================
 # MONAI
 # =================================
-import monai.transforms as tfms
+import monai.transforms as mt
 from monai.utils.enums import *
 
 # =================================
@@ -146,8 +146,8 @@ class MonaiTransform(DisplayedTransform):
         for suffix in ("d", "D"):
             candidate = name + suffix
 
-            if hasattr(tfms, candidate):
-                return getattr(tfms, candidate)
+            if hasattr(mt, candidate):
+                return getattr(mt, candidate)
 
         return None
 
@@ -308,8 +308,8 @@ class RandMonaiTransform(RandTransform):
         if rand_cls is None and det_cls is not None:
 
             candidate = "Rand" + det_cls.__name__
-            if hasattr(tfms, candidate):
-                rand_cls = getattr(tfms, candidate)
+            if hasattr(mt, candidate):
+                rand_cls = getattr(mt, candidate)
 
         # Infer Tfm from RandTfm
         if det_cls is None and rand_cls is not None:
@@ -319,8 +319,8 @@ class RandMonaiTransform(RandTransform):
             if name.startswith("Rand"):
 
                 candidate = name[4:]
-                if hasattr(tfms, candidate):
-                    det_cls = getattr(tfms, candidate)
+                if hasattr(mt, candidate):
+                    det_cls = getattr(mt, candidate)
 
         if rand_cls is None:
             raise ValueError(
@@ -349,8 +349,8 @@ class RandMonaiTransform(RandTransform):
 
             candidate = name + suffix
 
-            if hasattr(tfms, candidate):
-                return getattr(tfms, candidate)
+            if hasattr(mt, candidate):
+                return getattr(mt, candidate)
 
         return None
 
@@ -557,7 +557,7 @@ class Resample(MonaiTransform):
     The `Resample` class does not inherit from MONAI's `Resample` but from `Spacing` and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.
     
     """
-    _monai_transform = tfms.Spacing
+    _monai_transform = mt.Spacing
 
     def __init__(
         self,
@@ -588,7 +588,7 @@ class Spacing(MonaiTransform):
     A wrapper around MONAI's Spacing transform that supports multiple input types and auto-infers dict transforms.
 
     """
-    _monai_transform = tfms.Spacing
+    _monai_transform = mt.Spacing
 
     def __init__(
         self,
@@ -616,7 +616,7 @@ class Resize(MonaiTransform):
         keys: keys for dict transforms (if applicable)
         **kwargs: additional arguments to pass to the underlying transform
     """
-    _monai_transform = tfms.Resize
+    _monai_transform = mt.Resize
 
     def __init__(
         self,
@@ -643,7 +643,7 @@ class Crop(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.Crop
+    _monai_transform = mt.Crop
 
 
 # %% ../nbs/030_transforms.ipynb #9cceb4af
@@ -657,7 +657,7 @@ class SpatialCrop(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.SpatialCrop
+    _monai_transform = mt.SpatialCrop
 
 
 # %% ../nbs/030_transforms.ipynb #89d29c18
@@ -671,7 +671,7 @@ class CenterSpatialCrop(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.CenterSpatialCrop
+    _monai_transform = mt.CenterSpatialCrop
 
     def __init__(
         self,
@@ -706,7 +706,7 @@ class CropForeground(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.CropForeground
+    _monai_transform = mt.CropForeground
 
 # %% ../nbs/030_transforms.ipynb #8c0506ba
 class BoundingRect(MonaiTransform):
@@ -719,7 +719,7 @@ class BoundingRect(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.BoundingRect
+    _monai_transform = mt.BoundingRect
 
 # %% ../nbs/030_transforms.ipynb #cdeac873
 class CenterScaleCrop(MonaiTransform):
@@ -732,7 +732,7 @@ class CenterScaleCrop(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.CenterScaleCrop
+    _monai_transform = mt.CenterScaleCrop
 
     def __init__(
         self,
@@ -804,7 +804,7 @@ class Pad(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.Pad
+    _monai_transform = mt.Pad
 
 # %% ../nbs/030_transforms.ipynb #c1536f5c
 class SpatialPad(MonaiTransform):
@@ -817,7 +817,7 @@ class SpatialPad(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.SpatialPad
+    _monai_transform = mt.SpatialPad
 
     def __init__(
         self,
@@ -846,7 +846,7 @@ class BorderPad(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.BorderPad
+    _monai_transform = mt.BorderPad
 
     def __init__(
         self,
@@ -875,7 +875,7 @@ class DivisiblePad(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.DivisiblePad
+    _monai_transform = mt.DivisiblePad
 
     def __init__(
         self,
@@ -895,7 +895,7 @@ class DivisiblePad(MonaiTransform):
 # %% ../nbs/030_transforms.ipynb #6136faa1
 class ResizeWithPadOrCrop(MonaiTransform):
 
-    _monai_transform = tfms.ResizeWithPadOrCrop
+    _monai_transform = mt.ResizeWithPadOrCrop
 
     def __init__(
         self,
@@ -924,7 +924,7 @@ class Rotate(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.Rotate
+    _monai_transform = mt.Rotate
 
     def __init__(
         self,
@@ -954,7 +954,7 @@ class Rotate90(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.Rotate90
+    _monai_transform = mt.Rotate90
 
     def __init__(
         self,
@@ -984,7 +984,7 @@ class Zoom(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.Zoom
+    _monai_transform = mt.Zoom
 
     def __init__(
         self,
@@ -1015,7 +1015,7 @@ class Flip(MonaiTransform):
     - NumPy arrays
     """
 
-    _monai_transform = tfms.Flip
+    _monai_transform = mt.Flip
 
 # %% ../nbs/030_transforms.ipynb #4a5925ac
 class GridPatch(MonaiTransform):
@@ -1028,7 +1028,7 @@ class GridPatch(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.GridPatch
+    _monai_transform = mt.GridPatch
 
     def __init__(
         self,
@@ -1058,7 +1058,7 @@ class GridSplit(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.GridSplit
+    _monai_transform = mt.GridSplit
 
 # %% ../nbs/030_transforms.ipynb #86723835
 class SpatialResample(MonaiTransform):
@@ -1071,7 +1071,7 @@ class SpatialResample(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.SpatialResample
+    _monai_transform = mt.SpatialResample
 
 # %% ../nbs/030_transforms.ipynb #b893c9a2
 class ResampleToMatch(MonaiTransform):
@@ -1084,7 +1084,7 @@ class ResampleToMatch(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.ResampleToMatch
+    _monai_transform = mt.ResampleToMatch
 
 # %% ../nbs/030_transforms.ipynb #2a6317ac
 class Orientation(MonaiTransform):
@@ -1097,7 +1097,7 @@ class Orientation(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.Orientation
+    _monai_transform = mt.Orientation
 
 # %% ../nbs/030_transforms.ipynb #72313503
 class Affine(MonaiTransform):
@@ -1110,7 +1110,7 @@ class Affine(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.Affine
+    _monai_transform = mt.Affine
 
 # %% ../nbs/030_transforms.ipynb #1f9f82c4
 class AffineGrid(MonaiTransform):
@@ -1123,7 +1123,7 @@ class AffineGrid(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.AffineGrid
+    _monai_transform = mt.AffineGrid
 
 # %% ../nbs/030_transforms.ipynb #1e0bc9f5
 class GridDistortion(MonaiTransform):
@@ -1136,7 +1136,7 @@ class GridDistortion(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = tfms.GridDistortion
+    _monai_transform = mt.GridDistortion
 
 # %% ../nbs/030_transforms.ipynb #db4c0435
 class GaussianSmooth(MonaiTransform):
@@ -1150,7 +1150,7 @@ class GaussianSmooth(MonaiTransform):
     approx : str
         Kernel approximation method.
     """
-    _monai_transform = tfms.GaussianSmooth
+    _monai_transform = mt.GaussianSmooth
 
     def __init__(self, sigma=1.0, approx="erf", **kwargs):
         super().__init__(
@@ -1170,7 +1170,7 @@ class MedianSmooth(MonaiTransform):
     radius : int or sequence
         Radius of the median filter kernel.
     """
-    _monai_transform = tfms.MedianSmooth
+    _monai_transform = mt.MedianSmooth
 
     def __init__(self, radius=1, **kwargs):
         super().__init__(
@@ -1195,7 +1195,7 @@ class SavitzkyGolaySmooth(MonaiTransform):
     mode : str
         Padding mode.
     """
-    _monai_transform = tfms.SavitzkyGolaySmooth
+    _monai_transform = mt.SavitzkyGolaySmooth
 
     def __init__(self, window_length, order, axis=1, mode="zeros", **kwargs):
         super().__init__(
@@ -1226,7 +1226,7 @@ class GaussianSharpen(MonaiTransform):
     approx : str
         Kernel approximation method.
     """
-    _monai_transform = tfms.GaussianSharpen
+    _monai_transform = mt.GaussianSharpen
 
     def __init__(self, sigma1=3.0, sigma2=1.0, alpha=30.0, approx="erf", **kwargs):
         super().__init__(
@@ -1252,7 +1252,7 @@ class ShiftIntensity(MonaiTransform):
     safe : bool, optional
         If True, performs safe dtype conversion when overflow occurs.
     """
-    _monai_transform = tfms.ShiftIntensity
+    _monai_transform = mt.ShiftIntensity
 
     def __init__(self, offset, safe=False, **kwargs):
         super().__init__(
@@ -1281,7 +1281,7 @@ class StdShiftIntensity(MonaiTransform):
     dtype : data-type, optional
         Output data type.
     """
-    _monai_transform = tfms.StdShiftIntensity
+    _monai_transform = mt.StdShiftIntensity
     
     def __init__(self, factor, nonzero=False, channel_wise=False, dtype=np.float32, **kwargs):
         super().__init__(
@@ -1428,7 +1428,7 @@ class ScaleIntensity(MonaiTransform):
     dtype : data-type, optional
         Output data type.
     """
-    _monai_transform = tfms.ScaleIntensity
+    _monai_transform = mt.ScaleIntensity
 
     def __init__(self, minv=0.0, maxv=1.0, factor=None, channel_wise=False, dtype=np.float32, **kwargs):
         super().__init__(
@@ -1463,7 +1463,7 @@ class ScaleIntensityFixedMean(MonaiTransform):
         Output data type.
     """
 
-    _monai_transform = tfms.ScaleIntensityFixedMean
+    _monai_transform = mt.ScaleIntensityFixedMean
 
     def __init__(self, factor=0, preserve_range=False, fixed_mean=True, channel_wise=False, dtype=np.float32, **kwargs):
         super().__init__(
@@ -1497,7 +1497,7 @@ class ScaleIntensityRange(MonaiTransform):
         Output data type.
     """
 
-    _monai_transform = tfms.ScaleIntensityRange
+    _monai_transform = mt.ScaleIntensityRange
 
     def __init__(self, a_min, a_max, b_min=None, b_max=None, clip=False, dtype=np.float32, **kwargs):
         super().__init__(
@@ -1539,8 +1539,8 @@ class ScaleIntensityRangePercentiles(MonaiTransform):
         Output data type.
     """
 
-    _monai_transform = tfms.ScaleIntensityRangePercentiles
-    _dict_transform = tfms.ScaleIntensityRangePercentilesD
+    _monai_transform = mt.ScaleIntensityRangePercentiles
+    _dict_transform = mt.ScaleIntensityRangePercentilesD
 
     def __init__(self, lower, upper, b_min, b_max, clip=False, relative=False, channel_wise=False, dtype=np.float32, **kwargs):
         super().__init__(
@@ -1577,7 +1577,7 @@ class NormalizeIntensity(MonaiTransform):
     dtype : data-type
         Output data type.
     """
-    _monai_transform = tfms.NormalizeIntensity
+    _monai_transform = mt.NormalizeIntensity
 
     def __init__(self, subtrahend=None, divisor=None, nonzero=False, channel_wise=False, dtype=np.float32, **kwargs):
         super().__init__(
@@ -1608,7 +1608,7 @@ class HistogramNormalize(MonaiTransform):
     dtype : data-type
         Output data type.
     """
-    _monai_transform = tfms.HistogramNormalize
+    _monai_transform = mt.HistogramNormalize
     def __init__(self, num_bins=256, min=0, max=255, mask=None, dtype=np.float32, **kwargs):
         super().__init__(
             num_bins=num_bins,
@@ -1636,7 +1636,7 @@ class AdjustContrast(MonaiTransform):
     retain_stats : bool
         Preserve mean and standard deviation after transform.
     """
-    _monai_transform = tfms.AdjustContrast
+    _monai_transform = mt.AdjustContrast
     
     def __init__(self, gamma, invert_image=False, retain_stats=False, **kwargs):
         super().__init__(
@@ -1760,7 +1760,7 @@ class ComputeHoVerMaps(MonaiTransform):
         Output data type.
     """
 
-    _monai_transform = tfms.ComputeHoVerMaps
+    _monai_transform = mt.ComputeHoVerMaps
 
 # %% ../nbs/030_transforms.ipynb #c2c0c55f
 class ThresholdIntensity(MonaiTransform):
@@ -1778,7 +1778,7 @@ class ThresholdIntensity(MonaiTransform):
     cval : float
         Fill value for filtered pixels.
     """
-    _monai_transform = tfms.ThresholdIntensity
+    _monai_transform = mt.ThresholdIntensity
 
     def __init__(self, threshold, above=True, cval=0.0, **kwargs):
         super().__init__(
@@ -1803,7 +1803,7 @@ class MaskIntensity(MonaiTransform):
     select_fn : callable, optional
         Function defining valid mask values.
     """
-    _monai_transform = tfms.MaskIntensity
+    _monai_transform = mt.MaskIntensity
 
     def __init__(self, mask_data=None, select_fn=None, **kwargs):
         super().__init__(
@@ -1827,7 +1827,7 @@ class ForegroundMask(MonaiTransform):
     invert : bool
         Invert image before thresholding.
     """
-    _monai_transform=tfms.ForegroundMask
+    _monai_transform=mt.ForegroundMask
 
     def __init__(self, threshold="otsu", hsv_threshold=None, invert=False, **kwargs):
         super().__init__(
@@ -1904,8 +1904,8 @@ class RandCrop(RandMonaiTransform):
     keys : list of str, optional
         Keys to apply the transform to when using with dictionaries.
     """
-    _monai_transform = tfms.RandSpatialCrop
-    _monai_det_transform = tfms.SpatialCrop
+    _monai_transform = mt.RandSpatialCrop
+    _monai_det_transform = mt.SpatialCrop
 
     _val_transform = CenterSpatialCrop
 
@@ -2001,7 +2001,7 @@ class RandCrop2D(RandTransform):
     def encodes(self, x: BioImageBase):
         """Apply spatial cropping to a BioImageBase object."""
         bioimagetype = type(x)
-        return bioimagetype(tfms.SpatialCrop(roi_center=self.ctr, roi_size=self.size, lazy=self.lazy)(x))
+        return bioimagetype(mt.SpatialCrop(roi_center=self.ctr, roi_size=self.size, lazy=self.lazy)(x))
     
     def encodes(self, x: np.ndarray):
         """Apply spatial cropping to a NumPy array."""
@@ -2059,7 +2059,7 @@ class RandCropND(RandTransform):
     def encodes(self, x:BioImageBase):
         "Apply spatial crop transformation to the input image."
         bioimagetype = type(x)
-        return bioimagetype(tfms.SpatialCrop(roi_start=self.tl, roi_end=self.br, lazy=self.lazy)(x))
+        return bioimagetype(mt.SpatialCrop(roi_start=self.tl, roi_end=self.br, lazy=self.lazy)(x))
     
     def encodes(self, x: np.ndarray):
         """Apply spatial cropping to a NumPy array."""
@@ -2075,8 +2075,8 @@ class RandRotate90(RandMonaiTransform):
     This transform randomly rotates an image by 0, 90, 180, or 270 degrees during training and applies no rotation during validation.
     """
 
-    _monai_rand_transform = tfms.RandRotate90
-    _monai_det_transform = tfms.Rotate90
+    _monai_rand_transform = mt.RandRotate90
+    _monai_det_transform = mt.Rotate90
 
 # %% ../nbs/030_transforms.ipynb #c0f5f953
 class RandFlip(RandMonaiTransform):
@@ -2084,8 +2084,8 @@ class RandFlip(RandMonaiTransform):
     Randomly flips an ND image over a specified axis.
     Works with both NumPy arrays and BioImageBase objects.
     """
-    _monai_rand_transform = tfms.RandFlip
-    _monai_det_transform = tfms.Flip
+    _monai_rand_transform = mt.RandFlip
+    _monai_det_transform = mt.Flip
         
 
 # %% ../nbs/030_transforms.ipynb #74e4a03d
@@ -2095,8 +2095,8 @@ class RandZoom(RandMonaiTransform):
 
     """
 
-    _monai_rand_transform = tfms.RandZoom
-    _monai_det_transform = tfms.Zoom
+    _monai_rand_transform = mt.RandZoom
+    _monai_det_transform = mt.Zoom
 
     def __init__(self,
                  prob=0.1,
@@ -2270,8 +2270,8 @@ class RandGaussianNoise(RandMonaiTransform):
     """
     Add Gaussian noise to image.
     """
-    _monai_rand_transform = tfms.RandGaussianNoise
-    _monai_det_transform = tfms.RandGaussianNoise
+    _monai_rand_transform = mt.RandGaussianNoise
+    _monai_det_transform = mt.RandGaussianNoise
 
     @dispatch
     def before_call(self, b:BioImageBase, split_idx=0):
@@ -2294,8 +2294,8 @@ class RandGaussianSmooth(RandMonaiTransform):
     """
     Apply Gaussian smoothing with randomly sampled sigma.
     """
-    _monai_rand_transform = tfms.RandGaussianSmooth
-    _monai_det_transform = tfms.GaussianSmooth
+    _monai_rand_transform = mt.RandGaussianSmooth
+    _monai_det_transform = mt.GaussianSmooth
 
     _rand_kwargs = {'sigma': ['sigma_x', 'sigma_y']}
 
@@ -2334,8 +2334,8 @@ class RandGaussianSharpen(RandMonaiTransform):
     Randomly sharpen image using Gaussian kernels.
     """
 
-    _monai_rand_transform = tfms.RandGaussianSharpen
-    _monai_det_transform = tfms.GaussianSharpen
+    _monai_rand_transform = mt.RandGaussianSharpen
+    _monai_det_transform = mt.GaussianSharpen
 
     _rand_kwargs = {'sigma1': ['sigma1_x', 'sigma1_y'],
                     'sigma2': ['sigma2_x', 'sigma2_y']
@@ -2378,8 +2378,8 @@ class RandShiftIntensity(RandMonaiTransform):
     Equivalent to MONAI RandShiftIntensity but uses the deterministic
     ShiftIntensity transform internally.
     """
-    _monai_rand_transform = tfms.RandShiftIntensity
-    _monai_det_transform = tfms.ShiftIntensity
+    _monai_rand_transform = mt.RandShiftIntensity
+    _monai_det_transform = mt.ShiftIntensity
 
     _rand_kwargs = {'offset': 'offsets'}
 
@@ -2397,8 +2397,8 @@ class RandStdShiftIntensity(RandMonaiTransform):
     """
     Randomly shift intensity by a factor of the image standard deviation.
     """
-    _monai_rand_transform = tfms.RandStdShiftIntensity
-    _monai_det_transform = tfms.StdShiftIntensity
+    _monai_rand_transform = mt.RandStdShiftIntensity
+    _monai_det_transform = mt.StdShiftIntensity
 
     _rand_kwargs = {'factor': 'factors'}
 
@@ -2418,7 +2418,7 @@ class RandAdjustContrast(RandMonaiTransform):
     Randomly adjust image contrast using gamma correction.
     """
 
-    _monai_rand_transform = tfms.RandAdjustContrast
-    _monai_det_transform = tfms.AdjustContrast
+    _monai_rand_transform = mt.RandAdjustContrast
+    _monai_det_transform = mt.AdjustContrast
 
     _rand_kwargs = {'gamma': 'gamma'}
