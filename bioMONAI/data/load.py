@@ -924,7 +924,7 @@ class MonaiTransformMixin:
 
         if self.get_x is not None:
             x_loader = self.get_x
-        elif self.x_class:
+        elif self.x_class and hasattr(self.x_class, "get_dict_loader"):
             x_loader = self.x_class.get_dict_loader(
                 keys=self.x_keys,
                 transforms=self.item_transforms,
@@ -935,7 +935,7 @@ class MonaiTransformMixin:
 
         if self.get_y is not None:
             y_loader = self.get_y
-        elif self.y_class:
+        elif self.y_class and hasattr(self.y_class, "get_dict_loader"):
             y_loader = self.y_class.get_dict_loader(
                 keys=self.y_keys,
                 transforms=self.val_item_transforms,
