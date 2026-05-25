@@ -61,7 +61,7 @@ from monai.transforms.transform import Randomizable
 # =================================
 from ..utils import *
 from .core import *
-from ..transforms import RandMonaiTransform, RandTransform
+# from bioMONAI.transforms import RandMonaiTransform, RandTransform
 
 # =================================
 # fasttransform patch
@@ -877,8 +877,8 @@ class MonaiTransformMixin:
     # make this more general to detect any random transform, not just MONAI's
     def _is_random(self, t):
         is_rnd = (hasattr(t, "prob") or     
-                  isinstance(t, RandTransform) or
-                  isinstance(t, RandMonaiTransform) or
+                #   isinstance(t, RandTransform) or
+                #   isinstance(t, RandMonaiTransform) or
                   isinstance(t, Randomizable) or 
                   getattr(t, "_is_random", False))
         return is_rnd
@@ -922,29 +922,34 @@ class MonaiTransformMixin:
                 self.item_transforms
             )
 
-        x_loader = (
-            self.x_class.get_dict_loader(
+        if self.get_x is not None:
+            x_loader = self.get_x
+        elif self.x_class:
+            x_loader = self.x_class.get_dict_loader(
                 keys=self.x_keys,
                 transforms=self.item_transforms,
                 **self.kwargs,
             )
-            if self.x_class
-            else self.get_x
-        )
+        else:
+            x_loader = None
 
-        y_loader = (
-            self.y_class.get_dict_loader(
+        if self.get_y is not None:
+            y_loader = self.get_y
+        elif self.y_class:
+            y_loader = self.y_class.get_dict_loader(
                 keys=self.y_keys,
                 transforms=self.val_item_transforms,
                 **self.kwargs,
             )
-            if self.y_class
-            else self.get_y
-        )
+        else:
+            y_loader = None
+
+        # Remove None loaders
+        loaders = [l for l in [x_loader, y_loader] if l is not None]
 
         train_transform = self._prepare_transform(
             self.transforms,
-            loaders=[x_loader, y_loader],
+            loaders=loaders,
         )
 
         if self.val_transforms is None:
@@ -954,7 +959,7 @@ class MonaiTransformMixin:
         else:
             valid_transform = self._prepare_transform(
                 self.val_transforms,
-                loaders=[x_loader, y_loader],
+                loaders=loaders,
             )
 
         return train_transform, valid_transform
