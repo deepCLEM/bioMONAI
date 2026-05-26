@@ -1419,9 +1419,10 @@ class BaseTask:
     def config(self):
 
         cfg = {}
+        transforms = self.default_transforms
 
-        if self.default_transforms is not None:
-            cfg["transforms"] = self.default_transforms
+        if transforms is not None:
+            cfg["transforms"] = transforms
 
         return cfg
 
@@ -1451,19 +1452,21 @@ class ClassificationTask(BaseTask):
     default_x_keys = "image"
     default_y_keys = "label"
 
-    from bioMONAI.transforms import (
-        ScaleIntensity,
-        RandRotate90,
-        RandFlip,
-        RandZoom,
-    )
+    @property
+    def default_transforms(self):
+        from bioMONAI.transforms import (
+            ScaleIntensity,
+            RandRotate90,
+            RandFlip,
+            RandZoom,
+        )
 
-    default_transforms = [
-        ScaleIntensity(keys="image"),
-        RandRotate90(keys='image', prob=0.75),
-        RandFlip(keys='image', spatial_axis=[0, 1], prob=0.5),
-        RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
-    ]
+        return [
+            ScaleIntensity(keys="image"),
+            RandRotate90(keys='image', prob=0.75),
+            RandFlip(keys='image', spatial_axis=[0, 1], prob=0.5),
+            RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
+        ]
 
     def before_dataset(self, ctx):
         
