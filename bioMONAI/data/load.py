@@ -511,8 +511,21 @@ def build_source(data, **kwargs):
 
 # %% ../../nbs/022_data.load.ipynb #b3c95d7a
 class BaseSource:
-    def __init__(self, data, **kwargs):
-        self.data = data
+    def __init__(
+            self, 
+            data, 
+            x_keys=None,
+            y_keys=None,
+            x_class=None,
+            y_class=None,
+            get_items=None,
+            base_path=None,
+            folders=None,
+            suffixes=None,
+            keep_original=False,
+            **kwargs):
+        
+        store_attr()
         self.kwargs = kwargs
 
     def load(self):
@@ -523,6 +536,70 @@ class BaseSource:
     
     def peak(self):
         return self.df().head()
+    
+    def _add_key_mappings(self, keys):
+        if keys is None:
+            return
+        if isinstance(keys, str):
+            keys = [keys]
+        for key in keys:
+            self.get_items.setdefault(key, key)
+
+    def _build_class_loaders(self):
+        loaders = []
+        for cls, keys in ((self.x_class, self.x_keys), (self.y_class, self.y_keys)):
+            if cls and hasattr(cls, "get_dict_label"):
+                loader_kwargs = dict(self.kwargs)
+                if keys is not None:
+                    loader_kwargs["keys"] = keys
+                loaders.append(cls.get_dict_label(**loader_kwargs))
+        return loaders
+
+    def _has_path_config(self, new_col):
+        return (
+            new_col in self.folders
+            or new_col in self.suffixes
+            or self.base_path != Path()
+        )
+
+    def _is_missing(self, value):
+        if value is None:
+            return True
+        if isinstance(value, (list, tuple, dict)):
+            return False
+        try:
+            return bool(pd.isna(value))
+        except (TypeError, ValueError):
+            return False
+
+    def _build_path(self, value, new_col):
+        if self._is_missing(value):
+            return None
+
+        value = Path(str(value))
+        suffix = self.suffixes.get(new_col, "")
+        if suffix and not value.name.endswith(suffix):
+            value = value.with_name(f"{value.name}{suffix}")
+        if value.is_absolute():
+            return value.as_posix()
+
+        base = self.base_path
+
+        folder = self.folders.get(new_col)
+        if folder:
+            base = base / folder
+
+        return (base / value).as_posix()
+
+    def _build_paths(self, values, new_col):
+        return [self._build_path(v, new_col) for v in values]
+
+    def _format_value(self, value, new_col):
+        if not self._has_path_config(new_col):
+            return value
+        if isinstance(value, (list, tuple)):
+            return self._build_paths(value, new_col)
+        return self._build_path(value, new_col)
 
 # %% ../../nbs/022_data.load.ipynb #20a3f90e
 @register_source("dict")
@@ -532,6 +609,8 @@ class DictSource(BaseSource):
         data,
         x_keys=None,
         y_keys=None,
+        x_class=None,
+        y_class=None,
         get_items=None,
         base_path=None,
         folders=None,
@@ -542,45 +621,23 @@ class DictSource(BaseSource):
         if isinstance(data, dict):
             data = [data]
 
-        self.data = data
+        self.data = list(data)
 
-        # normalize get_items
         self.get_items = dict(get_items or {})
-
-        for key in [x_keys, y_keys]:
-            if key is None:
-                continue
-
-            if isinstance(key, str):
-                if key not in self.get_items:
-                    self.get_items[key] = key
-
-            elif isinstance(key, (list, tuple)):
-                for k in key:
-                    if k not in self.get_items:
-                        self.get_items[k] = k
+        self._add_key_mappings(x_keys)
+        self._add_key_mappings(y_keys)
 
         self.base_path = Path(base_path) if base_path else Path()
         self.folders = folders or {}
         self.suffixes = suffixes or {}
         self.keep_original = keep_original
+        self.x_keys = x_keys
+        self.y_keys = y_keys
+        self.x_class = x_class
+        self.y_class = y_class
+        self.kwargs = kwargs
 
-    def _build_path(self, value, new_col):
-        if value is None or pd.isna(value):
-            return None
-
-        base = self.base_path
-
-        folder = self.folders.get(new_col)
-        if folder:
-            base = base / folder
-
-        suffix = self.suffixes.get(new_col, "")
-
-        return (base / f"{value}{suffix}").as_posix()
-
-    def _build_paths(self, values, new_col):
-        return [self._build_path(v, new_col) for v in values]
+        self.loaders = self._build_class_loaders()
 
     def _resolve(self):
         out = []
@@ -593,29 +650,23 @@ class DictSource(BaseSource):
 
                 if isinstance(src_col, str):
                     value = row.get(src_col)
+                    item[new_col] = self._format_value(value, new_col)
 
-                    has_path_config = (
-                        new_col in self.folders
-                        or new_col in self.suffixes
-                        or self.base_path != Path()
-                    )
-
-                    if has_path_config:
-                        item[new_col] = self._build_path(value, new_col)
-                    else:
-                        item[new_col] = value
-
-                elif isinstance(src_col, list):
+                elif isinstance(src_col, (list, tuple)):
                     values = [row.get(c) for c in src_col]
-                    item[new_col] = self._build_paths(values, new_col)
+                    item[new_col] = self._format_value(values, new_col)
 
                 elif isinstance(src_col, Callable):
-                    item[new_col] = src_col(row)
+                    value = src_col(row)
+                    item[new_col] = self._format_value(value, new_col)
 
                 else:
                     raise ValueError(
                         f"Invalid src_col type for {new_col}: {type(src_col)}"
                     )
+
+            for loader in self.loaders:
+                item = loader(item)
 
             out.append(item)
 
@@ -1361,6 +1412,8 @@ class MonaiLoader:
 class BaseTask:
 
     default_dataset = 'cache'
+    default_x_keys = "input"
+    default_y_keys = "target"
     default_transforms = None
 
     def config(self):
@@ -1376,6 +1429,10 @@ class BaseTask:
         return ctx
 
     def before_load(self, ctx):
+        if ctx.config["x_keys"] is None:
+            ctx.config["x_keys"] = self.default_x_keys
+        if ctx.config["y_keys"] is None:
+            ctx.config["y_keys"] = self.default_y_keys
         return ctx
 
     def before_dataset(self, ctx):
@@ -1390,6 +1447,9 @@ class BaseTask:
 # %% ../../nbs/022_data.load.ipynb #419fe705
 @register_task("classification")
 class ClassificationTask(BaseTask):
+
+    default_x_keys = "image"
+    default_y_keys = "label"
 
     from bioMONAI.transforms import (
         ScaleIntensity,
@@ -1407,14 +1467,16 @@ class ClassificationTask(BaseTask):
 
     def before_dataset(self, ctx):
         
-        y_key = ctx.config.get("y_keys", 'label')
+        if ctx.config.get("vocab") is not None:
+            return ctx
+
+        y_key = ctx.config.get("y_keys") or self.default_y_keys
 
         vocab = list(dict.fromkeys(
             r[y_key] for r in ctx.records
         ))
 
-        # this replaces vocab if missing or None.
-        ctx.config["vocab"] = ctx.config.get("vocab") or vocab
+        ctx.config["vocab"] = vocab
 
         return ctx
 
@@ -1476,8 +1538,6 @@ class BioDataLoaders(DataLoaders):
             SourceClass.__init__,
             source_splits.get("val", source_splits["train"])
         )
-
-        # val_kwargs = source_splits.get("val", source_splits["train"])
     
         val = SourceClass(ctx.val_data, **val_kwargs).load()
 
@@ -1523,12 +1583,12 @@ class BioDataLoaders(DataLoaders):
 
         LoaderClass = LOADER_REGISTRY[ctx.backend]
 
-        loader_kwargs = route_kwargs(
-            LoaderClass.__init__,
-            ctx.config
-        )
+        # loader_kwargs = route_kwargs(
+        #     LoaderClass.__init__,
+        #     ctx.config
+        # )
 
-        loader = LoaderClass(**loader_kwargs)
+        loader = LoaderClass(**ctx.config)
 
         ctx.dls = loader.build(
             ctx.train_ds,

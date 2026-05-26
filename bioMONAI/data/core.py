@@ -78,16 +78,6 @@ class BioDataClass(MetaTensor):
     def set_transforms(cls, transforms):
         cls._transforms = transforms
     
-    # --------------------------------------------------
-    # GET DATA LOADERS
-    # --------------------------------------------------
-    @classmethod
-    def get_loader(cls,**kwargs) -> Callable:
-        raise NotImplementedError("Subclasses must implement the `get_loader` method to define how to load data.")
-
-    @classmethod
-    def get_dict_loader(cls, **kwargs) -> Callable:
-        raise NotImplementedError("Subclasses must implement the `get_dict_loader` method to define how to load data.")
     
     # --------------------------------------------------
     # LOADING
@@ -343,19 +333,19 @@ class BioLabel(BioDataClass):
     # --------------------------------------------------
     @classmethod
     def from_source(cls, x, **kwargs):
-        cat = cls.get_loader(**kwargs)
+        cat = cls.get_label(**kwargs)
         return cat(x)
     
     @classmethod
     def from_dict(cls, x:dict, keys:str|Iterable[str]=None, **kwargs):
-        cat = cls.get_dict_loader(keys=keys, **kwargs)
+        cat = cls.get_dict_label(keys=keys, **kwargs)
         return cat(x)
     
     # --------------------------------------------------
     # MONAI INTEGRATION
     # --------------------------------------------------
     @classmethod
-    def get_loader(cls,**kwargs) -> Callable:
+    def get_label(cls,**kwargs) -> Callable:
 
         vocab = kwargs.get('vocab', cls._vocab)
         sort = kwargs.get('sort', cls._sort)
@@ -366,7 +356,7 @@ class BioLabel(BioDataClass):
         return cat
 
     @classmethod
-    def get_dict_loader(cls, **kwargs) -> Callable:
+    def get_dict_label(cls, **kwargs) -> Callable:
 
         vocab = kwargs.get('vocab', cls._vocab)
         sort = kwargs.get('sort', cls._sort)
