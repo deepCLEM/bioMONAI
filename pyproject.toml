@@ -11,7 +11,7 @@ requires-python = ">=3.7"
 license = {text = "Apache-2.0"}
 authors = [{name = "bmandracchia", email = "biagio.mandracchia@uva.es"}]
 keywords = ['monai', 'pytorch', 'nbdev', 'jupyter', 'notebook', 'python']
-classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 2 - Pre-Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 [...]
+classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 2 - Pre-Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
 dependencies = []
 
 [project.urls]
