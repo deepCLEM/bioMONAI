@@ -11,7 +11,7 @@ requires-python = ">=3.7"
 license = {text = "Apache-2.0"}
 authors = [{name = "bmandracchia", email = "biagio.mandracchia@uva.es"}]
 keywords = ['monai', 'pytorch', 'nbdev', 'jupyter', 'notebook', 'python']
-classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 2 - Pre-Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
+classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 2 - Pre-Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 [...]
 dependencies = []
 
 [project.urls]
@@ -22,7 +22,10 @@ Documentation = "https://deepCLEM.github.io/bioMONAI"
 bioMONAI = "bioMONAI._modidx:d"
 
 [project.optional-dependencies]
-dev = ['nbdev==3.0.10']
+dev = [
+    'nbdev==3.0.10',
+    'execnb>=0.1.4'
+]
 
 [tool.setuptools.dynamic]
 version = {attr = "bioMONAI.__version__"}
@@ -31,3 +34,4 @@ version = {attr = "bioMONAI.__version__"}
 include = ["bioMONAI"]
 
 [tool.nbdev]
+custom_sidebar = false
