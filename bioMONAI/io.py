@@ -1477,16 +1477,10 @@ class BioImageReader(ImageReader):
 
     def _get_supported_suffixes(self) -> list[str]:
         """
-        Collect supported suffixes from loader registry.
+        Collect supported suffixes from loader registry removing leading dots.
         """
-        suffixes = set()
-
-        for loader in LOADER_REGISTRY.values():
-            exts = getattr(loader, "suffixes", None)
-            if exts:
-                suffixes.update(exts)
-
-        return list(suffixes)
+        # Extract keys from the inner registry dictionary and flatten any nested structures
+        return [ext.lstrip('.') for ext in LOADER_REGISTRY._loaders.keys()]
 
     # --------------------------------------------------
     def read(self, data: PathLike | Sequence[PathLike] | np.ndarray, **kwargs) -> MetaTensor:
