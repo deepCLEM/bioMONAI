@@ -4,8 +4,9 @@
 
 # %% auto #0
 __all__ = ['ScalarImage', 'SaveImage', 'SaveImaged', 'LOADER_REGISTRY', 'LoadImage', 'LoadImaged', 'write_image', 'tiff2torch',
-           'string2dict', 'split_path', 'is_ome_tiff', 'get_aics_metadata', 'extract_formats', 'bioio_loader',
-           'split_hdf_path', 'hdf5_loader', 'LoaderRegistry', 'image_reader', 'image_reader_dict', 'BioImageReader']
+           'string2dict', 'split_path', 'is_ome_tiff', 'BioImageMetadata', 'get_aics_metadata', 'extract_formats',
+           'bioio_loader', 'split_hdf_path', 'hdf5_loader', 'LoaderRegistry', 'image_reader', 'image_reader_dict',
+           'BioImageReader']
 
 # %% ../nbs/010_io.ipynb #58b60095
 # =================================
@@ -13,6 +14,9 @@ __all__ = ['ScalarImage', 'SaveImage', 'SaveImaged', 'LOADER_REGISTRY', 'LoadIma
 # =================================
 import time
 import re
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any
 
 # =================================
 # Scientific / data
@@ -57,6 +61,7 @@ from monai.utils import MetaKeys
 # bioMONAI
 # =================================
 from .utils import *
+
 
 # %% ../nbs/010_io.ipynb #8a6181f6
 ScalarImage = ScalarImage
@@ -176,6 +181,9 @@ def _to_serializable(value):
     """
     Expand metadata-like objects into dictionaries recursively.
     """
+    if isinstance(value, BioImageMetadata):
+        return value.to_dict()
+
     # numpy scalar types
     if isinstance(value, np.generic):
         return value.item()
@@ -219,9 +227,80 @@ def _to_serializable(value):
     return str(value)
 
 
+def _safe_attr(obj, attr, default=None):
+    try:
+        return getattr(obj, attr)
+    except Exception:
+        return default
+
+
+@dataclass(slots=True)
+class BioImageMetadata:
+    """
+    Lightweight metadata summary for BioIO-backed images.
+    """
+    filepath: str | None = None
+    reader: str | None = None
+    dims: str | None = None
+    source_shape: tuple[int, ...] | None = None
+    dtype: str | None = None
+    physical_pixel_sizes: dict | None = None
+    scenes: tuple[str, ...] | None = None
+    current_scene: str | None = None
+    channel_names: tuple[str, ...] | None = None
+    layout: str | None = None
+    standard_fields: dict = field(default_factory=dict)
+    raw: dict = field(default_factory=dict)
+
+    @classmethod
+    def from_bioimage(cls, image, path=None, layout=None, raw=None):
+        shape = _safe_attr(image, "shape")
+        scenes = _safe_attr(image, "scenes")
+        channel_names = _safe_attr(image, "channel_names")
+        physical_pixel_sizes = _safe_attr(image, "physical_pixel_sizes")
+        standard_metadata = _to_serializable(_safe_attr(image, "standard_metadata"))
+        reader = _safe_attr(image, "reader")
+
+        return cls(
+            filepath=None if path is None else str(path),
+            reader=None if reader is None else reader.__class__.__name__,
+            dims=str(_safe_attr(image, "dims")),
+            source_shape=None if shape is None else tuple(int(v) for v in shape),
+            dtype=str(_safe_attr(image, "dtype")),
+            physical_pixel_sizes=_to_serializable(physical_pixel_sizes),
+            scenes=None if scenes is None else tuple(str(s) for s in scenes),
+            current_scene=_to_serializable(_safe_attr(image, "current_scene")),
+            channel_names=None if channel_names is None else tuple(str(c) for c in channel_names),
+            layout=layout,
+            standard_fields={} if not isinstance(standard_metadata, dict) else standard_metadata,
+            raw={} if raw is None else raw,
+        )
+
+    def to_dict(self, include_raw: bool = False) -> dict:
+        meta = asdict(self)
+        raw = meta.pop("raw", {})
+        standard_fields = meta.pop("standard_fields", {})
+        meta = {
+            k: _to_serializable(v)
+            for k, v in meta.items()
+            if v is not None
+        }
+        meta.update({
+            k: _to_serializable(v)
+            for k, v in standard_fields.items()
+            if v is not None and k not in meta
+        })
+        if include_raw and raw:
+            meta["bioio"] = _to_serializable(raw)
+        return meta
+
+
 def get_aics_metadata(obj, skip=None):
     """
     Return expanded metadata dictionary from an AICSImage object.
+
+    This is intentionally opt-in because walking all BioIO attributes can force
+    expensive lazy properties. Use BioImageMetadata for the fast default path.
     """
 
     default_skip = {
@@ -257,6 +336,33 @@ def get_aics_metadata(obj, skip=None):
             attrs[attr] = f"<error: {e}>"
 
     return attrs
+
+
+def _bioio_metadata(image, path=None, layout=None, metadata="summary", skip=None):
+    """
+    Build BioIO metadata without forcing expensive lazy attributes by default.
+    """
+    if metadata in (False, None, "none"):
+        return {}
+
+    if isinstance(metadata, BioImageMetadata):
+        return metadata.to_dict()
+
+    if metadata in (True, "full"):
+        raw = get_aics_metadata(image, skip=skip)
+        return BioImageMetadata.from_bioimage(
+            image,
+            path=path,
+            layout=layout,
+            raw=raw,
+        ).to_dict(include_raw=True)
+
+    return BioImageMetadata.from_bioimage(
+        image,
+        path=path,
+        layout=layout,
+    ).to_dict()
+
 
 # %% ../nbs/010_io.ipynb #0ae336ba
 def extract_formats(filenames: Sequence[str] | str) -> list[str | None]:
@@ -347,6 +453,8 @@ class bioio_loader():
                  ind_dict=None, # Dictionary indicating the channels to load
                  loader=None, # Optional custom reader to use for loading the image
                  channels="CZYX", # The desired channel order for the output data
+                 metadata: str | bool | BioImageMetadata = "summary", # Metadata mode: "summary", "full", or "none"
+                 metadata_skip: set[str] | None = None, # Extra full-metadata fields to skip
                  **kwargs,
                 ):
         store_attr()
@@ -375,20 +483,26 @@ class bioio_loader():
         if ind_dict == None:
             # parse path string
             path, ind_dict = split_path(str(path))
-            
-        # Support for tiff files    
+             
         path = str(path)
         self.kwargs.setdefault('reconstruct_mosaic', False)
         image_aics = AICSImage(path, reader=self.loader, **self.kwargs)
 
         # Convert to numpy array    
         data = image_aics.get_image_data(self.channels, **ind_dict)
-        # extract metadata
-        meta = get_aics_metadata(image_aics)
+        # extract lightweight metadata by default
+        meta = _bioio_metadata(
+            image_aics,
+            path=path,
+            layout=self.channels,
+            metadata=self.metadata,
+            skip=self.metadata_skip,
+        )
         # Create an identity affine transformation matrix
         affine = np.eye(4)
         # Return the image data and the affine matrix
         return data, meta, affine
+
 
 
 # %% ../nbs/010_io.ipynb #2bf5edc3
@@ -469,33 +583,44 @@ class hdf5_loader():
 
 
 # %% ../nbs/010_io.ipynb #d418d00e
-def _preprocess(obj, transforms=None):
+def _as_transform_list(transforms):
     if transforms is None:
-        transforms = []
-    elif callable(transforms):
-        transforms = [transforms]
+        return ()
+    if callable(transforms):
+        return (transforms,)
+    return transforms
 
-    obj.meta['size_original'] = obj.shape
+
+def _preprocess(obj, transforms=None):
+    transforms = _as_transform_list(transforms)
+    meta = obj.meta
+    meta['size_original'] = obj.shape
+
+    if not transforms:
+        meta['size_after_tfms'] = obj.shape
+        return obj
+
+    transform_meta = meta.setdefault('transforms', {})
 
     for t in transforms:
-        start = time.time()
-
+        start = time.perf_counter()
         obj = t(obj)
+        elapsed = time.perf_counter() - start
 
-        name = t.__class__.__name__
+        meta = obj.meta
+        if transform_meta is not meta.get('transforms'):
+            transform_meta = meta.setdefault('transforms', transform_meta)
 
-        raw_params = getattr(t, "__dict__", {})
-        safe_params = _sanitize(raw_params)
-
-        obj.meta.setdefault('transforms', {})
-        obj.meta['transforms'][name] = {
-            'time': time.time() - start,
-            'params': safe_params,
+        raw_params = getattr(t, "__dict__", None)
+        transform_meta[t.__class__.__name__] = {
+            'time': elapsed,
+            'params': {} if not raw_params else _sanitize(raw_params),
         }
 
     obj.meta['size_after_tfms'] = getattr(obj, "shape", None)
 
     return obj
+
 
 # %% ../nbs/010_io.ipynb #582c31aa
 def _preprocess_dict(
@@ -529,39 +654,30 @@ def _preprocess_dict(
         dict:
             Transformed dictionary with updated MetaTensor metadata.
     """
-    if transforms is None:
-        transforms = []
-    elif callable(transforms):
-        transforms = [transforms]
+    transforms = _as_transform_list(transforms)
+    if not transforms:
+        return obj
 
     processed_keys = set()
 
     for t in transforms:
-        keys = getattr(t, "keys", [])
+        keys = getattr(t, "keys", ())
+        name = t.__class__.__name__
+        raw_params = getattr(t, "__dict__", None)
+        safe_params = {} if not raw_params else _sanitize(raw_params)
 
-        start = time.time()
-
+        start = time.perf_counter()
         obj = t(obj)
-
-        elapsed = time.time() - start
+        elapsed = time.perf_counter() - start
 
         for key in keys:
-            if key not in obj:
-                continue
-
-            tensor = obj[key]
+            tensor = obj.get(key)
 
             if not isinstance(tensor, MetaTensor):
                 continue
 
             processed_keys.add(key)
-
-            tensor.meta.setdefault("transforms", {})
-
-            raw_params = getattr(t, "__dict__", {})
-            safe_params = _sanitize(raw_params)
-
-            tensor.meta["transforms"][t.__class__.__name__] = {
+            tensor.meta.setdefault("transforms", {})[name] = {
                 "time": elapsed,
                 "params": safe_params,
             }
@@ -573,6 +689,7 @@ def _preprocess_dict(
             tensor.meta["size_after_tfms"] = tensor.shape 
 
     return obj
+
 
 # %% ../nbs/010_io.ipynb #c60c74aa
 class LoaderRegistry:
@@ -600,7 +717,7 @@ def _load_default(path, ind_dict=None, loader=None, channels="CZYX", **kwargs):
     path_str = str(path)
     if ind_dict == None:
         path_str, ind_dict = split_path(path_str)
-    data, meta, affine = bioio_loader(ind_dict, loader=loader, channels=channels)(path_str)
+    data, meta, affine = bioio_loader(ind_dict, loader=loader, channels=channels, **kwargs)(path_str)
 
     return MetaTensor(x=data, affine=affine, meta=meta)
 
@@ -696,9 +813,10 @@ def _load_tiff(path, ind_dict=None, channels="CZYX", **kwargs):
     else:
         image_loader = TiffReader
 
-    data, meta, affine = bioio_loader(ind_dict, loader=image_loader, channels=channels)(path_str)
+    data, meta, affine = bioio_loader(ind_dict, loader=image_loader, channels=channels, **kwargs)(path_str)
 
     return MetaTensor(x=data, affine=affine, meta=meta)
+
 
 # %% ../nbs/010_io.ipynb #6f152957
 @LOADER_REGISTRY.register(".czi")
@@ -753,6 +871,25 @@ def _get_loader(path: Path):
     return _load_default
 
 # %% ../nbs/010_io.ipynb #d9629282
+def _to_dtype_if_needed(metatensor: MetaTensor, dtype: torch.dtype | None = torch.float32) -> MetaTensor:
+    if dtype is None or metatensor.dtype == dtype:
+        return metatensor
+    return metatensor.to(dtype)
+
+
+def _attach_load_metadata(
+    metatensor: MetaTensor,
+    path: Path,
+    channels: str,
+    fmt: str | None = None,
+) -> MetaTensor:
+    meta = metatensor.meta
+    meta["filepath"] = str(path)
+    meta["format"] = extract_formats(path)[0] if fmt is None else fmt
+    meta["layout"] = channels
+    return metatensor
+
+
 def _load_and_preprocess(
     file_path: PathLike,
     transforms: Callable|Iterable[Callable]|None =None,
@@ -764,25 +901,22 @@ def _load_and_preprocess(
     """
     Load image and apply preprocessing transforms.
 
-    Also attaches file format metadata.
+    Also attaches file path, format, and layout metadata.
     """
     path = Path(file_path)
-
     image_loader = _get_loader(path)
-    metatensor = image_loader(path, channels=channels, ind_dict=ind_dict, **kwargs).to(dtype)
 
-    # store path
-    metatensor.meta["filepath"] = str(path)
-    metatensor.meta["transforms"] = {}
-
+    metatensor = image_loader(
+        path,
+        channels=channels,
+        ind_dict=ind_dict,
+        **kwargs,
+    )
+    metatensor = _to_dtype_if_needed(metatensor, dtype)
     metatensor = _preprocess(metatensor, transforms)
 
-    # format extraction
-    metatensor.meta['format'] = extract_formats(path)[0]
-    # save channels info
-    metatensor.meta['layout'] = channels
+    return _attach_load_metadata(metatensor, path, channels)
 
-    return metatensor
 
 # %% ../nbs/010_io.ipynb #80e604f7
 def _load_and_preprocess_dict(
@@ -818,41 +952,39 @@ def _load_and_preprocess_dict(
     if isinstance(keys, str):
         keys = [keys]
 
-    # load images into dict first
-    path_dict = {}
-    size_dict = {}
+    paths = {}
+    original_shapes = {}
+
     for key in keys:
-        path_dict[key] = Path(obj[key])
+        path = Path(obj[key])
+        paths[key] = path
 
-        image_loader = _get_loader(path_dict[key])
-
-        obj[key] = image_loader(
-            path_dict[key],
+        image_loader = _get_loader(path)
+        tensor = image_loader(
+            path,
             channels=channels,
             ind_dict=ind_dict,
-            **kwargs
-        ).to(dtype)
+            **kwargs,
+        )
+        tensor = _to_dtype_if_needed(tensor, dtype)
 
-        # check default metadata
-        obj[key].meta.setdefault("filepath", '')
-        obj[key].meta.setdefault("size_original", None)
-        obj[key].meta.setdefault("transforms", {})
-        obj[key].meta.setdefault("size_after_tfms", None)
+        original_shapes[key] = tensor.shape
+        obj[key] = tensor
 
-        # store size
-        size_dict[key] = obj[key].shape
-
-    # apply dict-aware preprocessing (handles metadata internally)
     obj = _preprocess_dict(obj, transforms)
 
-    # attach non-transform metadata
     for key in keys:
-        obj[key].meta["size_original"] = size_dict[key]
-        obj[key].meta["filepath"] = str(path_dict[key])
-        obj[key].meta["format"] = extract_formats(Path(obj[key].meta["filepath"]))[0]
-        obj[key].meta["layout"] = channels
+        tensor = obj[key]
+        if not isinstance(tensor, MetaTensor):
+            continue
+
+        meta = tensor.meta
+        meta["size_original"] = original_shapes[key]
+        meta["size_after_tfms"] = getattr(tensor, "shape", None)
+        _attach_load_metadata(tensor, paths[key], channels)
 
     return obj
+
 
 # %% ../nbs/010_io.ipynb #08b998f4
 def _multi_sequence_stream(
@@ -1010,58 +1142,69 @@ def _stack(
     return output
 
 
-def _meta_from_layout(shape: tuple[int, ...],           # The shape of the image tensor
-                      layout: str                       # The channel layout string (e.g., "CZYX")
-                      ) -> dict[str, int | str | None]: # A dictionary containing metadata extracted from the layout, including size, width, height, channels, depth, frames, sequence, mode, and kind.
+def _meta_from_layout(
+    shape: tuple[int, ...],           # The shape of the image tensor
+    layout: str,                      # The channel layout string (e.g., "CZYX")
+    meta: dict | None = None,         # Existing metadata used to avoid repeated BioIO fields
+) -> dict[str, int | str | tuple | None]:
     """
-    Extract metadata from channel layout.
-    Args:
-        shape: The shape of the image tensor
-        layout: The channel layout string (e.g., "CZYX")    
-    Returns:
-        A dictionary containing metadata extracted from the layout, including size, width, height, channels, depth, frames, sequence, mode, and kind.
-     """
+    Extract output-specific metadata from a channel layout.
 
-    _channel_modes = {1: "L", 3: "RGB"}
-    
+    Existing BioIO metadata is used to avoid adding aliases such as ``width``
+    when ``image_size_x`` is already present.
+    """
     if len(shape) != len(layout):
         raise ValueError(f"{shape} vs {layout}")
 
-    axis_map = dict(zip(layout, shape))
+    shape = tuple(int(v) for v in shape)
+    meta = {} if meta is None else meta
 
-    meta = {
-        "size_output": tuple(shape),
-        "width": axis_map.get("X"),
-        "height": axis_map.get("Y"),
-        "channels": axis_map.get("C"),
-        "depth": axis_map.get("Z"),
-        "frames": axis_map.get("T"),
-        "sequence": axis_map.get("S"),
-        MetaKeys.SPATIAL_SHAPE: tuple(axis_map[ax] for ax in "ZYX" if ax in axis_map),
+    def axis_size(axis):
+        idx = layout.find(axis)
+        return None if idx == -1 else shape[idx]
+
+    out = {
+        "size_output": shape,
+        MetaKeys.SPATIAL_SHAPE: tuple(
+            axis_size(axis) for axis in "ZYX" if axis in layout
+        ),
     }
 
-    # mode
-    c = meta["channels"]
-    meta["mode"] = (
-        "L" if c is None else _channel_modes.get(c, f"multichannel ({c})")
-    )
+    # Avoid duplicating flattened BioIO StandardMetadata fields.
+    for key, axis, bioio_key in (
+        ("width", "X", "image_size_x"),
+        ("height", "Y", "image_size_y"),
+        ("depth", "Z", "image_size_z"),
+        ("channels", "C", "image_size_c"),
+        ("frames", "T", "image_size_t"),
+        ("sequence", "S", None),
+    ):
+        value = axis_size(axis)
+        if value is not None and key not in meta and (bioio_key is None or bioio_key not in meta):
+            out[key] = value
 
-    # kind
-    if meta["sequence"] is not None and meta["sequence"] > 1:
-        meta["kind"] = "sequence"
-    if meta["frames"] is not None and meta["frames"] > 1:
-        meta["kind"] = "video"
-    elif meta["depth"] is not None and meta["depth"] > 1:
-        meta["kind"] = "volume"
-    else:
-        meta["kind"] = "image"
+    c = axis_size("C")
+    if "mode" not in meta:
+        out["mode"] = "L" if c is None else {1: "L", 3: "RGB"}.get(c, f"multichannel ({c})")
 
-    if "C" in layout:
-        meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = layout.index("C")
-    else:
-        meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = float("nan")
+    if "kind" not in meta:
+        sequence = axis_size("S")
+        frames = axis_size("T")
+        depth = axis_size("Z")
+        if sequence is not None and sequence > 1:
+            out["kind"] = "sequence"
+        elif frames is not None and frames > 1:
+            out["kind"] = "video"
+        elif depth is not None and depth > 1:
+            out["kind"] = "volume"
+        else:
+            out["kind"] = "image"
 
-    return meta
+    if MetaKeys.ORIGINAL_CHANNEL_DIM not in meta:
+        channel_dim = layout.find("C")
+        out[MetaKeys.ORIGINAL_CHANNEL_DIM] = channel_dim if channel_dim != -1 else float("nan")
+
+    return out
 
 
 def _to_numpy(x):
@@ -1244,6 +1387,7 @@ def image_reader(
             _meta_from_layout(
                 metatensor.shape,
                 metatensor.meta["layout"],
+                meta=metatensor.meta,
             )
         )
 
@@ -1266,6 +1410,7 @@ def image_reader(
         _meta_from_layout(
             metatensor.shape,
             channels,
+            meta=metatensor.meta,
         )
     )
 
@@ -1273,6 +1418,7 @@ def image_reader(
         output=output,
         metatensor=metatensor,
     )
+
 
 # %% ../nbs/010_io.ipynb #3135d535
 def image_reader_dict(
@@ -1446,6 +1592,7 @@ def image_reader_dict(
                 _meta_from_layout(
                     metatensor.shape,
                     channels,
+                    meta=metatensor.meta,
                 )
             )
 
@@ -1456,18 +1603,25 @@ def image_reader_dict(
 
     return out
 
+
 # %% ../nbs/010_io.ipynb #5a78f57f
 class BioImageReader(ImageReader):
     def __init__(
         self,
         converter: Callable[[MetaTensor], MetaTensor] | None = None,  # A callable that takes a MetaTensor and returns a MetaTensor
         reverse_indexing: bool = False,
+        cache: bool = True,
+        cache_size: int = 32,
         **kwargs,
     ):
         super().__init__()
         self.converter = converter
         self.reverse_indexing = reverse_indexing
+        self.cache = cache
+        self.cache_size = cache_size
         self.kwargs = kwargs
+        self._cache = {}
+        self._cache_order = []
 
     # --------------------------------------------------
     def verify_suffix(self, filename:Sequence[PathLike] | PathLike) -> bool:
@@ -1482,21 +1636,60 @@ class BioImageReader(ImageReader):
         # Extract keys from the inner registry dictionary and flatten any nested structures
         return [ext.lstrip('.') for ext in LOADER_REGISTRY._loaders.keys()]
 
+    def _cache_key(self, data, kwargs):
+        if not self.cache or self.cache_size <= 0:
+            return None
+        if isinstance(data, (str, Path)):
+            data_key = str(data)
+        elif isinstance(data, Sequence) and all(isinstance(d, (str, Path)) for d in data):
+            data_key = tuple(str(d) for d in data)
+        else:
+            return None
+        return (data_key, tuple(sorted((k, repr(v)) for k, v in kwargs.items())))
+
+    def _clone_metatensor(self, img: MetaTensor) -> MetaTensor:
+        affine = img.affine
+        if hasattr(affine, "clone"):
+            affine = affine.clone()
+        meta = dict(img.meta)
+        meta.pop("affine", None)
+        return MetaTensor(
+            x=img.as_tensor().clone(),
+            affine=affine,
+            meta=meta,
+        )
+
+    def _remember(self, key, img: MetaTensor):
+        if key is None:
+            return
+        self._cache[key] = self._clone_metatensor(img)
+        if key in self._cache_order:
+            self._cache_order.remove(key)
+        self._cache_order.append(key)
+        while len(self._cache_order) > self.cache_size:
+            old_key = self._cache_order.pop(0)
+            self._cache.pop(old_key, None)
+
     # --------------------------------------------------
     def read(self, data: PathLike | Sequence[PathLike] | np.ndarray, **kwargs) -> MetaTensor:
         kwargs_ = {**self.kwargs, **kwargs}
         
-        if len(data) == 1 and isinstance(data, Sequence) and not isinstance(data, (str, Path)):
+        if isinstance(data, Sequence) and not isinstance(data, (str, Path)) and len(data) == 1:
             data = data[0]
 
-        mt = image_reader(
-            data,
-            output="metatensor",
-            **kwargs_,
-        )
+        key = self._cache_key(data, kwargs_)
+        if key in self._cache:
+            mt = self._clone_metatensor(self._cache[key])
+        else:
+            mt = image_reader(
+                data,
+                **kwargs_,
+            )
 
-        if self.converter:
-            mt = self.converter(mt)
+            if self.converter:
+                mt = self.converter(mt)
+
+            self._remember(key, mt)
 
         return mt
 
@@ -1519,9 +1712,18 @@ class BioImageReader(ImageReader):
     
     def _get_spatial_shape(self, img: MetaTensor):
         m = img.meta
+        spatial_shape = m.get(MetaKeys.SPATIAL_SHAPE)
+        if spatial_shape is not None:
+            return tuple(reversed(spatial_shape))
         return tuple(
-            v for v in (m.get("width"), m.get("height"), m.get("depth")) if v is not None
+            v for v in (
+                m.get("width", m.get("image_size_x")),
+                m.get("height", m.get("image_size_y")),
+                m.get("depth", m.get("image_size_z")),
+            )
+            if v is not None
         )
+
 
 # %% ../nbs/010_io.ipynb #49b7b1f2
 LoadImage = LoadImage
