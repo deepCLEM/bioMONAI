@@ -1925,7 +1925,9 @@ def from_source(cls,
     
     # Optionally print a summary of the BioDataBlock if show_summary is True
     if show_summary:
-        bs = dataloader_ops['bs'] if dataloader_ops['bs'] is not None else 1
+        # bs = dataloader_ops['bs'] if dataloader_ops['bs'] is not None else 1
+        # securely get batch size with a default of 1 if not specified
+        bs = dataloader_ops.get('bs', 1)
         print(datablock.summary(data_source, bs=bs))
     
     return dataloder
@@ -2144,18 +2146,18 @@ def from_yaml(cls, data_source, yaml_path, show_summary:bool=False):
         "batch_tfms": batch_tfms
     })
 
-        # Optionally print a summary of the BioDataBlock if show_summary is True
-    if show_summary:
-        bs = biodataloader_ops['bs'] if biodataloader_ops['bs'] is not None else 1
-        print(datablock.summary(data_source, bs=bs))
-    
-    
     biodatablock_ops = {key: value for key, value in biodatablock_ops.items() if value is not None}
 
     biodataloader_ops = {key: value for key, value in biodataloader_ops.items() if value is not None}
     
     # Create BioDataBlock
     datablock = BioDataBlock(**biodatablock_ops)
+
+    # Optionally print a summary of the BioDataBlock if show_summary is True
+    if show_summary:
+        bs = biodataloader_ops['bs'] if biodataloader_ops['bs'] is not None else 1
+        print(datablock.summary(data_source, bs=bs))
+
 
     # Unpack biodataloader_ops directly (including bs)
     dataloder = datablock.dataloaders(data_source, **biodataloader_ops)
@@ -2187,7 +2189,7 @@ BioDataLoaders.class_from_path_func = delegates(to=BioDataLoaders.from_source)(B
 BioDataLoaders.class_from_df = delegates(to=BioDataLoaders.from_source)(BioDataLoaders.class_from_df)
 BioDataLoaders.class_from_csv = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_csv)
 BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_func)(BioDataLoaders.class_from_path_re)
-BioDataLoaders.class_from_lists = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_csv)
+BioDataLoaders.class_from_lists = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_lists)
 
 # %% ../../nbs/022_data.load.ipynb #13f09332
 def from_monai(
