@@ -1948,7 +1948,7 @@ def from_folder(cls, path, get_target_fn, train='train', valid='valid', valid_pc
     if get_items is None:
         get_items = get_image_files if valid_pct else partial(get_image_files, folders=[train, valid])
     ops = { 
-        'blocks':       (BioImageBlock(img_cls), BioImageBlock(target_img_cls)),
+        'blocks':       (img_cls.get_datablock(), target_img_cls.get_datablock()),
         'get_items':    get_items,
         'splitter':     splitter,
         'get_y':        get_target_fn,
@@ -1982,7 +1982,7 @@ def from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col=0, folder=None, 
     
     target_img_cls = img_cls if target_img_cls is None else target_img_cls
     ops = { 
-        'blocks':       (BioImageBlock(img_cls), BioImageBlock(target_img_cls)),
+        'blocks':       (img_cls.get_datablock(), target_img_cls.get_datablock()),
         'get_items':    None,
         'splitter':     splitter,
         'get_x':        ColReader(fn_col, pref=pref, suff=suff),
@@ -2006,7 +2006,7 @@ def class_from_folder(cls, path, train='train', valid='valid', valid_pct=None, s
     splitter = GrandparentSplitter(train_name=train, valid_name=valid) if valid_pct is None else RandomSplitter(valid_pct, seed=seed)
     get_items = get_image_files if valid_pct else partial(get_image_files, folders=[train, valid])
     ops = { 
-        'blocks':       (BioImageBlock(img_cls), CategoryBlock(vocab=vocab)),
+        'blocks':       (img_cls.get_datablock(), CategoryBlock(vocab=vocab)),
         'get_items':    get_items,
         'splitter':     splitter,
         'get_y':        parent_label,
@@ -2021,7 +2021,7 @@ def class_from_path_func(cls, path, fnames, label_func, valid_pct=0.2, seed=None
                     img_cls=BioImage, **kwargs):
     "Create from list of `fnames` in `path`s with `label_func`"
     ops = { 
-        'blocks':       (BioImageBlock(img_cls), CategoryBlock),
+        'blocks':       (img_cls.get_datablock, CategoryBlock),
         'splitter':     RandomSplitter(valid_pct, seed=seed),
         'get_y':        label_func,
         'item_tfms':    item_tfms,
@@ -2054,7 +2054,7 @@ def class_from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col='filename'
     splitter = _split      
 
     ops = { 
-        'blocks':       (BioImageBlock(img_cls), y_block),
+        'blocks':       (img_cls.get_datablock(), y_block),
         'get_items':    None,
         'splitter':     splitter,
         'get_x':        ColReader(fn_col, pref=pref, suff=suff),
@@ -2079,7 +2079,7 @@ def class_from_lists(cls, path, fnames, labels, valid_pct=0.2, seed:int=None, y_
         y_block = MultiCategoryBlock if is_listy(labels[0]) and len(labels[0]) > 1 else (
             RegressionBlock if isinstance(labels[0], float) else CategoryBlock)
     ops = { 
-        'blocks':       (BioImageBlock(img_cls), y_block),
+        'blocks':       (img_cls.get_datablock(), y_block),
         'splitter':     RandomSplitter(valid_pct, seed=seed),
         'item_tfms':    item_tfms,
         'batch_tfms':   batch_tfms,
@@ -2146,7 +2146,7 @@ def from_yaml(cls, data_source, yaml_path, show_summary:bool=False):
 
     # Update biodatablock_ops with the splitter
     biodatablock_ops.update({
-        "blocks": (BioImageBlock(cls=BioImage), CategoryBlock),
+        "blocks": (BioImage.get_datablock(), CategoryBlock),
         "get_items": get_items,
         "splitter": splitter,
         "get_y": parent_label,

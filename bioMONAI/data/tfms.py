@@ -824,10 +824,10 @@ def _process_single_image(
     # Load images
     # --------------------------------------------------
     image_reader_kwargs = route_kwargs(image_reader, kwargs)
-    row = input_class.create(
+    row = input_class.from_dict(
         row, keys=[input_key], transforms=_select_transforms(image_transforms, [input_key]), **image_reader_kwargs
     )
-    row = target_class.create(
+    row = target_class.from_dict(
         row, keys=[target_key], transforms=_select_transforms(image_transforms, [target_key]), **image_reader_kwargs
     )
 
@@ -906,12 +906,14 @@ def _load_dataset_dataframe(
 ):
     "Load dataset metadata into a DataFrame."
 
-    return pd.DataFrame(
-        BioDataLoaders._load_data(
-            data_paths,
-            colmap=colmap,
-        )
-    )
+    ctx = PipelineContext(
+            data=data_paths,
+            config={"get_items": colmap}
+            )
+
+    ctx = BioDataLoaders._load_data(ctx)
+
+    return pd.DataFrame(ctx.records)
 
 
 def _build_dataset_splits(
