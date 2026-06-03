@@ -8,7 +8,7 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'PipelineContext', 'detect_source', 'build_source', 'BaseSource', 'DictSource', 'DataFrameSource',
            'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin',
            'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BaseTask',
-           'ClassificationTask', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv',
+           'ClassificationTask', 'BioDataLoaders', 'BioImageBlock', 'from_source', 'from_folder', 'from_df', 'from_csv',
            'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv',
            'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader']
 
@@ -1896,6 +1896,14 @@ class BioDataLoaders(DataLoaders):
         )
 
 # %% ../../nbs/022_data.load.ipynb #5bec1991
+# =================================================================
+# WE CREATE THE MISSING BLOCK SO THE FACTORY METHODS CAN USE IT
+# =================================================================
+def BioImageBlock(cls=BioImage):
+    """A fastai block specifically for loading BioImages."""
+    # Assuming BioImage has a .create method. If not, TransformBlock handles it.
+    return TransformBlock(type_tfms=getattr(cls, 'create', cls))
+
 def from_source(cls, 
                 data_source, # The source of the data to be loaded by the dataloader. This can be any type that is compatible with the dataloading method specified in kwargs (e.g., paths, datasets).
                 show_summary:bool=False, # If True, print a summary of the BioDataBlock after creation.
@@ -2460,7 +2468,12 @@ def test_biodataloader(dls:DataLoaders,
                        csv_delimiter=None, 
                        csv_quoting=0
                        ):
-    "Test a `DataLoader` on a set of `test_files` and return the results as a list of tuples containing the file name and the corresponding input and target tensors."
+    """
+    Create a test `DataLoader` from various data sources (DataFrame, CSV, Directory, or MONAI Dataset).
+    
+    Returns:
+        A PyTorch/fastai DataLoader configured for testing/inference.
+    """
     if isinstance(test_data, pd.DataFrame):
         # Handle DataFrame case directly
         test_dl = dls.test_dl(test_data, with_labels=with_labels)
