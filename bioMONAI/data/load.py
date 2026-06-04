@@ -8,7 +8,7 @@ __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGIS
            'PipelineContext', 'detect_source', 'build_source', 'BaseSource', 'DictSource', 'DataFrameSource',
            'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin',
            'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BaseTask',
-           'ClassificationTask', 'BioDataLoaders', 'from_source', 'from_folder', 'from_df', 'from_csv',
+           'ClassificationTask', 'BioDataLoaders', 'BioImageBlock', 'from_source', 'from_folder', 'from_df', 'from_csv',
            'class_from_folder', 'class_from_path_func', 'class_from_path_re', 'class_from_df', 'class_from_csv',
            'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds', 'test_biodataloader']
 
@@ -1896,6 +1896,14 @@ class BioDataLoaders(DataLoaders):
         )
 
 # %% ../../nbs/022_data.load.ipynb #5bec1991
+# =================================================================
+# WE CREATE THE MISSING BLOCK SO THE FACTORY METHODS CAN USE IT
+# =================================================================
+def BioImageBlock(cls=BioImage):
+    """A fastai block specifically for loading BioImages."""
+    # Assuming BioImage has a .create method. If not, TransformBlock handles it.
+    return TransformBlock(type_tfms=getattr(cls, 'create', cls))
+
 def from_source(cls, 
                 data_source, # The source of the data to be loaded by the dataloader. This can be any type that is compatible with the dataloading method specified in kwargs (e.g., paths, datasets).
                 show_summary:bool=False, # If True, print a summary of the BioDataBlock after creation.
@@ -1925,7 +1933,9 @@ def from_source(cls,
     
     # Optionally print a summary of the BioDataBlock if show_summary is True
     if show_summary:
-        bs = dataloader_ops['bs'] if dataloader_ops['bs'] is not None else 1
+        # bs = dataloader_ops['bs'] if dataloader_ops['bs'] is not None else 1
+        # securely get batch size with a default of 1 if not specified
+        bs = dataloader_ops.get('bs', 1)
         print(datablock.summary(data_source, bs=bs))
     
     return dataloder
@@ -1938,7 +1948,7 @@ def from_folder(cls, path, get_target_fn, train='train', valid='valid', valid_pc
     if get_items is None:
         get_items = get_image_files if valid_pct else partial(get_image_files, folders=[train, valid])
     ops = { 
-        'blocks':       (img_cls.get_datablock(), target_img_cls.get_datablock()),
+        'blocks':       (BioImageBlock(img_cls), BioImageBlock(target_img_cls)),
         'get_items':    get_items,
         'splitter':     splitter,
         'get_y':        get_target_fn,
@@ -1972,7 +1982,7 @@ def from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col=0, folder=None, 
     
     target_img_cls = img_cls if target_img_cls is None else target_img_cls
     ops = { 
-        'blocks':       (img_cls.get_datablock(), target_img_cls.get_datablock()),
+        'blocks':       (BioImageBlock(img_cls), BioImageBlock(target_img_cls)),
         'get_items':    None,
         'splitter':     splitter,
         'get_x':        ColReader(fn_col, pref=pref, suff=suff),
@@ -1996,7 +2006,7 @@ def class_from_folder(cls, path, train='train', valid='valid', valid_pct=None, s
     splitter = GrandparentSplitter(train_name=train, valid_name=valid) if valid_pct is None else RandomSplitter(valid_pct, seed=seed)
     get_items = get_image_files if valid_pct else partial(get_image_files, folders=[train, valid])
     ops = { 
-        'blocks':       (img_cls.get_datablock(), CategoryBlock(vocab=vocab)),
+        'blocks':       (BioImageBlock(img_cls), CategoryBlock(vocab=vocab)),
         'get_items':    get_items,
         'splitter':     splitter,
         'get_y':        parent_label,
@@ -2011,7 +2021,7 @@ def class_from_path_func(cls, path, fnames, label_func, valid_pct=0.2, seed=None
                     img_cls=BioImage, **kwargs):
     "Create from list of `fnames` in `path`s with `label_func`"
     ops = { 
-        'blocks':       (img_cls.get_datablock, CategoryBlock),
+        'blocks':       (BioImageBlock(img_cls), CategoryBlock),
         'splitter':     RandomSplitter(valid_pct, seed=seed),
         'get_y':        label_func,
         'item_tfms':    item_tfms,
@@ -2044,7 +2054,7 @@ def class_from_df(cls, df, path='.', valid_pct=0.2, seed=None, fn_col='filename'
     splitter = _split      
 
     ops = { 
-        'blocks':       (img_cls.get_datablock(), y_block),
+        'blocks':       (BioImageBlock(img_cls), y_block),
         'get_items':    None,
         'splitter':     splitter,
         'get_x':        ColReader(fn_col, pref=pref, suff=suff),
@@ -2069,7 +2079,7 @@ def class_from_lists(cls, path, fnames, labels, valid_pct=0.2, seed:int=None, y_
         y_block = MultiCategoryBlock if is_listy(labels[0]) and len(labels[0]) > 1 else (
             RegressionBlock if isinstance(labels[0], float) else CategoryBlock)
     ops = { 
-        'blocks':       (img_cls.get_datablock(), y_block),
+        'blocks':       (BioImageBlock(img_cls), y_block),
         'splitter':     RandomSplitter(valid_pct, seed=seed),
         'item_tfms':    item_tfms,
         'batch_tfms':   batch_tfms,
@@ -2136,7 +2146,7 @@ def from_yaml(cls, data_source, yaml_path, show_summary:bool=False):
 
     # Update biodatablock_ops with the splitter
     biodatablock_ops.update({
-        "blocks": (BioImage.get_datablock(), CategoryBlock),
+        "blocks": (BioImageBlock(cls=BioImage), CategoryBlock),
         "get_items": get_items,
         "splitter": splitter,
         "get_y": parent_label,
@@ -2144,18 +2154,18 @@ def from_yaml(cls, data_source, yaml_path, show_summary:bool=False):
         "batch_tfms": batch_tfms
     })
 
-        # Optionally print a summary of the BioDataBlock if show_summary is True
-    if show_summary:
-        bs = biodataloader_ops['bs'] if biodataloader_ops['bs'] is not None else 1
-        print(datablock.summary(data_source, bs=bs))
-    
-    
     biodatablock_ops = {key: value for key, value in biodatablock_ops.items() if value is not None}
 
     biodataloader_ops = {key: value for key, value in biodataloader_ops.items() if value is not None}
     
     # Create BioDataBlock
     datablock = BioDataBlock(**biodatablock_ops)
+
+    # Optionally print a summary of the BioDataBlock if show_summary is True
+    if show_summary:
+        bs = biodataloader_ops['bs'] if biodataloader_ops['bs'] is not None else 1
+        print(datablock.summary(data_source, bs=bs))
+
 
     # Unpack biodataloader_ops directly (including bs)
     dataloder = datablock.dataloaders(data_source, **biodataloader_ops)
@@ -2187,7 +2197,7 @@ BioDataLoaders.class_from_path_func = delegates(to=BioDataLoaders.from_source)(B
 BioDataLoaders.class_from_df = delegates(to=BioDataLoaders.from_source)(BioDataLoaders.class_from_df)
 BioDataLoaders.class_from_csv = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_csv)
 BioDataLoaders.class_from_path_re = delegates(to=BioDataLoaders.class_from_path_func)(BioDataLoaders.class_from_path_re)
-BioDataLoaders.class_from_lists = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_csv)
+BioDataLoaders.class_from_lists = delegates(to=BioDataLoaders.class_from_df)(BioDataLoaders.class_from_lists)
 
 # %% ../../nbs/022_data.load.ipynb #13f09332
 def from_monai(
@@ -2458,7 +2468,12 @@ def test_biodataloader(dls:DataLoaders,
                        csv_delimiter=None, 
                        csv_quoting=0
                        ):
-    "Test a `DataLoader` on a set of `test_files` and return the results as a list of tuples containing the file name and the corresponding input and target tensors."
+    """
+    Create a test `DataLoader` from various data sources (DataFrame, CSV, Directory, or MONAI Dataset).
+    
+    Returns:
+        A PyTorch/fastai DataLoader configured for testing/inference.
+    """
     if isinstance(test_data, pd.DataFrame):
         # Handle DataFrame case directly
         test_dl = dls.test_dl(test_data, with_labels=with_labels)
