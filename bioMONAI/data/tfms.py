@@ -616,7 +616,7 @@ def split_dataframe(
             name: (
                 split.copy()
                 if isinstance(split, pd.DataFrame)
-                else work_df.loc[split].copy()
+                else work_df.iloc[split].copy()  # <-- Changed to .iloc
             )
             for name, split in splits.items()
         }
@@ -631,7 +631,7 @@ def split_dataframe(
             name: (
                 split.copy()
                 if isinstance(split, pd.DataFrame)
-                else work_df.loc[split].copy()
+                else work_df.iloc[split].copy()  # <-- Changed to .iloc
             )
             for name, split in zip(split_names, splits)
         }
