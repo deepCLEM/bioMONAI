@@ -426,37 +426,25 @@ class Resample(MonaiTransform):
     """
     A subclass of Spacing that handles image resampling based on specified sampling factors or voxel dimensions.
     
-    The `Resample` class does not inherit from MONAI's `Resample` but from `Spacing` and provides a flexible way to adjust the spacing (voxel size) of images by specifying either a sampling factor or explicitly providing new voxel dimensions.
-    
+    The `Resample` class provides a flexible way to adjust the spacing (voxel size) of images 
+    by specifying either a sampling factor or explicitly providing new voxel dimensions.
     """
     _monai_transform = mt.Spacing
 
-    @classmethod
-    def _prepare_backend_args_kwargs(cls, args, kwargs):
-        if "sampling" in kwargs and "pixdim" not in kwargs:
-            kwargs["pixdim"] = kwargs.pop("sampling")
-        return args, kwargs
-
-    def __init__(
-        self,
-        sampling=None,        # isotropic factor OR pixdim fallback
-        keys=None,
-        **kwargs
-    ):
-        """
-        If `pixdim` is provided in kwargs, it is used directly.
-        Otherwise `sampling` is used as pixdim.
-        """
-
+    def __new__(cls, sampling=None, *args, backend="monai", keys=None, **kwargs):
+        # Capturamos sampling posicionalmente. Si no existe, comprobamos si pasaron pixdim por kwargs
         if 'pixdim' not in kwargs:
             if sampling is None:
                 raise ValueError("Provide either `sampling` or `pixdim`")
             kwargs['pixdim'] = sampling
+            
+        return super().__new__(cls, *args, backend=backend, keys=keys, **kwargs)
 
-        super().__init__(
-            keys=keys,
-            **kwargs
-        )
+    def __init__(self, sampling=None, *args, keys=None, backend="fastai", **kwargs):
+        if 'pixdim' not in kwargs:
+            kwargs['pixdim'] = sampling
+            
+        super().__init__(*args, keys=keys, backend=backend, **kwargs)
 
 # %% ../nbs/030_transforms.ipynb #efd4242e
 class Spacing(MonaiTransform):
@@ -506,16 +494,35 @@ class Resize(MonaiTransform):
 # %% ../nbs/030_transforms.ipynb #bb51abb4
 class Crop(MonaiTransform):
     """
-    MONAI Crop wrapper using MonaiTransform.
+    MONAI SpatialCrop wrapper using MonaiTransform.
 
     Supports:
     - MetaTensor (preserves spatial metadata)
-    - dict (Crop*d auto-inferred)
+    - dict (SpatialCropd auto-inferred)
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = mt.Crop
+    _monai_transform = mt.SpatialCrop
 
+    def __init__(
+        self,
+        roi_center=None, 
+        roi_size=None, 
+        roi_start=None, 
+        roi_end=None, 
+        roi_slices=None,
+        keys=None,
+        **kwargs
+    ):
+        super().__init__(
+            roi_center=roi_center,
+            roi_size=roi_size,
+            roi_start=roi_start,
+            roi_end=roi_end,
+            roi_slices=roi_slices,
+            keys=keys,
+            **kwargs
+        )
 
 # %% ../nbs/030_transforms.ipynb #9cceb4af
 class SpatialCrop(MonaiTransform):
@@ -524,12 +531,31 @@ class SpatialCrop(MonaiTransform):
 
     Supports:
     - MetaTensor (preserves spatial metadata)
-    - dict (SpatialCrop*d auto-inferred)
+    - dict (SpatialCropd auto-inferred)
     - BioImageBase
     - NumPy arrays
     """
     _monai_transform = mt.SpatialCrop
 
+    def __init__(
+        self,
+        roi_center=None, 
+        roi_size=None, 
+        roi_start=None, 
+        roi_end=None, 
+        roi_slices=None,
+        keys=None,
+        **kwargs
+    ):
+        super().__init__(
+            roi_center=roi_center,
+            roi_size=roi_size,
+            roi_start=roi_start,
+            roi_end=roi_end,
+            roi_slices=roi_slices,
+            keys=keys,
+            **kwargs
+        )
 
 # %% ../nbs/030_transforms.ipynb #89d29c18
 class CenterSpatialCrop(MonaiTransform):
@@ -538,7 +564,7 @@ class CenterSpatialCrop(MonaiTransform):
 
     Supports:
     - MetaTensor (preserves spatial metadata)
-    - dict (CenterSpatialCrop*d auto-inferred)
+    - dict (CenterSpatialCropd auto-inferred)
     - BioImageBase
     - NumPy arrays
     """
@@ -667,11 +693,22 @@ class Pad(MonaiTransform):
 
     Supports:
     - MetaTensor (preserves spatial metadata)
-    - dict (Pad*d auto-inferred)
+    - dict (Padd auto-inferred)
     - BioImageBase
     - NumPy arrays
     """
     _monai_transform = mt.Pad
+
+    @classmethod
+    def _create_dict_transform(cls, keys, *args, **kwargs):
+        # MONAI's Padd is an architectural exception: it requires an instantiated 
+        # 'padder' object rather than raw arguments like 'to_pad'.
+        padder_obj = cls._monai_transform(*args, **kwargs)
+        
+        # Extract 'mode' if provided, as Padd also expects it at the dict level
+        mode = kwargs.get("mode", "constant")
+        
+        return mt.Padd(keys=keys, padder=padder_obj, mode=mode)
 
 # %% ../nbs/030_transforms.ipynb #c1536f5c
 class SpatialPad(MonaiTransform):
@@ -912,6 +949,31 @@ class GridSplit(MonaiTransform):
     _monai_transform = mt.GridSplit
 
 # %% ../nbs/030_transforms.ipynb #86723835
+class _StaticSpatialResample(mt.SpatialResample):
+    """Internal patch to allow static initialization of spatial_size and dst_affine."""
+    def __init__(self, spatial_size=None, dst_affine=None, **kwargs):
+        super().__init__(**kwargs)
+        self.spatial_size = spatial_size
+        self.dst_affine = dst_affine
+        
+    def __call__(self, img, **kwargs):
+        # Inject our static parameters automatically during the pipeline execution
+        kwargs.setdefault("spatial_size", self.spatial_size)
+        kwargs.setdefault("dst_affine", self.dst_affine)
+        return super().__call__(img, **kwargs)
+
+class _StaticSpatialResampled(mt.SpatialResampled):
+    """Internal patch for dictionary-based static initialization."""
+    def __init__(self, keys, spatial_size=None, dst_affine=None, **kwargs):
+        super().__init__(keys, **kwargs)
+        self.spatial_size = spatial_size
+        self.dst_affine = dst_affine
+        
+    def __call__(self, data, **kwargs):
+        kwargs.setdefault("spatial_size", self.spatial_size)
+        kwargs.setdefault("dst_affine", self.dst_affine)
+        return super().__call__(data, **kwargs)
+
 class SpatialResample(MonaiTransform):
     """
     MONAI SpatialResample wrapper using MonaiTransform.
@@ -922,7 +984,12 @@ class SpatialResample(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = mt.SpatialResample
+    _monai_transform = _StaticSpatialResample
+
+    @classmethod
+    def _create_dict_transform(cls, keys, *args, **kwargs):
+        # Override to ensure the dict inference uses our patched dictionary subclass
+        return _StaticSpatialResampled(keys, *args, **kwargs)
 
 # %% ../nbs/030_transforms.ipynb #b893c9a2
 class ResampleToMatch(MonaiTransform):
@@ -938,6 +1005,24 @@ class ResampleToMatch(MonaiTransform):
     _monai_transform = mt.ResampleToMatch
 
 # %% ../nbs/030_transforms.ipynb #2a6317ac
+import warnings
+import monai.transforms as mt
+
+class _QuietOrientation(mt.Orientation):
+    """Internal patch to suppress MONAI's FutureWarning regarding labels."""
+    def __init__(self, *args, **kwargs):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            super().__init__(*args, **kwargs)
+
+class _QuietOrientationd(mt.Orientationd):
+    """Internal patch to suppress MONAI's FutureWarning for dictionary inputs."""
+    def __init__(self, *args, **kwargs):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            super().__init__(*args, **kwargs)
+
+
 class Orientation(MonaiTransform):
     """
     MONAI Orientation wrapper using MonaiTransform.
@@ -948,7 +1033,12 @@ class Orientation(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = mt.Orientation
+    _monai_transform = _QuietOrientation
+
+    @classmethod
+    def _create_dict_transform(cls, keys, *args, **kwargs):
+        # Override to ensure the dict inference uses our quiet dictionary subclass
+        return _QuietOrientationd(keys, *args, **kwargs)
 
 # %% ../nbs/030_transforms.ipynb #72313503
 class Affine(MonaiTransform):
@@ -964,19 +1054,50 @@ class Affine(MonaiTransform):
     _monai_transform = mt.Affine
 
 # %% ../nbs/030_transforms.ipynb #1f9f82c4
+import monai.transforms as mt
+
+class _StaticAffineGrid(mt.AffineGrid):
+    """Internal patch to allow static initialization of spatial_size."""
+    def __init__(self, spatial_size=None, **kwargs):
+        super().__init__(**kwargs)
+        self.spatial_size = spatial_size
+        
+    def __call__(self, spatial_size=None, **kwargs):
+        # If spatial_size is passed during the call (dynamic), use it.
+        # Otherwise, fall back to the one defined during __init__ (static).
+        target_size = spatial_size if spatial_size is not None else self.spatial_size
+        return super().__call__(spatial_size=target_size, **kwargs)
+
 class AffineGrid(MonaiTransform):
     """
     MONAI AffineGrid wrapper using MonaiTransform.
 
     Supports:
     - MetaTensor (preserves spatial metadata)
-    - dict (AffineGrid*d auto-inferred)
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = mt.AffineGrid
+    _monai_transform = _StaticAffineGrid
 
 # %% ../nbs/030_transforms.ipynb #1e0bc9f5
+import monai.transforms as mt
+
+class _SafeGridDistortion(mt.GridDistortion):
+    """Internal patch to handle MONAI's strictly required arguments in proper positional order."""
+    def __init__(self, num_cells=5, distort_steps=None, **kwargs):
+        # We guarantee a value exists. If omitted, we pass an empty list.
+        steps = [] if distort_steps is None else distort_steps
+        # Pass num_cells and steps strictly in their required positional order
+        super().__init__(num_cells, steps, **kwargs)
+
+class _SafeGridDistortiond(mt.GridDistortiond):
+    """Internal patch for dict-based GridDistortion."""
+    def __init__(self, keys, num_cells=5, distort_steps=None, **kwargs):
+        steps = [] if distort_steps is None else distort_steps
+        # Pass keys, num_cells, and steps strictly in their required positional order
+        super().__init__(keys, num_cells, steps, **kwargs)
+
+
 class GridDistortion(MonaiTransform):
     """
     MONAI GridDistortion wrapper using MonaiTransform.
@@ -987,7 +1108,12 @@ class GridDistortion(MonaiTransform):
     - BioImageBase
     - NumPy arrays
     """
-    _monai_transform = mt.GridDistortion
+    _monai_transform = _SafeGridDistortion
+
+    @classmethod
+    def _create_dict_transform(cls, keys, *args, **kwargs):
+        # Override to ensure the dict inference uses our patched dictionary subclass
+        return _SafeGridDistortiond(keys, *args, **kwargs)
 
 # %% ../nbs/030_transforms.ipynb #db4c0435
 class GaussianSmooth(MonaiTransform):
@@ -1076,7 +1202,7 @@ class GaussianSharpen(MonaiTransform):
     """
     _monai_transform = mt.GaussianSharpen
 
-    def __init__(self, sigma1=3.0, sigma2=1.0, alpha=30.0, approx="erf", **kwargs):
+    def __init__(self, sigma1=0.5, sigma2=3.0, alpha=10.0, approx="erf", **kwargs):
         super().__init__(
             sigma1=sigma1,
             sigma2=sigma2,
@@ -1156,10 +1282,10 @@ def _scale_intensity_range(x,   # The input image to scale.
 # %% ../nbs/030_transforms.ipynb #1f6fe6dd
 class ScaleImage(Transform):
     """Image normalization."""
-    def __init__(x,                 # The input image to scale.
-                 min=0.0,           # The minimum intensity value.
-                 max=1.0,           # The maximum intensity value.
-                 axis=None,         # The axis or axes along which to compute the minimum and maximum values.
+    def __init__(self,              # The Transform configuration.
+                 min=0.0,           # The minimum intensity value of the output.
+                 max=1.0,           # The maximum intensity value of the output.
+                 axis=None,         # The axis or axes along which to compute the min/max values.
                  eps=1e-20,         # A small value to prevent division by zero.
                  dtype=np_float32,  # The data type to use for the output image.
                  ):
@@ -1169,8 +1295,8 @@ class ScaleImage(Transform):
         """Apply intensity scaling to a BioImageBase object."""
         bioimagetype = type(x)
         y = _scale_intensity_range(x, x.min(), x.max(), eps=self.eps, dtype=self.dtype)
-        y *= self.max
-        y += self.min
+        # Correctly scale from [0, 1] to the target [self.min, self.max] range
+        y = y * (self.max - self.min) + self.min 
         return bioimagetype(y)
     
     def encodes(self, x: np.ndarray):
@@ -1181,17 +1307,19 @@ class ScaleImage(Transform):
         y = y * (self.max - self.min) + self.min  # Scale to [min, max]
         return y.astype(self.dtype)
 
+# %% ../nbs/030_transforms.ipynb #53a06477
+show_doc(ScaleImage)
 
 # %% ../nbs/030_transforms.ipynb #567bbaab
 class ScaleImagePercentiles(Transform):
     """Percentile-based image normalization."""
-    def __init__(x,                 # The input image to scale.
-                 pmin=3,            # The minimum percentile value.
-                 pmax=99.8,         # The maximum percentile value.
-                 axis=None,         # The axis or axes along which to compute the minimum and maximum values.
-                 clip=True,         # If True, clips the output values to the specified range.
-                 b_min=0.0,         # The minimum intensity value.
-                 b_max=1.0,         # The maximum intensity value.
+    def __init__(self,              # The Transform configuration.
+                 pmin=3.0,          # The minimum percentile value (0-100).
+                 pmax=99.8,         # The maximum percentile value (0-100).
+                 axis=None,         # The axis or axes along which to compute the min/max percentiles.
+                 clip=True,         # If True, clips the output values to the specified [b_min, b_max] range.
+                 b_min=0.0,         # The minimum intensity bound after scaling.
+                 b_max=1.0,         # The maximum intensity bound after scaling.
                  eps=1e-20,         # A small value to prevent division by zero.
                  dtype=np_float32,  # The data type to use for the output image.
                  ):
@@ -1200,23 +1328,27 @@ class ScaleImagePercentiles(Transform):
     def encodes(self, x: BioImageBase):
         """Apply percentile-based normalization to a BioImageBase object."""
         bioimagetype = type(x)
-        mi = percentile(x, self.pmin, axis=self.axis, keepdims=True)
-        ma = percentile(x, self.pmax, axis=self.axis, keepdims=True)
+        # Convert to numpy for stable percentile calculation if it's a tensor
+        x_np = x.cpu().numpy() if hasattr(x, 'cpu') else x
+        mi = np.percentile(x_np, self.pmin, axis=self.axis, keepdims=True)
+        ma = np.percentile(x_np, self.pmax, axis=self.axis, keepdims=True)
+        
+        scaled = _scale_intensity_range(x, mi, ma, eps=self.eps, dtype=self.dtype)
         if self.clip:
-            return bioimagetype(np.clip(_scale_intensity_range(x, mi, ma, eps=self.eps, dtype=self.dtype), self.b_min, self.b_max))
-        return bioimagetype(_scale_intensity_range(x, mi, ma, eps=self.eps, dtype=self.dtype))
+            scaled = np.clip(scaled, self.b_min, self.b_max)
+        return bioimagetype(scaled)
     
     def encodes(self, x: np.ndarray):
         """Apply percentile-based normalization to a NumPy array."""
         mi = np.percentile(x, self.pmin, axis=self.axis, keepdims=True)
         ma = np.percentile(x, self.pmax, axis=self.axis, keepdims=True)
+        
         scaled = (x - mi) / (ma - mi + self.eps)
         scaled = scaled.astype(self.dtype)
 
         if self.clip:
             return np.clip(scaled, self.b_min, self.b_max)
         return scaled
-
 
 # %% ../nbs/030_transforms.ipynb #21775c1d
 class ScaleImageVariance(fastTransform):
@@ -1231,16 +1363,18 @@ class ScaleImageVariance(fastTransform):
     def encodes(self, x: BioImageBase):
         """Apply intensity variance scaling to a BioImageBase object."""
         bioimagetype = type(x)
-        # Calculate the current variance of the image intensities
-        mean, variance = torchmean(x), torchvar(x)
+        # We assume x is a tensor; using standard torch methods
+        mean, variance = x.mean(), x.var()
         if variance == 0:
-            return bioimagetype(x)  # Avoid division by zero
-        # Calculate the scaling factor based on the ratio of target to current variance
+            return bioimagetype(x)
+        
         scale_factor = (self.target_variance / variance).sqrt()
-        # Apply the scaling factor to each channel in the image
-        if x.ndim == self.ndim + 1:  # Check if it's a multi-channel image (e.g., RGB)
+        
+        # Apply scaling. If image is multi-channel (C, Z, Y, X), we subtract the global mean 
+        # or channel mean depending on expected behavior. Here we follow your logic:
+        if x.ndim == self.ndim + 1:
             for i in range(x.shape[0]):
-                x[i] = (x[i] - mean) * scale_factor
+                x[i] = (x[i] - x[i].mean()) * scale_factor
         else:
             x = (x - mean) * scale_factor
         return bioimagetype(x)
@@ -1250,12 +1384,11 @@ class ScaleImageVariance(fastTransform):
         mean = np.mean(x)
         variance = np.var(x)
         if variance == 0:
-            return x  # Avoid division by zero
+            return x
         scale_factor = np.sqrt(self.target_variance / variance)
         return (x - mean) * scale_factor
 
-
-# %% ../nbs/030_transforms.ipynb #18c593a5
+# %% ../nbs/030_transforms.ipynb #e61034e1
 class ScaleIntensity(MonaiTransform):
     """
     Scale image intensity to a specified range or by a multiplicative factor.
@@ -1286,6 +1419,7 @@ class ScaleIntensity(MonaiTransform):
         )
 
 
+# %% ../nbs/030_transforms.ipynb #45f0c519
 class ScaleIntensityFixedMean(MonaiTransform):
     """
     Scale intensity while preserving the original mean.
@@ -1320,6 +1454,8 @@ class ScaleIntensityFixedMean(MonaiTransform):
         )
 
 
+
+# %% ../nbs/030_transforms.ipynb #18c593a5
 class ScaleIntensityRange(MonaiTransform):
     """
     Linearly rescale intensities from one range to another.
@@ -1354,6 +1490,7 @@ class ScaleIntensityRange(MonaiTransform):
         )
 
 
+# %% ../nbs/030_transforms.ipynb #ef2051ff
 class ScaleIntensityRangePercentiles(MonaiTransform):
     """
     Scale intensity values based on image percentiles.
@@ -1431,6 +1568,7 @@ class NormalizeIntensity(MonaiTransform):
         )
 
 
+# %% ../nbs/030_transforms.ipynb #b667ddca
 class HistogramNormalize(MonaiTransform):
     """
     Normalize image intensity using histogram equalization.
@@ -1486,6 +1624,10 @@ class AdjustContrast(MonaiTransform):
         )
 
 # %% ../nbs/030_transforms.ipynb #95558960
+from fasttransform import Transform
+from fastcore.basics import store_attr
+import numpy as np
+
 class RelabelInstances(Transform):
     """Remap instance mask labels to consecutive integers.
     
@@ -1499,87 +1641,74 @@ class RelabelInstances(Transform):
                  ):
         store_attr()
 
-    def encodes(self, x: BioImageBase):
-        bioimagetype = type(x)
-
+    def encodes(self, x):
+        """Relabel instance mask (Handles both ndarray and BioImageBase)."""
+        # 1. Ensure we are working with a numpy array
         arr = np.asarray(x)
 
+        # 2. Find unique labels and exclude background
         unique_labels = np.unique(arr)
         fg_labels = unique_labels[unique_labels != self.background]
 
+        # 3. Create mapping dictionary
         new_ids = np.arange(1, len(fg_labels) + 1, dtype=self.dtype)
         mapping = dict(zip(fg_labels, new_ids))
 
+        # 4. Apply mapping to a new empty array
         y = np.full_like(arr, self.background, dtype=self.dtype)
-
         for old_id, new_id in mapping.items():
             y[arr == old_id] = new_id
 
-        return bioimagetype(y)
-    
-    def encodes(self, x: np.ndarray):
-        """Relabel instance mask (NumPy array)."""
-
-        x = np.asarray(x)
-
-        unique_labels = np.unique(x)
-
-        # Remove background from remapping
-        fg_labels = unique_labels[unique_labels != self.background]
-
-        # Create mapping dictionary
-        new_ids = np.arange(1, len(fg_labels) + 1, dtype=self.dtype)
-        mapping = dict(zip(fg_labels, new_ids))
-
-        # Initialize output
-        y = np.full_like(x, self.background, dtype=self.dtype)
-
-        # Apply mapping
-        for old_id, new_id in mapping.items():
-            y[x == old_id] = new_id
-
-        return y
+        # 5. Return the same type we received
+        if isinstance(x, np.ndarray) and type(x) is np.ndarray:
+            return y
+        return type(x)(y)
 
 # %% ../nbs/030_transforms.ipynb #1ffaa4e5
-class InstanceToMaskAndDistance(fastTransform):
+from fasttransform import Transform
+from fastcore.basics import store_attr
+import numpy as np
+from scipy.ndimage import distance_transform_edt
+
+class InstanceToMaskAndDistance(Transform):
     """
     Converts a single-channel instance segmentation map (CHW or CDHW)
     into a 2-channel image:
 
     Channel 0: Binary mask (instances > 0)
-    Channel 1: Distance transform (inside objects)
+    Channel 1: Distance transform (inside objects, globally normalized)
     """
 
     def __init__(self, 
-                 normalize=True,     # Normalize distance map per instance
+                 normalize=True,     # Normalize distance map globally to [0, 1]
                  ):
         store_attr()
 
-    def encodes(self, img: BioImageBase):
-        return type(img)(self._process(img.numpy()))
+    def encodes(self, img):
+        # 1. Store original type
+        is_ndarray = isinstance(img, np.ndarray) and type(img) is np.ndarray
+        orig_type = type(img)
+        
+        # 2. Convert to numpy and validate
+        arr = np.asarray(img)
+        assert arr.shape[0] == 1, "Input must have exactly 1 channel"
 
-    def encodes(self, img: np.ndarray):
-        return self._process(img)
-
-    def _process(self, img: np.ndarray):
-        """
-        img: (C,H,W) or (C,D,H,W) with C=1
-        """
-        assert img.shape[0] == 1, "Input must have exactly 1 channel"
-
-        inst = img[0]
+        inst = arr[0]
         binary = (inst > 0).astype(np.uint8)
 
-        # distance inside objects
+        # 3. Distance inside objects
         dist = distance_transform_edt(binary)
 
         if self.normalize and dist.max() > 0:
             dist = dist / dist.max()
 
-        # stack channels
-        out = np.stack([binary, dist], axis=0)
+        # 4. Stack channels
+        out = np.stack([binary, dist], axis=0).astype(np.float32)
 
-        return out.astype(np.float32)
+        # 5. Return correct type
+        if is_ndarray:
+            return out
+        return orig_type(out)
 
 # %% ../nbs/030_transforms.ipynb #f751f799
 class ComputeHoVerMaps(MonaiTransform):
@@ -1596,7 +1725,7 @@ class ComputeHoVerMaps(MonaiTransform):
 
     _monai_transform = mt.ComputeHoVerMaps
 
-# %% ../nbs/030_transforms.ipynb #c2c0c55f
+# %% ../nbs/030_transforms.ipynb #7d67fcc1
 class ThresholdIntensity(MonaiTransform):
     """
     Filter image intensities using a threshold.
@@ -1608,7 +1737,8 @@ class ThresholdIntensity(MonaiTransform):
     threshold : float
         Intensity threshold.
     above : bool
-        If True, filter values above the threshold.
+        If True, KEEPS values strictly above the threshold and replaces the rest.
+        If False, KEEPS values strictly below the threshold and replaces the rest.
     cval : float
         Fill value for filtered pixels.
     """
@@ -1622,7 +1752,7 @@ class ThresholdIntensity(MonaiTransform):
             **kwargs
         )
 
-
+# %% ../nbs/030_transforms.ipynb #4dc0cfdb
 class MaskIntensity(MonaiTransform):
     """
     Mask intensity values using a binary mask.
@@ -1646,6 +1776,7 @@ class MaskIntensity(MonaiTransform):
         )
 
 
+# %% ../nbs/030_transforms.ipynb #c2c0c55f
 class ForegroundMask(MonaiTransform):
     """
     Generate a binary foreground mask based on image intensity.
@@ -1673,30 +1804,49 @@ class ForegroundMask(MonaiTransform):
 from skimage.color import rgb2hed, hed2rgb
 
 # %% ../nbs/030_transforms.ipynb #1da05998
+from fasttransform import Transform
+from skimage.color import rgb2hed, hed2rgb
+import numpy as np
+
 class RGB2HED(Transform):
     """Convert RGB images to HED color space."""
-    def encodes(self, x: BioImageBase):
-        bioimagetype = type(x)
-        x = ScaleIntensity()(x).numpy()  # Ensure the image is scaled to [0, 1] before conversion
-        ihc = rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
-        return bioimagetype(torchTensor(ihc))  # Return the converted image with the same type as the input
-    
-    def encodes(self, x: np.ndarray):
-        x = ScaleIntensity()(x)  # Ensure the image is scaled to [0, 1] before conversion
-        return rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
+    def encodes(self, x):
+        is_ndarray = isinstance(x, np.ndarray) and type(x) is np.ndarray
+        orig_type = type(x)
+        
+        arr = np.asarray(x).astype(np.float32)
+        # Normalize strictly without distorting relative colors (if uint8)
+        if arr.max() > 1.5: 
+            arr = arr / 255.0
+            
+        # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
+        hwc_img = arr.transpose(1, 2, 0)
+        hed_hwc = rgb2hed(hwc_img)
+        hed_chw = hed_hwc.transpose(2, 0, 1).astype(np.float32)
+        
+        # Return the converted image with the same type as the input
+        if is_ndarray: 
+            return hed_chw
+        return orig_type(hed_chw)
 
-# %% ../nbs/030_transforms.ipynb #516c0f4f
 class HED2RGB(Transform):
     """Convert HED images back to RGB color space."""
-    def encodes(self, x: BioImageBase):
-        bioimagetype = type(x)
-        x = ScaleIntensity()(x).numpy()  # Ensure the image is scaled to [0, 1] before conversion
-        rgb = hed2rgb(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for hed2rgb, then back to (C, H, W)
-        return bioimagetype(torchTensor(rgb))  # Return the converted image with the same type as the input
-    
-    def encodes(self, x: np.ndarray):
-        x = ScaleIntensity()(x)  # Ensure the image is scaled to [0, 1] before conversion
-        return hed2rgb(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for hed2rgb, then back to (C, H, W)
+    def encodes(self, x):
+        is_ndarray = isinstance(x, np.ndarray) and type(x) is np.ndarray
+        orig_type = type(x)
+        
+        arr = np.asarray(x).astype(np.float32)
+        # Do NOT scale HED channels, it destroys chemical concentrations
+            
+        # Convert from (C, H, W) to (H, W, C) for hed2rgb, then back to (C, H, W)
+        hwc_img = arr.transpose(1, 2, 0)
+        rgb_hwc = hed2rgb(hwc_img)
+        rgb_chw = rgb_hwc.transpose(2, 0, 1).astype(np.float32)
+        
+        # Return the converted image with the same type as the input
+        if is_ndarray: 
+            return rgb_chw
+        return orig_type(rgb_chw)
 
 # %% ../nbs/030_transforms.ipynb #3f829aa9
 def _process_sz(size, ndim=3):
@@ -1798,6 +1948,7 @@ class RandCrop2D(RandTransform):
     performs a center crop during validation.
     """
     split_idx,order = None,1
+    
     def __init__(self, 
         size:int|tuple, # Size to crop to, duplicated if one value is specified
         lazy = False,   # a flag to indicate whether this transform should execute lazily or not. Defaults to False
@@ -1813,7 +1964,8 @@ class RandCrop2D(RandTransform):
     ):
         "Randomly positioning crop if train dataset else center crop"
         self.orig_sz = _get_sz(b)
-        if split_idx: self.ctr = (self.orig_sz)//2
+        if split_idx: 
+            self.ctr = (self.orig_sz)//2
         else:
             wd = self.orig_sz[0] - self.size[0]
             hd = self.orig_sz[1] - self.size[1]
@@ -1831,11 +1983,11 @@ class RandCrop2D(RandTransform):
         half_w, half_h = self.size[0] // 2, self.size[1] // 2
         cx, cy = self.ctr
 
-        # Calculate crop region
-        x_start, x_end = max(cx - half_w, 0), min(cx + half_w, x.shape[0])
-        y_start, y_end = max(cy - half_h, 0), min(cy + half_h, x.shape[1])
+        # CRITICAL FIX: Skip the first dimension (channel) and apply bounds to H and W
+        x_start, x_end = max(cx - half_w, 0), min(cx + half_w, x.shape[1])
+        y_start, y_end = max(cy - half_h, 0), min(cy + half_h, x.shape[2])
 
-        return x[x_start:x_end, y_start:y_end]
+        return x[:, x_start:x_end, y_start:y_end]
 
 # %% ../nbs/030_transforms.ipynb #4ae153f1
 class RandCropND(RandTransform):
@@ -1886,9 +2038,9 @@ class RandCropND(RandTransform):
     
     def encodes(self, x: np.ndarray):
         """Apply spatial cropping to a NumPy array."""
-        slices = tuple(slice(t, b) for t, b in zip(self.tl, self.br))
+        # CRITICAL FIX: Skip the first dimension (batch/channel) to avoid IndexErrors
+        slices = (slice(None),) + tuple(slice(t, b) for t, b in zip(self.tl, self.br))
         return x[slices]
-    
 
 # %% ../nbs/030_transforms.ipynb #f0512685
 class RandRotate90(RandMonaiTransform):
@@ -1966,6 +2118,9 @@ class RandZoom(RandMonaiTransform):
         }
 
 # %% ../nbs/030_transforms.ipynb #14c19a89
+import numpy as np
+import torch
+
 class RandCameraNoise(RandTransform):
     """
     Simulates camera noise with typedispatch support:
@@ -2019,7 +2174,7 @@ class RandCameraNoise(RandTransform):
         # dark current
         electrons += rs.poisson(self.dark_current * self.exp_time, size=electrons.shape)
 
-        # read noise (FIX: std should NOT be squared)
+        # read noise
         electrons += rs.normal(scale=self.readout, size=electrons.shape) * (self.bitdepth / 16)
 
         gain = np.broadcast_to(self.gain, electrons.shape).astype(np.float32).copy()
@@ -2027,11 +2182,13 @@ class RandCameraNoise(RandTransform):
 
         if self.camera == 'cmos':
             gain_noise = rs.normal(scale=self.gain_variance, size=electrons.shape)
-            offset_noise = (
-                rs.normal(scale=self.offset_variance, size=electrons.shape)
-                + rs.normal(scale=self.offset_variance, size=(electrons.shape[0],))
-            )
-
+            
+            # CRITICAL FIX: To simulate CMOS banding, apply variance across the Width dimension (Columns)
+            # Assuming standard PyTorch layout: (Channels, Height, Width) -> shape[2] is Width
+            column_noise = rs.normal(scale=self.offset_variance, size=(1, 1, electrons.shape[2]))
+            pixel_noise = rs.normal(scale=self.offset_variance, size=electrons.shape)
+            
+            offset_noise = pixel_noise + column_noise
             gain = gain + gain_noise
             offset = offset + offset_noise
 
@@ -2051,7 +2208,7 @@ class RandCameraNoise(RandTransform):
     # -------------------------
     # torch.Tensor
     # -------------------------
-    def encodes(self, x: torchTensor):
+    def encodes(self, x: torch.Tensor):
         rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
         out = self._apply_noise(x.numpy(), rs)
         return torch.as_tensor(out)
