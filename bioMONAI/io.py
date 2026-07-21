@@ -1691,6 +1691,8 @@ class BioImageReader(ImageReader):
 
 
 # %% ../nbs/010_io.ipynb #49b7b1f2
+from monai.transforms import LoadImage, LoadImaged
+
 # Re-exporting MONAI's standard loaders for convenience within bioMONAI
 LoadImage = LoadImage
 LoadImaged = LoadImaged
