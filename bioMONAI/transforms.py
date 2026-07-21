@@ -1307,9 +1307,6 @@ class ScaleImage(Transform):
         y = y * (self.max - self.min) + self.min  # Scale to [min, max]
         return y.astype(self.dtype)
 
-# %% ../nbs/030_transforms.ipynb #53a06477
-show_doc(ScaleImage)
-
 # %% ../nbs/030_transforms.ipynb #567bbaab
 class ScaleImagePercentiles(Transform):
     """Percentile-based image normalization."""
