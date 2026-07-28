@@ -228,7 +228,7 @@ def show_mosaic(t: np.ndarray | torchTensor,   # 3D image to plot
     plt.imshow(grid[0,:,:], cmap=cmap, alpha=alpha, **kwargs)
     plt.axis('off')
 
-# %% ../nbs/110_visualize.ipynb #ad679cb0
+# %% ../nbs/110_visualize.ipynb #be6a8024
 @delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
 def show_images_grid(images,            # A list of images to display.
                      ax=None,           # The Matplotlib axis to use for plotting.
@@ -1161,7 +1161,7 @@ def plot_roc_curve_with_std_interactive(
         legend=dict(orientation="v")
     )
 
-    fig.show()
+    #fig.show()
 
     return fig
 
