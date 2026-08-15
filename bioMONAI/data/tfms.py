@@ -364,7 +364,7 @@ def show_batch(
     """
     Show `max_n` inputs and targets from a batch.
 
-    Supports both MetaTensor and torch.Tensor inputs.
+    Supports both MetaTensor and torchTensor inputs.
     Converts to BioImage/BioImageMulti automatically.
     """
 
