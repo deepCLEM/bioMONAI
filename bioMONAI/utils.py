@@ -9,8 +9,9 @@ __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNew
            'ensure_tuple_rep', 'noop', 'merge', 'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze',
            'torchmax', 'is_cuda_available', 'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor',
            'route_kwargs', 'read_yaml', 'read_args_from_yaml', 'dictlist_to_funclist', 'dict2string',
-           'add_columns_to_csv', 'ColSplitter', 'TrainTestSplitter', 'FuncSplitter', 'NameSplitter', 'RandomSplitter',
-           'GrandparentSplitter', 'ParentSplitter', 'FileSplitter', 'TargetedTransform', 'apply_transforms']
+           'add_columns_to_csv', 'ColSplitter', 'TrainTestSplitter', 'FuncSplitter', 'IndexSplitter', 'NameSplitter',
+           'RandomSplitter', 'GrandparentSplitter', 'ParentSplitter', 'FileSplitter', 'TargetedTransform',
+           'apply_transforms']
 
 # %% ../nbs/000_utils.ipynb #f6eab00d
 # =================================
@@ -391,6 +392,34 @@ def FuncSplitter(func, **kwargs):
     
     _inner.split_names = kwargs.get("split_names", ("train", "valid"))
     _inner.func = func
+
+    return _inner
+
+# %% ../nbs/000_utils.ipynb #68ed2947
+def IndexSplitter(valid_idx, **kwargs):
+    """
+    Split items so that the provided indices are kept in validation and
+    all remaining indices are assigned to training.
+
+    Args:
+        valid_idx: int or iterable of integers identifying validation items.
+
+    Returns:
+        Callable returning ``(train_idx, valid_idx)`` in fastai-style format.
+    """
+    if isinstance(valid_idx, int):
+        valid_idx = [valid_idx]
+
+    valid_set = set(valid_idx)
+    valid_ordered = sorted(valid_set)
+
+    def _inner(o, **kwargs):
+        n = len(o)
+        train_idx = [i for i in range(n) if i not in valid_set]
+        return list(train_idx), list(valid_ordered)
+
+    _inner.split_names = kwargs.get("split_names", ("train", "valid"))
+    _inner.valid_idx = valid_ordered
 
     return _inner
 
