@@ -41,6 +41,7 @@ import monai.metrics as mm
 # bioMONAI
 # =================================
 from .losses import FRCLoss
+from .utils import *
 
 # %% ../nbs/060_metrics.ipynb #b2246e52
 def get_metric(metric_cls, backend="monai", *args, **kwargs):
