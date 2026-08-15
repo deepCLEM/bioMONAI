@@ -12,8 +12,6 @@ __all__ = ['MetaResolver', 'BioDataClass', 'BioImageBase', 'BioImage', 'BioVolum
 # =================================
 from plum import dispatch
 
-
-
 # =================================
 # fastai
 # =================================
