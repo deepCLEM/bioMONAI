@@ -17,6 +17,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from google_crc32c import value
+
 # =================================
 # Scientific / data
 # =================================
@@ -148,9 +150,6 @@ def is_ome_tiff(path: Path) -> bool:
     return path.suffixes[-2:] == [".ome", ".tiff"]
 
 # %% ../nbs/010_io.ipynb #646c32a6
-from google_crc32c import value
-
-
 def _to_serializable(value):
     """
     Expand metadata-like objects into dictionaries recursively.
@@ -1691,8 +1690,6 @@ class BioImageReader(ImageReader):
 
 
 # %% ../nbs/010_io.ipynb #49b7b1f2
-from monai.transforms import LoadImage, LoadImaged
-
 # Re-exporting MONAI's standard loaders for convenience within bioMONAI
 LoadImage = LoadImage
 LoadImaged = LoadImaged
