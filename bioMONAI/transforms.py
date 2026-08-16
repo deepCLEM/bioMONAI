@@ -1005,9 +1005,6 @@ class ResampleToMatch(MonaiTransform):
     _monai_transform = mt.ResampleToMatch
 
 # %% ../nbs/030_transforms.ipynb #2a6317ac
-import warnings
-import monai.transforms as mt
-
 class _QuietOrientation(mt.Orientation):
     """Internal patch to suppress MONAI's FutureWarning regarding labels."""
     def __init__(self, *args, **kwargs):
@@ -1054,8 +1051,6 @@ class Affine(MonaiTransform):
     _monai_transform = mt.Affine
 
 # %% ../nbs/030_transforms.ipynb #1f9f82c4
-import monai.transforms as mt
-
 class _StaticAffineGrid(mt.AffineGrid):
     """Internal patch to allow static initialization of spatial_size."""
     def __init__(self, spatial_size=None, **kwargs):
@@ -1080,8 +1075,6 @@ class AffineGrid(MonaiTransform):
     _monai_transform = _StaticAffineGrid
 
 # %% ../nbs/030_transforms.ipynb #1e0bc9f5
-import monai.transforms as mt
-
 class _SafeGridDistortion(mt.GridDistortion):
     """Internal patch to handle MONAI's strictly required arguments in proper positional order."""
     def __init__(self, num_cells=5, distort_steps=None, **kwargs):
@@ -1280,7 +1273,7 @@ def _scale_intensity_range(x,   # The input image to scale.
     return x
 
 # %% ../nbs/030_transforms.ipynb #1f6fe6dd
-class ScaleImage(Transform):
+class ScaleImage(fastTransform):
     """Image normalization."""
     def __init__(self,              # The Transform configuration.
                  min=0.0,           # The minimum intensity value of the output.
@@ -1298,7 +1291,16 @@ class ScaleImage(Transform):
         # Correctly scale from [0, 1] to the target [self.min, self.max] range
         y = y * (self.max - self.min) + self.min 
         return bioimagetype(y)
-    
+
+    def encodes(self, x: MetaTensor):
+            """Apply intensity scaling to a MetaTensor object."""
+            # Convert to numpy for stable percentile calculation if it's a tensor
+            x_np = x.cpu().numpy() if hasattr(x, 'cpu') else x
+            y = _scale_intensity_range(x_np, x_np.min(), x_np.max(), eps=self.eps, dtype=self.dtype)
+            # Correctly scale from [0, 1] to the target [self.min, self.max] range
+            y = y * (self.max - self.min) + self.min 
+            return MetaTensor(y)
+
     def encodes(self, x: np.ndarray):
         """Apply intensity scaling to a NumPy array."""
         mi = x.min(axis=self.axis, keepdims=True)
@@ -1308,7 +1310,7 @@ class ScaleImage(Transform):
         return y.astype(self.dtype)
 
 # %% ../nbs/030_transforms.ipynb #567bbaab
-class ScaleImagePercentiles(Transform):
+class ScaleImagePercentiles(fastTransform):
     """Percentile-based image normalization."""
     def __init__(self,              # The Transform configuration.
                  pmin=3.0,          # The minimum percentile value (0-100).
@@ -1334,6 +1336,18 @@ class ScaleImagePercentiles(Transform):
         if self.clip:
             scaled = np.clip(scaled, self.b_min, self.b_max)
         return bioimagetype(scaled)
+
+    def encodes(self, x: MetaTensor):
+            """Apply percentile-based normalization to a MetaTensor object."""
+            # Convert to numpy for stable percentile calculation if it's a tensor
+            x_np = x.cpu().numpy() if hasattr(x, 'cpu') else x
+            mi = np.percentile(x_np, self.pmin, axis=self.axis, keepdims=True)
+            ma = np.percentile(x_np, self.pmax, axis=self.axis, keepdims=True)
+            
+            scaled = _scale_intensity_range(x, mi, ma, eps=self.eps, dtype=self.dtype)
+            if self.clip:
+                scaled = np.clip(scaled, self.b_min, self.b_max)
+            return MetaTensor(scaled)
     
     def encodes(self, x: np.ndarray):
         """Apply percentile-based normalization to a NumPy array."""
@@ -1375,6 +1389,21 @@ class ScaleImageVariance(fastTransform):
         else:
             x = (x - mean) * scale_factor
         return bioimagetype(x)
+
+    def encodes(self, x: MetaTensor):
+        """Apply intensity variance scaling to a MetaTensor object."""
+        mean, variance = x.mean(), x.var()
+        if variance == 0:
+            return MetaTensor(x)
+        
+        scale_factor = (self.target_variance / variance).sqrt()
+        
+        if x.ndim == self.ndim + 1:
+            for i in range(x.shape[0]):
+                x[i] = (x[i] - x[i].mean()) * scale_factor
+        else:
+            x = (x - mean) * scale_factor
+        return MetaTensor(x)
     
     def encodes(self, x: np.ndarray):
         """Apply intensity variance scaling to a NumPy array."""
@@ -1621,11 +1650,7 @@ class AdjustContrast(MonaiTransform):
         )
 
 # %% ../nbs/030_transforms.ipynb #95558960
-from fasttransform import Transform
-from fastcore.basics import store_attr
-import numpy as np
-
-class RelabelInstances(Transform):
+class RelabelInstances(fastTransform):
     """Remap instance mask labels to consecutive integers.
     
     Example:
@@ -1662,12 +1687,7 @@ class RelabelInstances(Transform):
         return type(x)(y)
 
 # %% ../nbs/030_transforms.ipynb #1ffaa4e5
-from fasttransform import Transform
-from fastcore.basics import store_attr
-import numpy as np
-from scipy.ndimage import distance_transform_edt
-
-class InstanceToMaskAndDistance(Transform):
+class InstanceToMaskAndDistance(fastTransform):
     """
     Converts a single-channel instance segmentation map (CHW or CDHW)
     into a 2-channel image:
@@ -1801,11 +1821,7 @@ class ForegroundMask(MonaiTransform):
 from skimage.color import rgb2hed, hed2rgb
 
 # %% ../nbs/030_transforms.ipynb #1da05998
-from fasttransform import Transform
-from skimage.color import rgb2hed, hed2rgb
-import numpy as np
-
-class RGB2HED(Transform):
+class RGB2HED(fastTransform):
     """Convert RGB images to HED color space."""
     def encodes(self, x):
         is_ndarray = isinstance(x, np.ndarray) and type(x) is np.ndarray
@@ -1826,7 +1842,7 @@ class RGB2HED(Transform):
             return hed_chw
         return orig_type(hed_chw)
 
-class HED2RGB(Transform):
+class HED2RGB(fastTransform):
     """Convert HED images back to RGB color space."""
     def encodes(self, x):
         is_ndarray = isinstance(x, np.ndarray) and type(x) is np.ndarray
@@ -2115,9 +2131,6 @@ class RandZoom(RandMonaiTransform):
         }
 
 # %% ../nbs/030_transforms.ipynb #14c19a89
-import numpy as np
-import torch
-
 class RandCameraNoise(RandTransform):
     """
     Simulates camera noise with typedispatch support:
@@ -2203,9 +2216,9 @@ class RandCameraNoise(RandTransform):
         return type(x)(out)
 
     # -------------------------
-    # torch.Tensor
+    # torchTensor
     # -------------------------
-    def encodes(self, x: torch.Tensor):
+    def encodes(self, x: torchTensor):
         rs = np.random.RandomState(self.rs.randint(0, 2**32 - 1))
         out = self._apply_noise(x.numpy(), rs)
         return torch.as_tensor(out)
