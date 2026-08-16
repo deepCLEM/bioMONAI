@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Data classes and functions">
+<meta name="description" content="Core data structures and classes for biomedical imaging, integrating MONAI’s MetaTensors with fastai’s transform pipelines.">
 
 <title>Data – bioMONAI</title>
 <style>
@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-480c2803ffe5ab5d6b0bfe6db136e446.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-12a96eab3529714f9105c597ac717936.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -111,16 +111,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="Data – bioMONAI">
-<meta property="og:description" content="Data classes and functions">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/021_data.core_files/figure-html/cell-9-output-2.png">
+<meta property="og:description" content="Core data structures and classes for biomedical imaging, integrating MONAI’s MetaTensors with fastai’s transform pipelines.">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/021_data.core_files/figure-html/cell-5-output-2.png">
 <meta property="og:site_name" content="bioMONAI">
-<meta property="og:image:height" content="269">
-<meta property="og:image:width" content="407">
+<meta property="og:image:height" content="299">
+<meta property="og:image:width" content="549">
 <meta name="twitter:title" content="Data – bioMONAI">
-<meta name="twitter:description" content="Data classes and functions">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/021_data.core_files/figure-html/cell-9-output-2.png">
-<meta name="twitter:image-height" content="269">
-<meta name="twitter:image-width" content="407">
+<meta name="twitter:description" content="Core data structures and classes for biomedical imaging, integrating MONAI’s MetaTensors with fastai’s transform pipelines.">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/021_data.core_files/figure-html/cell-5-output-2.png">
+<meta name="twitter:image-height" content="299">
+<meta name="twitter:image-width" content="549">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -378,12 +378,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
-      <a href="./index.html" class="sidebar-logo-link">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
-      </a>
-      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -401,7 +395,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./io.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">I/O</span></a>
+ <span class="menu-text">Input / Output (I/O)</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -564,12 +558,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Multispectral Classification</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_histopathology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Histopathology</span></a>
   </div>
@@ -592,18 +580,60 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#data-types" id="toc-data-types" class="nav-link active" data-scroll-target="#data-types">Data types</a>
+  <li><a href="#data-types" id="toc-data-types" class="nav-link active" data-scroll-target="#data-types">Data Types</a>
   <ul>
-  <li><a href="#metaresolver" id="toc-metaresolver" class="nav-link" data-scroll-target="#metaresolver">MetaResolver</a></li>
-  <li><a href="#bioimagebase" id="toc-bioimagebase" class="nav-link" data-scroll-target="#bioimagebase">BioImageBase</a></li>
-  <li><a href="#bioimage" id="toc-bioimage" class="nav-link" data-scroll-target="#bioimage">BioImage</a></li>
-  <li><a href="#biovolume" id="toc-biovolume" class="nav-link" data-scroll-target="#biovolume">BioVolume</a></li>
-  <li><a href="#biovideo" id="toc-biovideo" class="nav-link" data-scroll-target="#biovideo">BioVideo</a></li>
-  <li><a href="#biomultichannel" id="toc-biomultichannel" class="nav-link" data-scroll-target="#biomultichannel">BioMultiChannel</a></li>
+  <li><a href="#metaresolver" id="toc-metaresolver" class="nav-link" data-scroll-target="#metaresolver">MetaResolver</a>
+  <ul class="collapse">
+  <li><a href="#example-using-metaresolver-to-create-a-custom-tensor-class-without-metaclass-conflicts" id="toc-example-using-metaresolver-to-create-a-custom-tensor-class-without-metaclass-conflicts" class="nav-link" data-scroll-target="#example-using-metaresolver-to-create-a-custom-tensor-class-without-metaclass-conflicts">Example: Using MetaResolver to create a custom tensor class without metaclass conflicts</a></li>
   </ul></li>
-  <li><a href="#data-conversion" id="toc-data-conversion" class="nav-link" data-scroll-target="#data-conversion">Data conversion</a>
-  <ul>
-  <li><a href="#tensor2bioimage" id="toc-tensor2bioimage" class="nav-link" data-scroll-target="#tensor2bioimage">Tensor2BioImage</a></li>
+  <li><a href="#base-data-classes" id="toc-base-data-classes" class="nav-link" data-scroll-target="#base-data-classes">Base Data Classes</a></li>
+  <li><a href="#biodataclass" id="toc-biodataclass" class="nav-link" data-scroll-target="#biodataclass">BioDataClass</a>
+  <ul class="collapse">
+  <li><a href="#example-creating-a-biodataclass-from-standard-tensors-and-metatensors" id="toc-example-creating-a-biodataclass-from-standard-tensors-and-metatensors" class="nav-link" data-scroll-target="#example-creating-a-biodataclass-from-standard-tensors-and-metatensors">Example: Creating a BioDataClass from standard tensors and MetaTensors</a></li>
+  <li><a href="#biodataclass-class-attributes-parameter-reference" id="toc-biodataclass-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#biodataclass-class-attributes-parameter-reference"><code>BioDataClass</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
+  <li><a href="#images" id="toc-images" class="nav-link" data-scroll-target="#images">Images</a></li>
+  <li><a href="#bioimagebase" id="toc-bioimagebase" class="nav-link" data-scroll-target="#bioimagebase">BioImageBase</a>
+  <ul class="collapse">
+  <li><a href="#examples-working-with-bioimagebase" id="toc-examples-working-with-bioimagebase" class="nav-link" data-scroll-target="#examples-working-with-bioimagebase">Examples: Working with BioImageBase</a></li>
+  <li><a href="#bioimagebase-class-attributes-parameter-reference" id="toc-bioimagebase-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#bioimagebase-class-attributes-parameter-reference"><code>BioImageBase</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
+  <li><a href="#bioimage" id="toc-bioimage" class="nav-link" data-scroll-target="#bioimage">BioImage</a></li>
+  <li><a href="#bioimage-1" id="toc-bioimage-1" class="nav-link" data-scroll-target="#bioimage-1">BioImage</a>
+  <ul class="collapse">
+  <li><a href="#example-using-bioimage-to-load-a-2d-region-of-interest" id="toc-example-using-bioimage-to-load-a-2d-region-of-interest" class="nav-link" data-scroll-target="#example-using-bioimage-to-load-a-2d-region-of-interest">Example: Using BioImage to load a 2D Region of Interest</a></li>
+  <li><a href="#bioimage-class-attributes-parameter-reference" id="toc-bioimage-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#bioimage-class-attributes-parameter-reference"><code>BioImage</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
+  <li><a href="#biovolume" id="toc-biovolume" class="nav-link" data-scroll-target="#biovolume">BioVolume</a></li>
+  <li><a href="#biovolume-1" id="toc-biovolume-1" class="nav-link" data-scroll-target="#biovolume-1">BioVolume</a>
+  <ul class="collapse">
+  <li><a href="#example-using-biovolume-to-load-a-3d-region-of-interest" id="toc-example-using-biovolume-to-load-a-3d-region-of-interest" class="nav-link" data-scroll-target="#example-using-biovolume-to-load-a-3d-region-of-interest">Example: Using BioVolume to load a 3D Region of Interest</a></li>
+  <li><a href="#biovolume-class-attributes-parameter-reference" id="toc-biovolume-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#biovolume-class-attributes-parameter-reference"><code>BioVolume</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
+  <li><a href="#maximum-intensity-projection-mip" id="toc-maximum-intensity-projection-mip" class="nav-link" data-scroll-target="#maximum-intensity-projection-mip">Maximum Intensity Projection (MIP)</a></li>
+  <li><a href="#biomip" id="toc-biomip" class="nav-link" data-scroll-target="#biomip">BioMIP</a>
+  <ul class="collapse">
+  <li><a href="#example-generating-a-maximum-intensity-projection-from-a-3d-volume" id="toc-example-generating-a-maximum-intensity-projection-from-a-3d-volume" class="nav-link" data-scroll-target="#example-generating-a-maximum-intensity-projection-from-a-3d-volume">Example: Generating a Maximum Intensity Projection from a 3D volume</a></li>
+  <li><a href="#biomip-class-attributes-parameter-reference" id="toc-biomip-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#biomip-class-attributes-parameter-reference"><code>BioMIP</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
+  <li><a href="#biovideo" id="toc-biovideo" class="nav-link" data-scroll-target="#biovideo">BioVideo</a></li>
+  <li><a href="#biovideo-1" id="toc-biovideo-1" class="nav-link" data-scroll-target="#biovideo-1">BioVideo</a>
+  <ul class="collapse">
+  <li><a href="#example-loading-temporalvideo-data-using-biovideo" id="toc-example-loading-temporalvideo-data-using-biovideo" class="nav-link" data-scroll-target="#example-loading-temporalvideo-data-using-biovideo">Example: Loading temporal/video data using BioVideo</a></li>
+  <li><a href="#biovideo-class-attributes-parameter-reference" id="toc-biovideo-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#biovideo-class-attributes-parameter-reference"><code>BioVideo</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
+  <li><a href="#biomultichannel" id="toc-biomultichannel" class="nav-link" data-scroll-target="#biomultichannel">BioMultiChannel</a></li>
+  <li><a href="#biomultichannel-1" id="toc-biomultichannel-1" class="nav-link" data-scroll-target="#biomultichannel-1">BioMultiChannel</a>
+  <ul class="collapse">
+  <li><a href="#example-loading-and-flattening-a-multi-channel-3d-stack" id="toc-example-loading-and-flattening-a-multi-channel-3d-stack" class="nav-link" data-scroll-target="#example-loading-and-flattening-a-multi-channel-3d-stack">Example: Loading and flattening a multi-channel 3D stack</a></li>
+  <li><a href="#biomultichannel-class-attributes-parameter-reference" id="toc-biomultichannel-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#biomultichannel-class-attributes-parameter-reference"><code>BioMultiChannel</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
+  <li><a href="#categorical-labels" id="toc-categorical-labels" class="nav-link" data-scroll-target="#categorical-labels">Categorical Labels</a></li>
+  <li><a href="#biolabel" id="toc-biolabel" class="nav-link" data-scroll-target="#biolabel">BioLabel</a>
+  <ul class="collapse">
+  <li><a href="#example-encoding-and-decoding-categorical-labels-using-biolabel" id="toc-example-encoding-and-decoding-categorical-labels-using-biolabel" class="nav-link" data-scroll-target="#example-encoding-and-decoding-categorical-labels-using-biolabel">Example: Encoding and decoding categorical labels using BioLabel</a></li>
+  <li><a href="#biolabel-class-attributes-parameter-reference" id="toc-biolabel-class-attributes-parameter-reference" class="nav-link" data-scroll-target="#biolabel-class-attributes-parameter-reference"><code>BioLabel</code> Class Attributes &amp; Parameter Reference</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/deepCLEM/bioMONAI/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
@@ -619,7 +649,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div>
   <div class="description">
-    Data classes and functions
+    Core data structures and classes for biomedical imaging, integrating MONAI’s MetaTensors with fastai’s transform pipelines.
   </div>
 </div>
 
@@ -638,10 +668,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="https://static.cloudflareinsights.com/beacon.min.js?token=62f27bdcb8964407a52676798db9edfa" defer=""></script>
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
 <section id="data-types" class="level2">
-<h2 class="anchored" data-anchor-id="data-types">Data types</h2>
-<p>The module introduces specialized classes to represent various bioimaging data structures, facilitating seamless integration with machine learning workflows.</p>
+<h2 class="anchored" data-anchor-id="data-types">Data Types</h2>
+<blockquote class="blockquote">
+<p>Specialized classes to represent various bioimaging data structures, facilitating seamless integration with both fastai and MONAI machine learning workflows.</p>
+</blockquote>
+<ul>
+<li><strong><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#metaresolver"><code>MetaResolver</code></a></strong>: A custom metaclass designed to resolve conflicts between PyTorch tensor bases and fastai’s custom tensor types, enabling safe multiple inheritance for our core medical data structures.</li>
+</ul>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L47" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L46" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="metaresolver" class="level3">
 <h3 class="anchored" data-anchor-id="metaresolver">MetaResolver</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -650,225 +685,305 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#metaresolver"><code>MetaResolver</code></a> class addresses metaclass conflicts, ensuring compatibility across different data structures. This is particularly useful when integrating with libraries that have specific metaclass requirements.</em></p>
-<p><strong>BioImageBase</strong> is a function that acts as a base class for biomedical images. It can be used for many things, such as loading image data as PyTorch tensors, displaying 2D slices of 3D images and making transformations on medical images.</p>
+<section id="example-using-metaresolver-to-create-a-custom-tensor-class-without-metaclass-conflicts" class="level4">
+<h4 class="anchored" data-anchor-id="example-using-metaresolver-to-create-a-custom-tensor-class-without-metaclass-conflicts">Example: Using MetaResolver to create a custom tensor class without metaclass conflicts</h4>
+<div id="5d344959" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CustomBioTensor(TensorImage, metaclass<span class="op">=</span>MetaResolver):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""A custom tensor class that safely inherits from fastai's TensorImage."""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize our custom tensor</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>my_tensor <span class="op">=</span> CustomBioTensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Type: </span><span class="sc">{</span><span class="bu">type</span>(my_tensor)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Is PyTorch Tensor? </span><span class="sc">{</span><span class="bu">isinstance</span>(my_tensor, torchTensor)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type: CustomBioTensor
+Is PyTorch Tensor? True</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="base-data-classes" class="level3">
+<h3 class="anchored" data-anchor-id="base-data-classes">Base Data Classes</h3>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biodataclass"><code>BioDataClass</code></a> acts as the foundational tensor class for all bioMONAI data types. Inheriting from MONAI’s <code>MetaTensor</code>, it seamlessly carries complex medical metadata while behaving exactly like a standard PyTorch Tensor.</p>
+</blockquote>
+<ul>
+<li><strong>Metadata tracking:</strong> Carries affine matrices, spatial shapes, and patient data through the pipeline via the <code>.meta</code> dictionary.</li>
+<li><strong>fastai integration:</strong> Includes built-in methods (like <code>get_datablock</code>) to easily hook into fastai’s <code>DataBlock</code> API.</li>
+<li><strong>Flexible instantiation:</strong> Can be initialized directly, from standard PyTorch Tensors (<code>from_tensor</code>), or from existing MONAI MetaTensors (<code>from_metatensor</code>).</li>
+</ul>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L79" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L54" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biodataclass" class="level3">
+<h3 class="anchored" data-anchor-id="biodataclass">BioDataClass</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioDataClass(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Base class for bioMONAI data.</em></p>
+<section id="example-creating-a-biodataclass-from-standard-tensors-and-metatensors" class="level4">
+<h4 class="anchored" data-anchor-id="example-creating-a-biodataclass-from-standard-tensors-and-metatensors">Example: Creating a BioDataClass from standard tensors and MetaTensors</h4>
+<div id="fb88b3e8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Initialize directly from a standard PyTorch Tensor with custom metadata</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># We use a 2D tensor to simulate a small image patch</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>base_tensor <span class="op">=</span> torchrand((<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>bio_data <span class="op">=</span> BioDataClass.from_tensor(base_tensor, meta<span class="op">=</span>{<span class="st">"patient_id"</span>: <span class="st">"12345"</span>, <span class="st">"modality"</span>: <span class="st">"MRI"</span>})</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"BioDataClass shape: </span><span class="sc">{</span>bio_data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss"> | Metadata: </span><span class="sc">{</span>bio_data<span class="sc">.</span>meta<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Convert an existing MONAI MetaTensor into a BioDataClass</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>mt <span class="op">=</span> MetaTensor(x<span class="op">=</span>torchones(<span class="dv">5</span>, <span class="dv">5</span>), meta<span class="op">=</span>{<span class="st">"space"</span>: <span class="st">"RAS"</span>})</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>bio_from_mt <span class="op">=</span> BioDataClass.from_metatensor(mt)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Converted from MetaTensor: </span><span class="sc">{</span><span class="bu">type</span>(bio_from_mt)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Visualization ---</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">3</span>))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the BioDataClass tensor</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(bio_data.numpy(), cmap<span class="op">=</span><span class="st">'magma'</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="ss">f"BioDataClass</span><span class="ch">\n</span><span class="ss">ID: </span><span class="sc">{</span>bio_data<span class="sc">.</span>meta[<span class="st">'patient_id'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">'off'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the converted MetaTensor</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(bio_from_mt.numpy(), cmap<span class="op">=</span><span class="st">'gray'</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="ss">f"Converted MetaTensor</span><span class="ch">\n</span><span class="ss">Space: </span><span class="sc">{</span>bio_from_mt<span class="sc">.</span>meta[<span class="st">'space'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">'off'</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BioDataClass shape: torch.Size([10, 10]) | Metadata: {'patient_id': '12345', 'modality': 'MRI', affine: tensor([[1., 0., 0., 0.],
+        [0., 1., 0., 0.],
+        [0., 0., 1., 0.],
+        [0., 0., 0., 1.]], dtype=torch.float64), space: RAS}
+Converted from MetaTensor: BioDataClass</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="021_data.core_files/figure-html/cell-5-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="biodataclass-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="biodataclass-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biodataclass"><code>BioDataClass</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">Parameters</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>from_tensor</code></strong></td>
+<td style="text-align: left;"><code>x: torch.Tensor</code>, <code>meta: dict \| None</code></td>
+<td style="text-align: left;">Creates a <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biodataclass"><code>BioDataClass</code></a> instance from a standard PyTorch tensor and an optional metadata dictionary.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>from_metatensor</code></strong></td>
+<td style="text-align: left;"><code>x: MetaTensor</code></td>
+<td style="text-align: left;">Converts an existing MONAI <code>MetaTensor</code> directly into a <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biodataclass"><code>BioDataClass</code></a>, preserving all metadata.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>set_transforms</code></strong></td>
+<td style="text-align: left;"><code>transforms</code></td>
+<td style="text-align: left;">Class method to set default transforms applied to this data type.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>get_datablock</code></strong></td>
+<td style="text-align: left;"><em>None</em></td>
+<td style="text-align: left;">Returns a fastai <code>TransformBlock</code> configured to load this specific data type.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="images" class="level3">
+<h3 class="anchored" data-anchor-id="images">Images</h3>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> acts as the core base class for biomedical images within bioMONAI. It combines the functionality of PyTorch tensors, MONAI’s <code>MetaTensor</code>, and fastai’s visualization utilities (<code>TensorImage</code>).</p>
+</blockquote>
+<ul>
+<li><strong>Unified Loading:</strong> Seamlessly loads multidimensional image data directly from raw file paths (<a href="https://deepCLEM.github.io/bioMONAI/data.load.html#from_source"><code>from_source</code></a>) or dictionaries (<code>from_dict</code>).</li>
+<li><strong>Metadata &amp; ROI:</strong> Manipulates image metadata and extracts Regions of Interest (ROI) via index dictionaries on the fly.</li>
+<li><strong>Native Visualization:</strong> Includes a built-in <code>.show()</code> method to visually render both 2D slices and 3D volumetric grids directly in Jupyter notebooks.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Note:</strong> Internal pure loaders (<code>get_loader</code>, <code>get_dict_loader</code>) return standard MONAI <code>MetaTensor</code> objects for maximum compatibility. High-level methods like <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#from_source"><code>from_source</code></a> and <code>from_dict</code> wrap these outputs directly into <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> instances so you can immediately use fastai’s <code>.show()</code> method.</p>
+</blockquote>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L106" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="bioimagebase" class="level3">
 <h3 class="anchored" data-anchor-id="bioimagebase">BioImageBase</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImageBase(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImageBase(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Base class for bioimaging data.</em></p>
 <p>Provides: - MetaTensor integration - visualization utilities - lightweight tensor wrapper</p>
-<div id="fcb6aa10" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a_dict <span class="op">=</span> BioImageBase.create({<span class="st">'image'</span>: <span class="st">'./data_examples/example_tiff.tiff'</span>}, keys<span class="op">=</span><span class="st">'image'</span>, channels<span class="op">=</span><span class="st">"YX"</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">type</span>(a_dict), <span class="bu">dict</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>test_eq(<span class="bu">type</span>(a_dict[<span class="st">'image'</span>]), BioImageBase)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>a_dict</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<pre><code>{'image': BioImageBase([[133, 133, 133,  ..., 133, 133, 132],
-         [133, 133, 133,  ..., 133, 133, 133],
-         [133, 133, 134,  ..., 133, 133, 133],
-         ...,
-         [133, 133, 133,  ..., 133, 133, 133],
-         [133, 133, 133,  ..., 133, 133, 133],
-         [133, 133, 134,  ..., 133, 132, 133]], dtype=torch.uint8)}</code></pre>
-</div>
-</div>
-<div id="a2733a88" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageBase.create(<span class="st">'./data_examples/example_tiff.tiff'</span>, channels<span class="op">=</span><span class="st">"YX"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>test_eq(a.shape, a.meta[<span class="st">'size_output'</span>])</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>test_eq(a_dict[<span class="st">'image'</span>].meta.keys(), a.meta.keys())</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>a.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<pre><code>{256: 512,
- 257: 512,
- 258: 8,
- 259: &lt;COMPRESSION.NONE: 1&gt;,
- 262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
- 273: (8,),
- 274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
- 277: 1,
- 278: 512,
- 279: (262144,),
- 284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
- 339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
- affine: tensor([[1., 0., 0., 0.],
-         [0., 1., 0., 0.],
-         [0., 0., 1., 0.],
-         [0., 0., 0., 1.]], dtype=torch.float64),
- space: RAS,
- 'filepath': 'data_examples/example_tiff.tiff',
- 'size_original': torch.Size([512, 512]),
- 'transforms': {},
- 'size_after_tfms': torch.Size([512, 512]),
- 'format': 'TIFF',
- 'layout': 'YX',
- 'size_output': (512, 512),
- 'width': 512,
- 'height': 512,
- 'channels': None,
- 'depth': None,
- 'frames': None,
- 'sequence': None,
- spatial_shape: (512, 512),
- 'mode': 'L',
- 'kind': 'image',
- original_channel_dim: nan}</code></pre>
-</div>
-</div>
-<div id="f39dabad" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageBase.create(<span class="st">'./data_examples/example_tiff.tiff'</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">type</span>(a).<span class="va">__name__</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>a.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="examples-working-with-bioimagebase" class="level4">
+<h4 class="anchored" data-anchor-id="examples-working-with-bioimagebase">Examples: Working with BioImageBase</h4>
+<div id="c93beba8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'./data_examples/example_tiff.tiff'</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Silence the harmless TIFF 'ResolutionUnit' warning to keep the console clean</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings():</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Load an entire volume and inspect it</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"--- Full Volume ---"</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    img_full <span class="op">=</span> BioImageBase.from_source(image_path)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>img_full<span class="sc">.</span>shape<span class="sc">}</span><span class="ss"> | Type: </span><span class="sc">{</span><span class="bu">type</span>(img_full)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Original Channels format: </span><span class="sc">{</span>img_full<span class="sc">.</span>meta<span class="sc">.</span>get(<span class="st">'layout'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Load a 2D Region of Interest (ROI) and display it</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- 2D ROI ---"</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    roi_2d <span class="op">=</span> BioImageBase.from_source(</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        image_path, </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        channels<span class="op">=</span><span class="st">"CYX"</span>, </span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="dv">0</span>, <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)} <span class="co"># First Z-slice, cropped Y</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>roi_2d<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Load a 3D ROI and display it as a grid</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- 3D Volumetric ROI (Grid View) ---"</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    roi_3d <span class="op">=</span> BioImageBase.from_source(</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        image_path, </span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        channels<span class="op">=</span><span class="st">"ZYX"</span>, </span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="bu">range</span>(<span class="dv">10</span>), <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)} <span class="co"># First 10 Z-slices, cropped Y</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>roi_3d<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Show the images using the built-in fastai/bioMONAI show method</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>roi_2d.show(title<span class="op">=</span><span class="st">"2D Slice (Z = 0)"</span>, figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>))</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>plt.show() <span class="co"># Ensure the 2D plot renders cleanly before the grid</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co"># A much shorter figsize (e.g., 15, 1.5) matches the 10:1 aspect ratio of the image strip</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>roi_3d.show(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="fl">1.5</span>)) </span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"3D Volumetric ROI (Grid View)"</span>, fontsize<span class="op">=</span><span class="dv">14</span>) </span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>torch.Size([1, 96, 512, 512])
-BioImageBase</code></pre>
+<pre><code>--- Full Volume ---
+Shape: torch.Size([1, 96, 512, 512]) | Type: BioImageBase
+Original Channels format: CZYX
+
+--- 2D ROI ---
+Shape: torch.Size([1, 300, 512])
+
+--- 3D Volumetric ROI (Grid View) ---
+Shape: torch.Size([10, 300, 512])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<pre><code>{256: 512,
- 257: 512,
- 258: 8,
- 259: &lt;COMPRESSION.NONE: 1&gt;,
- 262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
- 273: (8,),
- 274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
- 277: 1,
- 278: 512,
- 279: (262144,),
- 284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
- 339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
- affine: tensor([[1., 0., 0., 0.],
-         [0., 1., 0., 0.],
-         [0., 0., 1., 0.],
-         [0., 0., 0., 1.]], dtype=torch.float64),
- space: RAS,
- 'filepath': 'data_examples/example_tiff.tiff',
- 'size_original': torch.Size([1, 96, 512, 512]),
- 'transforms': {},
- 'size_after_tfms': torch.Size([1, 96, 512, 512]),
- 'format': 'TIFF',
- 'layout': 'CZYX',
- 'size_output': (1, 96, 512, 512),
- 'width': 512,
- 'height': 512,
- 'channels': 1,
- 'depth': 96,
- 'frames': None,
- 'sequence': None,
- spatial_shape: (96, 512, 512),
- 'mode': 'L',
- 'kind': 'volume',
- original_channel_dim: 0}</code></pre>
+<div>
+<figure class="figure">
+<p><img src="021_data.core_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
-</div>
-<p>The load method returns a pure MetaTensor instead of a BioImageBase instance</p>
-<div id="e09b4a57" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageBase.load()(<span class="st">'./data_examples/example_tiff.tiff'</span>) </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.shape)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">type</span>(a).<span class="va">__name__</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>a.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch.Size([1, 96, 512, 512])
-MetaTensor</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<pre><code>{256: 512,
- 257: 512,
- 258: 8,
- 259: &lt;COMPRESSION.NONE: 1&gt;,
- 262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
- 273: (8,),
- 274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
- 277: 1,
- 278: 512,
- 279: (262144,),
- 284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
- 339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
- affine: tensor([[1., 0., 0., 0.],
-         [0., 1., 0., 0.],
-         [0., 0., 1., 0.],
-         [0., 0., 0., 1.]], dtype=torch.float64),
- space: RAS,
- 'filepath': 'data_examples/example_tiff.tiff',
- 'size_original': torch.Size([1, 96, 512, 512]),
- 'transforms': {},
- 'size_after_tfms': torch.Size([1, 96, 512, 512]),
- 'format': 'TIFF',
- 'layout': 'CZYX',
- 'size_output': (1, 96, 512, 512),
- 'width': 512,
- 'height': 512,
- 'channels': 1,
- 'depth': 96,
- 'frames': None,
- 'sequence': None,
- spatial_shape: (96, 512, 512),
- 'mode': 'L',
- 'kind': 'volume',
- original_channel_dim: 0}</code></pre>
+<div>
+<figure class="figure">
+<p><img src="021_data.core_files/figure-html/cell-7-output-3.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
 </div>
-<div id="21f23057" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> BioImageBase.load_dict(keys<span class="op">=</span>[<span class="st">'image'</span>])({<span class="st">'image'</span>: <span class="st">'./data_examples/example_tiff.tiff'</span>}) </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a[<span class="st">'image'</span>].shape)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">type</span>(a).<span class="va">__name__</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>a[<span class="st">'image'</span>].meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="bioimagebase-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="bioimagebase-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">Parameters</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><a href="https://deepCLEM.github.io/bioMONAI/data.load.html#from_source"><code>from_source</code></a></strong></td>
+<td style="text-align: left;"><code>x</code>, <code>**kwargs</code></td>
+<td style="text-align: left;">Loads an image from a path directly into a <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> instance.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>from_dict</code></strong></td>
+<td style="text-align: left;"><code>x: dict</code>, <code>keys</code>, <code>**kwargs</code></td>
+<td style="text-align: left;">Loads images from dictionary paths, replacing them with <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> instances in-place.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>get_loader</code></strong></td>
+<td style="text-align: left;"><code>**kwargs</code></td>
+<td style="text-align: left;">Returns a callable that loads a source into a standard MONAI <code>MetaTensor</code>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>get_dict_loader</code></strong></td>
+<td style="text-align: left;"><code>**kwargs</code></td>
+<td style="text-align: left;">Returns a callable that processes a dictionary, loading target keys as <code>MetaTensor</code>s.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>show</code></strong></td>
+<td style="text-align: left;"><code>ctx</code>, <code>figsize</code>, <code>title</code>, <code>**kwargs</code></td>
+<td style="text-align: left;">Visually renders the image tensor (automatically supports 2D slices and 3D grids).</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="bioimage" class="level3">
+<h3 class="anchored" data-anchor-id="bioimage">BioImage</h3>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimage"><code>BioImage</code></a> is a specialization of <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> specifically tailored for standard 2D and 3D biomedical images. By defaulting the channel layout to <code>"CYX"</code>, it automatically handles the squeezing of unnecessary dimensions and sets the stage for standard 2D/3D transformations.</p>
+</blockquote>
+<ul>
+<li><strong>Default Layout:</strong> Sets <code>_channels = "CYX"</code> (Channels, Y, X) to streamline 2D image processing.</li>
+<li><strong>Direct Inheritance:</strong> Inherits all powerful features from <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> (like <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#from_source"><code>from_source</code></a>, <code>from_dict</code>, and <code>show</code>).</li>
+<li><strong>Simplified Workflow:</strong> Ideal for datasets where Z-stacks or time dimensions have already been reduced or are not required.</li>
+</ul>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L202" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bioimage-1" class="level3">
+<h3 class="anchored" data-anchor-id="bioimage-1">BioImage</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImage(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Tensor-backed bioimage loaded from disk.</em></p>
+<section id="example-using-bioimage-to-load-a-2d-region-of-interest" class="level4">
+<h4 class="anchored" data-anchor-id="example-using-bioimage-to-load-a-2d-region-of-interest">Example: Using BioImage to load a 2D Region of Interest</h4>
+<div id="a840b036" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'./data_examples/example_tiff.tiff'</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Silence the harmless TIFF 'ResolutionUnit' warning to keep the console clean.</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings():</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Load a 2D Region of Interest (ROI) directly as a BioImage</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    image_2d <span class="op">=</span> BioImage.from_source(</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        image_path, </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="dv">0</span>, <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)} </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Type: </span><span class="sc">{</span><span class="bu">type</span>(image_2d)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>image_2d<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the 2D image</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>image_2d.show(title<span class="op">=</span><span class="st">"BioImage: Z = 0"</span>, figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>))</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>torch.Size([1, 96, 512, 512])
-dict</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre><code>{256: 512,
- 257: 512,
- 258: 8,
- 259: &lt;COMPRESSION.NONE: 1&gt;,
- 262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
- 273: (8,),
- 274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
- 277: 1,
- 278: 512,
- 279: (262144,),
- 284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
- 339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
- affine: tensor([[1., 0., 0., 0.],
-         [0., 1., 0., 0.],
-         [0., 0., 1., 0.],
-         [0., 0., 0., 1.]], dtype=torch.float64),
- space: RAS,
- 'filepath': 'data_examples/example_tiff.tiff',
- 'size_original': torch.Size([1, 96, 512, 512]),
- 'transforms': {},
- 'size_after_tfms': None,
- 'format': 'TIFF',
- 'layout': 'CZYX',
- 'size_output': (1, 96, 512, 512),
- 'width': 512,
- 'height': 512,
- 'channels': 1,
- 'depth': 96,
- 'frames': None,
- 'sequence': None,
- spatial_shape: (96, 512, 512),
- 'mode': 'L',
- 'kind': 'volume',
- original_channel_dim: 0}</code></pre>
-</div>
-</div>
-<p>It is possible to load only an ROI, which should be indicated by using an index dictionary.</p>
-<div id="c9b7701f" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>imagebase_2d <span class="op">=</span> BioImageBase.create(<span class="st">'./data_examples/example_tiff.tiff'</span>, channels<span class="op">=</span><span class="st">"CYX"</span>, ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="dv">0</span>, <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)})  </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((<span class="bu">type</span>(imagebase_2d)).<span class="va">__name__</span>) </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imagebase_2d.shape)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>imagebase_2d.show(title<span class="op">=</span><span class="st">"Z = 0"</span>, figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>))<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>BioImageBase
-torch.Size([1, 300, 512])</code></pre>
+<pre><code>Type: BioImage
+Shape: torch.Size([1, 300, 512])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -878,82 +993,254 @@ torch.Size([1, 300, 512])</code></pre>
 </div>
 </div>
 </div>
-<div id="0a909223" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>imagebase_3d <span class="op">=</span> BioImageBase.create(<span class="st">'./data_examples/example_tiff.tiff'</span>, channels<span class="op">=</span><span class="st">"ZYX"</span>, ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="bu">range</span>(<span class="dv">10</span>), <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)})  </span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((<span class="bu">type</span>(imagebase_3d)).<span class="va">__name__</span>) </span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(imagebase_3d.shape)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>imagebase_3d.show()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>BioImageBase
-torch.Size([10, 300, 512])</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="021_data.core_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p><strong>BioImage</strong> is a specialization of BioImageBase that is specifically used for 2D and 3D biomedical images. To do so, it directly inherits from that class and then squeezes the image data and allows for transformations to be made there.</p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L175" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="bioimage" class="level3">
-<h3 class="anchored" data-anchor-id="bioimage">BioImage</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioImage(</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Tensor-backed bioimage loaded from disk.</em></p>
-<div id="77fd5e49" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>image_2d <span class="op">=</span> BioImage.create(<span class="st">'./data_examples/example_tiff.tiff'</span>, ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="dv">0</span>, <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)}) </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((<span class="bu">type</span>(image_2d)).<span class="va">__name__</span>) </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>test_eq(imagebase_2d, image_2d)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>image_2d.show(title<span class="op">=</span><span class="st">"Z = 0"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>BioImage</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="021_data.core_files/figure-html/cell-12-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="897246c9" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>image_2d <span class="op">=</span> BioImage.load(ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="dv">0</span>, <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)})(<span class="st">'./data_examples/example_tiff.tiff'</span>)  </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((<span class="bu">type</span>(image_2d)).<span class="va">__name__</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>test_eq(imagebase_2d, image_2d)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MetaTensor</code></pre>
-</div>
-</div>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L206" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="bioimage-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="bioimage-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimage"><code>BioImage</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Attribute</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>_channels</code></strong></td>
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;"><code>"CYX"</code></td>
+<td style="text-align: left;">The default channel layout used during loading. Automatically drops or squeezes unrequested dimensions like Z or T.</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Note: Initializes exactly like <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a>)</em></p>
+</section>
 </section>
 <section id="biovolume" class="level3">
 <h3 class="anchored" data-anchor-id="biovolume">BioVolume</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioVolume(</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Tensor-backed bioimage loaded from disk.</em></p>
-<p>This is the class that: - uses image_reader - handles transforms - returns MetaTensor-backed images</p>
-<div id="6115d5ab" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>image_3d <span class="op">=</span> BioVolume.create(<span class="st">'./data_examples/example_tiff.tiff'</span>, ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="bu">range</span>(<span class="dv">10</span>), <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)})  </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((<span class="bu">type</span>(image_3d)).<span class="va">__name__</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(image_3d.shape)</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>test_eq(imagebase_3d, image_3d[<span class="dv">0</span>])</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>image_3d.show()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biovolume"><code>BioVolume</code></a> is a specialization of <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> designed explicitly for handling 3D volumetric images. By defaulting to the <code>"CZYX"</code> channel layout, it ensures that volumetric data is parsed with the correct spatial dimensions, making it immediately ready for 3D spatial transforms.</p>
+</blockquote>
+<ul>
+<li><strong>Volumetric Focus:</strong> Sets <code>_channels = "CZYX"</code> (Channels, Depth/Z, Height/Y, Width/X) to explicitly preserve depth.</li>
+<li><strong>Direct Inheritance:</strong> Retains all the powerful loading and dictionary-handling capabilities of <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a>.</li>
+<li><strong>Volumetric Visualization:</strong> Works out-of-the-box with the native <code>.show()</code> method to automatically render an optimal 2D representation of your 4D data tensor.</li>
+</ul>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L211" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biovolume-1" class="level3">
+<h3 class="anchored" data-anchor-id="biovolume-1">BioVolume</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioVolume(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Tensor-backed volume loaded from disk.</em></p>
+<section id="example-using-biovolume-to-load-a-3d-region-of-interest" class="level4">
+<h4 class="anchored" data-anchor-id="example-using-biovolume-to-load-a-3d-region-of-interest">Example: Using BioVolume to load a 3D Region of Interest</h4>
+<div id="a24f1288" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'./data_examples/example_tiff.tiff'</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Silence the harmless TIFF 'ResolutionUnit' warning to keep the console clean.</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings():</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Load a 3D Region of Interest (ROI) (e.g., the first 10 Z-slices, cropped Y)</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    volume_3d <span class="op">=</span> BioVolume.from_source(</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        image_path, </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="bu">range</span>(<span class="dv">10</span>), <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)} </span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Type: </span><span class="sc">{</span><span class="bu">type</span>(volume_3d)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>volume_3d<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the 3D volume representation</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Using a square figsize since CZYX renders as a single aggregated view</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>volume_3d.show(title<span class="op">=</span><span class="st">"BioVolume: 3D ROI (CZYX Layout)"</span>, figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>BioVolume
-torch.Size([1, 10, 300, 512])</code></pre>
+<pre><code>Type: BioVolume
+Shape: torch.Size([1, 10, 300, 512])</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="021_data.core_files/figure-html/cell-11-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="biovolume-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="biovolume-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biovolume"><code>BioVolume</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Attribute</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>_channels</code></strong></td>
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;"><code>"CZYX"</code></td>
+<td style="text-align: left;">The default channel layout used during loading. Ensures the Z (depth) dimension is preserved for volumetric processing.</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Note: Initializes exactly like <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a>)</em></p>
+</section>
+</section>
+<section id="maximum-intensity-projection-mip" class="level3">
+<h3 class="anchored" data-anchor-id="maximum-intensity-projection-mip">Maximum Intensity Projection (MIP)</h3>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biomip"><code>BioMIP</code></a> represents a 3D image volume as a 2D image using Maximum Intensity Projection. It automatically squashes the Z-axis (depth) by taking the maximum voxel value along that dimension on the fly.</p>
+</blockquote>
+<ul>
+<li><strong>Automatic Projection:</strong> Inherits from <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> but automatically applies a projection operation over the Z-axis during loading.</li>
+<li><strong>Visualization Ready:</strong> Ideal for visualizing thick volumetric data (like fluorescent microscopy Z-stacks) in a flat, 2D format for quick assessments and presentations.</li>
+<li><strong>Metadata Updating:</strong> Automatically updates the internal <code>.meta['layout']</code> dictionary from <code>"CZYX"</code> to <code>"CYX"</code> to accurately reflect the dimensionality reduction.</li>
+</ul>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L233" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biomip" class="level3">
+<h3 class="anchored" data-anchor-id="biomip">BioMIP</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioMIP(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biomip"><code>BioMIP</code></a> class represents a 3D image stack as a 2D image using maximum intensity projection. This is particularly useful for visualizing volumetric data in a 2D format, aiding in quick assessments and presentations.</em></p>
+<section id="example-generating-a-maximum-intensity-projection-from-a-3d-volume" class="level4">
+<h4 class="anchored" data-anchor-id="example-generating-a-maximum-intensity-projection-from-a-3d-volume">Example: Generating a Maximum Intensity Projection from a 3D volume</h4>
+<div id="e66b031f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'./data_examples/example_tiff.tiff'</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Silence the harmless TIFF 'ResolutionUnit' warning to keep the console clean.</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings():</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Load the volume and automatically project it to 2D</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    image_mip <span class="op">=</span> BioMIP.from_source(image_path)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Type: </span><span class="sc">{</span><span class="bu">type</span>(image_mip)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Projected Shape: </span><span class="sc">{</span>image_mip<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Final Layout: </span><span class="sc">{</span>image_mip<span class="sc">.</span>meta<span class="sc">.</span>get(<span class="st">'layout'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the resulting 2D projection</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>image_mip.show(title<span class="op">=</span><span class="st">"Maximum Intensity Projection"</span>, figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type: BioMIP
+Projected Shape: torch.Size([1, 512, 512])
+Final Layout: CYX</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="021_data.core_files/figure-html/cell-13-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="biomip-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="biomip-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biomip"><code>BioMIP</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Attribute</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>_channels</code></strong></td>
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;"><code>"CZYX"</code></td>
+<td style="text-align: left;">The expected initial layout before the Z-axis is squashed.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>_show_args</code></strong></td>
+<td style="text-align: left;"><code>dict</code></td>
+<td style="text-align: left;"><code>{"cmap": "gray"}</code></td>
+<td style="text-align: left;">Default visualization styling applied when rendering the 2D projection.</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Note: Inherits loading methods like <a href="https://deepCLEM.github.io/bioMONAI/data.load.html#from_source"><code>from_source</code></a> from <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a>, automatically applying the projection step)</em></p>
+</section>
+</section>
+<section id="biovideo" class="level3">
+<h3 class="anchored" data-anchor-id="biovideo">BioVideo</h3>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biovideo"><code>BioVideo</code></a> is a specialization of <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> designed specifically for temporal or video data. By setting the default channel layout to <code>"CTYX"</code>, it ensures that time-series images (like live-cell imaging or standard video files) are parsed correctly for spatiotemporal transforms.</p>
+</blockquote>
+<ul>
+<li><strong>Temporal Focus:</strong> Sets <code>_channels = "CTYX"</code> (Channels, Time/Frames, Height/Y, Width/X) to explicitly preserve the sequence of frames.</li>
+<li><strong>Direct Inheritance:</strong> Retains all loading, dictionary-handling, and metadata-tracking capabilities of <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a>.</li>
+<li><strong>Video Processing:</strong> Ideal for pipelines dealing with live-cell imaging, behavioral videos, or dynamic medical imaging (e.g., cine MRI).</li>
+</ul>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L285" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biovideo-1" class="level3">
+<h3 class="anchored" data-anchor-id="biovideo-1">BioVideo</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioVideo(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Tensor-backed video loaded from disk.</em></p>
+<p>This is the class that: - uses image_reader - handles transforms - returns MetaTensor-backed images</p>
+<section id="example-loading-temporalvideo-data-using-biovideo" class="level4">
+<h4 class="anchored" data-anchor-id="example-loading-temporalvideo-data-using-biovideo">Example: Loading temporal/video data using BioVideo</h4>
+<div id="75fd7831" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'./data_examples/example_tiff.tiff'</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings():</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Load data as a temporal sequence</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    video_seq <span class="op">=</span> BioVideo.from_source(image_path)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Type:   </span><span class="sc">{</span><span class="bu">type</span>(video_seq)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape:  </span><span class="sc">{</span>video_seq<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Layout: </span><span class="sc">{</span>video_seq<span class="sc">.</span>meta<span class="sc">.</span>get(<span class="st">'layout'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the 4D video tensor representation</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>video_seq.show(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"BioVideo: Full Sequence (CTYX Layout)"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type:   BioVideo
+Shape:  torch.Size([1, 1, 512, 512])
+Layout: CTYX</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -963,21 +1250,86 @@ torch.Size([1, 10, 300, 512])</code></pre>
 </div>
 </div>
 </div>
-<div id="efab5cd5" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>image_3d <span class="op">=</span> BioVolume.load(ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="bu">range</span>(<span class="dv">10</span>), <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)}, channels<span class="op">=</span><span class="st">"ZYX"</span>)(<span class="st">'./data_examples/example_tiff.tiff'</span>)  </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(image_3d.shape)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>test_eq(imagebase_3d, image_3d)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="biovideo-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="biovideo-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biovideo"><code>BioVideo</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Attribute</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>_channels</code></strong></td>
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;"><code>"CTYX"</code></td>
+<td style="text-align: left;">The default channel layout used during loading. Ensures the T (time/frames) dimension is parsed and preserved.</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Note: Initializes exactly like <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a>)</em></p>
+</section>
+</section>
+<section id="biomultichannel" class="level3">
+<h3 class="anchored" data-anchor-id="biomultichannel">BioMultiChannel</h3>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biomultichannel"><code>BioMultiChannel</code></a> is a specialized class designed for handling multi-channel 2D and 3D images, assuming a <code>"CZYX"</code> layout by default.</p>
+</blockquote>
+<ul>
+<li><strong>Automatic Flattening:</strong> Automatically merges the Channel (C) and Depth (Z) dimensions (<code>merge_cd=True</code>) upon loading.</li>
+<li><strong>Microscopy Ready:</strong> Particularly useful in microscopy, where multi-channel 3D stacks are often flattened or interleaved into a single sequential axis to simplify downstream processing.</li>
+<li><strong>Specialized Visualization:</strong> Overrides the base <code>.show()</code> method to use <a href="https://deepCLEM.github.io/bioMONAI/visualize.html#show_multichannel"><code>show_multichannel</code></a>, expertly handling the rendering of composite or interleaved channel grids.</li>
+</ul>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L299" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biomultichannel-1" class="level3">
+<h3 class="anchored" data-anchor-id="biomultichannel-1">BioMultiChannel</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioMultiChannel(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Multi-channel 2D/3D image assuming CZYX layout.</em></p>
+<section id="example-loading-and-flattening-a-multi-channel-3d-stack" class="level4">
+<h4 class="anchored" data-anchor-id="example-loading-and-flattening-a-multi-channel-3d-stack">Example: Loading and flattening a multi-channel 3D stack</h4>
+<div id="699c895b" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> <span class="st">'./data_examples/example_tiff.tiff'</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings():</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Load a subset of the image (First 5 Z-slices).</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># BioMultiChannel will automatically merge the C and Z-depth dimensions.</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    image_mlt <span class="op">=</span> BioMultiChannel.from_source(</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>        image_path,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>        ind_dict<span class="op">=</span>{<span class="st">'Z'</span>: <span class="bu">range</span>(<span class="dv">5</span>), <span class="st">'Y'</span>: <span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">300</span>)}</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Type:   </span><span class="sc">{</span><span class="bu">type</span>(image_mlt)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape:  </span><span class="sc">{</span>image_mlt<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Layout: </span><span class="sc">{</span>image_mlt<span class="sc">.</span>meta<span class="sc">.</span>get(<span class="st">'layout'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the composited multi-channel image</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Using a square figsize since show_multichannel overlays them into a single view</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>image_mlt.show(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"BioMultiChannel: Composited Channels (5 Slices)"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>torch.Size([10, 300, 512])</code></pre>
-</div>
-</div>
-<div id="225ff6c5" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>image_mip <span class="op">=</span> BioMIP.create(<span class="st">'./data_examples/example_tiff.tiff'</span>)  </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(image_mip.shape)</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># test_eq(imagebase_mip, image_mip)</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>image_mip.show()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch.Size([1, 512, 512])</code></pre>
+<pre><code>Type:   BioMultiChannel
+Shape:  torch.Size([5, 300, 512])
+Layout: CYX</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -987,103 +1339,139 @@ torch.Size([1, 10, 300, 512])</code></pre>
 </div>
 </div>
 </div>
-<div id="59e8893b" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>image_mip.meta</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<pre><code>{256: 512,
- 257: 512,
- 258: 8,
- 259: &lt;COMPRESSION.NONE: 1&gt;,
- 262: &lt;PHOTOMETRIC.MINISBLACK: 1&gt;,
- 273: (8,),
- 274: &lt;ORIENTATION.TOPLEFT: 1&gt;,
- 277: 1,
- 278: 512,
- 279: (262144,),
- 284: &lt;PLANARCONFIG.CONTIG: 1&gt;,
- 339: &lt;SAMPLEFORMAT.UINT: 1&gt;,
- affine: tensor([[1., 0., 0., 0.],
-         [0., 1., 0., 0.],
-         [0., 0., 1., 0.],
-         [0., 0., 0., 1.]], dtype=torch.float64),
- space: RAS,
- 'filepath': 'data_examples/example_tiff.tiff',
- 'size_original': torch.Size([1, 96, 512, 512]),
- 'transforms': {},
- 'size_after_tfms': torch.Size([1, 96, 512, 512]),
- 'format': 'TIFF',
- 'layout': 'CYX',
- 'size_output': (1, 512, 512),
- 'width': 512,
- 'height': 512,
- 'channels': 1,
- 'depth': 96,
- 'frames': None,
- 'sequence': None,
- spatial_shape: (96, 512, 512),
- 'mode': 'L',
- 'kind': 'volume',
- original_channel_dim: 0}</code></pre>
-</div>
-</div>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L289" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="biovideo" class="level3">
-<h3 class="anchored" data-anchor-id="biovideo">BioVideo</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioVideo(</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Tensor-backed video loaded from disk.</em></p>
-<p>This is the class that: - uses image_reader - handles transforms - returns MetaTensor-backed images</p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L329" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="biomultichannel-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="biomultichannel-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biomultichannel"><code>BioMultiChannel</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Attribute / Parameter</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>_channels</code></strong></td>
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;"><code>"CZYX"</code></td>
+<td style="text-align: left;">The expected initial layout before merging operations.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>merge_cd</code></strong></td>
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;"><code>True</code></td>
+<td style="text-align: left;">If <code>True</code>, flattens the Z (depth) dimension into the C (channel) dimension during loading.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>interleaved</code></strong></td>
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;"><code>True</code></td>
+<td style="text-align: left;">Determines the permutation order when merging. If <code>True</code>, channels and depths are interleaved sequentially.</td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="biomultichannel" class="level3">
-<h3 class="anchored" data-anchor-id="biomultichannel">BioMultiChannel</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioMultiChannel(</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>Multi-channel 2D/3D image assuming CZYX layout.</em></p>
-<div id="653907e9" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>image_mlt <span class="op">=</span> BioMultiChannel.create(<span class="st">'./data_examples/example_tiff.tiff'</span>)  </span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>test_eq(image_mlt.shape, [<span class="dv">96</span>, <span class="dv">512</span>, <span class="dv">512</span>])</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>image_mlt.show()<span class="op">;</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Layout:'</span>, image_mlt.meta[<span class="st">'layout'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="categorical-labels" class="level3">
+<h3 class="anchored" data-anchor-id="categorical-labels">Categorical Labels</h3>
+<blockquote class="blockquote">
+<p><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biolabel"><code>BioLabel</code></a> is a specialized data class for handling categorical data, such as classification targets. Built on top of fastai’s <code>Categorize</code> transform, it automatically manages vocabulary creation, handles sorting, and seamlessly maps textual labels to integer IDs (and vice versa).</p>
+</blockquote>
+<ul>
+<li><strong>Vocabulary Management:</strong> Automatically builds, sorts, and maintains a unique vocabulary from your dataset.</li>
+<li><strong>fastai Integration:</strong> Leverages the native <code>Categorize</code> transform, ensuring full compatibility with standard deep learning pipelines.</li>
+<li><strong>Flexible Loading:</strong> Fully supports both standard sequence and dictionary-based data pipelines (<a href="https://deepCLEM.github.io/bioMONAI/data.load.html#from_source"><code>from_source</code></a> and <code>from_dict</code>).</li>
+</ul>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L371" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="biolabel" class="level3">
+<h3 class="anchored" data-anchor-id="biolabel">BioLabel</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BioLabel(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    x, affine:torch.Tensor <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, meta:<span class="bu">dict</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, applied_operations:<span class="bu">list</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    _args:VAR_POSITIONAL, _kwargs:VAR_KEYWORD</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Data class for Categorical data.</em></p>
+<section id="example-encoding-and-decoding-categorical-labels-using-biolabel" class="level4">
+<h4 class="anchored" data-anchor-id="example-encoding-and-decoding-categorical-labels-using-biolabel">Example: Encoding and decoding categorical labels using BioLabel</h4>
+<div id="b4e07edd" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Initialize the label encoder with a specific vocabulary</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (Note: duplicates are removed and the vocabulary is sorted alphabetically by default)</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>label_encoder <span class="op">=</span> BioLabel.get_label(vocab<span class="op">=</span>[<span class="st">'malignant'</span>, <span class="st">'benign'</span>, <span class="st">'benign'</span>, <span class="st">'normal'</span>])</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Generated Vocabulary: </span><span class="sc">{</span><span class="bu">list</span>(label_encoder.vocab)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Encode a string label into an integer ID</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>encoded_id <span class="op">=</span> label_encoder(<span class="st">'malignant'</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Encoded ID for 'malignant': </span><span class="sc">{</span>encoded_id<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Decode the integer ID back to the original string</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>decoded_label <span class="op">=</span> label_encoder.decode(encoded_id)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Decoded Label for ID </span><span class="sc">{</span>encoded_id<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>decoded_label<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Layout: CYX</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="021_data.core_files/figure-html/cell-21-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
+<pre><code>Generated Vocabulary: ['benign', 'malignant', 'normal']
+Encoded ID for 'malignant': TensorCategory(1)
+Decoded Label for ID TensorCategory(1): malignant</code></pre>
 </div>
 </div>
 </section>
+<section id="biolabel-class-attributes-parameter-reference" class="level4">
+<h4 class="anchored" data-anchor-id="biolabel-class-attributes-parameter-reference"><a href="https://deepCLEM.github.io/bioMONAI/data.core.html#biolabel"><code>BioLabel</code></a> Class Attributes &amp; Parameter Reference</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Attribute / Parameter</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>_keys</code></strong></td>
+<td style="text-align: left;"><code>list</code></td>
+<td style="text-align: left;"><code>['label']</code></td>
+<td style="text-align: left;">The default dictionary key used when parsing labels from a dictionary.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>_vocab</code></strong></td>
+<td style="text-align: left;"><code>list \| None</code></td>
+<td style="text-align: left;"><code>None</code></td>
+<td style="text-align: left;">The explicit vocabulary list. If <code>None</code>, it is inferred from the data.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><code>_sort</code></strong></td>
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;"><code>True</code></td>
+<td style="text-align: left;">Whether to automatically sort the vocabulary alphabetically.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><code>_add_na</code></strong></td>
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;"><code>False</code></td>
+<td style="text-align: left;">Whether to add an <code>#na#</code> (Not Available) token to the vocabulary to handle missing data.</td>
+</tr>
+</tbody>
+</table>
+
+
 </section>
-<section id="data-conversion" class="level2">
-<h2 class="anchored" data-anchor-id="data-conversion">Data conversion</h2>
-<p>To facilitate seamless integration between tensors and bioimaging data structures, the module provides conversion utilities.</p>
-<hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/data/core.py#L388" target="_blank" style="float:right; font-size:smaller">source</a></p>
-<section id="tensor2bioimage" class="level3">
-<h3 class="anchored" data-anchor-id="tensor2bioimage">Tensor2BioImage</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> Tensor2BioImage(</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    cls:BioImageBase<span class="op">=</span>BioImage</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><em>The <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#tensor2bioimage"><code>Tensor2BioImage</code></a> transform converts tensors into <a href="https://deepCLEM.github.io/bioMONAI/data.core.html#bioimagebase"><code>BioImageBase</code></a> instances, enabling the application of bioimaging-specific methods to tensor data. </em> This is essential for integrating deep learning models with bioimaging workflows.</p>
-
-
 </section>
 </section>
 

@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['SlidingWindowSplitter', 'get_images', 'get_gt', 'get_target', 'get_noisy_pair', 'show_batch', 'show_results',
-           'split_dataframe', 'build_df', 'build_df_from_folder', 'ProcessImageDataset']
+           'split_dataframe', 'build_df', 'build_df_from_folder', 'RandomPatchSplitter', 'ProcessImageDataset']
 
 # %% ../../nbs/023_data.tfms.ipynb #7a8886ba
 # =================================
@@ -755,6 +755,109 @@ def build_df_from_folder(
 
 # %% ../../nbs/023_data.tfms.ipynb #fd1ae9aa
 SlidingWindowSplitter = SlidingWindowSplitter
+
+# %% ../../nbs/023_data.tfms.ipynb #1ecab24a
+class RandomPatchSplitter(Splitter):
+    """
+    Extract random patches from input tensors.
+
+    Args:
+        patch_size: size of patches
+        num_patches: number of patches to sample
+        offset: offset for sampling
+        filter_fn: optional filtering function (patch, location) -> bool
+        pad_mode: padding mode
+        pad_value: padding value
+        device: torch device
+    """
+
+    def __init__(
+        self,
+        patch_size: Sequence[int] | int,
+        num_patches: int,
+        offset: Sequence[int] | int = 0,
+        filter_fn: Callable | None = None,
+        pad_mode: str | None = "constant",
+        pad_value: float | int = 0,
+        device: torch_device | str | None = None,
+    ):
+        super().__init__(patch_size=patch_size, device=device)
+        self.num_patches = num_patches
+        self.offset = offset
+        self.filter_fn = self._validate_filter_fn(filter_fn)
+        self.pad_mode = pad_mode
+        self.pad_value = pad_value
+
+    @staticmethod
+    def _validate_filter_fn(filter_fn):
+        if callable(filter_fn):
+            sig = signature(filter_fn)
+            n_params = len(sig.parameters)
+            num_pos_params = len([v for v in sig.parameters.values() if v.default is _empty])
+            if n_params < 2:
+                raise ValueError("`filter_fn` must accept (patch, location)")
+            elif num_pos_params > 2:
+                raise ValueError("`filter_fn` can have at most 2 positional params")
+        elif filter_fn is not None:
+            raise ValueError("`filter_fn` must be callable or None")
+        return filter_fn
+
+    def _get_valid_shape_parameters(self, spatial_shape):
+        spatial_ndim = len(spatial_shape)
+        patch_size = ensure_tuple_rep(self.patch_size, spatial_ndim)
+        offset = ensure_tuple_rep(self.offset, spatial_ndim)
+
+        for off, ps, sh in zip(offset, patch_size, spatial_shape):
+            if off < -ps:
+                raise ValueError("Offset too negative")
+            if off >= sh:
+                raise ValueError("Offset exceeds input size")
+
+        return patch_size, offset
+
+    def _get_patch(self, inputs, location, patch_size):
+        slices = (slice(None),) * 2 + tuple(
+            slice(loc, loc + ps) for loc, ps in zip(location, patch_size)
+        )
+        return inputs[slices]
+
+    def _sample_location(self, spatial_shape, patch_size, offset):
+        loc = []
+        for sh, ps, off in zip(spatial_shape, patch_size, offset):
+            low = max(off, 0)
+            high = max(sh - ps, 0)
+            if high < low:
+                # fallback (will require padding if enabled)
+                loc.append(low)
+            else:
+                loc.append(random.randint(low, high))
+        return tuple(loc)
+    
+    def get_input_shape(self, inputs: Any) -> tuple:
+        return tuple(inputs.shape[2:])
+
+    def get_padded_shape(self, spatial_shape: Sequence[int]) -> tuple:
+        return tuple(spatial_shape)
+    
+    def __call__(self, inputs: Any):
+        spatial_shape = tuple(inputs.shape[2:])
+        patch_size, offset = self._get_valid_shape_parameters(spatial_shape)
+
+        passed_patches = 0
+
+        attempts = 0
+        max_attempts = self.num_patches * 10  # avoid infinite loops
+
+        while passed_patches < self.num_patches and attempts < max_attempts:
+            loc = self._sample_location(spatial_shape, patch_size, offset)
+            patch = self._get_patch(inputs, loc, patch_size)
+
+            if self.filter_fn is None or self.filter_fn(patch, loc):
+                passed_patches += 1
+                yield patch, loc
+
+            attempts += 1
+            
 
 # %% ../../nbs/023_data.tfms.ipynb #28ac83da
 def _select_transforms(transforms, keys):

@@ -11,12 +11,12 @@ website:
       - 040_losses.ipynb
       - 050_nets.ipynb
       - 060_metrics.ipynb
-      - 060_optimizers.ipynb
-      - 070_engines.ipynb
-      - 080_callbacks.ipynb
-      - 090_inference.ipynb
-      - 100_datasets.ipynb
-      - 110_visualize.ipynb
+      - 070_optimizers.ipynb
+      - 080_engines.ipynb
+      - 090_callbacks.ipynb
+      - 100_inference.ipynb
+      - 110_datasets.ipynb
+      - 120_visualize.ipynb
       - section: Benchmarks
         contents:
           - Benchmarks/801_mednist_tutorial_biomonai.ipynb
@@ -31,9 +31,5 @@ website:
           - Tutorials/901_tutorial_classification.ipynb
           - Tutorials/902_tutorial_classification3D.ipynb
           - Tutorials/903_tutorial_denoising.ipynb
-          - Tutorials/904_tutorial_multispectral_classification.ipynb
-          - Tutorials/904a_tutorial_multispectral_classification_old_version.ipynb
-          - Tutorials/904b_tutorial_multispectral_classification.ipynb
-          - Tutorials/904c_tutorial_multispectral_classification.ipynb
           - Tutorials/905_tutorial_histopathology.ipynb
           - Tutorials/906_tutorial_Segmentation3D.ipynb

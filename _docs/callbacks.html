@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-480c2803ffe5ab5d6b0bfe6db136e446.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-12a96eab3529714f9105c597ac717936.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -115,14 +115,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <meta property="og:title" content="Callbacks – bioMONAI">
 <meta property="og:description" content="Event handlers">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/080_callbacks_files/figure-html/cell-10-output-3.png">
+<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/090_callbacks_files/figure-html/cell-10-output-3.png">
 <meta property="og:site_name" content="bioMONAI">
-<meta property="og:image:height" content="354">
+<meta property="og:image:height" content="351">
 <meta property="og:image:width" content="521">
 <meta name="twitter:title" content="Callbacks – bioMONAI">
 <meta name="twitter:description" content="Event handlers">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/080_callbacks_files/figure-html/cell-10-output-3.png">
-<meta name="twitter:image-height" content="354">
+<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/090_callbacks_files/figure-html/cell-10-output-3.png">
+<meta name="twitter:image-height" content="351">
 <meta name="twitter:image-width" content="521">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -381,12 +381,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
-      <a href="./index.html" class="sidebar-logo-link">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
-      </a>
-      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -404,7 +398,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./io.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">I/O</span></a>
+ <span class="menu-text">Input / Output (I/O)</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -567,12 +561,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Multispectral Classification</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_histopathology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Histopathology</span></a>
   </div>
@@ -653,7 +641,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="training-callbacks">Training Callbacks</h2>
 <p>Callbacks that add functionlities during the training phase, including Callbacks that make decisions depending how a monitored metric/loss behaves</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/callbacks.py#L20" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/callbacks.py#L22" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="meanlossgraphcallback" class="level3">
 <h3 class="anchored" data-anchor-id="meanlossgraphcallback">MeanLossGraphCallback</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -745,23 +733,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="loggers" class="level2">
 <h2 class="anchored" data-anchor-id="loggers">Loggers</h2>
-<p>The <code>ShowGraphCallback</code> is a convenient callback for visualizing training progress. By plotting the training and validation loss, it helps users monitor convergence and performance, making it easy to assess if the model requires adjustments in learning rate, architecture, or data handling.</p>
+<p>The <a href="https://deepCLEM.github.io/bioMONAI/callbacks.html#showgraphcallback"><code>ShowGraphCallback</code></a> is a convenient callback for visualizing training progress. By plotting the training and validation loss, it helps users monitor convergence and performance, making it easy to assess if the model requires adjustments in learning rate, architecture, or data handling.</p>
 <hr>
-<p><a href="https://github.com/fastai/fastai/blob/main/fastai/callback/progress.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/callbacks.py#L64" target="_blank" style="float:right; font-size:smaller">source</a></p>
 <section id="showgraphcallback" class="level3">
 <h3 class="anchored" data-anchor-id="showgraphcallback">ShowGraphCallback</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ShowGraphCallback(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    after_create:NoneType<span class="op">=</span><span class="va">None</span>, before_fit:NoneType<span class="op">=</span><span class="va">None</span>, before_epoch:NoneType<span class="op">=</span><span class="va">None</span>, before_train:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    before_batch:NoneType<span class="op">=</span><span class="va">None</span>, after_pred:NoneType<span class="op">=</span><span class="va">None</span>, after_loss:NoneType<span class="op">=</span><span class="va">None</span>, before_backward:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    after_cancel_backward:NoneType<span class="op">=</span><span class="va">None</span>, after_backward:NoneType<span class="op">=</span><span class="va">None</span>, before_step:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    after_cancel_step:NoneType<span class="op">=</span><span class="va">None</span>, after_step:NoneType<span class="op">=</span><span class="va">None</span>, after_cancel_batch:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    after_batch:NoneType<span class="op">=</span><span class="va">None</span>, after_cancel_train:NoneType<span class="op">=</span><span class="va">None</span>, after_train:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    before_validate:NoneType<span class="op">=</span><span class="va">None</span>, after_cancel_validate:NoneType<span class="op">=</span><span class="va">None</span>, after_validate:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    after_cancel_epoch:NoneType<span class="op">=</span><span class="va">None</span>, after_epoch:NoneType<span class="op">=</span><span class="va">None</span>, after_cancel_fit:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    after_fit:NoneType<span class="op">=</span><span class="va">None</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    args:VAR_POSITIONAL,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    style:<span class="bu">dict</span><span class="op">=</span>{<span class="st">'font.family'</span>: <span class="st">'sans-serif'</span>, <span class="st">'font.size'</span>: <span class="dv">10</span>, <span class="st">'text.color'</span>: <span class="st">'black'</span>, <span class="st">'axes.labelsize'</span>: <span class="dv">10</span>, <span class="st">'xtick.labelsize'</span>: <span class="dv">10</span>, <span class="st">'ytick.labelsize'</span>: <span class="dv">10</span>, <span class="st">'axes.titlesize'</span>: <span class="dv">16</span>, <span class="st">'axes.grid'</span>: <span class="va">True</span>, <span class="st">'axes.axisbelow'</span>: <span class="va">False</span>, <span class="st">'grid.alpha'</span>: <span class="fl">0.25</span>, <span class="st">'grid.linestyle'</span>: <span class="st">'-'</span>, <span class="st">'grid.color'</span>: <span class="st">'gray'</span>, <span class="st">'xtick.color'</span>: <span class="st">'white'</span>, <span class="st">'ytick.color'</span>: <span class="st">'white'</span>, <span class="st">'xtick.labelcolor'</span>: <span class="st">'black'</span>, <span class="st">'ytick.labelcolor'</span>: <span class="st">'black'</span>, <span class="st">'figure.dpi'</span>: <span class="dv">100</span>, <span class="st">'savefig.dpi'</span>: <span class="dv">300</span>, <span class="st">'axes.spines.top'</span>: <span class="va">False</span>, <span class="st">'axes.spines.right'</span>: <span class="va">False</span>, <span class="st">'axes.spines.left'</span>: <span class="va">True</span>, <span class="st">'axes.spines.bottom'</span>: <span class="va">True</span>, <span class="st">'figure.facecolor'</span>: <span class="st">'white'</span>, <span class="st">'savefig.facecolor'</span>: <span class="st">'white'</span>, <span class="st">'lines.color'</span>: <span class="st">'black'</span>, <span class="st">'axes.prop_cycle'</span>: cycler(<span class="st">'color'</span>, [<span class="st">'dimgray'</span>, <span class="st">'firebrick'</span>, <span class="st">'goldenrod'</span>, <span class="st">'teal'</span>, <span class="st">'#102e42'</span>, <span class="st">'darkslateblue'</span>, <span class="st">'#1c5175'</span>, <span class="st">'cadetblue'</span>, <span class="st">'steelblue'</span>])},</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    kwargs:VAR_KEYWORD</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Update a graph of training and validation loss</em></p>
 <div id="dc6d7869" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.test_utils <span class="im">import</span> synth_learner</span>
@@ -801,32 +784,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>12.469683</td>
-<td>10.642752</td>
+<td>22.033546</td>
+<td>21.049026</td>
 <td>00:00</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>10.907568</td>
-<td>7.576888</td>
+<td>19.264433</td>
+<td>14.814856</td>
 <td>00:00</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>9.167929</td>
-<td>5.002597</td>
+<td>16.147160</td>
+<td>9.624314</td>
 <td>00:00</td>
 </tr>
 <tr class="even">
 <td>3</td>
-<td>7.541678</td>
-<td>3.123832</td>
+<td>13.235481</td>
+<td>6.034212</td>
 <td>00:00</td>
 </tr>
 <tr class="odd">
 <td>4</td>
-<td>6.133796</td>
-<td>1.866151</td>
+<td>10.725522</td>
+<td>3.667081</td>
 <td>00:00</td>
 </tr>
 </tbody>
@@ -835,7 +818,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="080_callbacks_files/figure-html/cell-10-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="090_callbacks_files/figure-html/cell-10-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>

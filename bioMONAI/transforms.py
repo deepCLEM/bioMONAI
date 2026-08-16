@@ -13,8 +13,9 @@ __all__ = ['Blur', 'RandSpatialCrop', 'RandBlur', 'FunctionTransform', 'BioTrans
            'ScaleIntensityRange', 'ScaleIntensityRangePercentiles', 'NormalizeIntensity', 'HistogramNormalize',
            'AdjustContrast', 'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity',
            'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop', 'RandCrop2D', 'RandCropND',
-           'RandRotate90', 'RandFlip', 'RandZoom', 'RandCameraNoise', 'RandGaussianNoise', 'RandGaussianSmooth',
-           'RandGaussianSharpen', 'RandShiftIntensity', 'RandStdShiftIntensity', 'RandAdjustContrast']
+           'RandRotate', 'RandRotate90', 'RandFlip', 'RandZoom', 'RandCameraNoise', 'RandGaussianNoise',
+           'RandGaussianSmooth', 'RandGaussianSharpen', 'RandShiftIntensity', 'RandStdShiftIntensity',
+           'RandAdjustContrast']
 
 # %% ../nbs/030_transforms.ipynb #56ab9960
 # =================================
@@ -2054,6 +2055,27 @@ class RandCropND(RandTransform):
         # CRITICAL FIX: Skip the first dimension (batch/channel) to avoid IndexErrors
         slices = (slice(None),) + tuple(slice(t, b) for t, b in zip(self.tl, self.br))
         return x[slices]
+
+# %% ../nbs/030_transforms.ipynb #8ff481ab
+class RandRotate(RandMonaiTransform):
+
+    _monai_rand_transform = mt.RandRotate
+    _monai_det_transform = mt.Rotate
+
+    _rand_kwargs = {'angle': ['range_x', 'range_y', 'range_z']}
+    _default_kwargs = {'range_x': 0, 'range_y': 0, 'range_z': 0}
+
+    def encodes(self, x: BioImageBase):
+
+        # CYX → MONAI expects 1 value
+        if x.ndim == 3:
+            angle = self.sampled_kwargs["angle"]
+            self.sampled_kwargs["angle"] = angle[0]
+
+        tfm = self._monai_det_transform(**self.sampled_kwargs)
+        out = tfm(x)
+
+        return type(x)(x=out, meta=x.meta)
 
 # %% ../nbs/030_transforms.ipynb #f0512685
 class RandRotate90(RandMonaiTransform):

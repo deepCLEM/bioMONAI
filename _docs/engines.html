@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-480c2803ffe5ab5d6b0bfe6db136e446.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-12a96eab3529714f9105c597ac717936.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -108,23 +108,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <meta property="og:title" content="Engines – bioMONAI">
 <meta property="og:description" content="bioMONAI training engines">
-<meta property="og:image" content="https://deepCLEM.github.io/bioMONAI/070_engines_files/figure-html/cell-6-output-4.png">
 <meta property="og:site_name" content="bioMONAI">
-<meta property="og:image:height" content="351">
-<meta property="og:image:width" content="512">
 <meta name="twitter:title" content="Engines – bioMONAI">
 <meta name="twitter:description" content="bioMONAI training engines">
-<meta name="twitter:image" content="https://deepCLEM.github.io/bioMONAI/070_engines_files/figure-html/cell-6-output-4.png">
-<meta name="twitter:image-height" content="351">
-<meta name="twitter:image-width" content="512">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -381,12 +372,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
-      <a href="./index.html" class="sidebar-logo-link">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
-      </a>
-      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -404,7 +389,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./io.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">I/O</span></a>
+ <span class="menu-text">Input / Output (I/O)</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -567,12 +552,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Multispectral Classification</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_histopathology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Histopathology</span></a>
   </div>
@@ -672,54 +651,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> monai.networks.nets <span class="im">import</span> SEResNet50</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.data <span class="im">import</span> BioDataLoaders</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bioMONAI.metrics <span class="im">import</span> BalancedAccuracy, Precision, accuracy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-error">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ImportError</span>                               Traceback (most recent call last)
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[17]</span><span class="ansi-green-fg">, line 2</span>
-<span class="ansi-green-fg">      1</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">monai</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">networks</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">nets</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> SEResNet50
-<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">2</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">bioMONAI</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">data</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> BioDataLoaders
-<span class="ansi-green-fg">      3</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">bioMONAI</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">metrics</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> BalancedAccuracy, Precision, accuracy
-
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/bioMONAI/bioMONAI/data.py:96</span>
-<span class="ansi-green-fg">     88</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">bioMONAI</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">core</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> (
-<span class="ansi-green-fg">     89</span>     MetaTensor, torchTensor, BypassNewMeta, DisplayedTransform,
-<span class="ansi-green-fg">     90</span>     torchsqueeze, Path, List, L, PathLike, Sequence, Callable, Iterable,
-<span class="ansi-green-fg">     91</span>     torchmax, randint,
-<span class="ansi-green-fg">     92</span>     dictlist_to_funclist, read_yaml, apply_transforms
-<span class="ansi-green-fg">     93</span> )
-<span class="ansi-green-fg">     95</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">io</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> image_reader, BioImageReader, LoadImage, LoadImaged
-<span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">96</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">visualize</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> show_biodata, show_images_grid, show_multichannel
-<span class="ansi-green-fg">     98</span> <span style="font-style:italic;color:rgb(95,135,135)"># =================================</span>
-<span class="ansi-green-fg">     99</span> <span style="font-style:italic;color:rgb(95,135,135)"># Multiple dispatch</span>
-<span class="ansi-green-fg">    100</span> <span style="font-style:italic;color:rgb(95,135,135)"># =================================</span>
-<span class="ansi-green-fg">    101</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">plum</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> dispatch <span style="font-weight:bold;color:rgb(0,135,0)">as</span> typedispatch
-
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/bioMONAI/bioMONAI/visualize.py:41</span>
-<span class="ansi-green-fg">     36</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">fastai</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">vision</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">all</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> ifnone
-<span class="ansi-green-fg">     38</span> <span style="font-style:italic;color:rgb(95,135,135)"># =================================</span>
-<span class="ansi-green-fg">     39</span> <span style="font-style:italic;color:rgb(95,135,135)"># bioMONAI</span>
-<span class="ansi-green-fg">     40</span> <span style="font-style:italic;color:rgb(95,135,135)"># =================================</span>
-<span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">41</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">bioMONAI</span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">core</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> (
-<span class="ansi-green-fg">     42</span>     cells3d,
-<span class="ansi-green-fg">     43</span>     delegates,
-<span class="ansi-green-fg">     44</span>     hasattrs,
-<span class="ansi-green-fg">     45</span>     img2float,
-<span class="ansi-green-fg">     46</span>     tensor,
-<span class="ansi-green-fg">     47</span>     torchTensor,
-<span class="ansi-green-fg">     48</span>     torch_from_numpy,
-<span class="ansi-green-fg">     49</span> )
-<span class="ansi-green-fg">     50</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">.</span><span class="ansi-blue-fg ansi-bold">data</span><span style="color:rgb(188,188,188)"> </span><span style="font-weight:bold;color:rgb(0,135,0)">import</span> route_kwargs
-<span class="ansi-green-fg">     52</span> <span style="font-style:italic;color:rgb(95,135,135)"># =================================</span>
-<span class="ansi-green-fg">     53</span> <span style="font-style:italic;color:rgb(95,135,135)"># Optional / commented</span>
-<span class="ansi-green-fg">     54</span> <span style="font-style:italic;color:rgb(95,135,135)"># =================================</span>
-<span class="ansi-green-fg">     55</span> <span style="font-style:italic;color:rgb(95,135,135)"># from bioMONAI.io import tiff2torch</span>
-<span class="ansi-green-fg">     56</span> 
-<span class="ansi-green-fg">     57</span> <span style="font-style:italic;color:rgb(95,135,135)"># %% ../nbs/009_visualize.ipynb #4273c3de</span>
-
-<span class="ansi-red-fg">ImportError</span>: cannot import name 'tensor' from 'bioMONAI.core' (/home/biagio/bioMONAI/bioMONAI/core.py)</pre>
-</div>
-</div>
 </div>
 <div id="ce8e8341" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the data</span></span>
@@ -750,71 +681,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div id="660c3496" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the trainer with configuration from a YAML file </span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>yaml_path <span class="op">=</span> <span class="st">"./data_examples/sample_config.yml"</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> fastTrainer.from_yaml(data, model, yaml_path)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml_path = "./data_examples/sample_config.yml"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer = fastTrainer.from_yaml(data, model, yaml_path)</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>trainer.fit(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
-    }
-    progress:not([value]), progress:not([value])::-webkit-progress-bar {
-        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
-    }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-</div>
-<div class="cell-output cell-output-display">
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th">epoch</th>
-<th data-quarto-table-cell-role="th">train_loss</th>
-<th data-quarto-table-cell-role="th">valid_loss</th>
-<th data-quarto-table-cell-role="th">accuracy</th>
-<th data-quarto-table-cell-role="th">balanced_accuracy_score</th>
-<th data-quarto-table-cell-role="th">precision_score</th>
-<th data-quarto-table-cell-role="th">time</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>0</td>
-<td>0.801488</td>
-<td>0.537181</td>
-<td>0.793808</td>
-<td>0.734412</td>
-<td>0.795006</td>
-<td>00:23</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Better model found at epoch 0 with accuracy value: 0.7938084006309509.</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="070_engines_files/figure-html/cell-6-output-4.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># # Train the model</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># trainer.fit(1)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="08cf125f" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(trainer.recorder.metric_names)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>['epoch', 'train_loss', 'valid_loss', 'accuracy', 'balanced_accuracy_score', 'precision_score', 'time']</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print(trainer.recorder.metric_names)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>VisionTrainer is used for computer vision applications, where image normalization or other computer vision related settings are needed.</p>
 <hr>
@@ -823,33 +697,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="visiontrainer" class="level3">
 <h3 class="anchored" data-anchor-id="visiontrainer">visionTrainer</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> visionTrainer(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    dataloaders:DataLoaders, <span class="co"># The DataLoader objects containing training and validation datasets.</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    model:<span class="bu">callable</span>, <span class="co"># A callable model that will be trained on the dataset.</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    normalize:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, n_out:NoneType<span class="op">=</span><span class="va">None</span>, pretrained:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, weights:NoneType<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    loss_fn:typing.Any <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># The loss function to optimize during training. If None, defaults to a suitable default.</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    optimizer:fastai.optimizer.Optimizer <span class="op">|</span> fastai.optimizer.OptimWrapper<span class="op">=</span>Adam, <span class="co"># The optimizer function to use. Defaults to Adam if not specified.</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    lr:<span class="bu">float</span> <span class="op">|</span> <span class="bu">slice</span><span class="op">=</span><span class="fl">0.001</span>, <span class="co"># Learning rate for the optimizer. Can be a float or a slice object for learning rate scheduling.</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    splitter:<span class="bu">callable</span><span class="op">=</span>trainable_params,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    callbacks:fastai.callback.core.Callback <span class="op">|</span> collections.abc.MutableSequence <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># A callable that determines which parameters of the model should be updated during training.</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    metrics:typing.Any <span class="op">|</span> collections.abc.MutableSequence <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Optional list of callback functions to customize training behavior.</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    csv_log:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Metrics to evaluate the performance of the model during training.</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    show_graph:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether to log training history to a CSV file. If True, logs will be appended to 'history.csv'.</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># The base directory where models are saved or loaded from. Defaults to None.</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    find_lr:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Subdirectory within the base path where trained models are stored. Default is 'models'.</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    find_lr_fn:function<span class="op">=</span>valley, <span class="co"># Weight decay factor for optimization. Defaults to None.</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span> <span class="op">|</span> pathlib.Path <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Whether to apply weight decay to batch normalization and bias parameters.</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    model_dir:<span class="bu">str</span> <span class="op">|</span> pathlib.Path<span class="op">=</span><span class="st">'models'</span>, <span class="co"># Whether to update the batch normalization statistics during training.</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    wd:<span class="bu">float</span> <span class="op">|</span> <span class="bu">int</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, wd_bn_bias:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, train_bn:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    moms:<span class="bu">tuple</span><span class="op">=</span>(<span class="fl">0.95</span>, <span class="fl">0.85</span>, <span class="fl">0.95</span>), <span class="co"># Tuple of tuples representing the momentum values for different layers in the model. Defaults to FastAI's default settings if not specified.</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    default_cbs:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Automatically include default callbacks such as ShowGraphCallback and CSVLogger.</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    cut:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># model &amp; head args</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    init:function<span class="op">=</span>kaiming_normal_, custom_head:NoneType<span class="op">=</span><span class="va">None</span>, concat_pool:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, pool:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    lin_ftrs:NoneType<span class="op">=</span><span class="va">None</span>, ps:<span class="bu">float</span><span class="op">=</span><span class="fl">0.5</span>, first_bn:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, bn_final:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, lin_first:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    y_range:NoneType<span class="op">=</span><span class="va">None</span>, n_in:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> visionTrainer(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    dataloaders:DataLoaders, <span class="co"># The DataLoader objects containing training and validation datasets.</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    model:<span class="bu">callable</span>, <span class="co"># A callable model that will be trained on the dataset.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    normalize:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, n_out:NoneType<span class="op">=</span><span class="va">None</span>, pretrained:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, weights:NoneType<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    loss_fn:typing.Any <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># The loss function to optimize during training. If None, defaults to a suitable default.</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    optimizer:fastai.optimizer.Optimizer <span class="op">|</span> fastai.optimizer.OptimWrapper<span class="op">=</span>Adam, <span class="co"># The optimizer function to use. Defaults to Adam if not specified.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    lr:<span class="bu">float</span> <span class="op">|</span> <span class="bu">slice</span><span class="op">=</span><span class="fl">0.001</span>, <span class="co"># Learning rate for the optimizer. Can be a float or a slice object for learning rate scheduling.</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    splitter:<span class="bu">callable</span><span class="op">=</span>trainable_params,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    callbacks:fastai.callback.core.Callback <span class="op">|</span> collections.abc.MutableSequence <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># A callable that determines which parameters of the model should be updated during training.</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    metrics:typing.Any <span class="op">|</span> collections.abc.MutableSequence <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Optional list of callback functions to customize training behavior.</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    csv_log:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Metrics to evaluate the performance of the model during training.</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    show_graph:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Whether to log training history to a CSV file. If True, logs will be appended to 'history.csv'.</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    show_summary:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># The base directory where models are saved or loaded from. Defaults to None.</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    find_lr:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, <span class="co"># Subdirectory within the base path where trained models are stored. Default is 'models'.</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    find_lr_fn:function<span class="op">=</span>valley, <span class="co"># Weight decay factor for optimization. Defaults to None.</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    path:<span class="bu">str</span> <span class="op">|</span> pathlib.Path <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Whether to apply weight decay to batch normalization and bias parameters.</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    model_dir:<span class="bu">str</span> <span class="op">|</span> pathlib.Path<span class="op">=</span><span class="st">'models'</span>, <span class="co"># Whether to update the batch normalization statistics during training.</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    wd:<span class="bu">float</span> <span class="op">|</span> <span class="bu">int</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, wd_bn_bias:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, train_bn:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    moms:<span class="bu">tuple</span><span class="op">=</span>(<span class="fl">0.95</span>, <span class="fl">0.85</span>, <span class="fl">0.95</span>), <span class="co"># Tuple of tuples representing the momentum values for different layers in the model. Defaults to FastAI's default settings if not specified.</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    default_cbs:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, <span class="co"># Automatically include default callbacks such as ShowGraphCallback and CSVLogger.</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    cut:NoneType<span class="op">=</span><span class="va">None</span>, <span class="co"># model &amp; head args</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    init:function<span class="op">=</span>kaiming_normal_, custom_head:NoneType<span class="op">=</span><span class="va">None</span>, concat_pool:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, pool:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    lin_ftrs:NoneType<span class="op">=</span><span class="va">None</span>, ps:<span class="bu">float</span><span class="op">=</span><span class="fl">0.5</span>, first_bn:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, bn_final:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, lin_first:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    y_range:NoneType<span class="op">=</span><span class="va">None</span>, n_in:<span class="bu">int</span><span class="op">=</span><span class="dv">3</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Build a vision trainer from <code>dataloaders</code> and <code>model</code></em></p>
 
 

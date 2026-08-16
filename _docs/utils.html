@@ -78,9 +78,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-480c2803ffe5ab5d6b0bfe6db136e446.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-f2547b22a242253d4e5ffb2eb588b974.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-12a96eab3529714f9105c597ac717936.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5a3289df83dbd092ebacf8aa57b98ba6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -372,12 +372,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
-      <a href="./index.html" class="sidebar-logo-link">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
-      <img src="./images/logo_bioMONAI_full6.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
-      </a>
-      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -395,7 +389,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./io.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">I/O</span></a>
+ <span class="menu-text">Input / Output (I/O)</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -558,12 +552,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Tutorials/tutorial_multispectral_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Multispectral Classification</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./Tutorials/tutorial_histopathology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Histopathology</span></a>
   </div>
@@ -601,6 +589,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#funcsplitter" id="toc-funcsplitter" class="nav-link" data-scroll-target="#funcsplitter">FuncSplitter</a></li>
   <li><a href="#traintestsplitter" id="toc-traintestsplitter" class="nav-link" data-scroll-target="#traintestsplitter">TrainTestSplitter</a></li>
   <li><a href="#colsplitter" id="toc-colsplitter" class="nav-link" data-scroll-target="#colsplitter">ColSplitter</a></li>
+  <li><a href="#indexsplitter" id="toc-indexsplitter" class="nav-link" data-scroll-target="#indexsplitter">IndexSplitter</a></li>
   <li><a href="#namesplitter" id="toc-namesplitter" class="nav-link" data-scroll-target="#namesplitter">NameSplitter</a></li>
   <li><a href="#randomsplitter" id="toc-randomsplitter" class="nav-link" data-scroll-target="#randomsplitter">RandomSplitter</a></li>
   <li><a href="#filesplitter" id="toc-filesplitter" class="nav-link" data-scroll-target="#filesplitter">FileSplitter</a></li>
@@ -655,7 +644,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><em>Decorator: replace <code>**kwargs</code> in signature with params from <code>to</code></em></p>
 <p>The utils module contains helper functions and classes to facilitate data manipulation, model setup, and training. These utilities add flexibility and convenience, supporting rapid experimentation and efficient data handling.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L115" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L120" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="add_method" class="level3">
 <h3 class="anchored" data-anchor-id="add_method">add_method</h3>
@@ -665,7 +654,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L122" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L127" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="attributesfromdict" class="level3">
 <h3 class="anchored" data-anchor-id="attributesfromdict">attributesFromDict</h3>
@@ -676,7 +665,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/utils.html#attributesfromdict"><code>attributesFromDict</code></a> function simplifies the conversion of dictionary keys and values into object attributes, allowing dynamic attribute creation for configuration objects. This utility is handy for initializing model or dataset configurations directly from dictionaries, improving code readability and maintainability.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L131" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L136" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="get_device" class="level3">
 <h3 class="anchored" data-anchor-id="get_device">get_device</h3>
@@ -687,7 +676,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/utils.html#get_device"><code>get_device</code></a> function is used to detect if the device the code is executed in has got a CUDA-enabled GPU available. </em> If it doesn’t, it returns CPU.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L139" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L144" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2float" class="level3">
 <h3 class="anchored" data-anchor-id="img2float">img2float</h3>
@@ -698,7 +687,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/utils.html#img2float"><code>img2float</code></a> function turns an image into float representation.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L146" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L151" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="img2tensor" class="level3">
 <h3 class="anchored" data-anchor-id="img2tensor">img2Tensor</h3>
@@ -709,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>The <a href="https://deepCLEM.github.io/bioMONAI/utils.html#img2tensor"><code>img2Tensor</code></a> function turns an image into tensor representation after turning it first into float representation.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L153" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L158" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="route_kwargs" class="level3">
 <h3 class="anchored" data-anchor-id="route_kwargs">route_kwargs</h3>
@@ -722,7 +711,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Handles: - Explicit parameters - Functions with **kwargs (all extra keys are allowed)</p>
 <p>Routes kwargs only to functions that accept them.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L174" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L179" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="read_yaml" class="level3">
 <h3 class="anchored" data-anchor-id="read_yaml">read_yaml</h3>
@@ -733,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Reads a YAML file and returns its contents as a dictionary</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L181" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L186" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="read_args_from_yaml" class="level3">
 <h3 class="anchored" data-anchor-id="read_args_from_yaml">read_args_from_yaml</h3>
@@ -744,7 +733,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Reads arguments from a YAML file and converts them into a namespace.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L197" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L202" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dictlist_to_funclist" class="level3">
 <h3 class="anchored" data-anchor-id="dictlist_to_funclist">dictlist_to_funclist</h3>
@@ -754,7 +743,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L211" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L216" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="dict2string" class="level3">
 <h3 class="anchored" data-anchor-id="dict2string">dict2string</h3>
@@ -774,7 +763,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>test_eq(result, <span class="st">'C002_Z030_S001'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L230" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L235" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="add_columns_to_csv" class="level3">
 <h3 class="anchored" data-anchor-id="add_columns_to_csv">add_columns_to_csv</h3>
@@ -788,7 +777,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><em>Adds one or more new columns to an existing CSV file.</em></p>
 <p>Binary Index Splitters</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L356" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L361" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="funcsplitter" class="level3">
 <h3 class="anchored" data-anchor-id="funcsplitter">FuncSplitter</h3>
@@ -803,7 +792,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Args: func: Function returning True for validation items.</p>
 <p>Returns: Callable returning: <code>(train_idx, valid_idx)</code></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L319" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L324" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="traintestsplitter" class="level3">
 <h3 class="anchored" data-anchor-id="traintestsplitter">TrainTestSplitter</h3>
@@ -815,7 +804,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Split items into random train/valid subsets using sklearn train_test_split.</em></p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L268" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L273" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="colsplitter" class="level3">
 <h3 class="anchored" data-anchor-id="colsplitter">ColSplitter</h3>
@@ -825,43 +814,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>):</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Split items (DataFrame or list[dict]) by value in <code>col</code></em></p>
+<hr>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L399" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="indexsplitter" class="level3">
+<h3 class="anchored" data-anchor-id="indexsplitter">IndexSplitter</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> IndexSplitter(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    valid_idx, kwargs:VAR_KEYWORD</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Split items so that the provided indices are kept in validation and</em> all remaining indices are assigned to training.</p>
+<p>Args: valid_idx: int or iterable of integers identifying validation items.</p>
+<p>Returns: Callable returning <code>(train_idx, valid_idx)</code> in fastai-style format.</p>
 <div id="8e40ec39" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> ColSplitter</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">getattr</span>(</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        splitter(),</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"split_names"</span>,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">None</span>,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    ))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> ColSplitter</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">getattr</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        splitter(),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"split_names"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">None</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    ))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>('train', 'valid')</code></pre>
 </div>
 </div>
 <div id="246dbfbc" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> [</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">10</span>, <span class="st">'split'</span>: <span class="st">'train'</span>}, </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">20</span>, <span class="st">'split'</span>: <span class="st">'valid'</span>}, </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">30</span>, <span class="st">'split'</span>: <span class="dv">0</span>},</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> ColSplitter(col<span class="op">=</span><span class="st">'split'</span>, on<span class="op">=</span><span class="st">'valid'</span>)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># everything that is not 'valid' should be in train, so we should get 2 in train and 1 in valid</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Should be case-insensitive</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">0</span>]) <span class="op">==</span> <span class="dv">2</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">1</span>]) <span class="op">==</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> [</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">10</span>, <span class="st">'split'</span>: <span class="st">'train'</span>}, </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">20</span>, <span class="st">'split'</span>: <span class="st">'valid'</span>}, </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">30</span>, <span class="st">'split'</span>: <span class="dv">0</span>},</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> ColSplitter(col<span class="op">=</span><span class="st">'split'</span>, on<span class="op">=</span><span class="st">'valid'</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># everything that is not 'valid' should be in train, so we should get 2 in train and 1 in valid</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Should be case-insensitive</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">0</span>]) <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">1</span>]) <span class="op">==</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Ternary splitters</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L394" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L427" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="namesplitter" class="level3">
 <h3 class="anchored" data-anchor-id="namesplitter">NameSplitter</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> NameSplitter(</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    col:<span class="bu">str</span><span class="op">=</span><span class="st">'split_name'</span>, split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), kwargs:VAR_KEYWORD</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> NameSplitter(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    col:<span class="bu">str</span><span class="op">=</span><span class="st">'split_name'</span>, split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), kwargs:VAR_KEYWORD</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Split items by values in a column.</em></p>
 <p>Supports pandas DataFrames or <code>list[dict]</code> inputs and returns one index list per name in <code>split_names</code>.</p>
 <p>By default, returns two splits for fastai compatibility: <code>(train_idx, valid_idx)</code>.</p>
@@ -870,32 +872,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     Sequence of split names to extract indices for.</code></pre>
 <p>Returns: Callable: Function returning a tuple of index lists in the same order as <code>split_names</code>.</p>
 <div id="185808b8" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> [</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">10</span>, <span class="st">'split'</span>: <span class="st">'train'</span>},  <span class="co"># Mixed case</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">20</span>, <span class="st">'split'</span>: <span class="st">'valid'</span>},  <span class="co"># Uppercase</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">30</span>, <span class="st">'split'</span>: <span class="st">'test'</span>},</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> NameSplitter(col<span class="op">=</span><span class="st">'split'</span>)</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">0</span>]) <span class="op">==</span> <span class="dv">1</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">1</span>]) <span class="op">==</span> <span class="dv">1</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> NameSplitter(col<span class="op">=</span><span class="st">'split'</span>, split_names<span class="op">=</span><span class="st">'test'</span>) </span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># with only one string, it returns all items that match that string in valid and nothing in train</span></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">1</span></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> NameSplitter(col<span class="op">=</span><span class="st">'split'</span>, split_names<span class="op">=</span>[<span class="st">'train'</span>, <span class="st">'valid'</span>, <span class="st">'test'</span>]) </span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="co"># with only one string, it returns all items that match that string in valid and nothing in train</span></span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> [</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">10</span>, <span class="st">'split'</span>: <span class="st">'train'</span>},  <span class="co"># Mixed case</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">20</span>, <span class="st">'split'</span>: <span class="st">'valid'</span>},  <span class="co"># Uppercase</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>        {<span class="st">'id'</span>: <span class="dv">30</span>, <span class="st">'split'</span>: <span class="st">'test'</span>},</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> NameSplitter(col<span class="op">=</span><span class="st">'split'</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">0</span>]) <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result[<span class="dv">1</span>]) <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> NameSplitter(col<span class="op">=</span><span class="st">'split'</span>, split_names<span class="op">=</span><span class="st">'test'</span>) </span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="co"># with only one string, it returns all items that match that string in valid and nothing in train</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>splitter <span class="op">=</span> NameSplitter(col<span class="op">=</span><span class="st">'split'</span>, split_names<span class="op">=</span>[<span class="st">'train'</span>, <span class="st">'valid'</span>, <span class="st">'test'</span>]) </span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="co"># with only one string, it returns all items that match that string in valid and nothing in train</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> splitter(data)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>([0], [1])
 ([2],)
@@ -903,16 +905,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L486" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L519" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="randomsplitter" class="level3">
 <h3 class="anchored" data-anchor-id="randomsplitter">RandomSplitter</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> RandomSplitter(</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, test_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>,</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    random_state:NoneType<span class="op">=</span><span class="va">None</span>, stratify:NoneType<span class="op">=</span><span class="va">None</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, kwargs:VAR_KEYWORD</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> RandomSplitter(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), valid_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.2</span>, test_fraction:<span class="bu">float</span><span class="op">=</span><span class="fl">0.1</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    random_state:NoneType<span class="op">=</span><span class="va">None</span>, stratify:NoneType<span class="op">=</span><span class="va">None</span>, shuffle:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Randomly split items into subsets.</em></p>
 <p>Uses <code>sklearn.train_test_split</code>.</p>
 <p>The number of returned splits depends on <code>split_names</code>:</p>
@@ -950,15 +952,15 @@ shuffle:
     Whether to shuffle before splitting.</code></pre>
 <p>Returns: Callable returning index lists in the same order as <code>split_names</code>.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L819" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L852" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="filesplitter" class="level3">
 <h3 class="anchored" data-anchor-id="filesplitter">FileSplitter</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FileSplitter(</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    fname, split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'valid'</span>,), key:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, kwargs:VAR_KEYWORD</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> FileSplitter(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    fname, split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'valid'</span>,), key:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Split items using filenames listed in a text file.</em></p>
 <p>The file should contain one filename per line.</p>
 <p>Supports multiple split names similarly to <code>[</code>NameSplitter<code>](https://deepCLEM.github.io/bioMONAI/utils.html#namesplitter)</code>.</p>
@@ -974,30 +976,30 @@ key:
     Dictionary key containing file path.</code></pre>
 <p>Returns: Callable returning one index list per split name.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L779" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L812" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="parentsplitter" class="level3">
 <h3 class="anchored" data-anchor-id="parentsplitter">ParentSplitter</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ParentSplitter(</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), key:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, kwargs:VAR_KEYWORD</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ParentSplitter(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), key:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Split items by parent folder names.</em></p>
 <p>Args: split_names: Parent folder names to split on.</p>
 <pre><code>key:
     Dictionary key containing file path.</code></pre>
 <p>Returns: Callable returning one index list per name in <code>split_names</code>.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L729" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L762" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="grandparentsplitter" class="level3">
 <h3 class="anchored" data-anchor-id="grandparentsplitter">GrandparentSplitter</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> GrandparentSplitter(</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), key:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, kwargs:VAR_KEYWORD</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> GrandparentSplitter(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    split_names:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'train'</span>, <span class="st">'valid'</span>), key:<span class="bu">str</span><span class="op">=</span><span class="st">'image'</span>, kwargs:VAR_KEYWORD</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Split items by grandparent folder names.</em></p>
 <p>Example structure::</p>
 <pre><code>dataset/
@@ -1013,38 +1015,38 @@ key:
 <p>Returns: Callable returning one index list per name in <code>split_names</code>.</p>
 <hr>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L896" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L929" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="targetedtransform" class="level3">
 <h3 class="anchored" data-anchor-id="targetedtransform">TargetedTransform</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> TargetedTransform(</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    transform:<span class="bu">callable</span>, <span class="co"># The transform to apply. Must implement an `encodes()` method</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> used within a Transform pipeline.</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    targets:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'both'</span>,), <span class="co"># Specifies where the transform should be applied.</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>Supported values:</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> (<span class="st">"X"</span>,)      : <span class="bu">apply</span> only to the first element</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> (<span class="st">"y"</span>,)      : <span class="bu">apply</span> only to the second element</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> (<span class="st">"both"</span>,)   : <span class="bu">apply</span> to both elements</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> TargetedTransform(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    transform:<span class="bu">callable</span>, <span class="co"># The transform to apply. Must implement an `encodes()` method</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> used within a Transform pipeline.</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    targets:<span class="bu">tuple</span><span class="op">=</span>(<span class="st">'both'</span>,), <span class="co"># Specifies where the transform should be applied.</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>Supported values:</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> (<span class="st">"X"</span>,)      : <span class="bu">apply</span> only to the first element</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> (<span class="st">"y"</span>,)      : <span class="bu">apply</span> only to the second element</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> (<span class="st">"both"</span>,)   : <span class="bu">apply</span> to both elements</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Wrapper for a transform that specifies which input(s) it should be applied to.</em></p>
 <p>This allows fine-grained control when working with paired data such as (X, y), stereo images, or multi-modal inputs.</p>
 <hr>
-<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L935" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/deepCLEM/bioMONAI/blob/main/bioMONAI/utils.py#L968" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="apply_transforms" class="level3">
 <h3 class="anchored" data-anchor-id="apply_transforms">apply_transforms</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_transforms(</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    image, transforms</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_transforms(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    image, transforms</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Apply a list of transformations, ensuring at least one is applied.</em></p>
 <p>Supports: - plain transforms (applied to both images if tuple) - TargetedTransform(transform, targets=…)</p>
 <div id="4d0dd394" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we pass an empty list of transforms, it should return the input unchanged</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>test_eq(apply_transforms([<span class="dv">1</span>, <span class="dv">2</span>], []), [<span class="dv">1</span>, <span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
