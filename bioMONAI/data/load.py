@@ -51,7 +51,11 @@ from fastai.vision.all import (
 # =================================
 # MONAI
 # =================================
-from monai.data import Dataset as MonaiDataset, CacheDataset, PersistentDataset, SmartCacheDataset
+from monai.data import (
+    Dataset as MonaiDataset, CacheDataset, 
+    PersistentDataset, SmartCacheDataset,
+    DataLoader as MonaiDataLoader
+)
 # from monai.data.utils import pickle_hashing
 from monai.transforms import Compose
 from monai.transforms.transform import Randomizable
@@ -79,6 +83,15 @@ def _safe_repr(self):
         raise
 
 fasttransform.transform.Transform.__repr__ = _safe_repr
+
+# =================================
+# MonaiDataLoader patch
+# =================================
+import inspect
+
+MonaiDataLoader.__init__.__signature__ = inspect.signature(
+    torchDataLoader.__init__
+)
 
 # %% ../../nbs/022_data.load.ipynb #714b74d2
 class BioDataBlock(DataBlock):
@@ -1377,7 +1390,7 @@ class MonaiLoader:
         valid_kwargs = route_kwargs(torchDataLoader.__init__, self.valid_kwargs)
 
         # ---- train DataLoader ----
-        train_dl = torchDataLoader(
+        train_dl = MonaiDataLoader(
             train_ds,
             batch_size=self.batch_size,
             shuffle=self.shuffle,
@@ -1388,7 +1401,7 @@ class MonaiLoader:
         # ---- valid DataLoader ----
         valid_dl = None
         if valid_ds:
-            valid_dl = torchDataLoader(
+            valid_dl = MonaiDataLoader(
                 valid_ds,
                 batch_size=self.val_batch_size or self.batch_size,
                 shuffle=self.val_shuffle,
