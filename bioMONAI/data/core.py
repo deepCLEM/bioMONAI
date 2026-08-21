@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['MetaResolver', 'BioDataClass', 'BioImageBase', 'BioImage', 'BioVolume', 'BioMIP', 'BioVideo', 'BioMultiChannel',
-           'BioLabel']
+           'BioCategorize', 'BioLabel']
 
 # %% ../../nbs/021_data.core.ipynb #7a8886ba
 # =================================
@@ -367,72 +367,150 @@ class BioMultiChannel(BioImageBase):
 
 
 
+# %% ../../nbs/021_data.core.ipynb #381f0392
+class BioCategorize(DisplayedTransform):
+    def __init__(
+        self,
+        vocab=None,
+        sort=True,
+        add_na=False,
+        backend="fastai",
+    ):
+        self.cat = Categorize(
+            vocab=vocab,
+            sort=sort,
+            add_na=add_na,
+        )
+        self.backend = backend
+
+    @property
+    def vocab(self):
+        return self.cat.vocab
+
+    @property
+    def sort(self):
+        return self.cat.sort
+
+    @property
+    def add_na(self):
+        return self.cat.add_na
+
+    @property
+    def c(self):
+        return self.cat.c
+
+    def encodes(self, o):
+        x = self.cat(o)
+
+        if self.backend == "fastai":
+            return x
+        elif self.backend == "monai":
+            return x.as_subclass(torchTensor)
+
+        raise ValueError(f"Unknown backend: {self.backend!r}")
+
+    def decodes(self, o):
+        return self.cat.decode(o)
+
 # %% ../../nbs/021_data.core.ipynb #d3ec8d1a
 class BioLabel(BioDataClass):
     """
-    Data class for Categorical data.
-
+    Data class for categorical data.
     """
 
-    _keys = ['label']
+    _keys = ["label"]
     _vocab = None
     _sort = True
     _add_na = False
+    _backend = "monai"
 
     # --------------------------------------------------
     # LOADING
     # --------------------------------------------------
+
     @classmethod
     def from_source(cls, x, **kwargs):
         cat = cls.get_label(**kwargs)
         return cat(x)
-    
+
     @classmethod
-    def from_dict(cls, x:dict, keys:str|Iterable[str]=None, **kwargs):
+    def from_dict(
+        cls,
+        x: dict,
+        keys: str | Iterable[str] = None,
+        **kwargs,
+    ):
         cat = cls.get_dict_label(keys=keys, **kwargs)
         return cat(x)
-    
+
     # --------------------------------------------------
-    # MONAI INTEGRATION
+    # ENCODING
     # --------------------------------------------------
+
     @classmethod
-    def get_label(cls,**kwargs) -> Callable:
+    def _get_encoder(
+        cls,
+        vocab=None,
+        sort=None,
+        add_na=None,
+        backend="fastai",
+    ):
+        vocab = cls._vocab if vocab is None else vocab
+        sort = cls._sort if sort is None else sort
+        add_na = cls._add_na if add_na is None else add_na
 
-        vocab = kwargs.get('vocab', cls._vocab)
-        sort = kwargs.get('sort', cls._sort)
-        add_na = kwargs.get('add_na', cls._add_na)
+        return BioCategorize(
+            vocab=vocab,
+            sort=sort,
+            add_na=add_na,
+            backend=backend,
+        )
 
-        cat = Categorize(vocab=vocab, sort=sort, add_na=add_na)
+    # --------------------------------------------------
+    # LABEL
+    # --------------------------------------------------
 
-        return cat
+    @classmethod
+    def get_label(cls, **kwargs) -> Callable:
+        return cls._get_encoder(
+            vocab=kwargs.get("vocab", cls._vocab),
+            sort=kwargs.get("sort", cls._sort),
+            add_na=kwargs.get("add_na", cls._add_na),
+            backend=kwargs.get("backend", cls._backend),
+        )
+
+    # --------------------------------------------------
+    # DICT LABEL
+    # --------------------------------------------------
 
     @classmethod
     def get_dict_label(cls, **kwargs) -> Callable:
-
-        vocab = kwargs.get('vocab', cls._vocab)
-        sort = kwargs.get('sort', cls._sort)
-        add_na = kwargs.get('add_na', cls._add_na)
         keys = kwargs.get("keys", cls._keys)
 
         if isinstance(keys, str):
             keys = [keys]
 
-        cat = Categorize(vocab=vocab, sort=sort, add_na=add_na)
+        cat = cls._get_encoder(
+            vocab=kwargs.get("vocab", cls._vocab),
+            sort=kwargs.get("sort", cls._sort),
+            add_na=kwargs.get("add_na", cls._add_na),
+            backend=kwargs.get("backend", cls._backend),
+        )
 
         def _load_dict(data: dict):
             out = data.copy()
+
             for key in keys:
                 out[key] = cat(data[key])
+
             return out
 
-        # attach attrs
-        _load_dict.vocab = vocab
-        _load_dict.sort = sort
-        _load_dict.add_na = add_na
+        # Keep useful metadata on the loader
+        _load_dict.vocab = cat.vocab
+        _load_dict.sort = cat.sort
+        _load_dict.add_na = cat.add_na
         _load_dict.keys = keys
         _load_dict.cat = cat
+        _load_dict.backend = cat.backend
 
         return _load_dict
-
-    
-    
