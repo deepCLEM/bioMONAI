@@ -37,7 +37,7 @@ from torch.utils.data import Dataset as torchDataset
 # =================================
 from fastai.data.all import (
     DataLoaders, delegates, RegexLabeller, is_listy,
-    ColReader
+    ColReader, CategoryMap
 )
 
 from fastai.vision.all import (
@@ -559,13 +559,36 @@ class BaseSource:
             self.get_items.setdefault(key, key)
 
     def _build_class_loaders(self):
+
         loaders = []
-        for cls, keys in ((self.x_class, self.x_keys), (self.y_class, self.y_keys)):
+
+        for cls, keys in (
+            (self.x_class, self.x_keys),
+            (self.y_class, self.y_keys)
+        ):
             if cls and hasattr(cls, "get_dict_label"):
-                loader_kwargs = dict(self.kwargs)
+
                 if keys is not None:
-                    loader_kwargs["keys"] = keys
-                loaders.append(cls.get_dict_label(**loader_kwargs))
+                    self.kwargs["keys"] = keys
+
+                if (
+                    self.kwargs.get("vocab") is None
+                    and self.data is not None
+                ):
+                    labels = [d["label"] for d in self.data]
+
+                    vocab = CategoryMap(
+                        labels,
+                        sort=self.kwargs.get("sort", cls._sort),
+                        add_na=self.kwargs.get("add_na", cls._add_na),
+                    )
+
+                    self.kwargs["vocab"] = vocab
+
+                loaders.append(
+                    cls.get_dict_label(**dict(self.kwargs))
+                )
+
         return loaders
 
     def _has_path_config(self, new_col):
