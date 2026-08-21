@@ -453,6 +453,22 @@ def _show_summary(train_dl, val_dl=None):
 # %% ../../nbs/022_data.load.ipynb #e78657d2
 @dataclass
 class PipelineContext:
+    """Store the state and configuration of a data-loading pipeline.
+
+    Attributes:
+        data: Raw training input data.
+        val_data: Raw validation input data.
+        task: Pipeline task, such as ``"classification"`` or ``"segmentation"``.
+        dataset_name: Name of the selected dataset component.
+        backend: Dataset backend, such as ``"pytorch"`` or ``"monai"``.
+        mode: Current pipeline execution mode.
+        records: Loaded or intermediate data records.
+        train_ds: Training dataset.
+        valid_ds: Validation dataset.
+        dls: Constructed data loaders.
+        config: Pipeline configuration settings.
+        metadata: Runtime metadata collected during execution.
+    """
 
     # raw inputs
     data: Any = None
@@ -1596,11 +1612,11 @@ class BioDataLoaders(DataLoaders):
     @classmethod
     def _build_dataset(cls, ctx):
 
-        DatasetBuilderClass, inferred_backend = (
+        DatasetBuilderClass, inferred_dataset_backend = (
             DATASET_REGISTRY[ctx.dataset_name]
         )
 
-        ctx.backend = ctx.backend or inferred_backend
+        ctx.dataset_backend = inferred_dataset_backend
 
         # builder_kwargs = route_kwargs(
         #     DatasetBuilderClass.__init__,
@@ -1620,7 +1636,7 @@ class BioDataLoaders(DataLoaders):
     @classmethod
     def _build_loader(cls, ctx):
 
-        LoaderClass = LOADER_REGISTRY[ctx.backend]
+        LoaderClass = LOADER_REGISTRY[ctx.dataset_backend]
 
         # loader_kwargs = route_kwargs(
         #     LoaderClass.__init__,
