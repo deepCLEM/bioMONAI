@@ -460,7 +460,7 @@ class PipelineContext:
         val_data: Raw validation input data.
         task: Pipeline task, such as ``"classification"`` or ``"segmentation"``.
         dataset_name: Name of the selected dataset component.
-        backend: Dataset backend, such as ``"pytorch"`` or ``"monai"``.
+        backend: Training backend, such as ``"pytorch"`` or ``"monai"``.
         mode: Current pipeline execution mode.
         records: Loaded or intermediate data records.
         train_ds: Training dataset.
@@ -574,7 +574,7 @@ class BaseSource:
         for key in keys:
             self.get_items.setdefault(key, key)
 
-    def _build_class_loaders(self):
+    def _build_classification_encoders(self):
 
         loaders = []
 
@@ -587,10 +587,7 @@ class BaseSource:
                 if keys is not None:
                     self.kwargs["keys"] = keys
 
-                if (
-                    self.kwargs.get("vocab") is None
-                    and self.data is not None
-                ):
+                if self.kwargs.get("vocab") is None:
                     labels = [d["label"] for d in self.data]
 
                     vocab = CategoryMap(
@@ -689,17 +686,15 @@ class DictSource(BaseSource):
         self.y_class = y_class
         self.kwargs = kwargs
 
-        self.loaders = self._build_class_loaders()
+        self.encoders = self._build_classification_encoders()
 
     def _resolve(self):
         out = []
 
         for row in self.data:
-
             item = dict(row) if self.keep_original else {}
 
             for new_col, src_col in self.get_items.items():
-
                 if isinstance(src_col, str):
                     value = row.get(src_col)
                     item[new_col] = self._format_value(value, new_col)
@@ -717,12 +712,16 @@ class DictSource(BaseSource):
                         f"Invalid src_col type for {new_col}: {type(src_col)}"
                     )
 
-            for loader in self.loaders:
-                item = loader(item)
+            for encoder in self.encoders:
+                item = encoder(item)
 
             out.append(item)
 
-        return out
+        # One vocab per encoder.
+        vocabs = [encoder.vocab for encoder in self.encoders]
+        self.vocab = vocabs[0] if len(vocabs) == 1 else vocabs
+
+        return out  
 
     def load(self):
         return self._resolve()
@@ -1520,82 +1519,178 @@ class ClassificationTask(BaseTask):
             RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
         ]
 
-    def before_dataset(self, ctx):
+    # def before_dataset(self, ctx):
         
-        if ctx.config.get("vocab") is not None:
-            return ctx
+    #     if ctx.config.get("vocab") is not None:
+    #         return ctx
 
-        y_key = ctx.config.get("y_keys") or self.default_y_keys
+    #     ctx.config["vocab"] = ctx.records.encoders[0].vocab
 
-        vocab = list(dict.fromkeys(
-            r[y_key] for r in ctx.records
-        ))
-
-        ctx.config["vocab"] = vocab
-
-        return ctx
+    #     return ctx
 
 # %% ../../nbs/022_data.load.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
     """
-    Unified factory for building training, validation, and test DataLoaders.
+    Unified factory for constructing training, validation, and test DataLoaders.
 
-    This class orchestrates the full pipeline:
-        data → source → dataframe → dataset builder → loader
+    ``BioDataLoaders`` orchestrates the complete data pipeline::
 
-    It supports:
-    - Task-based defaults (transforms, configs)
-    - Multiple backends (fastai, MONAI, etc.)
-    - Optional external validation datasets
-    - Mode-based dataset construction (train / test)
+        data
+          ↓
+        source detection / loading
+          ↓
+        records
+          ↓
+        dataset builder
+          ↓
+        train_ds / valid_ds
+          ↓
+        loader builder
+          ↓
+        DataLoaders
+
+    The actual implementation used at each stage is selected through the
+    corresponding registry:
+
+    - ``TASK_REGISTRY``: task-specific defaults and setup hooks
+    - ``SOURCE_REGISTRY``: input source handling
+    - ``DATASET_REGISTRY``: dataset construction
+    - ``LOADER_REGISTRY``: DataLoader construction
+
+    This keeps the public API independent of the underlying backend. For
+    example, a MONAI dataset and a fastai dataset can be selected through
+    the same ``BioDataLoaders.create`` interface.
+
+    The pipeline is stateful internally through ``PipelineContext``. Each
+    stage receives the context, adds or updates the information required by
+    subsequent stages, and returns it.
+
+    Parameters are normally passed through ``create`` or ``test_dl`` rather
+    than calling the internal pipeline methods directly.
     """
 
-    # --------------------------------------------------
+    # ------------------------------------------------------------------
+    # Task stage
+    # ------------------------------------------------------------------
+
     @classmethod
     def _apply_task(cls, ctx):
+        """
+        Apply task-specific defaults and initialization.
 
+        If a task is specified, its registered task class is instantiated and
+        stored in ``ctx.task_obj``. The task may then:
+
+        1. provide a default dataset type;
+        2. provide default configuration values;
+        3. modify or initialize the pipeline context through ``setup``.
+
+        User-provided configuration always takes precedence over task
+        defaults.
+
+        Parameters
+        ----------
+        ctx : PipelineContext
+            Current pipeline context.
+
+        Returns
+        -------
+        PipelineContext
+            Updated context.
+        """
         if ctx.task is None:
             return ctx
 
         TaskClass = TASK_REGISTRY[ctx.task]
         task = TaskClass()
-
         ctx.task_obj = task
 
+        # A task can define the dataset implementation to use when the user
+        # has not selected one explicitly.
         if ctx.dataset_name is None:
             ctx.dataset_name = task.default_dataset
 
+        # Task defaults are only applied when the corresponding option was
+        # not explicitly provided by the user.
         defaults = task.config()
-
         for k, v in defaults.items():
             ctx.config.setdefault(k, v)
 
+        # Allow the task to perform additional context-specific setup.
         return task.setup(ctx)
 
-    # --------------------------------------------------
+    # ------------------------------------------------------------------
+    # Source stage
+    # ------------------------------------------------------------------
+
     @classmethod
     def _load_data(cls, ctx):
+        """
+        Load the input data and normalize it into records.
 
+        The source type is detected automatically from ``ctx.data`` and the
+        corresponding source class is obtained from ``SOURCE_REGISTRY``.
+
+        When ``val_data`` is provided, the training and validation sources
+        are loaded independently and then combined into a single record list.
+        A validation flag is added to each record so that downstream dataset
+        builders can preserve the train/validation split.
+
+        When ``val_data`` is not provided, the dataset builder is responsible
+        for creating the validation split.
+
+        Parameters
+        ----------
+        ctx : PipelineContext
+            Current pipeline context containing ``data`` and optional
+            ``val_data``.
+
+        Returns
+        -------
+        PipelineContext
+            Context with ``records`` populated.
+        """
         source_name = detect_source(ctx.data)
         SourceClass = SOURCE_REGISTRY[source_name]
 
-        source_splits = split_prefixed_kwargs(ctx.config)
+        # Source-specific options are derived from the common pipeline
+        # configuration. Prefixes such as ``train_`` and ``val_`` allow
+        # different source options for the two datasets.
+        source_config = {**ctx.config, "backend": ctx.backend}
+        source_splits = split_prefixed_kwargs(source_config)
 
-        train_kwargs = route_kwargs(SourceClass.__init__, source_splits["train"])
+        train_kwargs = route_kwargs(
+            SourceClass.__init__,
+            source_splits["train"],
+        )
 
-        train = SourceClass(ctx.data, **train_kwargs).load()
+        train_data_loader = SourceClass(
+            ctx.data,
+            **train_kwargs,
+        )
+        train = train_data_loader.load()
+        if hasattr(train_data_loader, "vocab"): # extracts autogenerated vocab
+            ctx.config["vocab"] = train_data_loader.vocab
 
+        # Without an external validation source, keep the complete training
+        # records together and let the dataset builder perform the split.
         if ctx.val_data is None:
             ctx.records = train
             return ctx
 
         val_kwargs = route_kwargs(
             SourceClass.__init__,
-            source_splits.get("val", source_splits["train"])
+            source_splits.get("val", source_splits["train"]),
         )
-    
-        val = SourceClass(ctx.val_data, **val_kwargs).load()
 
+        val = SourceClass(
+            ctx.val_data,
+            **val_kwargs,
+        ).load()
+
+        # External validation data is converted into the same record format
+        # as training data. The validation column is then used by dataset
+        # builders to preserve the externally supplied split.
         valid_col = ctx.config.get("valid_col", "is_valid")
 
         for r in train:
@@ -1605,54 +1700,99 @@ class BioDataLoaders(DataLoaders):
             r[valid_col] = True
 
         ctx.records = train + val
-
         return ctx
 
-    # --------------------------------------------------
+    # ------------------------------------------------------------------
+    # Dataset stage
+    # ------------------------------------------------------------------
+
     @classmethod
     def _build_dataset(cls, ctx):
+        """
+        Build the training and validation datasets.
 
+        ``DATASET_REGISTRY`` maps the requested dataset name to both:
+
+        - the dataset builder class;
+        - the backend to which that builder belongs.
+
+        The backend is therefore inferred from the dataset definition rather
+        than independently selected by the user. This prevents inconsistent
+        combinations such as a MONAI dataset with a fastai loader.
+
+        The selected builder receives the complete pipeline configuration
+        and converts ``ctx.records`` into ``ctx.train_ds`` and
+        ``ctx.valid_ds``.
+
+        Parameters
+        ----------
+        ctx : PipelineContext
+            Current pipeline context containing normalized records.
+
+        Returns
+        -------
+        PipelineContext
+            Context with datasets and the inferred dataset backend.
+        """
         DatasetBuilderClass, inferred_dataset_backend = (
             DATASET_REGISTRY[ctx.dataset_name]
         )
 
+        # The dataset determines which loader backend must be used.
         ctx.dataset_backend = inferred_dataset_backend
-
-        # builder_kwargs = route_kwargs(
-        #     DatasetBuilderClass.__init__,
-        #     ctx.config
-        # )
 
         builder = DatasetBuilderClass(**ctx.config)
 
-        (ctx.train_ds, ctx.valid_ds) = builder.build(
+        ctx.train_ds, ctx.valid_ds = builder.build(
             ctx.records,
-            mode=ctx.mode
+            mode=ctx.mode,
         )
 
         return ctx
 
-    # --------------------------------------------------
+    # ------------------------------------------------------------------
+    # Loader stage
+    # ------------------------------------------------------------------
+
     @classmethod
     def _build_loader(cls, ctx):
+        """
+        Build the final DataLoaders from the constructed datasets.
 
+        The loader implementation is selected from ``LOADER_REGISTRY`` using
+        the backend inferred by the dataset builder.
+
+        This deliberately separates dataset selection from loader selection:
+
+        ``dataset_name`` → dataset implementation → ``dataset_backend``
+        → loader implementation
+
+        Parameters
+        ----------
+        ctx : PipelineContext
+            Current pipeline context containing ``train_ds``,
+            ``valid_ds``, and ``dataset_backend``.
+
+        Returns
+        -------
+        PipelineContext
+            Context containing the final ``dls`` object.
+        """
         LoaderClass = LOADER_REGISTRY[ctx.dataset_backend]
-
-        # loader_kwargs = route_kwargs(
-        #     LoaderClass.__init__,
-        #     ctx.config
-        # )
 
         loader = LoaderClass(**ctx.config)
 
         ctx.dls = loader.build(
             ctx.train_ds,
-            ctx.valid_ds
+            ctx.valid_ds,
         )
 
         return ctx
 
-    # --------------------------------------------------
+    # ------------------------------------------------------------------
+    # Pipeline orchestration
+    # ------------------------------------------------------------------
+
     @classmethod
     def _run_pipeline(
         cls,
@@ -1664,7 +1804,59 @@ class BioDataLoaders(DataLoaders):
         mode="train",
         **kwargs,
     ):
+        """
+        Execute the complete DataLoader construction pipeline.
 
+        The pipeline is intentionally divided into independent stages so
+        that tasks, sources, datasets, and loaders can be extended through
+        registries without changing the public ``BioDataLoaders`` API.
+
+        Pipeline order::
+
+            task
+              ↓
+            before_load hook
+              ↓
+            source loading
+              ↓
+            before_dataset hook
+              ↓
+            dataset construction
+              ↓
+            before_loader hook
+              ↓
+            loader construction
+              ↓
+            after_loader hook
+              ↓
+            DataLoaders
+
+        In ``test`` mode, dataset splitting is disabled and the validation
+        dataset is explicitly removed before constructing the loader.
+
+        Parameters
+        ----------
+        data : Any
+            Training or test data source.
+        task : str, optional
+            Registered task name.
+        dataset : str, optional
+            Registered dataset builder name.
+        backend : str, optional
+            Backend used by source handling. The dataset backend used for
+            loader selection is inferred from ``DATASET_REGISTRY``.
+        val_data : Any, optional
+            Optional external validation data.
+        mode : {"train", "test"}
+            Pipeline operating mode.
+        **kwargs
+            Additional configuration passed through the pipeline.
+
+        Returns
+        -------
+        DataLoaders
+            The DataLoaders constructed by the selected backend.
+        """
         ctx = PipelineContext(
             data=data,
             val_data=val_data,
@@ -1675,130 +1867,162 @@ class BioDataLoaders(DataLoaders):
             config=kwargs,
         )
 
-        # ---- task defaults/setup ----
+        # ---- Task defaults and task initialization -------------------
         ctx = cls._apply_task(ctx)
 
-        # ---- load ----
+        # Tasks can modify the context before source loading.
         if hasattr(ctx, "task_obj"):
             ctx = ctx.task_obj.before_load(ctx)
-        
+
+        # ---- Source loading -------------------------------------------
+        # Convert the user's input into a normalized list of records.
         ctx = cls._load_data(ctx)
 
-        # ---- dataset ----
+        # ---- Dataset construction -------------------------------------
+        # Tasks can modify the records/configuration before dataset
+        # construction.
         if hasattr(ctx, "task_obj"):
             ctx = ctx.task_obj.before_dataset(ctx)
 
         ctx = cls._build_dataset(ctx)
 
+        # ---- Loader preparation ---------------------------------------
+        # Tasks can make final adjustments after the datasets exist but
+        # before the backend-specific loader is constructed.
         if hasattr(ctx, "task_obj"):
             ctx = ctx.task_obj.before_loader(ctx)
 
-        # ---- test mode ----
+        # In test mode only a single dataset is exposed to the loader.
         if mode == "test":
             ctx.valid_ds = None
 
-        # ---- loader ----
+        # ---- DataLoader construction ----------------------------------
         ctx = cls._build_loader(ctx)
 
+        # Tasks can inspect or modify the final DataLoaders.
         if hasattr(ctx, "task_obj"):
             ctx = ctx.task_obj.after_loader(ctx)
 
         return ctx.dls
 
-    # --------------------------------------------------
+    # ------------------------------------------------------------------
+    # Public factory API
+    # ------------------------------------------------------------------
+
     @classmethod
     def create(
         cls,
-        data: Any,                                                  # Training data source
-
-        task: Optional[str] = None,                                # Registered task name
-        dataset: Optional[str] = None,                             # Dataset builder name
-        backend: Optional[str] = None,                             # Backend override
-        val_data: Optional[Any] = None,                            # Optional validation data
-
-        x_keys: Optional[Sequence[str]] = None,                    # Input column keys
-        y_keys: Optional[Sequence[str]] = None,                    # Target column keys
-
-        x_class: Optional[str] = None,                             # Input object/type class
-        y_class: Optional[str] = None,                             # Target object/type class
-
-        get_items: Optional[Mapping[str, str]] = None,             # Column remapping dictionary
-        base_path: Optional[str] = None,                           # Base path for relative files
-        folders: Optional[Mapping[str, str]] = None,               # Folder mapping
-        suffixes: Optional[Mapping[str, str]] = None,              # File suffix mapping
-
-        keep_original: bool = False,                               # Preserve original samples
-
-        get_x: Optional[Callable] = None,                          # Custom input extractor
-        get_y: Optional[Callable] = None,                          # Custom target extractor
-
-        item_transforms: Optional[Sequence[Callable]] = None,      # Training item transforms
-        val_item_transforms: Optional[Sequence[Callable]] = None,  # Validation item transforms
-
-        transforms: Optional[Sequence[Callable]] = None,           # Training transforms
-        val_transforms: Optional[Sequence[Callable]] = None,       # Validation transforms
-
-        splitter: Optional[Callable] = None,                       # Dataset splitter
-
-        valid_fraction: float = 0.2,                               # Validation split fraction
-        seed: Optional[int] = None,                                # Random seed
-        shuffle: bool = True,                                      # Shuffle training data
-
-        batch_size: int = 64,                                      # Batch size
-        num_workers: int = 0,                                      # Number of workers
-        device: Optional[str] = None,                              # Device override
-
-        drop_last: bool = False,                                   # Drop incomplete last batch
-        pin_memory: bool = False,                                  # Pin memory in DataLoader
-        persistent_workers: bool = False,                          # Keep workers persistent
-
-        show_summary: bool = False,                                # Display dataset summary
-
-        **kwargs,                                                  # Additional pipeline kwargs
+        data: Any,
+        task: Optional[str] = None,
+        dataset: Optional[str] = None,
+        backend: Optional[str] = None,
+        val_data: Optional[Any] = None,
+        x_keys: Optional[Sequence[str]] = None,
+        y_keys: Optional[Sequence[str]] = None,
+        x_class: Optional[str] = None,
+        y_class: Optional[str] = None,
+        get_items: Optional[Mapping[str, str]] = None,
+        base_path: Optional[str] = None,
+        folders: Optional[Mapping[str, str]] = None,
+        suffixes: Optional[Mapping[str, str]] = None,
+        keep_original: bool = False,
+        get_x: Optional[Callable] = None,
+        get_y: Optional[Callable] = None,
+        item_transforms: Optional[Sequence[Callable]] = None,
+        val_item_transforms: Optional[Sequence[Callable]] = None,
+        transforms: Optional[Sequence[Callable]] = None,
+        val_transforms: Optional[Sequence[Callable]] = None,
+        splitter: Optional[Callable] = None,
+        valid_fraction: float = 0.2,
+        seed: Optional[int] = None,
+        shuffle: bool = True,
+        batch_size: int = 64,
+        num_workers: int = 0,
+        device: Optional[str] = None,
+        drop_last: bool = False,
+        pin_memory: bool = False,
+        persistent_workers: bool = False,
+        show_summary: bool = False,
+        **kwargs,
     ):
         """
         Create training and validation DataLoaders.
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | data | Any | — | Training data source |
-        | task | str | None | Registered task name |
-        | dataset | str | None | Dataset builder name |
-        | backend | str | None | Backend override |
-        | val_data | Any | None | Optional validation dataset |
-        | x_keys | Sequence[str] | None | Input column keys |
-        | y_keys | Sequence[str] | None | Target column keys |
-        | x_class | str | None | Input object class |
-        | y_class | str | None | Target object class |
-        | get_items | Mapping[str, str] | None | Column remapping dictionary for item extraction|
-        | base_path | str | None | Base path for relative files |
-        | folders | Mapping[str, str] | None | Folder mapping configuration |
-        | suffixes | Mapping[str, str] | None | File suffix mapping |
-        | keep_original | bool | False | Preserve original samples |
-        | get_x | callable | None | Custom input extractor |
-        | get_y | callable | None | Custom target extractor |
-        | item_transforms | Sequence[callable] | None | Training item transforms |
-        | val_item_transforms | Sequence[callable] | None | Validation item transforms |
-        | transforms | Sequence[callable] | None | Training transforms |
-        | val_transforms | Sequence[callable] | None | Validation transforms |
-        | splitter | callable | None | Dataset splitting function |
-        | valid_fraction | float | 0.2 | Validation split fraction |
-        | seed | int | None | Random seed |
-        | shuffle | bool | True | Shuffle training data |
-        | batch_size | int | 64 | Batch size |
-        | num_workers | int | 0 | Number of dataloader workers |
-        | device | str | None | Device override |
-        | drop_last | bool | False | Drop incomplete last batch |
-        | pin_memory | bool | False | Pin memory in DataLoader |
-        | persistent_workers | bool | False | Keep workers persistent |
-        | show_summary | bool | False | Display dataset summary |
-        | kwargs | dict | {} | Additional pipeline configuration |
+        This is the main public entry point for ``BioDataLoaders``. It
+        accepts a unified set of data, dataset, transform, splitting, and
+        loader options and dispatches them to the appropriate pipeline
+        components.
+
+        Most users should use this method rather than calling individual
+        pipeline stages.
+
+        Parameters
+        ----------
+        data : Any
+            Input training data. The source type is detected automatically.
+        task : str, optional
+            Registered task name. Tasks can provide dataset defaults and
+            task-specific configuration.
+        dataset : str, optional
+            Registered dataset builder name. If omitted, it may be inferred
+            from the selected task.
+        backend : str, optional
+            Backend used when loading the source. The final dataset backend
+            is inferred from the selected dataset builder.
+        val_data : Any, optional
+            Separate validation data. If provided, it is combined with the
+            training records using the configured validation column.
+        x_keys, y_keys : Sequence[str], optional
+            Keys identifying model inputs and targets.
+        x_class, y_class : str, optional
+            Input and target object/type classes.
+        get_items : Mapping[str, str], optional
+            Mapping used by sources to extract items from structured data.
+        base_path : str, optional
+            Base path used to resolve relative file paths.
+        folders, suffixes : Mapping[str, str], optional
+            Source-specific folder and filename suffix configuration.
+        keep_original : bool
+            Whether original samples should be preserved by the source.
+        get_x, get_y : callable, optional
+            Custom input and target extraction functions.
+        item_transforms, val_item_transforms : Sequence[callable], optional
+            Transforms applied at the item/source level for training and
+            validation data.
+        transforms, val_transforms : Sequence[callable], optional
+            Dataset transforms for training and validation.
+        splitter : callable, optional
+            Custom function used to split records into training and
+            validation subsets.
+        valid_fraction : float
+            Fraction of records assigned to validation when no explicit
+            validation split is provided.
+        seed : int, optional
+            Random seed used by splitting/shuffling components.
+        shuffle : bool
+            Whether to shuffle training samples.
+        batch_size : int
+            Training batch size.
+        num_workers : int
+            Number of DataLoader workers.
+        device : str, optional
+            Device used by the loader/backend.
+        drop_last : bool
+            Whether to drop an incomplete final training batch.
+        pin_memory : bool
+            Whether to enable pinned memory in the DataLoader.
+        persistent_workers : bool
+            Whether DataLoader workers should remain alive between epochs.
+        show_summary : bool
+            Whether to display a summary of the resulting DataLoaders.
+        **kwargs
+            Additional backend- or component-specific configuration.
 
         Returns
         -------
         DataLoaders
+            Training and validation DataLoaders.
         """
-
         return cls._run_pipeline(
             data,
             task=task,
@@ -1831,32 +2055,48 @@ class BioDataLoaders(DataLoaders):
             pin_memory=pin_memory,
             persistent_workers=persistent_workers,
             show_summary=show_summary,
-            **kwargs,  
+            **kwargs,
         )
 
-    # --------------------------------------------------
-    @classmethod
-    def create_from_yaml(
-        cls,
-        yaml_path: str,                               # YAML configuration file path
-    ):
-        """
-        Create training and validation DataLoaders from YAML configuration.
+    # ------------------------------------------------------------------
+    # YAML factory API
+    # ------------------------------------------------------------------
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | yaml_path | str | — | YAML configuration file path |
+    @classmethod
+    def create_from_yaml(cls, yaml_path: str):
+        """
+        Create training and validation DataLoaders from a YAML configuration.
+
+        The YAML file is loaded into a dictionary and the top-level pipeline
+        selectors (``data``, ``val_data``, ``task``, ``dataset``, and
+        ``backend``) are extracted before passing the remaining options to
+        the normal pipeline.
+
+        Parameters
+        ----------
+        yaml_path : str
+            Path to the YAML configuration file.
 
         Returns
         -------
         DataLoaders
+            Training and validation DataLoaders.
         """
         config = read_yaml(yaml_path) or {}
-        config = {key: (None if value == "None" else value) for key, value in config.items()}
+
+        # YAML commonly represents null values as the string "None".
+        config = {
+            key: (None if value == "None" else value)
+            for key, value in config.items()
+        }
 
         data = config.pop("data", None)
+
         if data is None:
-            raise ValueError("YAML config must contain a 'data' key for BioDataLoaders.create_from_yaml.")
+            raise ValueError(
+                "YAML config must contain a 'data' key "
+                "for BioDataLoaders.create_from_yaml."
+            )
 
         val_data = config.pop("val_data", None)
         task = config.pop("task", None)
@@ -1871,69 +2111,92 @@ class BioDataLoaders(DataLoaders):
             backend=backend,
             **config,
         )
-    
-    # --------------------------------------------------
+
+    # ------------------------------------------------------------------
+    # Test-data API
+    # ------------------------------------------------------------------
+
     @classmethod
     def test_dl(
         cls,
-        data: Any,                                    # Test data source
-        task: Optional[str] = None,                  # Registered task name
-        dataset: Optional[str] = None,               # Dataset builder name
-        backend: Optional[str] = None,               # Backend override
-        **kwargs,                                    # Additional pipeline kwargs
+        data: Any,
+        task: Optional[str] = None,
+        dataset: Optional[str] = None,
+        backend: Optional[str] = None,
+        **kwargs,
     ):
         """
-        Create a test DataLoader.
+        Create a DataLoader for test/inference data.
 
-        Validation transforms are automatically applied and dataset
-        splitting is disabled.
+        Test mode uses the same source, dataset, transform, and loader
+        pipeline as training, but disables dataset splitting and exposes
+        only the test dataset to the loader.
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | data | Any | — | Test data source |
-        | task | str | None | Registered task name |
-        | dataset | str | None | Dataset builder name |
-        | backend | str | None | Backend override |
-        | kwargs | dict | {} | Additional pipeline configuration |
+        Validation-specific transforms/configuration can still be supplied
+        through ``kwargs`` where supported by the selected backend.
+
+        Parameters
+        ----------
+        data : Any
+            Test data source.
+        task : str, optional
+            Registered task name.
+        dataset : str, optional
+            Registered dataset builder name.
+        backend : str, optional
+            Backend used during source loading. The final loader backend is
+            inferred from the selected dataset.
+        **kwargs
+            Additional pipeline, dataset, transform, or loader options.
 
         Returns
         -------
         DataLoader
+            DataLoader configured for test/inference data.
         """
-
         return cls._run_pipeline(
             data,
             task=task,
             dataset=dataset,
             backend=backend,
             mode="test",
-            **kwargs
+            **kwargs,
         )
-    
-    # --------------------------------------------------
-    @classmethod
-    def test_dl_from_yaml(
-        cls,
-        yaml_path: str,                               # YAML configuration file path
-    ):
-        """
-        Create a test DataLoader from YAML configuration.
 
-        | Parameter | Type | Default | Description |
-        |----------|------|----------|-------------|
-        | yaml_path | str | — | YAML configuration file path |
+    @classmethod
+    def test_dl_from_yaml(cls, yaml_path: str):
+        """
+        Create a test DataLoader from a YAML configuration.
+
+        The configuration is parsed in the same way as
+        ``create_from_yaml``, but the pipeline is executed in ``test`` mode.
+        Dataset splitting is therefore disabled and no validation DataLoader
+        is produced.
+
+        Parameters
+        ----------
+        yaml_path : str
+            Path to the YAML configuration file.
 
         Returns
         -------
         DataLoader
+            DataLoader configured for test/inference data.
         """
-        
         config = read_yaml(yaml_path) or {}
-        config = {key: (None if value == "None" else value) for key, value in config.items()}
+
+        config = {
+            key: (None if value == "None" else value)
+            for key, value in config.items()
+        }
 
         data = config.pop("data", None)
+
         if data is None:
-            raise ValueError("YAML config must contain a 'data' key for BioDataLoaders.test_dl_from_yaml.")
+            raise ValueError(
+                "YAML config must contain a 'data' key "
+                "for BioDataLoaders.test_dl_from_yaml."
+            )
 
         task = config.pop("task", None)
         dataset = config.pop("dataset", None)

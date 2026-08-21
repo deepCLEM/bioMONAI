@@ -386,7 +386,7 @@ class BioCategorize(DisplayedTransform):
         vocab=None,
         sort=True,
         add_na=False,
-        backend="fastai",
+        backend="monai",
     ):
         self.cat = Categorize(
             vocab=vocab,
@@ -470,7 +470,7 @@ class BioLabel(BioDataClass):
         vocab=None,
         sort=None,
         add_na=None,
-        backend="fastai",
+        backend="monai",
     ):
         """Create a categorical encoder configured for this label type."""
         vocab = cls._vocab if vocab is None else vocab
