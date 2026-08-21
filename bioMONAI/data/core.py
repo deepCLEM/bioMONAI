@@ -369,6 +369,18 @@ class BioMultiChannel(BioImageBase):
 
 # %% ../../nbs/021_data.core.ipynb #381f0392
 class BioCategorize(DisplayedTransform):
+    """Encode categorical labels using fastai's ``Categorize`` transform.
+
+    Supports fastai tensor outputs or plain PyTorch tensors for MONAI
+    compatibility.
+
+    Args:
+        vocab: Optional label vocabulary.
+        sort: Whether to sort the vocabulary.
+        add_na: Whether to include an unknown-category label.
+        backend: Output backend, either ``"fastai"`` or ``"monai"``.
+    """
+
     def __init__(
         self,
         vocab=None,
@@ -415,7 +427,10 @@ class BioCategorize(DisplayedTransform):
 # %% ../../nbs/021_data.core.ipynb #d3ec8d1a
 class BioLabel(BioDataClass):
     """
-    Data class for categorical data.
+    Data class for categorical target labels.
+
+    This class defines how labels are encoded/decoded for tasks involving
+    categorical values, including optional vocabulary sorting and NA handling.
     """
 
     _keys = ["label"]
@@ -430,6 +445,7 @@ class BioLabel(BioDataClass):
 
     @classmethod
     def from_source(cls, x, **kwargs):
+        """Load a label from a raw source using the configured encoder."""
         cat = cls.get_label(**kwargs)
         return cat(x)
 
@@ -440,6 +456,7 @@ class BioLabel(BioDataClass):
         keys: str | Iterable[str] = None,
         **kwargs,
     ):
+        """Load categorical labels from one or more keys in a dictionary."""
         cat = cls.get_dict_label(keys=keys, **kwargs)
         return cat(x)
 
@@ -455,6 +472,7 @@ class BioLabel(BioDataClass):
         add_na=None,
         backend="fastai",
     ):
+        """Create a categorical encoder configured for this label type."""
         vocab = cls._vocab if vocab is None else vocab
         sort = cls._sort if sort is None else sort
         add_na = cls._add_na if add_na is None else add_na
@@ -472,6 +490,7 @@ class BioLabel(BioDataClass):
 
     @classmethod
     def get_label(cls, **kwargs) -> Callable:
+        """Return a label encoder configured from class or runtime options."""
         return cls._get_encoder(
             vocab=kwargs.get("vocab", cls._vocab),
             sort=kwargs.get("sort", cls._sort),
@@ -485,6 +504,7 @@ class BioLabel(BioDataClass):
 
     @classmethod
     def get_dict_label(cls, **kwargs) -> Callable:
+        """Return a loader that encodes selected categorical fields in a dict."""
         keys = kwargs.get("keys", cls._keys)
 
         if isinstance(keys, str):
@@ -498,6 +518,7 @@ class BioLabel(BioDataClass):
         )
 
         def _load_dict(data: dict):
+            """Encode one or more categorical fields in a dictionary."""
             out = data.copy()
 
             for key in keys:

@@ -4,7 +4,7 @@
 
 # %% auto #0
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'BioDataBlock', 'register_source',
-           'register_dataset', 'register_loader', 'register_task', 'split_prefixed_kwargs', 'ReadDictDataset',
+           'register_dataset', 'register_loader', 'register_task', 'split_prefixed_kwargs', 'TupleDataset',
            'PipelineContext', 'detect_source', 'build_source', 'BaseSource', 'DictSource', 'DataFrameSource',
            'CSVSource', 'FolderSource', 'ListSource', 'CallableSource', 'DataSplitMixin', 'MonaiTransformMixin',
            'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader', 'MonaiLoader', 'BaseTask',
@@ -137,9 +137,9 @@ def register_source(name):
     return wrapper
 
 
-def register_dataset(name, backend):
+def register_dataset(name, dataset_backend):
     def wrapper(cls):
-        DATASET_REGISTRY[name] = (cls, backend)
+        DATASET_REGISTRY[name] = (cls, dataset_backend)
         return cls
     return wrapper
 
@@ -195,7 +195,7 @@ def split_prefixed_kwargs(kwargs, prefixes=("train_", "val_")):
     return groups
 
 # %% ../../nbs/022_data.load.ipynb #fdcce7d8
-class ReadDictDataset(torchDataset):
+class TupleDataset(torchDataset):
     def __init__(self, ds, x_keys="image", y_keys="label"):
         """
         ds: MONAI dataset (or any dict-like dataset)
@@ -1052,7 +1052,7 @@ class MonaiTransformMixin:
         return train_transform, valid_transform
 
 # %% ../../nbs/022_data.load.ipynb #85a42e13
-@register_dataset("datablock", backend="fastai")
+@register_dataset("datablock", dataset_backend="fastai")
 class DataBlockBuilder(DataSplitMixin):
 
     DEFAULT_INPUT_COLS = ["image", "img", "input", "x"]
@@ -1144,7 +1144,7 @@ class DataBlockBuilder(DataSplitMixin):
         return datablock, data
 
 # %% ../../nbs/022_data.load.ipynb #795e12ca
-@register_dataset("dataset", backend="monai")
+@register_dataset("dataset", dataset_backend="monai")
 class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     def __init__(
@@ -1197,7 +1197,7 @@ class MonaiDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
         return train_ds, valid_ds
 
 # %% ../../nbs/022_data.load.ipynb #f7b3f8b3
-@register_dataset("cache", backend="monai")
+@register_dataset("cache", dataset_backend="monai")
 class CacheDatasetBuilder(DataSplitMixin, MonaiTransformMixin):
 
     @delegates(CacheDataset.__init__, but=['transform'])
@@ -1398,9 +1398,9 @@ class MonaiLoader:
             For classification tasks
         """
         # ---- wrap datasets ----
-        train_ds = ReadDictDataset(train_ds, x_keys=self.x_keys, y_keys=self.y_keys)
+        train_ds = TupleDataset(train_ds, x_keys=self.x_keys, y_keys=self.y_keys)
         if valid_ds:
-            valid_ds = ReadDictDataset(valid_ds, x_keys=self.x_keys, y_keys=self.y_keys)
+            valid_ds = TupleDataset(valid_ds, x_keys=self.x_keys, y_keys=self.y_keys)
 
         # ---- optional vocab patch ----
         if self.vocab:
@@ -2301,8 +2301,8 @@ def from_monai(
     """
 
     # ---- wrap datasets ----
-    train_ds = ReadDictDataset(train_ds, x_keys=x_keys, y_keys=y_keys)
-    val_ds = ReadDictDataset(val_ds, x_keys=x_keys, y_keys=y_keys) if val_ds else None
+    train_ds = TupleDataset(train_ds, x_keys=x_keys, y_keys=y_keys)
+    val_ds = TupleDataset(val_ds, x_keys=x_keys, y_keys=y_keys) if val_ds else None
 
     # ----patch datasets ----
     if vocab:
@@ -2459,7 +2459,7 @@ def _create_test_dl(
         y_keys = getattr(valid_dl, "y_keys", "label")
 
     # ---- wrap dataset ----
-    test_ds = ReadDictDataset(test_ds, x_keys=x_keys, y_keys=y_keys)
+    test_ds = TupleDataset(test_ds, x_keys=x_keys, y_keys=y_keys)
 
     # ---- vocab fallback ----
     if vocab is None and hasattr(data, "vocab"):
