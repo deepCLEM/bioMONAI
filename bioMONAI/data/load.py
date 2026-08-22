@@ -22,6 +22,7 @@ import types
 from inspect import signature, _empty
 from pathlib import Path
 import pandas as pd
+import numpy as np
 
 # for pipeline context
 from dataclasses import dataclass, field
@@ -387,67 +388,441 @@ def _patch_dataloader(dl):
 
     return dl
 
-# %% ../../nbs/022_data.load.ipynb #b5833e23
+# %% ../../nbs/022_data.load.ipynb #6608aed5
 def _show_summary(train_dl, val_dl=None):
     """
-    Print a summary of the training and validation dataloaders.
+    Display a fastai-like summary of a DataLoader pipeline.
 
-    Displays dataset size, batch size, number of batches,
-    batch shapes/dtypes, and approximate memory usage (MB).
+    Reports:
+      - dataset size and split information
+      - DataLoader configuration
+      - x/y item pipelines
+      - item transforms
+      - one transformed sample
+      - collate function
+      - batch transforms, when available
+      - final batch structure
+      - metadata information when available
+
+    The summary is backend-agnostic and supports NumPy arrays,
+    PyTorch tensors and MONAI MetaTensors.
     """
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _unwrap_dataset(ds):
+        """Unwrap dataset wrappers such as TupleDataset."""
+        while hasattr(ds, "ds"):
+            ds = ds.ds
+        return ds
+
+    def _type_name(x):
+        if isinstance(x, MetaTensor):
+            return "MetaTensor"
+        if isinstance(x, torchTensor):
+            return "torch.Tensor"
+        if isinstance(x, np.ndarray):
+            return "numpy.ndarray"
+        return type(x).__name__
+
+    def _shape(x):
+        if hasattr(x, "shape"):
+            return tuple(x.shape)
+        return None
+
+    def _dtype(x):
+        return getattr(x, "dtype", None)
+
+    def _memory_mb(x):
+        if isinstance(x, (MetaTensor, torchTensor)):
+            return x.numel() * x.element_size() / (1024 ** 2)
+
+        if isinstance(x, np.ndarray):
+            return x.nbytes / (1024 ** 2)
+
+        return None
+
+    def _describe(x, indent="    "):
+        """
+        Compact representation of an object.
+
+        Deliberately does not print the contents of large tensors/arrays.
+        """
+        typ = _type_name(x)
+        shape = _shape(x)
+        dtype = _dtype(x)
+
+        parts = [typ]
+
+        if shape is not None:
+            parts.append(f"shape={shape}")
+
+        if dtype is not None:
+            parts.append(f"dtype={dtype}")
+
+        mem = _memory_mb(x)
+        if mem is not None:
+            parts.append(f"~{mem:.2f} MB")
+
+        if isinstance(x, MetaTensor):
+            parts.append("metadata=yes")
+
+        print(indent + " ".join(parts))
+
+    def _iter_transforms(transform):
+        """Return transforms from MONAI/fastai-like Compose objects."""
+        if transform is None:
+            return []
+
+        transforms = getattr(transform, "transforms", None)
+
+        if transforms is not None:
+            return list(transforms)
+
+        return [transform]
+
+    def _transform_name(t):
+        """Compact transform name + parameters."""
+        name = type(t).__name__
+
+        # MONAI transforms generally have a useful repr.
+        # Keep it compact rather than printing potentially huge internals.
+        try:
+            text = repr(t)
+            text = text.replace("\n", " ")
+            if len(text) > 180:
+                text = text[:177] + "..."
+            return f"{name} -- {text}"
+        except Exception:
+            return name
+
+    def _show_pipeline(pipeline, prefix=""):
+        transforms = _iter_transforms(pipeline)
+
+        if not transforms:
+            print(prefix + "Pipeline: None")
+            return
+
+        print(prefix + "Pipeline:")
+
+        for i, t in enumerate(transforms, 1):
+            print(f"{prefix}  {i}. {_transform_name(t)}")
+
+    def _get_pipeline(ds, name):
+        """
+        Try the common locations where the item pipeline may live.
+        """
+        pipeline = getattr(ds, name, None)
+
+        if pipeline is not None:
+            return pipeline
+
+        # Some wrappers expose the underlying dataset.
+        inner = getattr(ds, "ds", None)
+
+        if inner is not None:
+            return getattr(inner, name, None)
+
+        return None
+
+    def _find_metadata(x):
+        """Find metadata without requiring it to be part of the batch."""
+
+        if isinstance(x, MetaTensor):
+            return x.meta
+
+        if isinstance(x, dict):
+            if "meta" in x and isinstance(x["meta"], dict):
+                return x["meta"]
+
+            for v in x.values():
+                meta = _find_metadata(v)
+                if meta is not None:
+                    return meta
+
+        if isinstance(x, (tuple, list)):
+            for v in x:
+                meta = _find_metadata(v)
+                if meta is not None:
+                    return meta
+
+        return None
+
+    def _show_metadata(ds):
+        """
+        Inspect metadata from the underlying dataset.
+
+        This is intentionally independent of the DataLoader output.
+        Therefore numpy+meta/tensor+meta do not need to carry metadata
+        through the batch.
+        """
+        source_ds = _unwrap_dataset(ds)
+
+        try:
+            item = source_ds[0]
+        except Exception:
+            return
+
+        meta = _find_metadata(item)
+
+        if meta is None:
+            return
+
+        print("\nMetadata:")
+        print("  available : yes")
+        print(f"  keys      : {list(meta.keys())}")
+
+        fields = (
+            "filename",
+            "filename_or_obj",
+            "original_shape",
+            "spatial_shape",
+            "pixdim",
+            "spacing",
+            "space",
+            "affine",
+            "original_affine",
+        )
+
+        for key in fields:
+            if key not in meta:
+                continue
+
+            value = meta[key]
+
+            if isinstance(value, np.ndarray):
+                value = (
+                    f"array(shape={value.shape}, "
+                    f"dtype={value.dtype})"
+                )
+
+            print(f"  {key:<11}: {value}")
+
+    # ------------------------------------------------------------------
+    # Sample tracing
+    # ------------------------------------------------------------------
+
+    def _show_sample_pipeline(ds, x_keys, y_keys):
+        """
+        Build and display one sample through the dataset transform.
+
+        This is the equivalent of fastai's:
+            Building one sample
+            applying ...
+            gives ...
+        """
+
+        print("\nBuilding one sample")
+
+        try:
+            # Use the underlying dictionary dataset when possible.
+            source_ds = _unwrap_dataset(ds)
+
+            # Raw item, before the MONAI transform pipeline.
+            raw_item = source_ds.data[0] if hasattr(source_ds, "data") else None
+
+            if raw_item is None:
+                print("  Could not access raw dataset item.")
+                return
+
+            print("  starting from")
+            print(f"    {raw_item}")
+
+            transform = getattr(source_ds, "transform", None)
+
+            if transform is None:
+                print("  No item transform to apply")
+                return
+
+            # ----------------------------------------------------------
+            # MONAI Compose
+            # ----------------------------------------------------------
+            transforms = _iter_transforms(transform)
+
+            current = raw_item
+
+            for t in transforms:
+                print(f"\n  applying {_transform_name(t)}")
+
+                try:
+                    current = t(current)
+                except Exception as e:
+                    print(f"    ERROR: {e}")
+                    break
+
+                print("    gives")
+                _describe_sample(current)
+
+            print("\nFinal sample:")
+            _describe_sample(current)
+
+        except Exception as e:
+            print(f"  Could not build sample: {e}")
+
+    def _describe_sample(x, indent="    "):
+        """
+        Describe a sample without printing its full contents.
+        """
+
+        if isinstance(x, dict):
+            for k, v in x.items():
+                print(f"{indent}{k}:")
+                _describe_sample(v, indent + "  ")
+            return
+
+        if isinstance(x, (tuple, list)):
+            for i, v in enumerate(x):
+                print(f"{indent}[{i}]:")
+                _describe_sample(v, indent + "  ")
+            return
+
+        _describe(x, indent)
+
+    # ------------------------------------------------------------------
+    # Batch summary
+    # ------------------------------------------------------------------
+
+    def _show_batch(dl):
+        print("\nBuilding one batch")
+
+        try:
+            batch = next(iter(dl))
+        except Exception as e:
+            print(f"  Could not build batch: {e}")
+            return
+
+        collate = getattr(dl, "collate_fn", None)
+
+        print("\nCollating items in a batch")
+
+        if collate is None:
+            print("  collate_fn: default")
+        else:
+            print(
+                f"  collate_fn: "
+                f"{getattr(collate, '__name__', type(collate).__name__)}"
+            )
+
+        # --------------------------------------------------------------
+        # Final batch
+        # --------------------------------------------------------------
+
+        print("\nFinal batch:")
+
+        if isinstance(batch, (tuple, list)):
+            if len(batch) == 2:
+                print("  x:")
+                _describe(batch[0], "    ")
+
+                print("  y:")
+                _describe(batch[1], "    ")
+            else:
+                for i, item in enumerate(batch):
+                    print(f"  [{i}]:")
+                    _describe(item, "    ")
+
+        elif isinstance(batch, dict):
+            for k, v in batch.items():
+                print(f"  {k}:")
+                _describe(v, "    ")
+
+        else:
+            _describe(batch, "    ")
+
+    # ------------------------------------------------------------------
+    # DataLoader
+    # ------------------------------------------------------------------
+
     def _describe_dl(dl, name):
+
         print(f"\n{name} DataLoader")
-        print("-" * (len(name) + 11))
+        print("=" * (len(name) + 12))
 
         ds = dl.dataset
+        source_ds = _unwrap_dataset(ds)
 
-        # dataset info
         try:
             ds_len = len(ds)
-        except:
+        except Exception:
             ds_len = "unknown"
 
         print(f"Dataset size : {ds_len}")
         print(f"Batch size   : {dl.batch_size}")
         print(f"Batches      : {len(dl)}")
 
-        if hasattr(ds, "vocab"):
-            print(f"Classes      : {ds.vocab}")
+        if hasattr(dl, "shuffle"):
+            print(f"Shuffle      : {dl.shuffle}")
 
-        # inspect one batch
-        try:
-            batch = next(iter(dl))
-        except Exception as e:
-            print(f"Could not fetch batch: {e}")
-            return
+        print(f"Workers      : {dl.num_workers}")
 
-        print("\nBatch structure:")
+        # --------------------------------------------------------------
+        # Vocabulary
+        # --------------------------------------------------------------
 
-        def _tensor_size(x):
-            return x.numel() * x.element_size() / (1024 ** 2)  # MB
+        vocab = getattr(dl, "vocab", None)
 
-        total_mem = 0.0
+        if vocab is not None:
+            print(f"Classes      : {vocab}")
 
-        if isinstance(batch, (list, tuple)):
-            for i, item in enumerate(batch):
-                if isinstance(item, torchTensor):
-                    mem = _tensor_size(item)
-                    total_mem += mem
-                    print(f"  [{i}] shape={tuple(item.shape)} dtype={item.dtype} ~{mem:.2f} MB")
-                else:
-                    print(f"  [{i}] type={type(item)}")
-        elif isinstance(batch, dict):
-            for k, v in batch.items():
-                if isinstance(v, torchTensor):
-                    mem = _tensor_size(v)
-                    total_mem += mem
-                    print(f"  {k}: shape={tuple(v.shape)} dtype={v.dtype} ~{mem:.2f} MB")
-                else:
-                    print(f"  {k}: type={type(v)}")
+        # --------------------------------------------------------------
+        # Dataset / item pipeline
+        # --------------------------------------------------------------
+
+        x_keys = getattr(ds, "x_keys", None)
+        y_keys = getattr(ds, "y_keys", None)
+
+        if x_keys is not None:
+            print(f"x_keys       : {x_keys}")
+
+        if y_keys is not None:
+            print(f"y_keys       : {y_keys}")
+
+        transform = getattr(source_ds, "transform", None)
+
+        if transform is not None:
+            print("\nItem transforms:")
+            _show_pipeline(transform, prefix="  ")
+
+        # --------------------------------------------------------------
+        # Sample
+        # --------------------------------------------------------------
+
+        _show_sample_pipeline(ds, x_keys, y_keys)
+
+        # --------------------------------------------------------------
+        # Collation / batch
+        # --------------------------------------------------------------
+
+        print("\nBatch transforms:")
+
+        # PyTorch/MONAI DataLoader normally has only collate_fn here.
+        collate = getattr(dl, "collate_fn", None)
+
+        if collate is None:
+            print("  collate_fn: default")
         else:
-            print(type(batch))
+            print(
+                f"  collate_fn: "
+                f"{getattr(collate, '__name__', type(collate).__name__)}"
+            )
 
-        print(f"Approx batch memory: {total_mem:.2f} MB")
+        # --------------------------------------------------------------
+        # Final batch
+        # --------------------------------------------------------------
+
+        _show_batch(dl)
+
+        # --------------------------------------------------------------
+        # Metadata
+        # --------------------------------------------------------------
+
+        _show_metadata(ds)
+
+    # ------------------------------------------------------------------
+    # Train / validation
+    # ------------------------------------------------------------------
 
     _describe_dl(train_dl, "Train")
 
@@ -467,7 +842,23 @@ def _to_numpy(x):
     return x
 
 def numpy_collate(batch):
-    return _to_numpy(torch_default_collate(batch))
+    xs = []
+    ys = []
+
+    for sample in batch:
+        x, y = sample
+
+        if (
+            isinstance(x, (tuple, list))
+            and len(x) == 2
+            and isinstance(x[1], dict)
+        ):
+            x = x[0]
+
+        xs.append(x)
+        ys.append(y)
+
+    return np.stack(xs), np.asarray(ys)
 
 MONAI_COLLATE = {
     "numpy": numpy_collate,
