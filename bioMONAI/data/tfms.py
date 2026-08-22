@@ -347,6 +347,19 @@ def show_batch(x: BioImageBase,      # The input image data.
     
     return ctxs
 
+# %% ../../nbs/023_data.tfms.ipynb #55a7370c
+def _to_bioimage(x):
+    
+    cls = BioImage if x.shape[0] == 1 else BioMultiChannel
+
+    if isinstance(x, (MetaTensor, torchTensor)):
+        return cls.from_metatensor(x)
+
+    if isinstance(x, np.ndarray):
+        return cls.from_numpy(x)
+
+    return x
+
 # %% ../../nbs/023_data.tfms.ipynb #bee716ba
 @typedispatch
 def show_batch(
@@ -387,8 +400,7 @@ def show_batch(
         # -------------------------
         # Convert tensors → BioImage
         # -------------------------
-        cls = BioImage if x[0].shape[0] == 1 else BioMultiChannel
-        x_bio = [cls.from_metatensor(t) for t in x]
+        x_bio = [_to_bioimage(t) for t in x]
 
         # -------------------------
         # Convert y to list
@@ -417,6 +429,59 @@ def show_batch(
     # -------------------------
     for i, ((img, lbl), ax) in enumerate(zip(samples, ctxs)):
         if i >= max_n: break
+        img.show(ctx=ax, **kwargs)
+        ax.set_title(str(lbl), fontsize=10)
+
+    return ctxs
+
+# %% ../../nbs/023_data.tfms.ipynb #7ee4aff1
+@typedispatch
+def show_batch(
+    x: list[np.ndarray],
+    y: list,
+    samples=None,
+    ctxs=None,
+    max_n=9,
+    nrows=None,
+    ncols=None,
+    figsize=None,
+    vocab=None,
+    **kwargs,
+):
+    if samples is None:
+        x = x[:max_n]
+
+        x_bio = [_to_bioimage(t) for t in x]
+
+        y_list = []
+        for value in y[:len(x)]:
+            if isinstance(value, np.generic):
+                value = value.item()
+            elif isinstance(value, np.ndarray) and value.ndim == 0:
+                value = value.item()
+
+            y_list.append(value)
+
+        if vocab is not None:
+            y_list = [vocab[o] for o in y_list]
+
+        samples = list(zip(x_bio, y_list))
+
+    if ctxs is None:
+        ctxs = get_grid(
+            min(len(samples), max_n),
+            nrows=nrows,
+            ncols=ncols,
+            figsize=figsize,
+        )
+
+    if isinstance(ctxs, np.ndarray):
+        ctxs = ctxs.flatten()
+
+    for i, ((img, lbl), ax) in enumerate(zip(samples, ctxs)):
+        if i >= max_n:
+            break
+
         img.show(ctx=ax, **kwargs)
         ax.set_title(str(lbl), fontsize=10)
 

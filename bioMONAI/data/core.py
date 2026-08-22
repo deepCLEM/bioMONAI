@@ -10,6 +10,7 @@ __all__ = ['MetaResolver', 'BioDataClass', 'BioImageBase', 'BioImage', 'BioVolum
 # =================================
 # Standard library
 # =================================
+from numpy import ndarray
 from plum import dispatch
 
 # =================================
@@ -69,6 +70,10 @@ class BioDataClass(MetaTensor):
     @classmethod
     def from_metatensor(cls, x: MetaTensor):
         return cls(x=x.data, meta=x.meta)
+
+    @classmethod
+    def from_numpy(cls, x: ndarray, meta: dict | None = None):
+        return cls(x=x, meta=meta or {})
     
     # --------------------------------------------------
     # TRANSFORMS
@@ -76,7 +81,6 @@ class BioDataClass(MetaTensor):
     @classmethod
     def set_transforms(cls, transforms):
         cls._transforms = transforms
-    
     
     # --------------------------------------------------
     # LOADING
@@ -371,14 +375,14 @@ class BioMultiChannel(BioImageBase):
 class BioCategorize(DisplayedTransform):
     """Encode categorical labels using fastai's ``Categorize`` transform.
 
-    Supports fastai tensor outputs or plain PyTorch tensors for MONAI
-    compatibility.
+    Supports fastai tensors, PyTorch tensors, or NumPy arrays.
 
     Args:
         vocab: Optional label vocabulary.
         sort: Whether to sort the vocabulary.
         add_na: Whether to include an unknown-category label.
-        backend: Output backend, either ``"fastai"`` or ``"monai"``.
+        backend: Output backend, either ``"fastai"``, ``"monai"``,
+            or ``"numpy"``.
     """
 
     def __init__(
@@ -388,6 +392,12 @@ class BioCategorize(DisplayedTransform):
         add_na=False,
         backend="monai",
     ):
+        if backend not in {"fastai", "monai", "numpy"}:
+            raise ValueError(
+                f"BioCategorize: unknown backend {backend!r}. "
+                "Expected one of {'fastai', 'monai', 'numpy'}."
+            )
+
         self.cat = Categorize(
             vocab=vocab,
             sort=sort,
@@ -416,10 +426,12 @@ class BioCategorize(DisplayedTransform):
 
         if self.backend == "fastai":
             return x
-        elif self.backend == "monai":
-            return x.as_subclass(torchTensor)
 
-        raise ValueError(f"Unknown backend: {self.backend!r}")
+        if self.backend == "monai":
+            return x.as_subclass(torch.Tensor)
+
+        if self.backend == "numpy":
+            return x.cpu().numpy()
 
     def decodes(self, o):
         return self.cat.decode(o)
