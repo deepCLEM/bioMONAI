@@ -389,8 +389,8 @@ BIOCATEGORIZE_BACKENDS = {
     "ignite": _to_monai,
     "keras": _to_monai,
     "numpy": _to_numpy,
-    "tensorflow": _to_numpy,
-    "jax": _to_numpy,
+    # "tensorflow": _to_numpy,
+    # "jax": _to_numpy,
 }
 
 

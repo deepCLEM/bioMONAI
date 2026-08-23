@@ -860,6 +860,7 @@ def numpy_collate(batch):
 
     return np.stack(xs), np.asarray(ys)
 
+
 MONAI_COLLATE = {
     "fastai": None,
     "monai": None,
@@ -867,8 +868,8 @@ MONAI_COLLATE = {
     "ignite": None,
     "keras": None,
     "numpy": numpy_collate,
-    "tensorflow": numpy_collate,
-    "jax": numpy_collate,
+    # "tensorflow": numpy_collate,
+    # "jax": numpy_collate,
 }
 
 # %% ../../nbs/022_data.load.ipynb #e78657d2
