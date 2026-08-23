@@ -84,95 +84,135 @@ def show_image(values, # A 2D or 3D array of pixel values representing the image
 
 # %% ../nbs/120_visualize.ipynb #501a869c
 @delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
-def show_multichannel(img,                  # A tensor or numpy array representing a multi-channel image.
-                      ax=None,              # The Matplotlib axis to use for plotting.
-                      figsize=None,         # The size of the figure.
-                      title=None,           # The title of the image.
-                      max_slices=3,         # The maximum number of slices to display.
-                      ctx=None,             # The context to use for plotting.
-                      layout='horizontal',  # The layout type: 'horizontal', 'square', or 'multirow'.
-                      num_cols=3,           # The number of columns for the 'multirow' layout. Ignored for other layouts.
-                      **kwargs):
+def show_multichannel(
+    img,                       # A tensor or numpy array representing a multi-channel image.
+    ax=None,                   # The Matplotlib axis to use for plotting.
+    figsize=None,              # The size of the figure.
+    title=None,                # The title of the image.
+    max_slices=3,              # The maximum number of slices to display.
+    ctx=None,                  # The context to use for plotting.
+    layout='horizontal',       # The layout type: 'horizontal', 'square', or 'multirow'.
+    num_cols=3,                # Number of columns for the 'multirow' layout.
+    channel_axis=0,            # Channel axis. 0 for channel-first, -1 for channel-last.
+    **kwargs,
+):
     """
-    Show multi-channel CYX image with options for horizontal, square, or multi-row layout.
+    Show a multi-channel image.
+
+    By default, images are assumed to be channel-first (C,Y,X). Use
+    ``channel_axis=-1`` for channel-last (Y,X,C) images.
     """
-    # Check if the image has the as_tensor attribute
+
+    # Convert to NumPy
     if hasattr(img, 'as_tensor'):
-        # If it has as_tensor, convert it to tensor and then to numpy
         img_tensor = img.as_tensor().cpu().numpy()
     else:
-        # Attempt to convert img to a numpy array directly
         try:
-            img_tensor = np.array(img)
+            img_tensor = np.asarray(img)
         except Exception as e:
-            raise TypeError("The provided image cannot be converted to a tensor or numpy array.") from e
+            raise TypeError(
+                "The provided image cannot be converted to a tensor or numpy array."
+            ) from e
+
+    if img_tensor.ndim != 3:
+        raise ValueError(
+            f"Expected a 3D multi-channel image, got shape {img_tensor.shape}."
+        )
+
+    # Normalize to channel-first internally
+    if channel_axis < 0:
+        channel_axis += img_tensor.ndim
+
+    if channel_axis not in range(img_tensor.ndim):
+        raise ValueError(
+            f"Invalid channel_axis={channel_axis} for image with "
+            f"{img_tensor.ndim} dimensions."
+        )
+
+    if channel_axis != 0:
+        img_tensor = np.moveaxis(img_tensor, channel_axis, 0)
+
+    num_channels = img_tensor.shape[0]
 
     # Set figure size if not provided
     if figsize is None:
-        figsize = (5, 5) if img_tensor.shape[0] == 3 else (8, 4)  # Larger for multi-channel
+        figsize = (5, 5) if num_channels == 3 else (8, 4)
 
     # Create axis if not provided
     ax = ifnone(ax, ctx)
     if ax is None:
-        fig, ax = plt.subplots(figsize=figsize)
+        _, ax = plt.subplots(figsize=figsize)
 
-    # Handle RGB images (C=3)
-    if img_tensor.ndim == 3 and img_tensor.shape[0] == 3:  # CYX format, where C=3 (RGB)
-        img_to_show = img_tensor.transpose(1, 2, 0)  # Convert from CYX (Channels, Y, X) to YXC (Height, Width, Channels)
-        if max(img_to_show.flatten()) > 1.0:
-            ax.imshow(img_to_show / 255, **kwargs)
-        else:
-            ax.imshow(img_to_show, **kwargs)
+    # RGB
+    if num_channels == 3:
+        img_to_show = img_tensor.transpose(1, 2, 0)
 
-    # Handle multi-channel images (C≠3)
+        if np.max(img_to_show) > 1.0:
+            img_to_show = img_to_show / 255
+
+        ax.imshow(img_to_show, **kwargs)
+
+    # Multi-channel grayscale
     else:
-        num_channels = img_tensor.shape[0]
-        
         # Limit number of channels to max_slices
         if num_channels > max_slices:
-            middle_slices = range(num_channels // 2 - max_slices // 2, num_channels // 2 + max_slices // 2)
-            img_tensor = img_tensor[list(middle_slices)]
+            start = num_channels // 2 - max_slices // 2
+            end = start + max_slices
+            img_tensor = img_tensor[start:end]
+            num_channels = img_tensor.shape[0]
 
         if layout == 'square':
-            # Calculate the grid size
-            grid_size = int(np.ceil(np.sqrt(img_tensor.shape[0])))
-            grid_canvas = np.zeros((grid_size * img_tensor.shape[1], grid_size * img_tensor.shape[2]))
+            grid_size = int(np.ceil(np.sqrt(num_channels)))
+            height, width = img_tensor.shape[1:3]
+
+            grid_canvas = np.zeros(
+                (grid_size * height, grid_size * width)
+            )
+
             for idx, channel in enumerate(img_tensor):
                 row = idx // grid_size
                 col = idx % grid_size
-                grid_canvas[row * img_tensor.shape[1]:(row + 1) * img_tensor.shape[1],
-                            col * img_tensor.shape[2]:(col + 1) * img_tensor.shape[2]] = channel
+
+                grid_canvas[
+                    row * height:(row + 1) * height,
+                    col * width:(col + 1) * width,
+                ] = channel
+
             img_to_show = grid_canvas
 
         elif layout == 'multirow':
             num_rows = int(np.ceil(num_channels / num_cols))
-            row_height = img_tensor.shape[1]
-            col_width = img_tensor.shape[2]
-            multirow_canvas = np.zeros((num_rows * row_height, num_cols * col_width))
+            height, width = img_tensor.shape[1:3]
+
+            multirow_canvas = np.zeros(
+                (num_rows * height, num_cols * width)
+            )
 
             for idx, channel in enumerate(img_tensor):
                 row = idx // num_cols
                 col = idx % num_cols
-                multirow_canvas[row * row_height:(row + 1) * row_height,
-                                col * col_width:(col + 1) * col_width] = channel
+
+                multirow_canvas[
+                    row * height:(row + 1) * height,
+                    col * width:(col + 1) * width,
+                ] = channel
+
             img_to_show = multirow_canvas
 
-        else:  # Horizontal layout
-            img_to_show = np.concatenate([img_tensor[c] for c in range(img_tensor.shape[0])], axis=1)
+        else:
+            img_to_show = np.concatenate(
+                [img_tensor[c] for c in range(num_channels)],
+                axis=1,
+            )
 
-        # Display the image as grayscale
         ax.imshow(img_to_show, **kwargs)
 
-    # Set title for the image
     if title:
         ax.set_title(title)
 
-    # Turn off the axis for a cleaner display
     ax.axis('off')
 
     return ax
-
-
 
 # %% ../nbs/120_visualize.ipynb #cdc50b00
 # Utility function for determining figure bounds
@@ -182,7 +222,7 @@ def _fig_bounds(x):
 
 # %% ../nbs/120_visualize.ipynb #ba0b8261
 @delegates(plt.Axes.imshow, keep=True)
-def show_mosaic(t: np.ndarray | torchTensor,   # 3D image to plot
+def show_mosaic(t: np.ndarray | torchTensor,        # 3D image to plot
                   axis: int = 0,                    # axis to split 3D array to 2D images
                   figsize: tuple = (15,15),         # size of the figure
                   cmap: str = 'gray',               # colormap to use
@@ -326,9 +366,10 @@ def show_plane(ax,                  # The axis object to display the slice on.
 
 # %% ../nbs/120_visualize.ipynb #92ed68f5
 @delegates(show_plane, keep=True)
-def show_slices(data,          # A 3D numpy array representing the image tensor.
-                planes=None,   # A tuple containing the indices of the planes to visualize.
-                showlines=True,# Whether to show dashed lines on the planes, rows, and columns.
+def show_slices(data,               # A 3D numpy array representing the image tensor.
+                planes=None,        # A tuple containing the indices of the planes to visualize.
+                showlines=True,     # Whether to show dashed lines on the planes, rows, and columns.
+                style='default',    # style options
                 **kwargs):
     """
     Visualize slices of a 3D image tensor along its planes, rows, and columns.
@@ -336,28 +377,22 @@ def show_slices(data,          # A 3D numpy array representing the image tensor.
     if planes:
         z, y, x = planes
     else:
-        # Extract dimensions
-        (z, y, x) = data.shape
-        z = z // 2
-        y = y // 2
-        x = x // 2
-    
-    # Create subplots
-    _, (a, b, c) = plt.subplots(ncols=3, figsize=(15, 5))
-    
-    # Display slices along planes, rows, and columns
-    if showlines:
-        show_plane(a, data[z], title=f'Plane = {z}', lines=[y, x], **kwargs)
-        show_plane(b, data[:, y, :], title=f'Row = {y}', lines=[z, x], **kwargs)
-        show_plane(c, data[:, :, x], title=f'Column = {x}', lines=[z, y], **kwargs)
-    else:
-        show_plane(a, data[z], title=f'Plane = {z}')
-        show_plane(b, data[:, y, :], title=f'Row = {y}')
-        show_plane(c, data[:, :, x], title=f'Column = {x}')
-    
-    # Show the plot
-    plt.show()
+        z, y, x = data.shape
+        z, y, x = z // 2, y // 2, x // 2
 
+    with plt.style.context(style or 'default'):
+        _, (a, b, c) = plt.subplots(ncols=3, figsize=(15, 5))
+
+        if showlines:
+            show_plane(a, data[z], title=f'Plane = {z}', lines=[y, x], **kwargs)
+            show_plane(b, data[:, y, :], title=f'Row = {y}', lines=[z, x], **kwargs)
+            show_plane(c, data[:, :, x], title=f'Column = {x}', lines=[z, y], **kwargs)
+        else:
+            show_plane(a, data[z], title=f'Plane = {z}', **kwargs)
+            show_plane(b, data[:, y, :], title=f'Row = {y}', **kwargs)
+            show_plane(c, data[:, :, x], title=f'Column = {x}', **kwargs)
+
+        plt.show()
 
 # %% ../nbs/120_visualize.ipynb #0078d8cd
 def slice_explorer(data,            # A 3D numpy array representing the image tensor.

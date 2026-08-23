@@ -396,13 +396,13 @@ def _show_summary(train_dl, val_dl=None):
     Reports:
       - dataset size and split information
       - DataLoader configuration
+      - pipeline configuration
       - x/y item pipelines
       - item transforms
       - one transformed sample
       - collate function
-      - batch transforms, when available
       - final batch structure
-      - metadata information when available
+      - sample metadata, including MONAI MetaTensor metadata
 
     The summary is backend-agnostic and supports NumPy arrays,
     PyTorch tensors and MONAI MetaTensors.
@@ -463,6 +463,7 @@ def _show_summary(train_dl, val_dl=None):
             parts.append(f"dtype={dtype}")
 
         mem = _memory_mb(x)
+
         if mem is not None:
             parts.append(f"~{mem:.2f} MB")
 
@@ -487,14 +488,15 @@ def _show_summary(train_dl, val_dl=None):
         """Compact transform name + parameters."""
         name = type(t).__name__
 
-        # MONAI transforms generally have a useful repr.
-        # Keep it compact rather than printing potentially huge internals.
         try:
             text = repr(t)
             text = text.replace("\n", " ")
+
             if len(text) > 180:
                 text = text[:177] + "..."
+
             return f"{name} -- {text}"
+
         except Exception:
             return name
 
@@ -519,7 +521,6 @@ def _show_summary(train_dl, val_dl=None):
         if pipeline is not None:
             return pipeline
 
-        # Some wrappers expose the underlying dataset.
         inner = getattr(ds, "ds", None)
 
         if inner is not None:
@@ -527,8 +528,18 @@ def _show_summary(train_dl, val_dl=None):
 
         return None
 
+    # ------------------------------------------------------------------
+    # Sample metadata
+    # ------------------------------------------------------------------
+
     def _find_metadata(x):
-        """Find metadata without requiring it to be part of the batch."""
+        """
+        Find metadata recursively.
+
+        MONAI MetaTensors expose metadata through ``.meta``.
+        Dictionary-based datasets may also contain an explicit ``meta``
+        dictionary.
+        """
 
         if isinstance(x, MetaTensor):
             return x.meta
@@ -539,29 +550,54 @@ def _show_summary(train_dl, val_dl=None):
 
             for v in x.values():
                 meta = _find_metadata(v)
+
                 if meta is not None:
                     return meta
 
         if isinstance(x, (tuple, list)):
             for v in x:
                 meta = _find_metadata(v)
+
                 if meta is not None:
                     return meta
 
         return None
 
-    def _show_metadata(ds):
-        """
-        Inspect metadata from the underlying dataset.
+    def _format_metadata_value(value):
+        """Compact representation of metadata values."""
 
-        This is intentionally independent of the DataLoader output.
-        Therefore numpy+meta/tensor+meta do not need to carry metadata
-        through the batch.
+        if isinstance(value, np.ndarray):
+            return (
+                f"array(shape={value.shape}, "
+                f"dtype={value.dtype})"
+            )
+
+        if isinstance(value, torchTensor):
+            return (
+                f"tensor(shape={tuple(value.shape)}, "
+                f"dtype={value.dtype})"
+            )
+
+        if isinstance(value, MetaTensor):
+            return (
+                f"MetaTensor(shape={tuple(value.shape)}, "
+                f"dtype={value.dtype})"
+            )
+
+        return value
+
+    def _show_sample_metadata(ds):
         """
+        Display metadata attached to the first dataset sample.
+
+        This includes metadata stored in MONAI MetaTensors.
+        """
+
         source_ds = _unwrap_dataset(ds)
 
         try:
             item = source_ds[0]
+
         except Exception:
             return
 
@@ -570,10 +606,10 @@ def _show_summary(train_dl, val_dl=None):
         if meta is None:
             return
 
-        print("\nMetadata:")
+        print("\nSample metadata:")
         print("  available : yes")
-        print(f"  keys      : {list(meta.keys())}")
 
+        # Show the most useful spatial/image metadata first.
         fields = (
             "filename",
             "filename_or_obj",
@@ -586,19 +622,49 @@ def _show_summary(train_dl, val_dl=None):
             "original_affine",
         )
 
+        shown = set()
+
         for key in fields:
             if key not in meta:
                 continue
 
-            value = meta[key]
+            value = _format_metadata_value(meta[key])
 
-            if isinstance(value, np.ndarray):
-                value = (
-                    f"array(shape={value.shape}, "
-                    f"dtype={value.dtype})"
-                )
+            print(f"  {key:<15}: {value}")
+            shown.add(key)
 
-            print(f"  {key:<11}: {value}")
+        # Show any additional metadata fields afterwards.
+        remaining = [
+            key for key in meta.keys()
+            if key not in shown
+        ]
+
+        for key in remaining:
+            value = _format_metadata_value(meta[key])
+            print(f"  {key:<15}: {value}")
+
+    # ------------------------------------------------------------------
+    # Pipeline configuration
+    # ------------------------------------------------------------------
+
+    def _show_config(dl):
+        """
+        Display the configuration used to construct the DataLoader.
+
+        ``dl.config`` contains the pipeline configuration together with
+        high-level information such as task, dataset name, backend and
+        mode.
+        """
+
+        config = getattr(dl, "config", None)
+
+        if not config:
+            return
+
+        print("\nPipeline configuration:")
+
+        for key, value in config.items():
+            print(f"  {key:<15}: {value}")
 
     # ------------------------------------------------------------------
     # Sample tracing
@@ -607,21 +673,19 @@ def _show_summary(train_dl, val_dl=None):
     def _show_sample_pipeline(ds, x_keys, y_keys):
         """
         Build and display one sample through the dataset transform.
-
-        This is the equivalent of fastai's:
-            Building one sample
-            applying ...
-            gives ...
         """
 
         print("\nBuilding one sample")
 
         try:
-            # Use the underlying dictionary dataset when possible.
             source_ds = _unwrap_dataset(ds)
 
             # Raw item, before the MONAI transform pipeline.
-            raw_item = source_ds.data[0] if hasattr(source_ds, "data") else None
+            raw_item = (
+                source_ds.data[0]
+                if hasattr(source_ds, "data")
+                else None
+            )
 
             if raw_item is None:
                 print("  Could not access raw dataset item.")
@@ -636,9 +700,6 @@ def _show_summary(train_dl, val_dl=None):
                 print("  No item transform to apply")
                 return
 
-            # ----------------------------------------------------------
-            # MONAI Compose
-            # ----------------------------------------------------------
             transforms = _iter_transforms(transform)
 
             current = raw_item
@@ -648,6 +709,7 @@ def _show_summary(train_dl, val_dl=None):
 
                 try:
                     current = t(current)
+
                 except Exception as e:
                     print(f"    ERROR: {e}")
                     break
@@ -689,6 +751,7 @@ def _show_summary(train_dl, val_dl=None):
 
         try:
             batch = next(iter(dl))
+
         except Exception as e:
             print(f"  Could not build batch: {e}")
             return
@@ -699,6 +762,7 @@ def _show_summary(train_dl, val_dl=None):
 
         if collate is None:
             print("  collate_fn: default")
+
         else:
             print(
                 f"  collate_fn: "
@@ -712,18 +776,21 @@ def _show_summary(train_dl, val_dl=None):
         print("\nFinal batch:")
 
         if isinstance(batch, (tuple, list)):
+
             if len(batch) == 2:
                 print("  x:")
                 _describe(batch[0], "    ")
 
                 print("  y:")
                 _describe(batch[1], "    ")
+
             else:
                 for i, item in enumerate(batch):
                     print(f"  [{i}]:")
                     _describe(item, "    ")
 
         elif isinstance(batch, dict):
+
             for k, v in batch.items():
                 print(f"  {k}:")
                 _describe(v, "    ")
@@ -745,6 +812,7 @@ def _show_summary(train_dl, val_dl=None):
 
         try:
             ds_len = len(ds)
+
         except Exception:
             ds_len = "unknown"
 
@@ -765,6 +833,12 @@ def _show_summary(train_dl, val_dl=None):
 
         if vocab is not None:
             print(f"Classes      : {vocab}")
+
+        # --------------------------------------------------------------
+        # Pipeline configuration
+        # --------------------------------------------------------------
+
+        _show_config(dl)
 
         # --------------------------------------------------------------
         # Dataset / item pipeline
@@ -797,11 +871,11 @@ def _show_summary(train_dl, val_dl=None):
 
         print("\nBatch transforms:")
 
-        # PyTorch/MONAI DataLoader normally has only collate_fn here.
         collate = getattr(dl, "collate_fn", None)
 
         if collate is None:
             print("  collate_fn: default")
+
         else:
             print(
                 f"  collate_fn: "
@@ -815,10 +889,10 @@ def _show_summary(train_dl, val_dl=None):
         _show_batch(dl)
 
         # --------------------------------------------------------------
-        # Metadata
+        # Sample metadata
         # --------------------------------------------------------------
 
-        _show_metadata(ds)
+        _show_sample_metadata(ds)
 
     # ------------------------------------------------------------------
     # Train / validation
@@ -1932,29 +2006,23 @@ class MonaiLoader:
 # %% ../../nbs/022_data.load.ipynb #d0121f4b
 class BaseTask:
 
-    default_dataset = 'cache'
+    default_dataset = "cache"
     default_x_keys = "input"
     default_y_keys = "target"
     default_transforms = None
 
     def config(self):
-
-        cfg = {}
-        transforms = self.default_transforms
-
-        if transforms is not None:
-            cfg["transforms"] = transforms
-
-        return cfg
+        return {
+            "x_keys": self.default_x_keys,
+            "y_keys": self.default_y_keys,
+            "transforms": self.default_transforms,
+        }
+    
 
     def setup(self, ctx):
         return ctx
 
     def before_load(self, ctx):
-        if ctx.config["x_keys"] is None:
-            ctx.config["x_keys"] = self.default_x_keys
-        if ctx.config["y_keys"] is None:
-            ctx.config["y_keys"] = self.default_y_keys
         return ctx
 
     def before_dataset(self, ctx):
@@ -1973,8 +2041,14 @@ class ClassificationTask(BaseTask):
     default_x_keys = "image"
     default_y_keys = "label"
 
-    @property
-    def default_transforms(self):
+    def setup(self, ctx):
+        if ctx.config["transforms"] is None:
+            ctx.config["transforms"] = self._default_transforms(ctx)
+
+        return ctx
+
+
+    def _default_transforms(self, ctx):
         from bioMONAI.transforms import (
             ScaleIntensity,
             RandRotate90,
@@ -1984,19 +2058,20 @@ class ClassificationTask(BaseTask):
 
         return [
             ScaleIntensity(keys="image"),
-            RandRotate90(keys='image', prob=0.75),
-            RandFlip(keys='image', spatial_axis=[0, 1], prob=0.5),
-            RandZoom(keys='image', min_zoom=0.9, max_zoom=1.1, prob=0.5),
+            RandRotate90(keys="image", prob=0.75),
+            RandFlip(
+                keys="image",
+                # spatial_axis=spatial_axes,
+                prob=0.5,
+            ),
+            RandZoom(
+                keys="image",
+                min_zoom=0.9,
+                max_zoom=1.1,
+                prob=0.5,
+            ),
         ]
 
-    # def before_dataset(self, ctx):
-        
-    #     if ctx.config.get("vocab") is not None:
-    #         return ctx
-
-    #     ctx.config["vocab"] = ctx.records.encoders[0].vocab
-
-    #     return ctx
 
 # %% ../../nbs/022_data.load.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
@@ -2055,8 +2130,17 @@ class BioDataLoaders(DataLoaders):
         2. provide default configuration values;
         3. modify or initialize the pipeline context through ``setup``.
 
-        User-provided configuration always takes precedence over task
-        defaults.
+        User-provided configuration always takes precedence over task defaults.
+        Task defaults are applied only when the corresponding configuration value
+        is ``None``. This distinguishes an unspecified option from an explicit
+        user choice:
+
+        - ``None``: use the task default.
+        - Any other value, including empty containers such as ``[]``: preserve the
+        user-provided value.
+
+        For example, ``transforms=None`` uses the task's default transforms,
+        whereas ``transforms=[]`` explicitly disables transforms.
 
         Parameters
         ----------
@@ -2083,8 +2167,10 @@ class BioDataLoaders(DataLoaders):
         # Task defaults are only applied when the corresponding option was
         # not explicitly provided by the user.
         defaults = task.config()
+
         for k, v in defaults.items():
-            ctx.config.setdefault(k, v)
+            if ctx.config.get(k) is None:
+                ctx.config[k] = v
 
         # Allow the task to perform additional context-specific setup.
         return task.setup(ctx)
@@ -2210,6 +2296,19 @@ class BioDataLoaders(DataLoaders):
 
         # The dataset determines which loader backend must be used.
         ctx.dataset_backend = inferred_dataset_backend
+
+        # Optionally return data in channel-last format.
+        if ctx.config.get("channel_last", False):
+            from bioMONAI.transforms import AsChannelLast
+
+            transforms = list(ctx.config.get("transforms") or [])
+
+            if not any(isinstance(t, AsChannelLast) for t in transforms):
+                transforms.append(
+                    AsChannelLast(keys=ctx.config["x_keys"], channel_dim=0)
+                )
+
+            ctx.config["transforms"] = transforms
 
         builder = DatasetBuilderClass(**ctx.config)
 
@@ -2375,6 +2474,17 @@ class BioDataLoaders(DataLoaders):
         # Tasks can inspect or modify the final DataLoaders.
         if hasattr(ctx, "task_obj"):
             ctx = ctx.task_obj.after_loader(ctx)
+
+        # ---- Final metadata ---------------------------------------------
+        ctx.dls.config = {
+            **ctx.config,
+            "task": ctx.task,
+            "dataset_name": ctx.dataset_name,
+            "backend": ctx.backend,
+            "mode": ctx.mode,
+        }
+
+        ctx.dls.metadata = ctx.metadata
 
         return ctx.dls
 
