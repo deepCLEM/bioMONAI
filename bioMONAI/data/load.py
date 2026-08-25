@@ -25,6 +25,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import re
+# import matplotlib.pyplot as plt
 
 # for pipeline context
 from dataclasses import dataclass, field
@@ -904,6 +905,9 @@ def _show_summary(train_dl, val_dl=None):
 
     if val_dl is not None:
         _describe_dl(val_dl, "Valid")
+
+# %% ../../nbs/022_data.load.ipynb #e15596b9
+# import copy
 
 # %% ../../nbs/022_data.load.ipynb #f01db4bd
 def _to_numpy(x):
