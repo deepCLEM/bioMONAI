@@ -6,12 +6,13 @@
 __all__ = ['SOURCE_REGISTRY', 'DATASET_REGISTRY', 'LOADER_REGISTRY', 'TASK_REGISTRY', 'MONAI_COLLATE', 'BioDataBlock',
            'register_source', 'register_dataset', 'register_loader', 'register_task', 'split_prefixed_kwargs',
            'TupleDataset', 'numpy_collate', 'PipelineContext', 'detect_source', 'build_source', 'BaseSource',
-           'DictSource', 'DataFrameSource', 'CSVSource', 'FolderSource', 'ListSource', 'CallableSource',
-           'DataSplitMixin', 'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder',
-           'FastaiLoader', 'MonaiLoader', 'BaseTask', 'ClassificationTask', 'BioDataLoaders', 'BioImageBlock',
-           'from_source', 'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func',
-           'class_from_path_re', 'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai',
-           'from_monai_ds', 'test_biodataloader']
+           'DictSource', 'DataFrameSource', 'CSVSource', 'FolderSource', 'get_path', 'get_name', 'get_stem',
+           'get_parent', 'get_suffix', 'get_paired_image', 'get_mask', 'ListSource', 'CallableSource', 'DataSplitMixin',
+           'MonaiTransformMixin', 'DataBlockBuilder', 'MonaiDatasetBuilder', 'CacheDatasetBuilder', 'FastaiLoader',
+           'MonaiLoader', 'BaseTask', 'ClassificationTask', 'BioDataLoaders', 'BioImageBlock', 'from_source',
+           'from_folder', 'from_df', 'from_csv', 'class_from_folder', 'class_from_path_func', 'class_from_path_re',
+           'class_from_df', 'class_from_csv', 'class_from_lists', 'from_yaml', 'from_monai', 'from_monai_ds',
+           'test_biodataloader']
 
 # %% ../../nbs/022_data.load.ipynb #7a8886ba
 # =================================
@@ -23,6 +24,7 @@ from inspect import signature, _empty
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import re
 
 # for pipeline context
 from dataclasses import dataclass, field
@@ -1269,40 +1271,274 @@ class CSVSource(BaseSource):
     def load(self):
         return self.source.load()
 
-# %% ../../nbs/022_data.load.ipynb #7111765f
+# %% ../../nbs/022_data.load.ipynb #d34184c9
 @register_source("folder")
 class FolderSource(BaseSource):
+    """
+    Source for discovering records from a directory tree.
 
-    def __init__(self, root, get_items, **kwargs):
+    One field in ``get_items`` defines the primary filesystem items.
+    Each discovered primary item becomes one record. All remaining
+    fields are derived from that primary path using callables.
+
+    The primary field is specified by ``x_key``. If ``x_key`` is omitted,
+    the first field in ``get_items`` is used.
+
+    The primary specification can be:
+
+    - a directory path, which is recursively scanned for files;
+    - a glob pattern;
+    - a regex, which is recursively matched against files from ``root``;
+    - ``(subfolder, regex)``, which recursively matches files below a
+      subfolder.
+
+    All non-primary specifications must be callables and receive the
+    discovered primary path.
+
+    Parameters
+    ----------
+    root : path-like
+        Root directory containing the data.
+    get_items : dict
+        Mapping from field names to discovery or derivation specifications.
+    x_key : str, optional
+        Name of the primary field. Defaults to the first field.
+    **kwargs
+        Additional arguments forwarded to :class:`DictSource`.
+    """
+
+    def __init__(
+        self,
+        root,
+        get_items,
+        x_key=None,
+        **kwargs,
+    ):
         self.root = Path(root)
         self.get_items = get_items
+        self.x_key = x_key or next(iter(get_items))
 
-        scanned = {
-            key: self._scan(folder)
-            for key, folder in self.get_items.items()
-        }
+        if self.x_key not in get_items:
+            raise ValueError(
+                f"x_key {self.x_key!r} is not present in get_items."
+            )
 
-        records = [
-            dict(zip(scanned.keys(), values))
-            for values in zip(*scanned.values())
-        ]
+        # Only the primary field is allowed to perform filesystem
+        # discovery. Every other field is derived from its path.
+        for key, spec in get_items.items():
+            if key != self.x_key and not callable(spec):
+                raise ValueError(
+                    f"get_items[{key!r}] must be callable because only "
+                    f"the x_key ({self.x_key!r}) can define discovery."
+                )
+
+        data = self._discover()
 
         self.source = DictSource(
-            records,
-            get_items={k: k for k in scanned.keys()},
-            base_path=self.root,
-            folders=self.get_items,
+            data,
+            get_items={k: k for k in data[0]} if data else {},
+            folders={self.x_key: self.root},
             keep_original=True,
             **kwargs,
         )
 
-    def _scan(self, folder):
+    def _discover(self):
+        """Discover primary files and build one record per file."""
 
-        path = self.root / folder
-        return sorted([f.name for f in path.iterdir()])
+        # The x specification is the sole source of record discovery.
+        primary = self._scan(self.get_items[self.x_key])
+
+        records = []
+
+        for path in primary:
+            if not path.is_file():
+                continue
+
+            record = {}
+
+            # The primary field contains the discovered path. All other
+            # fields are derived from exactly this same path.
+            for key, spec in self.get_items.items():
+                if key == self.x_key:
+                    record[key] = path.relative_to(self.root).as_posix()
+                else:
+                    record[key] = spec(path)
+
+            records.append(record)
+
+        return records
+
+    def _scan(self, spec):
+        """Discover files from a directory, glob, or regular expression."""
+
+        # (subfolder, regex) searches recursively below the subfolder.
+        if isinstance(spec, tuple):
+            if len(spec) != 2:
+                raise ValueError(
+                    "A discovery tuple must have the form "
+                    "(subfolder, regex)."
+                )
+
+            subfolder, pattern = spec
+            base = self.root / subfolder
+
+            if not base.is_dir():
+                raise ValueError(
+                    f"Discovery directory does not exist: {base}"
+                )
+
+            regex = re.compile(pattern)
+
+            return sorted(
+                path
+                for path in base.rglob("*")
+                if path.is_file()
+                and regex.search(path.relative_to(self.root).as_posix())
+            )
+
+        if not isinstance(spec, str):
+            raise ValueError(
+                "The x_key specification must be a directory, glob, "
+                "regex, or (subfolder, regex) tuple."
+            )
+
+        path = self.root / spec
+
+        # An existing directory is recursively scanned.
+        if path.is_dir():
+            return sorted(
+                p for p in path.rglob("*")
+                if p.is_file()
+            )
+
+        # Glob expressions are resolved relative to root.
+        if any(c in spec for c in "*?[]"):
+            return sorted(
+                p for p in self.root.glob(spec)
+                if p.is_file()
+            )
+
+        # Otherwise treat the string as a regular expression and search
+        # recursively from root.
+        regex = re.compile(spec)
+
+        return sorted(
+            path
+            for path in self.root.rglob("*")
+            if path.is_file()
+            and regex.search(path.relative_to(self.root).as_posix())
+        )
 
     def load(self):
+        """Load the discovered records using the underlying DictSource."""
         return self.source.load()
+
+# %% ../../nbs/022_data.load.ipynb #d37482b9
+def get_path(root=None):
+    """Return a callable that returns the path relative to ``root``."""
+
+    def _get(path):
+        return path.relative_to(root) if root is not None else path
+
+    return _get
+
+
+def get_name(path):
+    """Return the filename of the discovered item."""
+    return path.name
+
+
+def get_stem(path):
+    """Return the filename stem of the discovered item."""
+    return path.stem
+
+
+def get_parent(path):
+    """Return the name of the parent directory of the discovered item."""
+    return path.parent.name
+
+
+def get_suffix(path):
+    """Return the suffix of the discovered item."""
+    return path.suffix
+
+
+def get_paired_image(
+    subfolder=None,
+    replace=None,
+    suffix="",
+    prefix="",
+    extension=None,
+):
+    """
+    Return a callable that constructs a paired file path.
+
+    The returned callable accepts either a string or path-like object and
+    constructs the corresponding paired file path.
+
+    Parameters
+    ----------
+    subfolder : str or path-like, optional
+        Subfolder containing the paired file. If ``None``, keep the
+        original parent directory.
+    replace : str, tuple, or dict, optional
+        Replacement applied to the filename stem.
+
+        - ``str``: remove the substring.
+        - ``(old, new)``: replace ``old`` with ``new``.
+        - ``dict``: apply each ``old -> new`` replacement.
+    suffix : str, optional
+        Suffix to append to the filename stem.
+    prefix : str, optional
+        Prefix to prepend to the filename stem.
+    extension : str, optional
+        Replacement extension for the paired file.
+    """
+
+    def _get(path):
+        path = Path(path)
+
+        stem = path.stem
+
+        if isinstance(replace, str):
+            stem = stem.replace(replace, "")
+
+        elif isinstance(replace, tuple):
+            old, new = replace
+            stem = stem.replace(old, new)
+
+        elif isinstance(replace, dict):
+            for old, new in replace.items():
+                stem = stem.replace(old, new)
+
+        filename = f"{prefix}{stem}{suffix}"
+
+        if extension is None:
+            extension_ = path.suffix
+        else:
+            extension_ = str(extension)
+            if not extension_.startswith("."):
+                extension_ = f".{extension_}"
+
+        filename += extension_
+
+        if subfolder is None:
+            return str(path.parent / filename)
+
+        return str(path.parent.parent / subfolder / filename)
+
+    return _get
+
+
+def get_mask(subfolder="masks", suffix="", extension=None):
+    """
+    Return a callable that constructs a mask path paired with ``path``.
+    """
+    return get_paired_image(
+        subfolder=subfolder,
+        suffix=suffix,
+        extension=extension,
+    )
 
 # %% ../../nbs/022_data.load.ipynb #be11809c
 @register_source("list")
@@ -2017,9 +2253,15 @@ class BaseTask:
             "y_keys": self.default_y_keys,
             "transforms": self.default_transforms,
         }
-    
 
     def setup(self, ctx):
+        if ctx.dataset_name is None:
+            ctx.dataset_name = self.default_dataset
+
+        for k, v in self.config().items():
+            if ctx.config.get(k) is None:
+                ctx.config[k] = v
+
         return ctx
 
     def before_load(self, ctx):
@@ -2041,14 +2283,7 @@ class ClassificationTask(BaseTask):
     default_x_keys = "image"
     default_y_keys = "label"
 
-    def setup(self, ctx):
-        if ctx.config["transforms"] is None:
-            ctx.config["transforms"] = self._default_transforms(ctx)
-
-        return ctx
-
-
-    def _default_transforms(self, ctx):
+    def _default_transforms(self):
         from bioMONAI.transforms import (
             ScaleIntensity,
             RandRotate90,
@@ -2061,7 +2296,7 @@ class ClassificationTask(BaseTask):
             RandRotate90(keys="image", prob=0.75),
             RandFlip(
                 keys="image",
-                # spatial_axis=spatial_axes,
+                spatial_axis=0,
                 prob=0.5,
             ),
             RandZoom(
@@ -2072,6 +2307,11 @@ class ClassificationTask(BaseTask):
             ),
         ]
 
+    def config(self):
+        return {
+            **super().config(),
+            "transforms": self._default_transforms(),
+        }
 
 # %% ../../nbs/022_data.load.ipynb #2cffab91
 class BioDataLoaders(DataLoaders):
@@ -2159,20 +2399,9 @@ class BioDataLoaders(DataLoaders):
         task = TaskClass()
         ctx.task_obj = task
 
-        # A task can define the dataset implementation to use when the user
-        # has not selected one explicitly.
-        if ctx.dataset_name is None:
-            ctx.dataset_name = task.default_dataset
-
-        # Task defaults are only applied when the corresponding option was
-        # not explicitly provided by the user.
-        defaults = task.config()
-
-        for k, v in defaults.items():
-            if ctx.config.get(k) is None:
-                ctx.config[k] = v
-
-        # Allow the task to perform additional context-specific setup.
+        # Allow the task to perform additional context-specific setup, like
+        # appling Task defaults when the corresponding option was not explicitly
+        # provided by the user.
         return task.setup(ctx)
 
     # ------------------------------------------------------------------
