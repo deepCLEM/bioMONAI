@@ -4,16 +4,16 @@
 
 # %% auto #0
 __all__ = ['Blur', 'RandSpatialCrop', 'RandBlur', 'FunctionTransform', 'BioTransform', 'MonaiTransform', 'RandMonaiTransform',
-           'ApplyTo', 'Resample', 'Spacing', 'Resize', 'Crop', 'SpatialCrop', 'CenterSpatialCrop', 'CropForeground',
-           'BoundingRect', 'CenterScaleCrop', 'CropND', 'Pad', 'SpatialPad', 'BorderPad', 'DivisiblePad',
-           'ResizeWithPadOrCrop', 'Rotate', 'Rotate90', 'Zoom', 'Flip', 'GridPatch', 'GridSplit', 'SpatialResample',
-           'ResampleToMatch', 'Orientation', 'Affine', 'AffineGrid', 'GridDistortion', 'GaussianSmooth', 'MedianSmooth',
-           'SavitzkyGolaySmooth', 'GaussianSharpen', 'ShiftIntensity', 'StdShiftIntensity', 'ScaleImage',
-           'ScaleImagePercentiles', 'ScaleImageVariance', 'ScaleIntensity', 'ScaleIntensityFixedMean',
-           'ScaleIntensityRange', 'ScaleIntensityRangePercentiles', 'NormalizeIntensity', 'HistogramNormalize',
-           'AdjustContrast', 'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps', 'ThresholdIntensity',
-           'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop', 'RandCrop2D', 'RandCropND',
-           'RandRotate', 'RandRotate90', 'RandFlip', 'RandZoom', 'RandCameraNoise', 'RandGaussianNoise',
+           'ApplyTo', 'EnsureChannelFirst', 'AsChannelLast', 'Resample', 'Spacing', 'Resize', 'Crop', 'SpatialCrop',
+           'CenterSpatialCrop', 'CropForeground', 'BoundingRect', 'CenterScaleCrop', 'CropND', 'Pad', 'SpatialPad',
+           'BorderPad', 'DivisiblePad', 'ResizeWithPadOrCrop', 'Rotate', 'Rotate90', 'Zoom', 'Flip', 'GridPatch',
+           'GridSplit', 'SpatialResample', 'ResampleToMatch', 'Orientation', 'Affine', 'AffineGrid', 'GridDistortion',
+           'GaussianSmooth', 'MedianSmooth', 'SavitzkyGolaySmooth', 'GaussianSharpen', 'ShiftIntensity',
+           'StdShiftIntensity', 'ScaleImage', 'ScaleImagePercentiles', 'ScaleImageVariance', 'ScaleIntensity',
+           'ScaleIntensityFixedMean', 'ScaleIntensityRange', 'ScaleIntensityRangePercentiles', 'NormalizeIntensity',
+           'HistogramNormalize', 'AdjustContrast', 'RelabelInstances', 'InstanceToMaskAndDistance', 'ComputeHoVerMaps',
+           'ThresholdIntensity', 'MaskIntensity', 'ForegroundMask', 'RGB2HED', 'HED2RGB', 'RandCrop', 'RandCrop2D',
+           'RandCropND', 'RandRotate', 'RandRotate90', 'RandFlip', 'RandZoom', 'RandCameraNoise', 'RandGaussianNoise',
            'RandGaussianSmooth', 'RandGaussianSharpen', 'RandShiftIntensity', 'RandStdShiftIntensity',
            'RandAdjustContrast']
 
@@ -421,6 +421,33 @@ class ApplyTo(Transform):
         elems = list(x)
         elems[self.idx] = self.tfm(elems[self.idx], **kwargs)
         return tuple(elems)
+
+# %% ../nbs/030_transforms.ipynb #4347b8e7
+class EnsureChannelFirst(MonaiTransform):
+    """
+    Adjust or add the channel dimension of input data to ensure channel_first shape.
+
+    This extracts the original_channel_dim info from provided meta_data dictionary or MetaTensor input. This value should state which dimension is the channel dimension so that it can be moved forward, or contain “no_channel” to state no dimension is the channel and so a 1-size first dimension is to be added.
+    """
+    _monai_transform = mt.EnsureChannelFirst
+
+    def __init__(self, strict_check=True, channel_dim=None):
+        super().__init__(
+            strict_check=strict_check, 
+            channel_dim=channel_dim,
+        ) 
+
+# %% ../nbs/030_transforms.ipynb #f92a8db2
+class AsChannelLast(MonaiTransform):
+    """
+    Change the channel dimension of the image to the last dimension.
+    """
+    _monai_transform = mt.AsChannelLast
+
+    def __init__(self, channel_dim=0):
+        super().__init__( 
+            channel_dim=channel_dim,
+        ) 
 
 # %% ../nbs/030_transforms.ipynb #9a9cd349
 class Resample(MonaiTransform):
