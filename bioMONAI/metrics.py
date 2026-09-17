@@ -5,8 +5,8 @@
 # %% auto #0
 __all__ = ['METRIC_BACKENDS', 'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'register_metric_backend',
            'MonaiFastaiMetric', 'MetricBackend', 'MonaiMetricBackend', 'FastaiMetricBackend', 'BioMetric', 'SSIMMetric',
-           'PSNRMetric', 'MSSSIMMetric', 'MAEMetric', 'RMSEMetric', 'DiceMetric', 'PanopticQualityMetric',
-           'ROCAUCMetric', 'FRCMetric']
+           'PSNRMetric', 'MSSSIMMetric', 'MAEMetric', 'RMSEMetric', 'DiceFastaiMetric', 'DiceMetric',
+           'PanopticQualityMetric', 'ROCAUCMetric', 'FRCMetric']
 
 # %% ../nbs/060_metrics.ipynb #09106178
 # =================================
@@ -60,27 +60,84 @@ def register_metric_backend(name):
 
 # %% ../nbs/060_metrics.ipynb #4fe16d89
 class MonaiFastaiMetric(Metric):
+    """
+    Adapt a MONAI metric to the fastai metric interface.
 
-    def __init__(self, metric):
+    This adapter delegates metric computation to a MONAI metric while
+    providing the interface expected by fastai's training loop.
+
+    The prediction and target are obtained from ``learn.pred`` and
+    ``learn.yb[0]`` respectively. Subclasses can override ``_prepare``
+    to adapt the data representation required by a specific MONAI metric.
+
+    Parameters
+    ----------
+    metric : Metric
+        Instantiated MONAI metric.
+    name : str, optional
+        Name exposed to fastai. If omitted, the ``"Metric"`` suffix is
+        removed from the MONAI metric class name.
+
+    Notes
+    -----
+    This class does not alter predictions or targets by default. Metric-
+    specific preprocessing should be implemented by overriding
+    ``_prepare`` in a subclass.
+    """
+
+    def __init__(self, metric, name=None):
         self.metric = metric
-
-    def reset(self):
-        if hasattr(self.metric, "reset"):
-            self.metric.reset()
-
-    def accumulate(self, learn):
-        pred, targ = learn.pred, learn.y
-        self.metric(pred, targ)
-
-    @property
-    def value(self):
-        if hasattr(self.metric, "aggregate"):
-            return self.metric.aggregate().mean().item()
-        return None
+        self._name = name or metric.__class__.__name__.replace("Metric", "")
 
     @property
     def name(self):
-        return self.metric.__class__.__name__
+        return self._name
+
+    def reset(self):
+        self.metric.reset()
+
+    def _prepare(self, pred, target):
+        """
+        Prepare predictions and targets before metric computation.
+
+        Parameters
+        ----------
+        pred : torch.Tensor
+            Predictions produced by the fastai learner.
+        target : torch.Tensor
+            Ground-truth target from the fastai learner.
+
+        Returns
+        -------
+        tuple
+            Prepared ``(pred, target)`` pair.
+
+        Notes
+        -----
+        The default implementation returns the inputs unchanged. Subclasses
+        can override this method when a MONAI metric requires a specific
+        representation.
+        """
+        return pred, target
+
+    def accumulate(self, learn):
+        pred, target = self._prepare(
+            learn.pred,
+            learn.yb,
+        )
+        self.metric(pred, target)
+
+    @property
+    def value(self):
+        value = self.metric.aggregate()
+
+        if isinstance(value, tuple):
+            value = value[0]
+
+        if hasattr(value, "numel") and value.numel() == 1:
+            return value.item()
+
+        return value
 
 # %% ../nbs/060_metrics.ipynb #54d473f4
 class MetricBackend:
@@ -169,26 +226,137 @@ class MAEMetric(BioMetric):
 class RMSEMetric(BioMetric):
     _default = mm.RMSEMetric
 
+# %% ../nbs/060_metrics.ipynb #925bfd79
+class DiceFastaiMetric(MonaiFastaiMetric):
+    """
+    Adapt MONAI's ``DiceMetric`` to the fastai metric interface.
+
+    This adapter creates a MONAI ``DiceMetric`` and converts predictions
+    produced by a fastai segmentation model to the representation expected
+    by MONAI before computing the metric.
+
+    Parameters
+    ----------
+    include_background : bool, default=True
+        Whether to include the background class in the Dice computation.
+
+    reduction : str, default="mean"
+        Reduction method used to combine Dice scores.
+
+    get_not_nans : bool, default=False
+        Whether to return the number of non-NaN values used in the
+        reduction.
+
+    ignore_empty : bool, default=True
+        Whether to ignore samples with an empty target segmentation.
+
+    num_classes : int, optional
+        Number of classes when using single-channel label maps.
+
+    return_with_label : bool or list of str, default=False
+        Whether to return Dice values together with their labels.
+
+    per_component : bool, default=False
+        Whether to compute Dice independently for each binary component.
+
+    Notes
+    -----
+    For single-channel predictions, logits are converted to binary
+    predictions using a sigmoid activation and a threshold of 0.5.
+
+    For multi-channel predictions, the class with the highest logit is
+    selected using ``argmax``.
+
+    Targets without a channel dimension are expanded to include one.
+    The actual Dice computation is delegated to MONAI's ``DiceMetric``.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            mm.DiceMetric(*args, **kwargs),
+            name="Dice",
+        )
+
+    def _prepare(self, pred, target):
+        # Binary segmentation: one output channel
+        if pred.ndim == target.ndim + 1:
+            if pred.shape[1] == 1:
+                pred = (torch.sigmoid(pred) > 0.5).float()
+
+            # Multi-class segmentation
+            else:
+                pred = pred.argmax(dim=1, keepdim=True)
+
+        # Add channel dimension to label-map targets
+        if target.ndim == pred.ndim - 1:
+            target = target.unsqueeze(1)
+
+        return pred, target
+
 # %% ../nbs/060_metrics.ipynb #a63e7732
 class DiceMetric(BioMetric):
     """
-    Dice coefficient metric for binary target in segmentation
-    Works for binary segmentation with 1-channel logits.
-    Accepts all keyword arguments supported by monai.metrics.DiceMetric
-        Example:
-            DiceMetric(
-                include_background=False,
-                reduction="mean",
-                get_not_nans=False,
-                ignore_empty=True
-            )
+    Compute the Dice coefficient for segmentation tasks.
+
+    The metric measures the overlap between predicted and target
+    segmentations. It supports both single-channel label maps for
+    multi-class segmentation and multi-channel predictions for
+    multi-label or class-wise segmentation.
+
+    Parameters
+    ----------
+    include_background : bool, default=True
+        Whether to include the background channel in the computation.
+
+    reduction : str, default="mean"
+        Reduction method applied to the per-sample and per-channel
+        Dice scores. Common options include "mean", "sum",
+        "mean_batch", "sum_batch", and "none".
+
+    get_not_nans : bool, default=False
+        If True, also return the number of non-NaN values used in
+        the reduction.
+
+    ignore_empty : bool, default=True
+        Whether to ignore cases where the target segmentation is empty.
+        If True, empty target regions do not contribute to the metric.
+
+    num_classes : int, optional
+        Number of classes when the input is provided as a single-channel
+        label map. This is required when the number of classes cannot be
+        inferred from the input.
+
+    return_with_label : bool or list of str, default=False
+        If True, return the metric value together with its class labels.
+        A list of labels can be provided to explicitly name the classes.
+
+    per_component : bool, default=False
+        If True, compute the Dice score independently for each binary
+        component.
+
+    Examples
+    --------
+    Compute the mean Dice score while excluding the background::
+
+        dice = DiceMetric(
+            include_background=False,
+            reduction="mean",
+        )
+
+    Compute per-class Dice scores::
+
+        dice = DiceMetric(
+            include_background=False,
+            reduction="none",
+        )
     """
     _default = mm.DiceMetric
-    _fastai = fm.Dice # this should be updated
+    _fastai = DiceFastaiMetric
+
 
 
 # %% ../nbs/060_metrics.ipynb #7df2d770
-def PanopticQualityMetric(**kwargs):
+class PanopticQualityMetric(BioMetric):
     """
     Wrapper around monai.metrics.PanopticQualityMetric.
 
@@ -200,20 +368,21 @@ def PanopticQualityMetric(**kwargs):
 
     All kwargs are forwarded to MONAI PanopticQualityMetric.
     """
-    pq_metric = mm.PanopticQualityMetric(**kwargs)
+    _default = mm.PanopticQualityMetric
+    # pq_metric = mm.PanopticQualityMetric(**kwargs)
 
-    def PQ(pred, target):
-        # Convert logits to discrete labels
-        # pred = pred.argmax(dim=1)  # (B, H, W)
+    # def PQ(pred, target):
+    #     # Convert logits to discrete labels
+    #     # pred = pred.argmax(dim=1)  # (B, H, W)
 
-        if target.ndim == 4 and target.shape[1] == 1:
-            target = target.squeeze(1)
+    #     if target.ndim == 4 and target.shape[1] == 1:
+    #         target = target.squeeze(1)
 
-        pq_metric.reset()
-        pq_metric(y_pred=pred, y=target)
-        return pq_metric.aggregate()
+    #     pq_metric.reset()
+    #     pq_metric(y_pred=pred, y=target)
+    #     return pq_metric.aggregate()
 
-    return AvgMetric(PQ)
+    # return AvgMetric(PQ)
 
 # %% ../nbs/060_metrics.ipynb #0481c954
 def ROCAUCMetric(num_classes=None, # if not None, checks if preds and targets are one-hot encoded
