@@ -315,62 +315,186 @@ class BioOptimizer:
 # %% ../nbs/070_optimizers.ipynb #ab236576
 class Adadelta(BioOptimizer):
     """
-    Adaptive learning-rate optimizer that restricts aggressive updates
-    by using a running window of gradient updates.
+    Adadelta optimizer with adaptive per-parameter learning rates.
 
-    Adadelta is designed to reduce the need to manually select a global
-    learning rate and is an extension of Adagrad that avoids continually
-    accumulating all past squared gradients.
+    Adadelta adapts the learning rate using a decaying average of past
+    squared gradients and a decaying average of past squared parameter
+    updates. Unlike Adagrad, it does not accumulate squared gradients
+    indefinitely, which prevents the effective learning rate from
+    continually shrinking.
 
-    Parameters and behavior are provided by ``torch.optim.Adadelta``.
+    For gradient ``g_t``, the running averages are
+
+    ``E[g²]_t = rho * E[g²]_{t-1} + (1 - rho) * g_t²``
+
+    and
+
+    ``E[Δθ²]_t = rho * E[Δθ²]_{t-1} + (1 - rho) * Δθ_t²``.
+
+    The parameter update is approximately
+
+    ``Δθ_t = -sqrt(E[Δθ²]_{t-1} + eps) /
+             sqrt(E[g²]_t + eps) * g_t``
+
+    followed by ``θ_t = θ_{t-1} + Δθ_t``.
+
+    Parameters
+    ----------
+    lr : float, default=1.0
+        Coefficient applied to the adaptive update. Although Adadelta
+        is relatively insensitive to the choice of learning rate, it
+        still scales the resulting parameter update.
+    rho : float, default=0.9
+        Decay factor used for the running averages of squared gradients
+        and squared parameter updates. Larger values give longer memory.
+    eps : float, default=1e-6
+        Small constant added for numerical stability.
+    weight_decay : float, default=0
+        L2 penalty applied to the parameters.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent instead of gradient descent.
+    capturable : bool, default=False
+        Enables CUDA graph / ``torch.compile`` compatible state handling
+        where supported.
+    differentiable : bool, default=False
+        If ``True``, records the optimizer operation as part of the
+        autograd graph.
     """
-
     _default = toptim.Adadelta
 
 
 class Adafactor(BioOptimizer):
     """
-    Memory-efficient adaptive optimizer designed for large models.
+    Memory-efficient adaptive optimizer based on factorized second moments.
 
-    Adafactor reduces optimizer-state memory requirements by factorizing
-    the second-moment estimates for suitable parameter tensors. It is
-    particularly useful when the optimizer state would otherwise consume
-    substantial memory.
+    Adafactor is designed primarily for large models where storing a full
+    second-moment tensor for every parameter would consume substantial
+    memory. For sufficiently large matrix-like parameters, the second
+    moment is approximated using row and column statistics rather than
+    storing one value for every element.
 
-    Parameters and behavior are provided by ``torch.optim.Adafactor``.
+    The adaptive update is based on a normalized second-moment estimate
+    followed by optional parameter-scale-dependent learning-rate scaling.
+    In simplified form,
+
+    ``θ_t = θ_{t-1} - η_t * g_t / (sqrt(V_t) + eps)``
+
+    where ``V_t`` is the estimated second moment and ``η_t`` is the
+    effective learning rate determined by the optimizer configuration.
+
+    Parameters
+    ----------
+    lr : float or None, default=None
+        Learning rate. When ``None``, Adafactor uses its relative-step
+        learning-rate schedule.
+    beta2_decay : float, default=-0.8
+        Exponent controlling the time-dependent decay used to estimate
+        the second moment.
+    eps : tuple, default=(1e-30, 1e-3)
+        Numerical-stability constants used by the second-moment
+        computation and update scaling.
+    d : float, default=1.0
+        Constant controlling the scale of the relative learning-rate
+        schedule.
+    weight_decay : float, default=0.0
+        Weight-decay coefficient.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    capturable : bool, default=False
+        Enables graph-capturable state handling where supported.
     """
-
     _default = toptim.Adafactor
 
 
 class Adagrad(BioOptimizer):
     """
-    Adaptive gradient optimizer that maintains a separate learning rate
+    Adaptive Gradient optimizer with a separate effective learning rate
     for each parameter.
 
-    Adagrad accumulates the squared gradients over time and uses this
-    accumulated information to scale parameter updates. It can be
-    useful when parameters have gradients with substantially different
-    frequencies.
+    Adagrad accumulates the squared gradients seen during optimization
+    and divides each parameter's gradient by the square root of this
+    accumulated quantity:
 
-    Parameters and behavior are provided by ``torch.optim.Adagrad``.
+    ``G_t = G_{t-1} + g_t²``
+
+    ``θ_t = θ_{t-1} - lr * g_t / (sqrt(G_t) + eps)``.
+
+    Consequently, frequently updated parameters receive progressively
+    smaller effective learning rates, while rarely updated parameters
+    retain relatively larger learning rates.
+
+    Parameters
+    ----------
+    lr : float, default=1e-2
+        Initial learning rate.
+    lr_decay : float, default=0
+        Learning-rate decay applied as a function of the optimization
+        step count.
+    weight_decay : float, default=0
+        L2 penalty applied to the parameters.
+    initial_accumulator_value : float, default=0
+        Initial value of the accumulated squared-gradient state.
+    eps : float, default=1e-10
+        Numerical-stability constant added to the denominator.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
     """
-
     _default = toptim.Adagrad
 
 
 class Adam(BioOptimizer):
     """
-    Adaptive optimizer combining momentum-like first-moment estimates
-    with second-moment estimates of the gradients.
+    Adaptive Moment Estimation optimizer.
 
-    Adam is widely used for deep learning because it adapts the learning
-    rate independently for each parameter while incorporating estimates
-    of both the gradient and its squared magnitude.
+    Adam maintains exponentially decaying estimates of both the first
+    and second moments of the gradient:
 
-    Parameters and behavior are provided by ``torch.optim.Adam``.
+    ``m_t = beta1 * m_{t-1} + (1 - beta1) * g_t``
+
+    ``v_t = beta2 * v_{t-1} + (1 - beta2) * g_t²``.
+
+    Bias-corrected estimates are used to compute the update:
+
+    ``m̂_t = m_t / (1 - beta1^t)``
+
+    ``v̂_t = v_t / (1 - beta2^t)``
+
+    ``θ_t = θ_{t-1} - lr * m̂_t / (sqrt(v̂_t) + eps)``.
+
+    Parameters
+    ----------
+    lr : float, default=1e-3
+        Learning rate.
+    betas : tuple of float, default=(0.9, 0.999)
+        Decay rates for the first and second moment estimates.
+    eps : float, default=1e-8
+        Numerical-stability constant added to the denominator.
+    weight_decay : float, default=0
+        Weight-decay coefficient. For decoupled weight decay, use
+        ``AdamW``.
+    amsgrad : bool, default=False
+        If ``True``, maintains the maximum historical second-moment
+        estimate as in AMSGrad.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    capturable : bool, default=False
+        Enables graph-capturable optimizer state where supported.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
+    fused : bool or None, default=None
+        Whether to use the fused implementation when supported by the
+        selected device and dtype.
     """
-
     _default = toptim.Adam
 
 
@@ -378,28 +502,78 @@ class AdamW(BioOptimizer):
     """
     Adam optimizer with decoupled weight decay.
 
-    AdamW separates weight decay from the adaptive gradient update,
-    making the weight-decay coefficient independent of the gradient
-    normalization performed by Adam.
+    AdamW separates weight decay from the adaptive gradient update.
+    The Adam update is computed from the gradients, while the parameters
+    are independently shrunk according to the weight-decay coefficient.
 
-    Parameters and behavior are provided by ``torch.optim.AdamW``.
+    Ignoring implementation details, the update can be written as
+
+    ``θ_t = θ_{t-1} - lr * AdamUpdate(g_t)
+           - lr * weight_decay * θ_{t-1}``.
+
+    This decoupling makes the weight-decay parameter behave independently
+    of the gradient normalization used by Adam.
+
+    Parameters
+    ----------
+    lr : float, default=1e-3
+        Learning rate.
+    betas : tuple of float, default=(0.9, 0.999)
+        Decay rates for the first- and second-moment estimates.
+    eps : float, default=1e-8
+        Numerical-stability constant.
+    weight_decay : float, default=1e-2
+        Coefficient controlling decoupled parameter shrinkage.
+    amsgrad : bool, default=False
+        If ``True``, uses the AMSGrad variant.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    capturable : bool, default=False
+        Enables graph-capturable state handling where supported.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
+    fused : bool or None, default=None
+        Whether to use the fused implementation when supported.
     """
-
     _default = toptim.AdamW
 
 
 class Adamax(BioOptimizer):
     """
-    Adam variant based on the infinity norm of the gradients.
+    Adam variant using the infinity norm of past gradients.
 
-    Adamax replaces Adam's second-moment estimate with an exponentially
-    weighted infinity-norm estimate. It can provide a different
-    numerical behavior from standard Adam, particularly for gradients
-    with large or highly variable magnitudes.
+    Adamax replaces Adam's exponentially weighted second moment with an
+    exponentially weighted infinity norm. The state is updated as
 
-    Parameters and behavior are provided by ``torch.optim.Adamax``.
+    ``u_t = max(beta2 * u_{t-1}, |g_t|)``.
+
+    The first-moment estimate is computed as in Adam and the parameter
+    update uses the infinity-norm state:
+
+    ``θ_t = θ_{t-1} - lr * m̂_t / (u_t + eps)``.
+
+    Adamax can be numerically useful when gradients contain large or
+    highly variable values.
+
+    Parameters
+    ----------
+    lr : float, default=2e-3
+        Learning rate.
+    betas : tuple of float, default=(0.9, 0.999)
+        Decay rates for the first moment and infinity-norm estimates.
+    eps : float, default=1e-8
+        Numerical-stability constant.
+    weight_decay : float, default=0
+        L2 weight-decay coefficient.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
     """
-
     _default = toptim.Adamax
 
 
@@ -407,46 +581,110 @@ class ASGD(BioOptimizer):
     """
     Averaged Stochastic Gradient Descent optimizer.
 
-    ASGD maintains a running average of parameter values and can use
-    this averaged solution to improve convergence and generalization
-    in suitable optimization problems.
+    ASGD performs stochastic gradient updates while maintaining a
+    time-weighted average of the parameters after a configurable
+    starting point. The averaged parameters can provide improved
+    convergence behavior for some optimization problems.
 
-    Parameters and behavior are provided by ``torch.optim.ASGD``.
+    Parameters
+    ----------
+    lr : float, default=1e-2
+        Initial learning rate.
+    lambd : float, default=1e-4
+        Regularization/decay coefficient controlling the learning-rate
+        schedule.
+    alpha : float, default=0.75
+        Power used in the learning-rate schedule.
+    t0 : float, default=1e6
+        Number of iterations before averaging begins.
+    weight_decay : float, default=0
+        L2 weight-decay coefficient.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
     """
-
     _default = toptim.ASGD
 
 
 class LBFGS(BioOptimizer):
     """
-    Limited-memory BFGS optimizer.
+    Limited-memory BFGS quasi-Newton optimizer.
 
-    LBFGS is a quasi-Newton optimization method that approximates
-    second-order information without explicitly storing the full
-    Hessian. It can be effective for smaller problems but generally
-    requires substantially more memory and computation per optimization
-    step than first-order optimizers.
+    LBFGS approximates second-order optimization without explicitly
+    constructing the Hessian. It stores a limited history of parameter
+    and gradient differences to approximate inverse-Hessian information.
 
-    LBFGS requires a closure that recomputes the model output and loss
-    when ``step`` is called.
+    Unlike most PyTorch optimizers, LBFGS requires a ``closure`` passed
+    to ``step``. The closure must recompute the model loss and gradients,
+    because LBFGS may evaluate it multiple times during a single
+    optimization step.
 
-    Parameters and behavior are provided by ``torch.optim.LBFGS``.
+    LBFGS is generally better suited to relatively small models or
+    optimization problems where accurate deterministic optimization is
+    more important than minimizing per-step computation and memory.
+
+    Parameters
+    ----------
+    lr : float, default=1
+        Step-size multiplier.
+    max_iter : int, default=20
+        Maximum number of internal optimization iterations per
+        ``step`` call.
+    max_eval : int or None, default=None
+        Maximum number of closure evaluations per step. If ``None``,
+        PyTorch derives a value from ``max_iter``.
+    tolerance_grad : float, default=1e-7
+        Terminate when the maximum gradient magnitude falls below this
+        threshold.
+    tolerance_change : float, default=1e-9
+        Terminate when the loss or parameter change becomes sufficiently
+        small.
+    history_size : int, default=100
+        Number of previous updates retained for the inverse-Hessian
+        approximation.
+    line_search_fn : str or None, default=None
+        Optional line-search algorithm. PyTorch currently supports
+        ``"strong_wolfe"``.
     """
-
     _default = toptim.LBFGS
 
 
 class NAdam(BioOptimizer):
     """
-    Adam optimizer with Nesterov momentum.
+    Adam optimizer with Nesterov-style momentum.
 
     NAdam combines Adam's adaptive first- and second-moment estimates
-    with a Nesterov-style momentum formulation, allowing the gradient
-    update to incorporate a look-ahead component.
+    with a Nesterov-style momentum formulation. The resulting update
+    uses information from the current gradient together with the
+    momentum estimate to provide a look-ahead effect.
 
-    Parameters and behavior are provided by ``torch.optim.NAdam``.
+    Parameters
+    ----------
+    lr : float, default=2e-3
+        Learning rate.
+    betas : tuple of float, default=(0.9, 0.999)
+        Decay rates for the first- and second-moment estimates.
+    eps : float, default=1e-8
+        Numerical-stability constant.
+    weight_decay : float, default=0
+        Weight-decay coefficient.
+    momentum_decay : float, default=4e-3
+        Decay applied to the Nesterov momentum schedule.
+    decoupled_weight_decay : bool, default=False
+        If ``True``, applies weight decay independently of the gradient
+        update, giving AdamW-like behavior.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    capturable : bool, default=False
+        Enables graph-capturable state handling where supported.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
     """
-
     _default = toptim.NAdam
 
 
@@ -454,13 +692,35 @@ class RAdam(BioOptimizer):
     """
     Rectified Adam optimizer.
 
-    RAdam rectifies the adaptive learning rate during the early stages
-    of optimization to account for the variance of the adaptive
-    momentum estimate.
+    RAdam modifies Adam by accounting for the variance of the adaptive
+    learning rate during the early stages of optimization. Adam's
+    adaptive second-moment estimate can be poorly behaved when only a
+    small number of samples have contributed to it; RAdam dynamically
+    rectifies this effect based on the estimated length of the
+    available variance.
 
-    Parameters and behavior are provided by ``torch.optim.RAdam``.
+    Parameters
+    ----------
+    lr : float, default=1e-3
+        Learning rate.
+    betas : tuple of float, default=(0.9, 0.999)
+        Decay rates for the first- and second-moment estimates.
+    eps : float, default=1e-8
+        Numerical-stability constant.
+    weight_decay : float, default=0
+        Weight-decay coefficient.
+    decoupled_weight_decay : bool, default=False
+        If ``True``, applies weight decay independently of the adaptive
+        gradient update.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    capturable : bool, default=False
+        Enables graph-capturable state handling where supported.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
     """
-
     _default = toptim.RAdam
 
 
@@ -468,27 +728,68 @@ class RMSprop(BioOptimizer):
     """
     Root Mean Square Propagation optimizer.
 
-    RMSprop scales parameter updates using an exponentially weighted
-    average of squared gradients. This helps adapt the effective
-    learning rate independently for each parameter.
+    RMSprop maintains an exponentially weighted average of squared
+    gradients and divides the gradient by the square root of this
+    running average:
 
-    Parameters and behavior are provided by ``torch.optim.RMSprop``.
+    ``v_t = alpha * v_{t-1} + (1 - alpha) * g_t²``
+
+    ``θ_t = θ_{t-1} - lr * g_t / (sqrt(v_t) + eps)``.
+
+    An optional momentum term can further smooth the parameter updates.
+
+    Parameters
+    ----------
+    lr : float, default=1e-2
+        Learning rate.
+    alpha : float, default=0.99
+        Smoothing coefficient for the running squared-gradient average.
+    eps : float, default=1e-8
+        Numerical-stability constant.
+    weight_decay : float, default=0
+        L2 weight-decay coefficient.
+    momentum : float, default=0
+        Momentum coefficient. ``0`` disables momentum.
+    centered : bool, default=False
+        If ``True``, normalizes using an estimate of gradient variance
+        rather than only the second moment.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
     """
-
     _default = toptim.RMSprop
 
 
 class Rprop(BioOptimizer):
     """
-    Resilient backpropagation optimizer.
+    Resilient Backpropagation optimizer.
 
-    Rprop adapts the update magnitude for each parameter based primarily
-    on changes in the sign of its gradient rather than the gradient's
-    absolute magnitude.
+    Rprop adapts the magnitude of each parameter update according to
+    changes in the sign of its gradient rather than its absolute
+    magnitude. If the gradient retains the same sign between steps,
+    the update magnitude increases; if the sign changes, the magnitude
+    decreases.
 
-    Parameters and behavior are provided by ``torch.optim.Rprop``.
+    This makes Rprop substantially less sensitive to the scale of the
+    gradients than magnitude-based optimizers.
+
+    Parameters
+    ----------
+    lr : float, default=1e-2
+        Initial update magnitude for each parameter.
+    etas : tuple of float, default=(0.5, 1.2)
+        Multiplicative factors used to decrease or increase the update
+        magnitude after a gradient-sign change or continuation.
+    step_sizes : tuple of float, default=(1e-6, 50)
+        Minimum and maximum allowed update magnitudes.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
     """
-
     _default = toptim.Rprop
 
 
@@ -496,25 +797,66 @@ class SGD(BioOptimizer):
     """
     Stochastic Gradient Descent optimizer.
 
-    SGD updates parameters using their gradients and optionally supports
-    momentum, dampening, weight decay, and Nesterov momentum.
+    SGD updates parameters directly using their gradients:
 
-    Parameters and behavior are provided by ``torch.optim.SGD``.
+    ``θ_t = θ_{t-1} - lr * g_t``.
+
+    Optional momentum maintains a velocity that combines the current
+    gradient with previous updates:
+
+    ``v_t = momentum * v_{t-1} + g_t``.
+
+    Nesterov momentum modifies this update using a look-ahead gradient.
+    Weight decay can additionally regularize the parameters.
+
+    Parameters
+    ----------
+    lr : float
+        Learning rate controlling the magnitude of each update.
+    momentum : float, default=0
+        Momentum factor. ``0`` disables momentum.
+    dampening : float, default=0
+        Dampening applied to the contribution of the current gradient
+        when momentum is enabled.
+    weight_decay : float, default=0
+        L2 weight-decay coefficient.
+    nesterov : bool, default=False
+        If ``True``, uses Nesterov momentum. Requires ``momentum > 0``
+        and ``dampening == 0``.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
+    foreach : bool or None, default=None
+        Whether to use the multi-tensor implementation when available.
+    differentiable : bool, default=False
+        If ``True``, records optimizer operations in the autograd graph.
+    fused : bool or None, default=None
+        Whether to use the fused implementation when supported.
     """
-
     _default = toptim.SGD
 
 
 class SparseAdam(BioOptimizer):
     """
-    Adam variant designed for parameters with sparse gradients.
+    Adam optimizer for parameters with sparse gradients.
 
-    SparseAdam maintains adaptive first- and second-moment estimates
-    while updating only the entries associated with sparse gradients.
-    It is intended for models and parameters that produce sparse
-    gradients, such as suitable embedding layers.
+    SparseAdam applies Adam-style first- and second-moment updates only
+    to entries for which the gradient is present. This avoids performing
+    dense optimizer-state updates for parameters whose gradients are
+    sparse.
 
-    Parameters and behavior are provided by ``torch.optim.SparseAdam``.
+    It is intended for parameters such as suitable embedding tables
+    that produce sparse gradients. It should not be used with ordinary
+    dense gradients.
+
+    Parameters
+    ----------
+    lr : float, default=1e-3
+        Learning rate.
+    betas : tuple of float, default=(0.9, 0.999)
+        Decay rates for the first- and second-moment estimates.
+    eps : float, default=1e-8
+        Numerical-stability constant added to the denominator.
+    maximize : bool, default=False
+        If ``True``, performs gradient ascent.
     """
-
     _default = toptim.SparseAdam
