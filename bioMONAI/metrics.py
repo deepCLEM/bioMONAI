@@ -719,7 +719,7 @@ class MetricsReloadedCategorical(BioMetric):
 
 # %% ../nbs/060_metrics.ipynb #c8d22398
 class FRCMetric(BioMetric):
-    _default = partial(mm.LossMetric,loss_fn=FRCLoss)
+    _default = partial(mm.LossMetric,loss_fn=FRCLoss())
 
 # %% ../nbs/060_metrics.ipynb #ba352fcc
 class VarianceMetric(BioMetric):
