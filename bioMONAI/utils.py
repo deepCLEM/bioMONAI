@@ -8,10 +8,10 @@ __all__ = ['delegates', 'hasattrs', 'List', 'L', 'Any', 'store_attr', 'BypassNew
            'MutableSequence', 'Mapping', 'Optional', 'Union', 'Path', 'PurePath', 'PathLike', 'ensure_tuple',
            'ensure_tuple_rep', 'noop', 'merge', 'torchTensor', 'torch_from_numpy', 'torch_device', 'torchsqueeze',
            'torchmax', 'is_cuda_available', 'add_method', 'attributesFromDict', 'get_device', 'img2float', 'img2Tensor',
-           'route_kwargs', 'read_yaml', 'read_args_from_yaml', 'dictlist_to_funclist', 'dict2string',
+           'dict2string', 'route_kwargs', 'read_yaml', 'read_args_from_yaml', 'dictlist_to_funclist',
            'add_columns_to_csv', 'ColSplitter', 'TrainTestSplitter', 'FuncSplitter', 'IndexSplitter', 'NameSplitter',
            'RandomSplitter', 'GrandparentSplitter', 'ParentSplitter', 'FileSplitter', 'TargetedTransform',
-           'apply_transforms']
+           'apply_transforms', 'TestLearner']
 
 # %% ../nbs/000_utils.ipynb #f6eab00d
 # =================================
@@ -154,6 +154,25 @@ def img2Tensor(image):
     """
     return torchTensor(img2float(image))
 
+# %% ../nbs/000_utils.ipynb #4a1ccda2
+def dict2string(d, # The dictionary to convert.
+                item_sep="_", # The separator between dictionary items (default is ", ").
+                key_value_sep="", # The separator between keys and values (default is ": ").
+                pad_zeroes=None, # The minimum width for integer values, padded with zeros. If None, no padding is applied.
+                ):
+    """
+    Transforms a dictionary into a string with customizable separators and optional zero padding for integers.
+
+    Returns the formatted dictionary as a string.
+    """
+    def format_value(value):
+        if isinstance(value, int) and pad_zeroes is not None:
+            return f"{value:0{pad_zeroes}d}"
+        return str(value)
+    
+    return item_sep.join(f"{k}{key_value_sep}{format_value(v)}" for k, v in d.items())
+
+
 # %% ../nbs/000_utils.ipynb #f840c066
 def route_kwargs(func, kwargs):
     """
@@ -211,25 +230,6 @@ def dictlist_to_funclist(transform_dicts):
             transforms.append(transform_obj(**params))
 
     return transforms
-
-# %% ../nbs/000_utils.ipynb #73e25968
-def dict2string(d, # The dictionary to convert.
-                item_sep="_", # The separator between dictionary items (default is ", ").
-                key_value_sep="", # The separator between keys and values (default is ": ").
-                pad_zeroes=None, # The minimum width for integer values, padded with zeros. If None, no padding is applied.
-                ):
-    """
-    Transforms a dictionary into a string with customizable separators and optional zero padding for integers.
-
-    Returns the formatted dictionary as a string.
-    """
-    def format_value(value):
-        if isinstance(value, int) and pad_zeroes is not None:
-            return f"{value:0{pad_zeroes}d}"
-        return str(value)
-    
-    return item_sep.join(f"{k}{key_value_sep}{format_value(v)}" for k, v in d.items())
-
 
 # %% ../nbs/000_utils.ipynb #18e0fe6e
 def add_columns_to_csv(csv_path, # Path to the input CSV file
@@ -1017,3 +1017,92 @@ def apply_transforms(image, transforms):
             image2 = apply_transform_to_image(image2, t)
 
     return image1, image2
+
+# %% ../nbs/000_utils.ipynb #f3a86217
+class TestLearner:
+    """Lightweight fastai-compatible Learner mock for testing."""
+
+    def __init__(
+        self,
+        model=None,
+        dls=None,
+        loss_func=None,
+        preds=([], []),
+        targs=None,
+        xb=None,
+        prediction=None,
+        **kwargs,
+    ):
+        self.model = model
+        self.dls = dls
+        self.loss_func = loss_func
+        self.recorder = SimpleNamespace(values=[])
+        self.opt = SimpleNamespace()
+        self.cbs = []
+        self.training = False
+        self.calls = []
+
+        if targs is None and isinstance(preds, (tuple, list)) and len(preds) == 2:
+            preds, targs = preds
+
+        self.pred = preds
+        self.xb = xb
+        self.yb = targs
+        self._preds = (preds, targs)
+        self._prediction = prediction
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def _record(self, name, *args, **kwargs):
+        self.calls.append((name, args, kwargs))
+        return self
+
+    def fit(self, *args, **kwargs):
+        return self._record("fit", *args, **kwargs)
+
+    def fit_one_cycle(self, *args, **kwargs):
+        return self._record("fit_one_cycle", *args, **kwargs)
+
+    def fine_tune(self, *args, **kwargs):
+        return self._record("fine_tune", *args, **kwargs)
+
+    def validate(self, *args, **kwargs):
+        self._record("validate", *args, **kwargs)
+        return []
+
+    def get_preds(self, *args, **kwargs):
+        self._record("get_preds", *args, **kwargs)
+        return self._preds
+
+    def predict(self, *args, **kwargs):
+        self._record("predict", *args, **kwargs)
+        return self._prediction
+
+    def save(self, *args, **kwargs):
+        return self._record("save", *args, **kwargs)
+
+    def load(self, *args, **kwargs):
+        return self._record("load", *args, **kwargs)
+
+    def export(self, *args, **kwargs):
+        return self._record("export", *args, **kwargs)
+
+# %% ../nbs/000_utils.ipynb #845f7be8
+def dict2string(d, # The dictionary to convert.
+                item_sep="_", # The separator between dictionary items (default is ", ").
+                key_value_sep="", # The separator between keys and values (default is ": ").
+                pad_zeroes=None, # The minimum width for integer values, padded with zeros. If None, no padding is applied.
+                ):
+    """
+    Transforms a dictionary into a string with customizable separators and optional zero padding for integers.
+
+    Returns the formatted dictionary as a string.
+    """
+    def format_value(value):
+        if isinstance(value, int) and pad_zeroes is not None:
+            return f"{value:0{pad_zeroes}d}"
+        return str(value)
+    
+    return item_sep.join(f"{k}{key_value_sep}{format_value(v)}" for k, v in d.items())
+

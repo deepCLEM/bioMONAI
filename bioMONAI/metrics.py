@@ -4,9 +4,12 @@
 
 # %% auto #0
 __all__ = ['METRIC_BACKENDS', 'register_metric_backend', 'MonaiFastaiMetric', 'MetricBackend', 'MonaiMetricBackend',
-           'FastaiMetricBackend', 'BioMetric', 'SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric', 'RMSEMetric',
-           'DiceFastaiMetric', 'DiceMetric', 'PanopticQualityMetric', 'ROCAUCMetric', 'MetricsReloadedBinaryFastai',
-           'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric']
+           'FastaiMetricBackend', 'BioMetric', 'MSEMetric', 'SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric',
+           'RMSEMetric', 'DiceFastaiMetric', 'DiceMetric', 'IoUMetric', 'GeneralizedDiceScore', 'PanopticQualityMetric',
+           'ROCAUCMetric', 'ROCAUCFastaiMetric', 'AveragePrecisionMetric', 'ConfusionMatrixMetric',
+           'HausdorffDistanceMetric', 'SurfaceDistanceMetric', 'SurfaceDiceMetric', 'FIDMetric', 'MMDMetric',
+           'MetricsReloadedBinaryFastai', 'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric',
+           'VarianceMetric', 'LabelQualityScore']
 
 # %% ../nbs/060_metrics.ipynb #09106178
 # =================================
@@ -207,6 +210,10 @@ class BioMetric:
         return cls._create_metric(backend, *args, **kwargs)
 
 # %% ../nbs/060_metrics.ipynb #4960aa4d
+class MSEMetric(BioMetric):
+    _default = mm.MSEMetric
+
+
 class SSIMMetric(BioMetric):
     _default = mm.SSIMMetric
 
@@ -355,6 +362,14 @@ class DiceMetric(BioMetric):
 
 
 
+# %% ../nbs/060_metrics.ipynb #37db4336
+class IoUMetric(BioMetric):
+    _default = mm.MeanIoU
+
+# %% ../nbs/060_metrics.ipynb #fb8decf3
+class GeneralizedDiceScore(BioMetric):
+    _default = mm.GeneralizedDiceScore
+
 # %% ../nbs/060_metrics.ipynb #7df2d770
 class PanopticQualityMetric(BioMetric):
     """
@@ -420,6 +435,229 @@ def ROCAUCMetric(num_classes=None, # if not None, checks if preds and targets ar
 
     return AvgMetric(ROCAUC)
 
+# %% ../nbs/060_metrics.ipynb #249510e0
+class ROCAUCFastaiMetric(MonaiFastaiMetric):
+    """
+    Adapt MONAI's ``ROCAUCMetric`` to the fastai metric interface.
+
+    This adapter optionally applies an activation function and converts
+    class-index predictions and targets to one-hot representations before
+    delegating ROC-AUC computation to MONAI.
+
+    Parameters
+    ----------
+    num_classes : int, optional
+        Number of classes.
+
+        If provided, predictions and targets are converted to one-hot
+        representations when they are not already encoded with
+        ``num_classes`` channels.
+
+        If ``None``, predictions and targets are assumed to already have
+        the representation expected by MONAI's ``ROCAUCMetric``.
+
+    act : callable, optional
+        Activation function applied to predictions before computing the
+        metric. Typical choices are ``torch.sigmoid`` for binary
+        classification or ``torch.softmax`` for multiclass
+        classification.
+
+    *args
+        Positional arguments passed to ``monai.metrics.ROCAUCMetric``.
+
+    **kwargs
+        Additional keyword arguments passed to
+        ``monai.metrics.ROCAUCMetric``.
+
+    Notes
+    -----
+    The adapter detects already encoded data by checking whether the
+    second dimension contains ``num_classes`` channels. Otherwise,
+    class-index labels are converted to one-hot representations.
+
+    The underlying MONAI metric is reset before each accumulation step.
+    This preserves the behavior of the previous function-based wrapper,
+    where each fastai metric evaluation produced an independent ROC-AUC
+    value.
+
+    Examples
+    --------
+    Binary classification with sigmoid activation::
+
+        metric = ROCAUCFastaiMetric(
+            num_classes=2,
+            act=torch.sigmoid,
+        )
+
+    Multiclass classification with softmax activation::
+
+        metric = ROCAUCFastaiMetric(
+            num_classes=3,
+            act=lambda x: torch.softmax(x, dim=1),
+        )
+    """
+
+    def __init__(self, num_classes=None, act=None, *args, **kwargs):
+        self.num_classes = num_classes
+        self.act = act
+
+        metric = mm.ROCAUCMetric(*args, **kwargs)
+
+        super().__init__(
+            metric,
+            name="ROCAUC",
+        )
+
+    def _maybe_one_hot(self, x):
+        """
+        Convert class-index data to one-hot representation when needed.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Predictions or targets.
+
+        Returns
+        -------
+        torch.Tensor
+            ``x`` unchanged if it already contains ``num_classes``
+            channels; otherwise converted to one-hot representation.
+        """
+        if self.num_classes is None:
+            return x
+
+        if x.ndim > 1 and x.shape[1] == self.num_classes:
+            return x
+
+        return one_hot(
+            x.long(),
+            num_classes=self.num_classes,
+        )
+
+    def _prepare(self, pred, target):
+        """
+        Apply activation and optional one-hot encoding.
+
+        Parameters
+        ----------
+        pred : torch.Tensor
+            Predictions produced by the fastai learner.
+
+        target : torch.Tensor or tuple
+            Ground-truth targets. Fastai normally stores targets in
+            ``learn.yb`` as a tuple.
+
+        Returns
+        -------
+        tuple
+            Prepared ``(pred, target)`` pair suitable for MONAI's
+            ``ROCAUCMetric``.
+        """
+        if isinstance(target, (tuple, list)):
+            target = target[0]
+
+        if self.act is not None:
+            pred = self.act(pred)
+
+        if self.num_classes is not None:
+            pred = self._maybe_one_hot(pred)
+            target = self._maybe_one_hot(target)
+
+        return pred, target
+
+    def accumulate(self, learn):
+        """
+        Accumulate ROC-AUC for the current fastai batch.
+
+        The MONAI metric is reset before processing the batch so that
+        the result matches the behavior of the previous functional
+        ``ROCAUCMetric`` wrapper.
+        """
+        pred, target = self._prepare(
+            learn.pred,
+            learn.yb,
+        )
+
+        self.metric.reset()
+        self.metric(pred, target)
+
+# %% ../nbs/060_metrics.ipynb #a86d7472
+class ROCAUCMetric(BioMetric):
+    """
+    Compute the area under the receiver operating characteristic curve
+    (ROC-AUC) using MONAI.
+
+    ROC-AUC summarizes the ability of a model to distinguish between
+    positive and negative classes across all possible classification
+    thresholds. For multiclass problems, MONAI supports different
+    reduction strategies for combining the per-class AUC values.
+
+    Parameters
+    ----------
+    average : str, default="macro"
+        Reduction method used to combine AUC values across classes.
+        The available options depend on the underlying MONAI
+        implementation.
+
+    get_not_nans : bool, default=False
+        If ``True``, also return the number of valid, non-NaN AUC
+        values when aggregating the metric.
+
+    kwargs
+        Additional keyword arguments are passed directly to MONAI's
+        :class:`monai.metrics.ROCAUCMetric`.
+
+    Notes
+    -----
+    With ``backend="fastai"``, predictions are optionally activated and
+    converted to one-hot representations by ``ROCAUCFastaiMetric`` before
+    being passed to MONAI.
+
+    With the default MONAI backend, ``num_classes`` and ``act`` are not
+    interpreted by this wrapper; they are specific to the fastai adapter.
+
+    Examples
+    --------
+    Compute macro-averaged ROC-AUC with the default MONAI backend::
+
+        metric = ROCAUCMetric()
+
+    Use the metric with the fastai backend::
+
+        metric = ROCAUCMetric(backend="fastai")
+
+    """
+    _default = mm.ROCAUCMetric
+    _fastai = ROCAUCFastaiMetric
+
+# %% ../nbs/060_metrics.ipynb #06247a60
+class AveragePrecisionMetric(BioMetric):
+    _default = mm.AveragePrecisionMetric
+
+# %% ../nbs/060_metrics.ipynb #65149c1d
+class ConfusionMatrixMetric(BioMetric):
+    _default = mm.ConfusionMatrixMetric
+
+# %% ../nbs/060_metrics.ipynb #06bef472
+class HausdorffDistanceMetric(BioMetric):
+    _default = mm.HausdorffDistanceMetric
+
+# %% ../nbs/060_metrics.ipynb #a13fc7d6
+class SurfaceDistanceMetric(BioMetric):
+    _default = mm.SurfaceDistanceMetric
+
+# %% ../nbs/060_metrics.ipynb #0481a590
+class SurfaceDiceMetric(BioMetric):
+    _default = mm.SurfaceDiceMetric
+
+# %% ../nbs/060_metrics.ipynb #33fa9b46
+class FIDMetric(BioMetric):
+    _default = mm.FIDMetric
+
+# %% ../nbs/060_metrics.ipynb #54b110e4
+class MMDMetric(BioMetric):
+    _default = mm.MMDMetric
+
 # %% ../nbs/060_metrics.ipynb #bfad25b6
 class MetricsReloadedBinaryFastai(MonaiFastaiMetric):
     """
@@ -480,10 +718,13 @@ class MetricsReloadedCategorical(BioMetric):
     _default = mm.MetricsReloadedCategorical
 
 # %% ../nbs/060_metrics.ipynb #c8d22398
-def FRCMetric(image1, image2):
-    """
-    Metric derived from FRC loss.
-    """
+class FRCMetric(BioMetric):
+    _default = partial(mm.LossMetric,loss_fn=FRCLoss)
 
-    return 1.0 - FRCLoss(image1, image2)
+# %% ../nbs/060_metrics.ipynb #ba352fcc
+class VarianceMetric(BioMetric):
+    _default = mm.VarianceMetric
 
+# %% ../nbs/060_metrics.ipynb #4536906b
+class LabelQualityScore(BioMetric):
+    _default = mm.LabelQualityScore
