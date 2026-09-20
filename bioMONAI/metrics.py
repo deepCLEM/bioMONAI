@@ -6,7 +6,7 @@
 __all__ = ['METRIC_BACKENDS', 'register_metric_backend', 'MonaiFastaiMetric', 'MetricBackend', 'MonaiMetricBackend',
            'FastaiMetricBackend', 'BioMetric', 'MSEMetric', 'SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric',
            'RMSEMetric', 'DiceFastaiMetric', 'DiceMetric', 'IoUMetric', 'GeneralizedDiceScore', 'PanopticQualityMetric',
-           'ROCAUCMetric', 'ROCAUCFastaiMetric', 'AveragePrecisionMetric', 'ConfusionMatrixMetric',
+           'ROCAUCFastaiMetric', 'ROCAUCMetric', 'AveragePrecisionMetric', 'ConfusionMatrixMetric',
            'HausdorffDistanceMetric', 'SurfaceDistanceMetric', 'SurfaceDiceMetric', 'FIDMetric', 'MMDMetric',
            'MetricsReloadedBinaryFastai', 'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric',
            'VarianceMetric', 'LabelQualityScore']
@@ -398,42 +398,6 @@ class PanopticQualityMetric(BioMetric):
     #     return pq_metric.aggregate()
 
     # return AvgMetric(PQ)
-
-# %% ../nbs/060_metrics.ipynb #0481c954
-def ROCAUCMetric(num_classes=None, # if not None, checks if preds and targets are one-hot encoded
-                 act=None,         # activation operations, typically Sigmoid or Softmax.
-                 **kwargs):
-    """
-    Wrapper around monai.metrics.ROCAUCMetric.
-
-    If num_classes is None:
-        assumes pred and target are already one-hot / probability encoded.
-
-    If num_classes is provided:
-        automatically one-hot encodes pred/target when needed.
-    """
-    rocaucmetric = mm.ROCAUCMetric(**kwargs)
-
-    def _maybe_one_hot(x):
-        # already encoded
-        if x.ndim > 1 and x.shape[1] == num_classes:
-            return x
-
-        return one_hot(x.long(), num_classes=num_classes)
-
-    def ROCAUC(pred, target):
-        if act is not None:
-            pred = act(pred)
-
-        if num_classes is not None:
-            pred = _maybe_one_hot(pred)
-            target = _maybe_one_hot(target)
-
-        rocaucmetric.reset()
-        rocaucmetric(pred, target)
-        return rocaucmetric.aggregate()
-
-    return AvgMetric(ROCAUC)
 
 # %% ../nbs/060_metrics.ipynb #249510e0
 class ROCAUCFastaiMetric(MonaiFastaiMetric):

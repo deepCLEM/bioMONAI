@@ -998,35 +998,55 @@ class PipelineContext:
 
 # %% ../../nbs/022_data.load.ipynb #d8e838b9
 def detect_source(data):
+    """
+    Detect the source type of input data.
 
+    Parameters
+    ----------
+    data : object
+        Data source to inspect. Supported sources include callables,
+        DataFrames, dictionaries, lists/tuples, CSV paths, and folders.
+
+    Returns
+    -------
+    str
+        Registered source name corresponding to the input type.
+
+    Raises
+    ------
+    ValueError
+        If the input cannot be mapped to a supported source type.
+    """
     if callable(data):
         return "callable"
 
     if isinstance(data, pd.DataFrame):
         return "dataframe"
 
-    # single dict
+    # Single dictionary
     if isinstance(data, dict):
         return "dict"
 
-    # list/tuple handling
+    # List/tuple handling
     if isinstance(data, (list, tuple)):
 
         if len(data) == 0:
             return "list"
 
-        # list of dicts
+        # List of dictionaries
         if all(isinstance(x, dict) for x in data):
             return "dict"
 
         return "list"
 
-    if isinstance(data, str):
+    # String or Path
+    if isinstance(data, (str, Path)):
+        path = Path(data)
 
-        if data.endswith(".csv"):
+        if path.suffix.lower() == ".csv":
             return "csv"
 
-        if Path(data).is_dir():
+        if path.is_dir():
             return "folder"
 
     raise ValueError("Cannot detect data source")
