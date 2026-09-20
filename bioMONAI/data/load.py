@@ -1336,6 +1336,8 @@ class FolderSource(BaseSource):
         root,
         get_items,
         x_key=None,
+        folders=None,
+        keep_original=True,
         **kwargs,
     ):
         self.root = Path(root)
@@ -1358,11 +1360,13 @@ class FolderSource(BaseSource):
 
         data = self._discover()
 
+        folders = folders or {self.x_key: self.root}
+
         self.source = DictSource(
             data,
             get_items={k: k for k in data[0]} if data else {},
-            folders={self.x_key: self.root},
-            keep_original=True,
+            folders=folders,
+            keep_original=keep_original,
             **kwargs,
         )
 
