@@ -73,6 +73,7 @@ from fastcore.script import risinstance
 # =================================
 from .utils import *
 from .datasets import download_medmnist
+# from bioMONAI.optimizers import Adam
 
 # %% auto #0
 __all__ = ['TrainerFactory', 'BACKEND_REGISTRY', 'TRAINER_REGISTRY', 'register_backend', 'register_trainer', 'TrainerConfig',
@@ -768,7 +769,7 @@ class BioTrainer:
         find_lr=False,
         find_lr_kwargs=None,
         save_dir="models",
-        backend="torch",
+        backend="monai",
         trainer="supervised",
         backend_kwargs=None,
     ):
@@ -919,28 +920,83 @@ def fastai_build_trainer(self):
     """
     trainer_factory = self._get_trainer()
 
-    kwargs = self._common_kwargs()
-    kwargs.update(self.config.backend_kwargs)
+    kwargs = self._translate_kwargs(
+        self._common_kwargs(),
+        target=trainer_factory,
+    )
+
+    kwargs.update(
+        self._backend_kwargs(
+            target=trainer_factory,
+        )
+    )
 
     self.trainer = trainer_factory(**kwargs)
-
     return self
 
 # %% ../nbs/080_engines.ipynb #8ef75e4a
-def fastai_fit(self):
+def fastai_fit(
+    self,
+    n_epoch=None,
+    lr=None,
+    wd=None,
+    cbs=None,
+    reset_opt=False,
+    start_epoch=0,
+):
     """
     Train using the configured fastai trainer.
+
+    The signature follows :meth:`fastTrainer.fit`, while arguments omitted
+    by the caller are filled from the canonical :class:`TrainerConfig`.
+
+    Parameters
+    ----------
+    n_epoch
+        Number of epochs. If ``None``, uses ``config.epochs``.
+    lr
+        Learning rate. If ``None``, uses ``config.lr``.
+    wd
+        Weight decay. If ``None``, uses ``backend_kwargs["wd"]`` when
+        provided; otherwise the native fastai default is used.
+    cbs
+        Callbacks passed to ``fastTrainer.fit``. If ``None``, uses
+        ``config.callbacks``.
+    reset_opt
+        Whether to reset the optimizer before training.
+    start_epoch
+        Epoch from which to resume training.
 
     Returns
     -------
     Any
-        Result returned by the underlying trainer.
+        Result returned by ``fastTrainer.fit``.
     """
     if self.trainer is None:
         self._build_trainer()
 
-    return self.trainer.fit()
+    cfg = self.config
 
+    if n_epoch is None:
+        n_epoch = cfg.epochs
+
+    if lr is None:
+        lr = cfg.lr
+
+    if cbs is None:
+        cbs = cfg.callbacks
+
+    if wd is None:
+        wd = cfg.backend_kwargs.get("wd", None)
+
+    return self.trainer.fit(
+        n_epoch=n_epoch,
+        lr=lr,
+        wd=wd,
+        cbs=cbs,
+        reset_opt=reset_opt,
+        start_epoch=start_epoch,
+    )
 
 # %% ../nbs/080_engines.ipynb #ed399495
 def fastai_validate(self):
@@ -996,6 +1052,7 @@ def fastai_predict(self, *args, **kwargs):
     return self.trainer.predict(*args, **kwargs)
 
 # %% ../nbs/080_engines.ipynb #5b7c2202
+@register_backend("fastai")
 class FastaiTrainerBackend(TrainerBackend):
     """
     fastai training backend for bioMONAI.
@@ -1023,7 +1080,7 @@ class FastaiTrainerBackend(TrainerBackend):
 
     arg_map = {
         "dls": "dataloaders",
-        "loss": "loss_func",
+        "loss": "loss_fn",
         "save_dir": "model_dir",
     }
 
@@ -1034,6 +1091,7 @@ FastaiTrainerBackend.validate = fastai_validate
 FastaiTrainerBackend.predict = fastai_predict
 
 # %% ../nbs/080_engines.ipynb #0e561fee
+@register_trainer("fastai", "supervised")
 class fastTrainer(Learner):
     """
     A custom implementation of the FastAI Learner class for training models in bioinformatics applications.
@@ -1051,7 +1109,7 @@ class fastTrainer(Learner):
                  metrics: Any | MutableSequence | None = None, # Optional list of callback functions to customize training behavior.
                  csv_log: bool = False, # Metrics to evaluate the performance of the model during training.
                  show_graph: bool = True, # Whether to log training history to a CSV file. If True, logs will be appended to 'history.csv'.
-                 show_graph: bool = True, # The base directory where models are saved or loaded from. Defaults to None.
+                 show_summary: bool = True, # The base directory where models are saved or loaded from. Defaults to None.
                  find_lr: bool = False, # Subdirectory within the base path where trained models are stored. Default is 'models'.
                  find_lr_fn = valley, # Weight decay factor for optimization. Defaults to None.
                  path: str | Path | None = None, # Whether to apply weight decay to batch normalization and bias parameters.
@@ -1160,33 +1218,6 @@ class fastTrainer(Learner):
             model_dir = model_dir, wd = wd, wd_bn_bias = wd_bn_bias, train_bn = train_bn, moms = moms,
             csv_log = csv_log, show_graph = show_graph, show_summary = show_summary          
         )        
-
-# %% ../nbs/080_engines.ipynb #28fcf20f
-@register_trainer("fastai", "supervised")
-def _fastai_supervised(
-    *args: Any,
-    **kwargs: Any,
-) -> Any:
-    """
-    Construct the fastai-based bioMONAI supervised trainer.
-
-    This trainer provides the standard supervised training workflow
-    for the fastai backend and delegates training behavior to
-    :class:`fastTrainer`.
-
-    Parameters
-    ----------
-    *args
-        Positional arguments forwarded to ``fastTrainer``.
-    **kwargs
-        Keyword arguments forwarded to ``fastTrainer``.
-
-    Returns
-    -------
-    fastTrainer
-        Configured fastai-based training engine.
-    """
-    return fastTrainer(*args, **kwargs)
 
 # %% ../nbs/080_engines.ipynb #8d0023f0
 def _add_norm(dls, meta, pretrained, n_in=3):
