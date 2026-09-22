@@ -517,13 +517,18 @@ def _common_kwargs(
     Returns
     -------
     dict
-        Canonical training arguments.
+        Canonical training arguments used by backend adapters to construct
+        native trainers.
 
     Notes
     -----
     Validation scheduling options such as ``validate`` and ``valid_every``
     are intentionally excluded. They control orchestration rather than
     native trainer construction.
+
+    The canonical names are preserved here. Backend-specific ``arg_map``
+    definitions are responsible for translating names when a native
+    framework uses different terminology.
     """
     cfg = self.config
 
@@ -536,8 +541,15 @@ def _common_kwargs(
         "epochs": cfg.epochs,
         "lr": cfg.lr,
         "device": cfg.device,
+        "callbacks": cfg.callbacks,
         "inferer": cfg.inferer,
         "postprocessing": cfg.postprocessing,
+        "csv_logger": cfg.csv_logger,
+        "show_graph": cfg.show_graph,
+        "show_results": cfg.show_results,
+        "find_lr": cfg.find_lr,
+        "find_lr_kwargs": cfg.find_lr_kwargs,
+        "save_dir": cfg.save_dir,
     }
 
 # %% ../nbs/080_engines.ipynb #947e79ee
