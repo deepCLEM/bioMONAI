@@ -56,12 +56,11 @@ from .utils import *
 # %% ../nbs/040_losses.ipynb #f6eae6b4
 LOSS_BACKENDS = {}
 
-
 def register_loss_backend(name):
     """Register a loss backend."""
     def decorator(backend):
         if name in LOSS_BACKENDS:
-            raise ValueError(f"Metric backend already registered: {name}")
+            raise ValueError(f"Loss backend already registered: {name}")
         LOSS_BACKENDS[name] = backend
         return backend
 
