@@ -45,6 +45,7 @@ import monai.metrics as mm
 # bioMONAI
 # =================================
 from .losses import FRCLoss
+from .backend import get_backend
 from .utils import *
 
 # %% ../nbs/060_metrics.ipynb #05d4562d
@@ -244,7 +245,7 @@ class FastaiMetricBackend(MetricBackend):
             return metric_cls(*args, **kwargs)
 
         adapted_cls = type(
-            f"Fastai{metric_cls.__name__}",
+            f"{metric_cls.__name__}",
             (FastaiMetricMixin, metric_cls),
             {},
         )
@@ -253,11 +254,53 @@ class FastaiMetricBackend(MetricBackend):
 
 # %% ../nbs/060_metrics.ipynb #0661c10a
 class BioMetric:
-    default_backend = "monai"
+    """
+    Backend-independent interface for metrics in bioMONAI.
+
+    ``BioMetric`` provides a common interface for metrics implemented across
+    different deep-learning backends. A metric can define a backend-specific
+    implementation through attributes such as ``_torch``, ``_monai``,
+    ``_fastai``, or ``_keras``. If no implementation is defined for the
+    active backend, ``_default`` is used instead.
+
+    The active backend is selected globally with
+    :func:`bioMONAI.set_backend` and is obtained through
+    :func:`bioMONAI.get_backend`. Consequently, metrics do not expose a
+    ``backend`` argument.
+
+    Attributes
+    ----------
+    _default : callable, optional
+        Default metric implementation used when no backend-specific
+        implementation is available.
+    _<backend> : callable, optional
+        Backend-specific metric implementation. For example, ``_monai``
+        or ``_fastai``. When defined, it takes precedence over
+        ``_default`` for the corresponding active backend.
+
+    Examples
+    --------
+    Select the backend globally and instantiate metrics normally:
+
+    >>> bioMONAI.set_backend("monai")
+    >>> metric = DiceMetric()
+
+    The same metric interface can then be used with another backend:
+
+    >>> bioMONAI.set_backend("fastai")
+    >>> metric = DiceMetric()
+    """
+
     _default = None
 
     @classmethod
     def _get_metric(cls, backend):
+        """
+        Return the metric implementation for a backend.
+
+        A backend-specific implementation takes precedence over
+        ``_default``.
+        """
         metric_cls = getattr(cls, f"_{backend}", None)
 
         if metric_cls is None:
@@ -266,29 +309,51 @@ class BioMetric:
         if metric_cls is None:
             raise ValueError(
                 f"No metric implementation for backend '{backend}' "
-                f"and no default implementation defined."
+                f"and no default implementation is defined for "
+                f"{cls.__name__}."
             )
 
         return metric_cls
 
     @classmethod
     def _create_metric(cls, backend, *args, **kwargs):
+        """
+        Create the metric using the selected backend adapter.
+        """
         metric_cls = cls._get_metric(backend)
 
         try:
             backend_cls = METRIC_BACKENDS[backend]
         except KeyError:
-            raise ValueError(f"Unknown metric backend: {backend}")
+            raise ValueError(
+                f"Unknown metric backend '{backend}'. "
+                f"Available metric backends: {list(METRIC_BACKENDS)}"
+            ) from None
 
-        return backend_cls().create(metric_cls, *args, **kwargs)
+        return backend_cls().create(
+            metric_cls,
+            *args,
+            **kwargs,
+        )
 
     @property
     def name(self):
+        """
+        Return the metric name.
+        """
         return self.__class__.__name__
 
-    def __new__(cls, *args, backend=None, **kwargs):
-        backend = backend or cls.default_backend
-        return cls._create_metric(backend, *args, **kwargs)
+    def __new__(cls, *args, **kwargs):
+        """
+        Instantiate the metric using the globally active backend.
+        """
+        backend = get_backend()
+
+        return cls._create_metric(
+            backend,
+            *args,
+            **kwargs,
+        )
 
 # %% ../nbs/060_metrics.ipynb #4960aa4d
 class MSEMetric(BioMetric):
