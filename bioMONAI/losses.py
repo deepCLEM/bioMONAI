@@ -51,6 +51,7 @@ import fastai.losses as fl
 # =================================
 # bioMONAI
 # =================================
+from .backend import get_backend
 from .utils import *
 
 # %% ../nbs/040_losses.ipynb #f6eae6b4
@@ -71,20 +72,17 @@ class BioLoss:
     """
     Backend-independent interface for loss functions in bioMONAI.
 
-    ``BioLoss`` defines a canonical loss together with its default activation
-    and decoding functions. A loss can optionally provide a backend-specific
+    ``BioLoss`` defines a canonical loss together with its activation and
+    decoding functions. A loss can optionally provide a backend-specific
     implementation through attributes such as ``_torch``, ``_monai``,
     ``_fastai``, or ``_keras``.
 
-    When an explicit backend implementation is available, it is instantiated
-    directly and the backend adapter is skipped. Otherwise, ``_default`` is
-    passed to the registered backend adapter, which adapts the loss to the
-    selected framework.
+    When an explicit implementation for the active backend is available,
+    it is instantiated directly and the backend adapter is skipped.
+    Otherwise, ``_default`` is passed to the registered backend adapter.
 
     Parameters
     ----------
-    backend : str, default="monai"
-        Backend used to instantiate the loss.
     *args
         Positional arguments passed to the loss implementation.
     **kwargs
@@ -93,17 +91,24 @@ class BioLoss:
     Attributes
     ----------
     _default : callable
-        Default loss implementation.
+        Default loss implementation used when no backend-specific
+        implementation is available.
     _<backend> : callable, optional
         Backend-specific loss implementation. For example, ``_torch`` or
-        ``_fastai``. When present, this implementation takes precedence over
-        ``_default`` and is instantiated directly.
+        ``_fastai``. When present, this implementation takes precedence
+        over ``_default``.
     activation : callable
-        Converts raw model outputs into the prediction space associated with
-        the loss. Defaults to ``noops``.
+        Converts raw model outputs into the prediction space associated
+        with the loss. Defaults to ``noops``.
     decodes : callable
-        Converts predictions into their decoded representation. Defaults to
-        ``noops``.
+        Converts predictions into their decoded representation.
+        Defaults to ``noops``.
+
+    Notes
+    -----
+    The active backend is selected globally with
+    :func:`bioMONAI.set_backend`. Consequently, losses do not need to
+    receive a ``backend`` argument.
     """
 
     _default = None
@@ -111,11 +116,11 @@ class BioLoss:
     activation = noops
     decodes = noops
 
-    def __new__(cls, *args, backend="monai", **kwargs):
+    def __new__(cls, *args, **kwargs):
         """
-        Instantiate the loss using the requested backend.
+        Instantiate the loss using the globally active backend.
         """
-        backend = cls._validate_backend(backend)
+        backend = get_backend()
 
         # Use an explicit backend implementation when available.
         backend_loss = getattr(cls, f"_{backend}", None)
@@ -124,7 +129,7 @@ class BioLoss:
             return backend_loss(*args, **kwargs)
 
         # Otherwise let the backend adapter wrap/adapt the default loss.
-        backend_cls = cls._get_backend(backend)
+        backend_cls = cls._get_backend_loss(backend)
 
         return backend_cls.create(
             cls,
@@ -132,24 +137,17 @@ class BioLoss:
             **kwargs,
         )
 
-    @staticmethod
-    def _validate_backend(backend):
-        """Validate and normalize a backend name."""
-        if not isinstance(backend, str) or not backend.strip():
-            raise ValueError("backend must be a non-empty string")
-        return backend.lower()
-
     @classmethod
-    def _get_backend(cls, backend):
+    def _get_backend_loss(cls, backend):
         """
-        Return the registered backend adapter for ``backend``.
+        Return the registered loss adapter for ``backend``.
         """
         try:
             return LOSS_BACKENDS[backend]
         except KeyError:
             raise ValueError(
-                f"Unknown loss backend '{backend}'. "
-                f"Available backends: {list(LOSS_BACKENDS)}"
+                f"Loss backend '{backend}' is not registered. "
+                f"Available loss backends: {list(LOSS_BACKENDS)}"
             ) from None
 
 # %% ../nbs/040_losses.ipynb #2ab781ca
