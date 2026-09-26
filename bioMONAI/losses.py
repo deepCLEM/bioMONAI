@@ -116,6 +116,9 @@ class BioLoss:
     activation = noops
     decodes = noops
 
+    flatten = True
+    is_2d = False
+
     def __new__(cls, *args, **kwargs):
         """
         Instantiate the loss using the globally active backend.
@@ -251,6 +254,8 @@ class FastaiLossBackend(LossBackend):
         loss = fastaiBaseLoss(
             loss_cls._default,
             *args,
+            flatten=loss_cls.flatten,
+            is_2d=loss_cls.is_2d,
             **kwargs,
         )
 
@@ -1294,7 +1299,8 @@ class FRCLoss(BioLoss):
     """
 
     _default = _FRCLoss
-    _torch = _FRCLoss
+
+    flatten = False
 
 # %% ../nbs/040_losses.ipynb #57afa0f0
 class KLDivLoss(BioLoss):
