@@ -319,8 +319,8 @@ class TrainerConfig:
         Whether to enable CSV logging, when supported by the backend.
     show_graph
         Whether to display training graphs, when supported by the backend.
-    show_results
-        Whether to display training results, when supported by the backend.
+    show_summary
+        Whether to display a model summary, when supported by the backend.
     find_lr
         Whether to perform learning-rate finding before training.
     find_lr_kwargs
@@ -368,7 +368,7 @@ class TrainerConfig:
 
     csv_logger: bool = False
     show_graph: bool = False
-    show_results: bool = False
+    show_summary: bool = False
     find_lr: bool = False
     find_lr_kwargs: Dict[str, Any] = field(default_factory=dict)
     save_dir: str | Path = "models"
@@ -567,7 +567,7 @@ def _common_kwargs(
         "postprocessing": cfg.postprocessing,
         "csv_logger": cfg.csv_logger,
         "show_graph": cfg.show_graph,
-        "show_results": cfg.show_results,
+        "show_summary": cfg.show_summary,
         "find_lr": cfg.find_lr,
         "find_lr_kwargs": cfg.find_lr_kwargs,
         "save_dir": cfg.save_dir,
@@ -823,8 +823,8 @@ class BioTrainer:
     show_graph
         Whether to display training graphs when supported by the selected
         trainer.
-    show_results
-        Whether to display training results when supported by the selected
+    show_summary
+        Whether to display a model summary when supported by the selected
         trainer.
     find_lr
         Whether to perform learning-rate finding when supported by the
@@ -890,7 +890,7 @@ class BioTrainer:
         postprocessing=None,
         csv_logger=False,
         show_graph=False,
-        show_results=False,
+        show_summary=False,
         find_lr=False,
         find_lr_kwargs=None,
         save_dir="models",
@@ -937,7 +937,7 @@ class BioTrainer:
             postprocessing=postprocessing,
             csv_logger=csv_logger,
             show_graph=show_graph,
-            show_results=show_results,
+            show_summary=show_summary,
             find_lr=find_lr,
             find_lr_kwargs=find_lr_kwargs or {},
             save_dir=save_dir,
