@@ -54,7 +54,7 @@ from fastai.data.all import (
     hasattrs, List, L, Normalize
 )
 
-from fastai.optimizer import Adam, OptimWrapper, Optimizer
+from fastai.optimizer import OptimWrapper, Optimizer
 
 from fastai.vision.all import (
     Any, BypassNewMeta, CSVLogger, ClassificationInterpretation,
@@ -71,9 +71,10 @@ from fastcore.script import risinstance
 # =================================
 # bioMONAI
 # =================================
+from .backend import get_backend
 from .utils import *
 from .datasets import download_medmnist
-# from bioMONAI.optimizers import Adam
+from .optimizers import Adam
 
 # %% auto #0
 __all__ = ['TrainerFactory', 'BACKEND_REGISTRY', 'TRAINER_REGISTRY', 'register_backend', 'register_trainer', 'TrainerConfig',
@@ -314,8 +315,23 @@ class TrainerConfig:
         Optional inference strategy used during validation.
     postprocessing
         Optional post-processing applied during validation.
+    csv_logger
+        Whether to enable CSV logging, when supported by the backend.
+    show_graph
+        Whether to display training graphs, when supported by the backend.
+    show_results
+        Whether to display training results, when supported by the backend.
+    find_lr
+        Whether to perform learning-rate finding before training.
+    find_lr_kwargs
+        Arguments passed to the learning-rate finder.
+    save_dir
+        Directory used for model checkpoints and other training artifacts.
     backend
-        Training backend identifier.
+        Resolved training backend selected through
+        :func:`bioMONAI.get_backend`.
+    trainer
+        Training strategy implemented by the selected backend.
     backend_kwargs
         Backend-specific arguments that do not belong in the common API.
 
@@ -324,6 +340,11 @@ class TrainerConfig:
     The names in this class are deliberately independent of native
     frameworks. For example, bioMONAI uses ``epochs`` rather than MONAI's
     ``max_epochs`` and ``loss`` rather than ``loss_function``.
+
+    The active backend is selected globally with
+    :func:`bioMONAI.set_backend`. ``TrainerConfig`` stores the resolved
+    backend so that the trainer adapter can consistently use the backend
+    selected when the :class:`BioTrainer` was created.
     """
 
     model: Any = None
@@ -350,7 +371,7 @@ class TrainerConfig:
     show_results: bool = False
     find_lr: bool = False
     find_lr_kwargs: Dict[str, Any] = field(default_factory=dict)
-    save_dir: str | Path = 'models'
+    save_dir: str | Path = "models"
 
     backend: str = "monai"
     trainer: str = "supervised"
@@ -678,7 +699,7 @@ TrainerBackend.validate = _trainer_backend_validate
 TrainerBackend.predict = _trainer_backend_predict
 
 # %% ../nbs/080_engines.ipynb #fbe27391
-def _instantiate_component(component, kwargs=None, backend=None, *args):
+def _instantiate_component(component, kwargs=None, *args):
     """
     Instantiate a component when it is a class.
 
@@ -691,8 +712,6 @@ def _instantiate_component(component, kwargs=None, backend=None, *args):
         Component class or already-instantiated callable.
     kwargs
         Arguments used when instantiating a class.
-    backend
-        Backend to inject when constructing a class.
     *args
         Positional arguments passed to the constructor.
 
@@ -700,6 +719,12 @@ def _instantiate_component(component, kwargs=None, backend=None, *args):
     -------
     Any
         Instantiated component or the original callable.
+
+    Notes
+    -----
+    Backend selection is handled internally by the component through the
+    globally configured bioMONAI backend. The helper therefore does not
+    inject or override a ``backend`` argument.
     """
     if component is None:
         return None
@@ -710,15 +735,15 @@ def _instantiate_component(component, kwargs=None, backend=None, *args):
 
     kwargs = dict(kwargs or {})
 
-    # Explicit user configuration always takes precedence.
-    kwargs.setdefault("backend", backend)
-
     return component(*args, **kwargs)
 
 
-def _instantiate_metrics(metrics, metrics_kwargs=None, backend=None):
+def _instantiate_metrics(metrics, metrics_kwargs=None):
     """
     Instantiate metric classes while preserving already-created callables.
+
+    Backend selection is handled by each metric through the globally
+    configured bioMONAI backend.
     """
     if metrics is None:
         return None
@@ -729,7 +754,7 @@ def _instantiate_metrics(metrics, metrics_kwargs=None, backend=None):
     kwargs = metrics_kwargs or {}
 
     return [
-        _instantiate_component(metric, kwargs, backend)
+        _instantiate_component(metric, kwargs)
         for metric in metrics
     ]
 
@@ -742,15 +767,15 @@ class BioTrainer:
     delegates framework-specific implementation to a registered
     :class:`TrainerBackend`.
 
-    Components such as losses, metrics, and optimizers can be supplied either
-    as classes, in which case ``BioTrainer`` constructs them using the selected
-    backend, or as already-instantiated callables, in which case they are used
-    unchanged.
+    The training backend is selected globally with
+    :func:`bioMONAI.set_backend` and is shared automatically by the
+    trainer, optimizer, loss, and metrics. The ``trainer`` argument
+    selects the training strategy implemented by the active backend.
 
-    The ``backend`` selects the underlying training framework, while
-    ``trainer`` selects the training strategy implemented by that backend.
-    For example, ``backend="fastai", trainer="supervised"`` uses the bioMONAI
-    ``fastTrainer`` implementation.
+    Components such as losses, metrics, and optimizers can be supplied
+    either as classes, in which case ``BioTrainer`` constructs them using
+    the active backend, or as already-instantiated callables, in which
+    case they are used unchanged.
 
     Parameters
     ----------
@@ -764,22 +789,18 @@ class BioTrainer:
         ``optimizer_kwargs``.
     optimizer_kwargs
         Additional arguments used to instantiate ``optimizer`` when it is
-        provided as a class. The selected ``backend`` is automatically added
-        unless ``backend`` is explicitly specified.
+        provided as a class.
     loss
         Loss class or already-instantiated callable. When a class is
         provided, it is instantiated using ``loss_kwargs``.
     loss_kwargs
-        Additional arguments used to instantiate ``loss`` when it is provided
-        as a class. The selected ``backend`` is automatically added unless
-        ``backend`` is explicitly specified.
+        Additional arguments used to instantiate ``loss`` when it is
+        provided as a class.
     metrics
         Metric class, callable, or sequence of metric classes/callables.
         Metric classes are instantiated using ``metrics_kwargs``.
     metrics_kwargs
-        Additional arguments used to instantiate metric classes. The selected
-        ``backend`` is automatically added unless ``backend`` is explicitly
-        specified.
+        Additional arguments used to instantiate metric classes.
     epochs
         Number of training epochs.
     lr
@@ -797,7 +818,8 @@ class BioTrainer:
     postprocessing
         Optional validation post-processing.
     csv_logger
-        Whether to enable CSV logging when supported by the selected trainer.
+        Whether to enable CSV logging when supported by the selected
+        trainer.
     show_graph
         Whether to display training graphs when supported by the selected
         trainer.
@@ -811,12 +833,8 @@ class BioTrainer:
         Additional arguments passed to the learning-rate finder.
     save_dir
         Directory used for saved models and training artifacts.
-    backend
-        Training backend identifier, such as ``"fastai"`` or ``"monai"``.
-        The backend is propagated automatically to losses, metrics, and
-        optimizers constructed by ``BioTrainer``.
     trainer
-        Training strategy registered for the selected backend, such as
+        Training strategy registered for the active backend, such as
         ``"supervised"`` or ``"gan"``.
     backend_kwargs
         Optional backend-specific arguments that are not part of the common
@@ -824,41 +842,31 @@ class BioTrainer:
 
     Notes
     -----
-    ``BioTrainer`` deliberately does not expose native framework names such
-    as MONAI's ``max_epochs`` or ``loss_function``. Backend adapters perform
-    that translation.
+    The backend is selected globally before creating the trainer::
 
-    ``backend`` and ``trainer`` are independent. A backend can provide
-    multiple trainer implementations, and the same trainer name can be
-    implemented by multiple backends.
+        bioMONAI.set_backend("fastai")
 
-    Losses, metrics, and optimizers follow the same resolution mechanism.
-    Passing a class delegates construction to ``BioTrainer``::
-
-        BioTrainer(
+        trainer = BioTrainer(
             model=model,
             dls=dls,
-            loss=SSIMLoss,
-            loss_kwargs={"spatial_dims": 3},
-            metrics=DiceMetric,
             optimizer=Adam,
-            optimizer_kwargs={"weight_decay": 1e-4},
-            backend="monai",
+            loss=CrossEntropyLoss,
+            metrics=[AccuracyMetric],
+            epochs=2,
+            lr=1e-3,
         )
 
-    An already-configured callable can instead be passed directly::
+    Changing the global backend affects subsequently constructed
+    components and trainers. Already-instantiated components are not
+    reconstructed.
 
-        BioTrainer(
-            model=model,
-            dls=dls,
-            loss=SSIMLoss(1),
-            metrics=[DiceMetric()],
-            optimizer=Adam(model.parameters(), lr=1e-3),
-            backend="monai",
-        )
+    ``BioTrainer`` deliberately does not expose native framework names
+    such as MONAI's ``max_epochs`` or ``loss_function``. Backend adapters
+    perform that translation.
 
-    In the latter case, ``BioTrainer`` does not reconstruct the component and
-    the corresponding ``*_kwargs`` are not applied.
+    ``trainer`` and the global backend are independent. A backend can
+    provide multiple trainer implementations, and the same trainer name
+    can be implemented by multiple backends.
     """
 
     def __init__(
@@ -886,33 +894,31 @@ class BioTrainer:
         find_lr=False,
         find_lr_kwargs=None,
         save_dir="models",
-        backend="monai",
         trainer="supervised",
         backend_kwargs=None,
     ):
+        backend = get_backend()
+
         optimizer_kwargs = dict(optimizer_kwargs or {})
         loss_kwargs = dict(loss_kwargs or {})
         metrics_kwargs = dict(metrics_kwargs or {})
 
         # Resolve framework-independent components before constructing the
-        # backend. This gives every backend the same canonical objects.
+        # backend. Every component uses the same globally selected backend.
         resolved_loss = _instantiate_component(
             loss,
             loss_kwargs,
-            backend,
         )
 
         resolved_metrics = _instantiate_metrics(
             metrics,
             metrics_kwargs,
-            backend,
         )
 
         resolved_optimizer = self._resolve_optimizer(
             optimizer,
             optimizer_kwargs,
             model,
-            backend,
         )
 
         self.config = TrainerConfig(
@@ -945,9 +951,12 @@ class BioTrainer:
         self.backend = self._build_backend()
 
     @staticmethod
-    def _resolve_optimizer(optimizer, kwargs, model, backend):
+    def _resolve_optimizer(optimizer, kwargs, model):
         """
         Instantiate an optimizer class or return an existing optimizer.
+
+        Optimizer classes are instantiated with ``model.parameters()``.
+        Already-instantiated optimizers or factories are returned unchanged.
         """
         if optimizer is None:
             return None
@@ -961,30 +970,29 @@ class BioTrainer:
                 "A model is required when 'optimizer' is provided as a class."
             )
 
-        kwargs = dict(kwargs)
-        kwargs.setdefault("backend", backend)
-
-        return optimizer(model.parameters(), **kwargs)
+        return optimizer(
+            model.parameters(),
+            **dict(kwargs),
+        )
 
     def _build_backend(self):
         """
-        Instantiate the registered backend selected by ``config.backend``.
+        Instantiate the trainer backend selected by the global backend.
 
         Returns
         -------
         TrainerBackend
             Backend responsible for implementing the selected training
             strategy.
-
-        Raises
-        ------
-        ValueError
-            If the requested backend has not been registered.
         """
-        backend_cls = BACKEND_REGISTRY.get(self.config.backend)
+        backend_cls = BACKEND_REGISTRY.get(
+            self.config.backend
+        )
 
         if backend_cls is None:
-            available = ", ".join(sorted(BACKEND_REGISTRY))
+            available = ", ".join(
+                sorted(BACKEND_REGISTRY)
+            )
 
             raise ValueError(
                 f"Unknown training backend "
@@ -997,9 +1005,6 @@ class BioTrainer:
     def fit(self):
         """
         Train the model using the selected backend and trainer.
-
-        Validation is automatically performed according to ``validate`` and
-        ``valid_every`` when supported by the selected trainer.
 
         Returns
         -------
@@ -1046,8 +1051,7 @@ class BioTrainer:
         Returns
         -------
         Any
-            The native or bioMONAI trainer instance created by the selected
-            backend and trainer implementation.
+            Native or bioMONAI trainer instance.
         """
         return self.backend.trainer
 
@@ -1059,7 +1063,7 @@ class BioTrainer:
         Returns
         -------
         Any or None
-            The backend evaluator, or ``None`` when validation is integrated
+            Backend evaluator, or ``None`` when validation is integrated
             directly into the trainer.
         """
         return self.backend.evaluator

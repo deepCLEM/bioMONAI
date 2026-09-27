@@ -14,6 +14,7 @@ __all__ = ['OPTIMIZER_BACKENDS', 'OptimWrapper', 'register_optimizer_backend', '
 # =================================
 # import numpy as np
 # import pandas as pd
+from functools import partial
 
 # =================================
 # PyTorch
@@ -137,9 +138,7 @@ class FastaiOptimizerBackend(OptimizerBackend):
     @classmethod
     def create(cls, optimizer_cls, params, *args, **kwargs):
         """Instantiate a PyTorch optimizer and wrap it for fastai."""
-        optimizer = optimizer_cls(params, *args, **kwargs)
-        return OptimWrapper(optimizer)
-
+        return partial(OptimWrapper, opt=optimizer_cls)(params, *args, **kwargs)
 
 @register_optimizer_backend("monai")
 class MonaiOptimizerBackend(OptimizerBackend):
@@ -242,49 +241,35 @@ class BioOptimizer:
     """
     Backend-independent interface for optimizers in bioMONAI.
 
-    ``BioOptimizer`` provides a common interface for optimizers across
-    supported bioMONAI backends. Each optimizer subclass defines a default
-    implementation through ``_default`` and may optionally provide
-    backend-specific implementations through attributes such as ``_torch``,
-    ``_fastai``, ``_keras``, or ``_monai``.
+    ``BioOptimizer`` provides a common interface for optimizers implemented
+    across different deep-learning backends. An optimizer can define a
+    backend-specific implementation through attributes such as ``_torch``,
+    ``_fastai``, ``_keras``, or ``_monai``. If no implementation is defined
+    for the active backend, ``_default`` is used instead.
 
     The active backend is selected globally with
     :func:`bioMONAI.set_backend` and is obtained through
-    :func:`bioMONAI.get_backend`. Optimizers therefore do not expose a
+    :func:`bioMONAI.get_backend`. Consequently, optimizers do not expose a
     ``backend`` argument.
-
-    Parameters
-    ----------
-    params : iterable
-        Iterable of parameters to optimize.
-    *args
-        Positional arguments passed to the optimizer implementation.
-    **kwargs
-        Keyword arguments passed to the optimizer implementation.
 
     Attributes
     ----------
-    params : iterable
-        Parameters passed to the optimizer.
-    optimizer : object
-        Backend-specific optimizer instance.
-
-    Class Attributes
-    ----------------
-    _default : callable
-        Default optimizer implementation.
+    _default : callable, optional
+        Default optimizer implementation used when no backend-specific
+        implementation is available.
     _<backend> : callable, optional
-        Backend-specific optimizer implementation. When defined, it takes
-        precedence over ``_default`` for that backend.
+        Backend-specific optimizer implementation. For example, ``_torch``
+        or ``_fastai``. When defined, it takes precedence over ``_default``
+        for the corresponding active backend.
 
     Examples
     --------
-    Select the backend globally and instantiate an optimizer normally:
+    Select the backend globally and instantiate optimizers normally:
 
     >>> bioMONAI.set_backend("torch")
     >>> optimizer = Adam(model.parameters(), lr=1e-3)
 
-    The same interface can be used with another backend:
+    The same optimizer interface can then be used with another backend:
 
     >>> bioMONAI.set_backend("fastai")
     >>> optimizer = Adam(model.parameters(), lr=1e-3)
@@ -292,29 +277,10 @@ class BioOptimizer:
 
     _default = None
 
-    def __init__(
-        self,
-        params,
-        *args,
-        **kwargs,
-    ):
-        self.params = params
-
-        backend = get_backend()
-        optimizer_cls = self._get_optimizer_cls(backend)
-
-        self.optimizer = self._create_optimizer(
-            backend,
-            optimizer_cls,
-            params,
-            *args,
-            **kwargs,
-        )
-
     @classmethod
-    def _get_optimizer_cls(cls, backend):
+    def _get_optimizer(cls, backend):
         """
-        Return the optimizer implementation for ``backend``.
+        Return the optimizer implementation for a backend.
 
         A backend-specific implementation takes precedence over
         ``_default``.
@@ -334,29 +300,34 @@ class BioOptimizer:
         return optimizer_cls
 
     @classmethod
-    def _create_optimizer(
-        cls,
-        backend,
-        optimizer_cls,
-        params,
-        *args,
-        **kwargs,
-    ):
+    def _create_optimizer(cls, backend, *args, **kwargs):
         """
         Create the optimizer using the selected backend adapter.
         """
+        optimizer_cls = cls._get_optimizer(backend)
+
         try:
             backend_cls = OPTIMIZER_BACKENDS[backend]
         except KeyError:
             raise ValueError(
                 f"Unknown optimizer backend '{backend}'. "
-                f"Available optimizer backends: "
-                f"{list(OPTIMIZER_BACKENDS)}"
+                f"Available optimizer backends: {list(OPTIMIZER_BACKENDS)}"
             ) from None
 
-        return backend_cls.create(
+        return backend_cls().create(
             optimizer_cls,
-            params,
+            *args,
+            **kwargs,
+        )
+
+    def __new__(cls, *args, **kwargs):
+        """
+        Instantiate the optimizer using the globally active backend.
+        """
+        backend = get_backend()
+
+        return cls._create_optimizer(
+            backend,
             *args,
             **kwargs,
         )
