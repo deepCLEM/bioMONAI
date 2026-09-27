@@ -62,21 +62,15 @@ def register_metric_backend(name):
     return decorator
 
 # %% ../nbs/060_metrics.ipynb #da277220
-class FastaiMetricMixin:
+from fastai.metrics import Metric
+
+class FastaiMetricMixin(Metric):
     """
     Mixin that adapts an epoch-level metric to the fastai ``Metric`` interface.
 
-    The mixin is designed to be combined with native metric implementations
-    such as MONAI metrics. It provides the fastai metric lifecycle while
-    leaving metric computation, accumulation, and aggregation to the native
-    implementation.
-
-    Predictions are obtained from ``learn.pred``. Targets are obtained from
-    ``learn.yb`` and normalized to a single target tensor when fastai stores
-    them in a tuple or list.
-
-    Subclasses can override ``_prepare`` when the native metric requires a
-    specific representation of predictions or targets.
+    The native metric is responsible for metric computation, accumulation,
+    and aggregation, while this mixin exposes the lifecycle expected by
+    fastai.
     """
 
     def __init__(self, *args, name=None, **kwargs):
@@ -89,73 +83,29 @@ class FastaiMetricMixin:
         return self._name
 
     def _get_target(self, yb):
-        """
-        Extract the target tensor from fastai's target representation.
-
-        Fastai normally stores targets in ``learn.yb`` as a tuple, but simple
-        learners or tests may provide a tensor directly. When a tuple or list
-        is provided, the first element is assumed to be the primary target.
-
-        Parameters
-        ----------
-        yb : torch.Tensor, tuple, or list
-            Target representation stored by the learner.
-
-        Returns
-        -------
-        torch.Tensor
-            Target tensor used by the metric.
-        """
+        """Extract the primary target from fastai's target representation."""
         if isinstance(yb, (tuple, list)):
             return yb[0]
-
         return yb
 
     def _prepare(self, pred, target):
         """
-        Prepare predictions and targets before metric computation.
+        Prepare predictions and targets before native metric computation.
 
-        The default implementation returns both inputs unchanged. Subclasses
-        can override this method when the native metric requires a specific
-        representation.
-
-        Parameters
-        ----------
-        pred : torch.Tensor
-            Predictions produced by the learner.
-
-        target : torch.Tensor
-            Normalized target tensor.
-
-        Returns
-        -------
-        tuple
-            Prepared ``(pred, target)`` pair.
+        Subclasses can override this when required.
         """
         return pred, target
 
     def accumulate(self, learn):
-        """
-        Accumulate metric statistics for the current batch.
-
-        Parameters
-        ----------
-        learn : fastai.Learner
-            Learner containing the predictions and targets for the current
-            batch.
-        """
+        """Accumulate statistics for the current batch."""
         target = self._get_target(learn.yb)
-
-        pred, target = self._prepare(
-            learn.pred,
-            target,
-        )
+        pred, target = self._prepare(learn.pred, target)
 
         self(pred, target)
 
     @property
     def value(self):
-        """Return the aggregated metric value."""
+        """Return the aggregated scalar metric value."""
         value = self.aggregate()
 
         if isinstance(value, tuple):
