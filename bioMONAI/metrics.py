@@ -814,6 +814,7 @@ class ROCAUCMetric(BioMetric):
 # %% ../nbs/060_metrics.ipynb #06247a60
 class AveragePrecisionMetric(BioMetric):
     _default = mm.AveragePrecisionMetric
+    _fastai = fm.APScoreMulti
 
 # %% ../nbs/060_metrics.ipynb #65149c1d
 class ConfusionMatrixMetric(BioMetric):

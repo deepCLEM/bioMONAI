@@ -73,6 +73,7 @@ from monai.transforms.transform import Randomizable
 # =================================
 from ..utils import *
 from .core import *
+from ..backend import get_backend, set_backend
 # from bioMONAI.transforms import RandMonaiTransform, RandTransform
 
 # =================================
@@ -391,8 +392,18 @@ def _patch_dataloader(dl):
 
     return dl
 
-# %% ../../nbs/022_data.load.ipynb #6608aed5
-def _show_summary(train_dl, val_dl=None):
+# %% ../../nbs/022_data.load.ipynb #e15596b9
+# import copy
+
+# %% ../../nbs/022_data.load.ipynb #c8282ea1
+def _show_summary(
+    train_dl,
+    val_dl=None,
+    show_batch=True,
+    show_stats=True,
+    max_n=4,
+    bins=50,
+):
     """
     Display a fastai-like summary of a DataLoader pipeline.
 
@@ -406,9 +417,29 @@ def _show_summary(train_dl, val_dl=None):
       - collate function
       - final batch structure
       - sample metadata, including MONAI MetaTensor metadata
+      - images before and after item transforms
+      - intensity statistics and histograms before and after transforms
 
-    The summary is backend-agnostic and supports NumPy arrays,
-    PyTorch tensors and MONAI MetaTensors.
+    Parameters
+    ----------
+    train_dl : DataLoader
+        Training DataLoader.
+    val_dl : DataLoader, optional
+        Validation DataLoader.
+    show_batch : bool, default=True
+        Display image batches before and after item transforms.
+    show_stats : bool, default=True
+        Display numerical statistics and intensity histograms.
+    max_n : int, default=4
+        Maximum number of samples used when visualizing batches.
+    bins : int, default=50
+        Number of bins used for intensity histograms.
+
+    Notes
+    -----
+    ``show_batch`` is not modified. The summary creates a temporary
+    DataLoader for the untransformed data when necessary and uses the
+    existing ``show_batch`` implementation for visualization.
     """
 
     # ------------------------------------------------------------------
@@ -448,11 +479,8 @@ def _show_summary(train_dl, val_dl=None):
         return None
 
     def _describe(x, indent="    "):
-        """
-        Compact representation of an object.
+        """Compact representation of an object."""
 
-        Deliberately does not print the contents of large tensors/arrays.
-        """
         typ = _type_name(x)
         shape = _shape(x)
         dtype = _dtype(x)
@@ -477,6 +505,7 @@ def _show_summary(train_dl, val_dl=None):
 
     def _iter_transforms(transform):
         """Return transforms from MONAI/fastai-like Compose objects."""
+
         if transform is None:
             return []
 
@@ -489,11 +518,11 @@ def _show_summary(train_dl, val_dl=None):
 
     def _transform_name(t):
         """Compact transform name + parameters."""
+
         name = type(t).__name__
 
         try:
-            text = repr(t)
-            text = text.replace("\n", " ")
+            text = repr(t).replace("\n", " ")
 
             if len(text) > 180:
                 text = text[:177] + "..."
@@ -519,6 +548,7 @@ def _show_summary(train_dl, val_dl=None):
         """
         Try the common locations where the item pipeline may live.
         """
+
         pipeline = getattr(ds, name, None)
 
         if pipeline is not None:
@@ -536,13 +566,7 @@ def _show_summary(train_dl, val_dl=None):
     # ------------------------------------------------------------------
 
     def _find_metadata(x):
-        """
-        Find metadata recursively.
-
-        MONAI MetaTensors expose metadata through ``.meta``.
-        Dictionary-based datasets may also contain an explicit ``meta``
-        dictionary.
-        """
+        """Find metadata recursively."""
 
         if isinstance(x, MetaTensor):
             return x.meta
@@ -590,17 +614,12 @@ def _show_summary(train_dl, val_dl=None):
         return value
 
     def _show_sample_metadata(ds):
-        """
-        Display metadata attached to the first dataset sample.
-
-        This includes metadata stored in MONAI MetaTensors.
-        """
+        """Display metadata attached to the first dataset sample."""
 
         source_ds = _unwrap_dataset(ds)
 
         try:
             item = source_ds[0]
-
         except Exception:
             return
 
@@ -612,7 +631,6 @@ def _show_summary(train_dl, val_dl=None):
         print("\nSample metadata:")
         print("  available : yes")
 
-        # Show the most useful spatial/image metadata first.
         fields = (
             "filename",
             "filename_or_obj",
@@ -636,7 +654,6 @@ def _show_summary(train_dl, val_dl=None):
             print(f"  {key:<15}: {value}")
             shown.add(key)
 
-        # Show any additional metadata fields afterwards.
         remaining = [
             key for key in meta.keys()
             if key not in shown
@@ -651,13 +668,7 @@ def _show_summary(train_dl, val_dl=None):
     # ------------------------------------------------------------------
 
     def _show_config(dl):
-        """
-        Display the configuration used to construct the DataLoader.
-
-        ``dl.config`` contains the pipeline configuration together with
-        high-level information such as task, dataset name, backend and
-        mode.
-        """
+        """Display the configuration used to construct the DataLoader."""
 
         config = getattr(dl, "config", None)
 
@@ -673,17 +684,31 @@ def _show_summary(train_dl, val_dl=None):
     # Sample tracing
     # ------------------------------------------------------------------
 
+    def _describe_sample(x, indent="    "):
+        """Describe a sample without printing its full contents."""
+
+        if isinstance(x, dict):
+            for k, v in x.items():
+                print(f"{indent}{k}:")
+                _describe_sample(v, indent + "  ")
+            return
+
+        if isinstance(x, (tuple, list)):
+            for i, v in enumerate(x):
+                print(f"{indent}[{i}]:")
+                _describe_sample(v, indent + "  ")
+            return
+
+        _describe(x, indent)
+
     def _show_sample_pipeline(ds, x_keys, y_keys):
-        """
-        Build and display one sample through the dataset transform.
-        """
+        """Build and display one sample through the dataset transform."""
 
         print("\nBuilding one sample")
 
         try:
             source_ds = _unwrap_dataset(ds)
 
-            # Raw item, before the MONAI transform pipeline.
             raw_item = (
                 source_ds.data[0]
                 if hasattr(source_ds, "data")
@@ -726,80 +751,276 @@ def _show_summary(train_dl, val_dl=None):
         except Exception as e:
             print(f"  Could not build sample: {e}")
 
-    def _describe_sample(x, indent="    "):
+    # ------------------------------------------------------------------
+    # Raw dataset / DataLoader
+    # ------------------------------------------------------------------
+
+    def _get_stage_dataset(ds, n_transforms):
         """
-        Describe a sample without printing its full contents.
+        Create a temporary dataset containing only the first ``n_transforms``
+        of the item pipeline.
+
+        The original dataset is never modified.
+
+        Parameters
+        ----------
+        ds : DataLoader dataset
+            Dataset whose transform pipeline should be truncated.
+        n_transforms : int
+            Number of transforms to keep.
+
+        Returns
+        -------
+        Dataset or None
+            A shallow copy with the truncated transform pipeline.
+        """
+
+        source_ds = _unwrap_dataset(ds)
+
+        transform = getattr(source_ds, "transform", None)
+
+        if transform is None:
+            return None
+
+        transforms = _iter_transforms(transform)
+
+        if not transforms:
+            return None
+
+        try:
+            stage_ds = copy.copy(source_ds)
+
+            if n_transforms == 0:
+                stage_ds.transform = None
+
+            elif n_transforms == 1:
+                stage_ds.transform = transforms[0]
+
+            else:
+                # Preserve the same Compose type where possible.
+                compose_cls = type(transform)
+
+                try:
+                    stage_ds.transform = compose_cls(
+                        transforms[:n_transforms]
+                    )
+                except Exception:
+                    stage_ds.transform = Compose(
+                        transforms[:n_transforms]
+                    )
+
+            return stage_ds
+
+        except Exception:
+            return None
+
+
+    def _get_stage_dl(dl, n_transforms):
+        """
+        Create a temporary DataLoader corresponding to a transform stage.
+
+        The original DataLoader is never modified.
+        """
+
+        stage_ds = _get_stage_dataset(dl.dataset, n_transforms)
+
+        if stage_ds is None:
+            return None
+
+        try:
+            stage_dl = copy.copy(dl)
+            stage_dl.dataset = stage_ds
+            return stage_dl
+
+        except Exception:
+            return None
+
+    # ------------------------------------------------------------------
+    # Batch utilities
+    # ------------------------------------------------------------------
+
+    def _to_numpy(x):
+        """Convert tensor-like image data to NumPy."""
+
+        if isinstance(x, MetaTensor):
+            return x.detach().cpu().numpy()
+
+        if isinstance(x, torchTensor):
+            return x.detach().cpu().numpy()
+
+        if isinstance(x, np.ndarray):
+            return x
+
+        return None
+
+    def _iter_named_values(x, name=""):
+        """
+        Recursively yield numerical arrays with their corresponding key.
         """
 
         if isinstance(x, dict):
-            for k, v in x.items():
-                print(f"{indent}{k}:")
-                _describe_sample(v, indent + "  ")
+            for key, value in x.items():
+                child_name = f"{name}.{key}" if name else str(key)
+                yield from _iter_named_values(value, child_name)
             return
 
         if isinstance(x, (tuple, list)):
-            for i, v in enumerate(x):
-                print(f"{indent}[{i}]:")
-                _describe_sample(v, indent + "  ")
+            for i, value in enumerate(x):
+                child_name = f"{name}[{i}]" if name else f"[{i}]"
+                yield from _iter_named_values(value, child_name)
             return
 
-        _describe(x, indent)
+        array = _to_numpy(x)
 
-    # ------------------------------------------------------------------
-    # Batch summary
-    # ------------------------------------------------------------------
+        if array is not None and np.issubdtype(array.dtype, np.number):
+            yield name or "value", array
 
-    def _show_batch(dl):
-        print("\nBuilding one batch")
+    def _stats(array):
+        """Calculate compact numerical statistics."""
 
-        try:
-            batch = next(iter(dl))
+        array = np.asarray(array)
 
-        except Exception as e:
-            print(f"  Could not build batch: {e}")
+        if array.size == 0:
+            return None
+
+        values = array.astype(np.float64, copy=False)
+
+        finite = values[np.isfinite(values)]
+
+        if finite.size == 0:
+            return None
+
+        return {
+            "shape": array.shape,
+            "dtype": array.dtype,
+            "min": float(finite.min()),
+            "max": float(finite.max()),
+            "mean": float(finite.mean()),
+            "std": float(finite.std()),
+        }
+
+    def _show_stats(batch, title, bins=50):
+        """
+        Display statistics and intensity histograms for a batch.
+
+        One histogram is produced for each numerical field in the batch.
+        """
+
+        named_values = list(_iter_named_values(batch))
+
+        if not named_values:
+            print(f"\n{title}: no numerical data found.")
             return
 
-        collate = getattr(dl, "collate_fn", None)
+        print(f"\n{title}")
 
-        print("\nCollating items in a batch")
+        for name, array in named_values:
+            stats = _stats(array)
 
-        if collate is None:
-            print("  collate_fn: default")
+            if stats is None:
+                continue
 
-        else:
             print(
-                f"  collate_fn: "
-                f"{getattr(collate, '__name__', type(collate).__name__)}"
+                f"  {name}: "
+                f"shape={stats['shape']}  "
+                f"dtype={stats['dtype']}  "
+                f"range=[{stats['min']:.4g}, {stats['max']:.4g}]  "
+                f"mean={stats['mean']:.4g}  "
+                f"std={stats['std']:.4g}"
             )
 
         # --------------------------------------------------------------
-        # Final batch
+        # Histograms
         # --------------------------------------------------------------
 
-        print("\nFinal batch:")
+        for name, array in named_values:
+            values = np.asarray(array).astype(
+                np.float64,
+                copy=False,
+            )
 
-        if isinstance(batch, (tuple, list)):
+            values = values[np.isfinite(values)]
 
-            if len(batch) == 2:
-                print("  x:")
-                _describe(batch[0], "    ")
+            if values.size == 0:
+                continue
 
-                print("  y:")
-                _describe(batch[1], "    ")
+            # Avoid huge memory use for very large volumes.
+            if values.size > 1_000_000:
+                rng = np.random.default_rng(0)
+                values = rng.choice(
+                    values,
+                    size=1_000_000,
+                    replace=False,
+                )
 
-            else:
-                for i, item in enumerate(batch):
-                    print(f"  [{i}]:")
-                    _describe(item, "    ")
+            plt.figure(figsize=(6, 4))
 
-        elif isinstance(batch, dict):
+            plt.hist(
+                values.ravel(),
+                bins=bins,
+            )
 
-            for k, v in batch.items():
-                print(f"  {k}:")
-                _describe(v, "    ")
+            plt.xlabel("Intensity")
+            plt.ylabel("Frequency")
+            plt.title(f"{title}: {name}")
+            plt.tight_layout()
+            plt.show()
 
-        else:
-            _describe(batch, "    ")
+    # ------------------------------------------------------------------
+    # Batch visualization
+    # ------------------------------------------------------------------
+
+    def _show_batch_comparison(dl):
+        """
+        Show images after loading and after all item transforms.
+
+        ``show_batch`` itself is not modified.
+        """
+
+        transforms = _iter_transforms(
+            getattr(_unwrap_dataset(dl.dataset), "transform", None)
+        )
+
+        if not transforms:
+            print("\nNo item transforms available for comparison.")
+            return
+
+        # --------------------------------------------------------------
+        # After first transform = after loading
+        # --------------------------------------------------------------
+
+        if len(transforms) >= 1:
+
+            loaded_dl = _get_stage_dl(dl, 1)
+            print(loaded_dl)
+
+            if loaded_dl is not None:
+                print("\nImages after loading:")
+
+                try:
+                    loaded_dl.show_batch(max_n=max_n)
+                except TypeError:
+                    loaded_dl.show_batch()
+
+        # --------------------------------------------------------------
+        # Final transformed images
+        # --------------------------------------------------------------
+
+        print("\nImages after transforms:")
+
+        try:
+            dl.show_batch(max_n=max_n)
+        except TypeError:
+            dl.show_batch()
+
+    def _get_batch(dl):
+        """Get one batch without modifying the DataLoader."""
+
+        try:
+            return next(iter(dl))
+        except Exception as e:
+            print(f"  Could not build batch: {e}")
+            return None
 
     # ------------------------------------------------------------------
     # DataLoader
@@ -815,7 +1036,6 @@ def _show_summary(train_dl, val_dl=None):
 
         try:
             ds_len = len(ds)
-
         except Exception:
             ds_len = "unknown"
 
@@ -869,7 +1089,7 @@ def _show_summary(train_dl, val_dl=None):
         _show_sample_pipeline(ds, x_keys, y_keys)
 
         # --------------------------------------------------------------
-        # Collation / batch
+        # Collation
         # --------------------------------------------------------------
 
         print("\nBatch transforms:")
@@ -889,7 +1109,75 @@ def _show_summary(train_dl, val_dl=None):
         # Final batch
         # --------------------------------------------------------------
 
-        _show_batch(dl)
+        print("\nFinal batch:")
+
+        batch = _get_batch(dl)
+
+        if batch is not None:
+
+            if isinstance(batch, (tuple, list)):
+
+                if len(batch) == 2:
+                    print("  x:")
+                    _describe(batch[0], "    ")
+
+                    print("  y:")
+                    _describe(batch[1], "    ")
+
+                else:
+                    for i, item in enumerate(batch):
+                        print(f"  [{i}]:")
+                        _describe(item, "    ")
+
+            elif isinstance(batch, dict):
+
+                for k, v in batch.items():
+                    print(f"  {k}:")
+                    _describe(v, "    ")
+
+            else:
+                _describe(batch, "    ")
+
+        # --------------------------------------------------------------
+        # Visual comparison
+        # --------------------------------------------------------------
+
+        if show_batch:
+            _show_batch_comparison(dl)
+
+        # --------------------------------------------------------------
+        # Numerical statistics
+        # --------------------------------------------------------------
+
+        if show_stats:
+
+            # --------------------------------------------------------------
+            # Statistics after loading
+            # --------------------------------------------------------------
+
+            loaded_dl = _get_stage_dl(dl, 1)
+
+            if loaded_dl is not None:
+
+                loaded_batch = _get_batch(loaded_dl)
+
+                if loaded_batch is not None:
+                    _show_stats(
+                        loaded_batch,
+                        "Statistics after loading",
+                        bins=bins,
+                    )
+
+            # --------------------------------------------------------------
+            # Statistics after all transforms
+            # --------------------------------------------------------------
+
+            if batch is not None:
+                _show_stats(
+                    batch,
+                    "Statistics after transforms",
+                    bins=bins,
+                )
 
         # --------------------------------------------------------------
         # Sample metadata
@@ -905,9 +1193,6 @@ def _show_summary(train_dl, val_dl=None):
 
     if val_dl is not None:
         _describe_dl(val_dl, "Valid")
-
-# %% ../../nbs/022_data.load.ipynb #e15596b9
-# import copy
 
 # %% ../../nbs/022_data.load.ipynb #f01db4bd
 def _to_numpy(x):
@@ -979,7 +1264,7 @@ class PipelineContext:
     # task/config
     task: Optional[str] = None
     dataset_name: Optional[str] = None
-    backend: Optional[str] = None
+    backend: Optional[str] = get_backend()
     mode: str = "train"
 
     # loaded/intermediate state
@@ -2130,7 +2415,6 @@ class MonaiLoader:
         y_keys="label",
         show_summary=False,
         vocab=None,
-        backend="monai",
         **kwargs,
     ):
         """
@@ -2158,17 +2442,17 @@ class MonaiLoader:
             Whether to show DataLoader summary.
         vocab : optional
             Vocabulary for classification tasks.
-        backend : str
-            Training backend. Determines the DataLoader collation strategy.
         **kwargs :
             Additional DataLoader kwargs (train + validation).
             Validation-specific arguments can be prefixed with ``val_``.
         """
         store_attr()
 
-        if backend not in MONAI_COLLATE:
+        self.backend = get_backend()
+
+        if self.backend not in MONAI_COLLATE:
             raise ValueError(
-                f"Unsupported backend {backend!r} for MonaiLoader. "
+                f"Unsupported backend {self.backend!r} for MonaiLoader. "
                 f"Expected one of {set(MONAI_COLLATE)}."
             )
 
@@ -2628,7 +2912,6 @@ class BioDataLoaders(DataLoaders):
         data,
         task=None,
         dataset=None,
-        backend=None,
         val_data=None,
         mode="train",
         **kwargs,
@@ -2691,7 +2974,6 @@ class BioDataLoaders(DataLoaders):
             val_data=val_data,
             task=task,
             dataset_name=dataset,
-            backend=backend,
             mode=mode,
             config=kwargs,
         )
@@ -2755,7 +3037,6 @@ class BioDataLoaders(DataLoaders):
         data: Any,
         task: Optional[str] = None,
         dataset: Optional[str] = None,
-        backend: Optional[str] = None,
         val_data: Optional[Any] = None,
         x_keys: Optional[Sequence[str]] = None,
         y_keys: Optional[Sequence[str]] = None,
@@ -2867,7 +3148,6 @@ class BioDataLoaders(DataLoaders):
             data,
             task=task,
             dataset=dataset,
-            backend=backend,
             val_data=val_data,
             x_keys=x_keys,
             y_keys=y_keys,
@@ -2908,8 +3188,8 @@ class BioDataLoaders(DataLoaders):
         Create training and validation DataLoaders from a YAML configuration.
 
         The YAML file is loaded into a dictionary and the top-level pipeline
-        selectors (``data``, ``val_data``, ``task``, ``dataset``, and
-        ``backend``) are extracted before passing the remaining options to
+        selectors (``data``, ``val_data``, ``task``, ``dataset``) 
+        are extracted before passing the remaining options to
         the normal pipeline.
 
         Parameters
@@ -2941,14 +3221,12 @@ class BioDataLoaders(DataLoaders):
         val_data = config.pop("val_data", None)
         task = config.pop("task", None)
         dataset = config.pop("dataset", None)
-        backend = config.pop("backend", None)
 
         return cls._run_pipeline(
             data,
             val_data=val_data,
             task=task,
             dataset=dataset,
-            backend=backend,
             **config,
         )
 
@@ -2962,7 +3240,6 @@ class BioDataLoaders(DataLoaders):
         data: Any,
         task: Optional[str] = None,
         dataset: Optional[str] = None,
-        backend: Optional[str] = None,
         **kwargs,
     ):
         """
@@ -2998,7 +3275,6 @@ class BioDataLoaders(DataLoaders):
             data,
             task=task,
             dataset=dataset,
-            backend=backend,
             mode="test",
             **kwargs,
         )
@@ -3040,13 +3316,11 @@ class BioDataLoaders(DataLoaders):
 
         task = config.pop("task", None)
         dataset = config.pop("dataset", None)
-        backend = config.pop("backend", None)
 
         return cls.test_dl(
             data,
             task=task,
             dataset=dataset,
-            backend=backend,
             **config,
         )
 
