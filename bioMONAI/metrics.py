@@ -8,8 +8,8 @@ __all__ = ['METRIC_BACKENDS', 'register_metric_backend', 'FastaiMetric', 'Metric
            'RMSEMetric', 'DiceFastaiMetric', 'DiceMetric', 'IoUMetric', 'GeneralizedDiceScore', 'PanopticQualityMetric',
            'ROCAUCFastaiMetric', 'ROCAUCMetric', 'AveragePrecisionMetric', 'ConfusionMatrixMetric',
            'HausdorffDistanceMetric', 'SurfaceDistanceMetric', 'SurfaceDiceMetric', 'FIDMetric', 'MMDMetric',
-           'MetricsReloadedBinaryFastai', 'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCLossMetric',
-           'FRCMetric', 'VarianceMetric', 'LabelQualityScore']
+           'MetricsReloadedBinaryFastai', 'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric',
+           'VarianceMetric', 'LabelQualityScore']
 
 # %% ../nbs/060_metrics.ipynb #09106178
 # =================================
@@ -220,13 +220,15 @@ class BioMetric:
     @classmethod
     def _get_metric(cls, backend):
         """
-        Return the metric implementation for a backend.
-
-        A backend-specific implementation takes precedence over
-        ``_default``.
+        Return the metric implementation for a registered backend.
         """
-        metric_cls = getattr(cls, f"_{backend}", None)
+        if backend not in METRIC_BACKENDS:
+            raise ValueError(
+                f"Unknown metric backend '{backend}'. "
+                f"Available metric backends: {list(METRIC_BACKENDS)}"
+            )
 
+        metric_cls = getattr(cls, f"_{backend}", None)
         if metric_cls is None:
             metric_cls = cls._default
 
@@ -245,14 +247,7 @@ class BioMetric:
         Create the metric using the selected backend adapter.
         """
         metric_cls = cls._get_metric(backend)
-
-        try:
-            backend_cls = METRIC_BACKENDS[backend]
-        except KeyError:
-            raise ValueError(
-                f"Unknown metric backend '{backend}'. "
-                f"Available metric backends: {list(METRIC_BACKENDS)}"
-            ) from None
+        backend_cls = METRIC_BACKENDS[backend]
 
         return backend_cls().create(
             metric_cls,
@@ -477,20 +472,7 @@ class PanopticQualityMetric(BioMetric):
     All kwargs are forwarded to MONAI PanopticQualityMetric.
     """
     _default = mm.PanopticQualityMetric
-    # pq_metric = mm.PanopticQualityMetric(**kwargs)
 
-    # def PQ(pred, target):
-    #     # Convert logits to discrete labels
-    #     # pred = pred.argmax(dim=1)  # (B, H, W)
-
-    #     if target.ndim == 4 and target.shape[1] == 1:
-    #         target = target.squeeze(1)
-
-    #     pq_metric.reset()
-    #     pq_metric(y_pred=pred, y=target)
-    #     return pq_metric.aggregate()
-
-    # return AvgMetric(PQ)
 
 # %% ../nbs/060_metrics.ipynb #249510e0
 class ROCAUCFastaiMetric(FastaiMetric):
@@ -525,7 +507,12 @@ class ROCAUCFastaiMetric(FastaiMetric):
 
         # Multiclass: predictions are [N, C], targets are [N]
         if pred.ndim == target.ndim + 1:
-            num_classes = pred.shape[1]
+            num_classes = self.num_classes or pred.shape[1]
+
+            if self.num_classes is not None and pred.shape[1] != self.num_classes:
+                raise ValueError(
+                    f"Expected {self.num_classes} classes, got {pred.shape[1]}."
+                )
 
             if target.ndim == 1:
                 target = one_hot(
@@ -700,7 +687,7 @@ class MetricsReloadedCategorical(BioMetric):
     _default = mm.MetricsReloadedCategorical
 
 # %% ../nbs/060_metrics.ipynb #bcb17f76
-class FRCLossMetric(mm.LossMetric):
+class _FRCLossMetric(mm.LossMetric):
     """
     MONAI metric wrapper for the Fourier Ring Correlation loss.
 
@@ -743,7 +730,7 @@ class FRCMetric(BioMetric):
     The metric uses ``FRCLoss`` through MONAI's ``LossMetric`` wrapper.
     """
 
-    _default = FRCLossMetric
+    _default = _FRCLossMetric
 
 # %% ../nbs/060_metrics.ipynb #ba352fcc
 class VarianceMetric(BioMetric):
