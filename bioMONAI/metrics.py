@@ -5,11 +5,10 @@
 # %% auto #0
 __all__ = ['METRIC_BACKENDS', 'register_metric_backend', 'FastaiMetric', 'MetricBackend', 'MonaiMetricBackend',
            'FastaiMetricBackend', 'BioMetric', 'MSEMetric', 'SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric',
-           'RMSEMetric', 'DiceFastaiMetric', 'DiceMetric', 'IoUMetric', 'GeneralizedDiceScore', 'PanopticQualityMetric',
-           'ROCAUCFastaiMetric', 'ROCAUCMetric', 'AveragePrecisionMetric', 'ConfusionMatrixMetric',
-           'HausdorffDistanceMetric', 'SurfaceDistanceMetric', 'SurfaceDiceMetric', 'FIDMetric', 'MMDMetric',
-           'MetricsReloadedBinaryFastai', 'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric',
-           'VarianceMetric', 'LabelQualityScore']
+           'RMSEMetric', 'DiceMetric', 'IoUMetric', 'GeneralizedDiceScore', 'PanopticQualityMetric', 'AccuracyMetric',
+           'ROCAUCMetric', 'AveragePrecisionMetric', 'ConfusionMatrixMetric', 'HausdorffDistanceMetric',
+           'SurfaceDistanceMetric', 'SurfaceDiceMetric', 'FIDMetric', 'MMDMetric', 'MetricsReloadedBinaryFastai',
+           'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric', 'VarianceMetric', 'LabelQualityScore']
 
 # %% ../nbs/060_metrics.ipynb #09106178
 # =================================
@@ -18,7 +17,6 @@ __all__ = ['METRIC_BACKENDS', 'register_metric_backend', 'FastaiMetric', 'Metric
 from torch import (
     abs,
     argmax,
-    complex64,
     div,
     isnan,
     is_tensor,
@@ -27,6 +25,15 @@ from torch import (
     sigmoid,
     where,
     zeros_like,
+    cat,
+    full_like,
+    nanmean,
+    nansum,
+    sum,
+    zeros,
+    float32,
+    all,
+    eq,
 )
 from torch.nn.functional import one_hot, softmax
 
@@ -34,7 +41,7 @@ from torch.nn.functional import one_hot, softmax
 # fastai
 # =================================
 import fastai.metrics as fm
-from fastai.vision.all import AvgMetric, Metric, partial
+from fastai.vision.all import Metric
 
 # =================================
 # MONAI
@@ -168,11 +175,14 @@ class FastaiMetricBackend(MetricBackend):
         object
             Fastai-compatible metric instance.
         """
-
-        if issubclass(metric_cls, Metric):
-            return metric_cls(*args, **kwargs)
-
+        
         metric = metric_cls(*args, **kwargs)
+
+        if isinstance(metric, Metric):
+            # print(f"Creating fastai metric: {metric_cls.__name__}")
+            return metric
+
+        # print(f"Adapting metric {metric_cls.__name__} to fastai interface")
 
         return FastaiMetric(metric)
 
@@ -299,88 +309,203 @@ class RMSEMetric(BioMetric):
     _default = mm.RMSEMetric
 
 # %% ../nbs/060_metrics.ipynb #925bfd79
-class DiceFastaiMetric(FastaiMetric):
+class _FastaiDice(Metric):
     """
-    Fastai-compatible adapter for MONAI's ``DiceMetric``.
+    Computes Dice score for prediction-ground-truth label pairs.
 
-    Dice computation and accumulation are delegated to MONAI, while this
-    adapter provides the metric lifecycle expected by fastai.
+    This Fastai implementation mirrors the interface and semantics of
+    :class:`monai.metrics.DiceMetric`.
 
-    Predictions produced by a fastai segmentation model are converted to
-    the representation expected by MONAI before metric computation:
+    Predictions and targets may be provided as either:
 
-    * single-channel predictions are converted to binary masks using
-      sigmoid activation followed by a threshold of ``0.5``;
-    * multi-channel predictions are converted to discrete class labels
-      using ``argmax`` over the channel dimension;
-    * targets without a channel dimension are expanded with a singleton
-      channel dimension.
+    - one-hot/channel-first tensors ``BCHW[D]``, or
+    - single-channel label maps ``B1HW[D]``.
+
+    No activation is applied to predictions. When label maps are supplied,
+    ``num_classes`` must be specified.
 
     Parameters
     ----------
     include_background : bool, default=True
-        Whether to include the background class in the Dice computation.
+        Whether to include the background class (channel 0).
     reduction : str, default="mean"
-        Reduction method used to combine Dice scores.
+        Reduction applied to the per-sample, per-channel Dice values.
+        Supported values are ``"none"``, ``"mean"``, ``"sum"``,
+        ``"mean_batch"``, and ``"mean_channel"``.
     get_not_nans : bool, default=False
-        Whether to return the number of non-NaN values used in the
-        reduction.
+        Whether to return the number of valid, non-NaN values.
     ignore_empty : bool, default=True
-        Whether to ignore samples with an empty target segmentation.
-    num_classes : int, optional
-        Number of classes when using single-channel label maps.
-    return_with_label : bool or list of str, default=False
-        Whether to return Dice values together with their labels.
-    per_component : bool, default=False
-        Whether to compute Dice independently for each binary component.
-    **kwargs
-        Additional arguments accepted by MONAI's ``DiceMetric``.
+        Whether to ignore samples whose ground-truth segmentation is empty.
+        Ignored values are represented by NaN.
+    num_classes : int or None, default=None
+        Number of classes when predictions and/or targets are supplied as
+        single-channel label maps.
+    return_with_label : bool or list[str], default=False
+        When ``reduction="mean_batch"``, optionally return a dictionary
+        containing one value per channel.
     """
 
     def __init__(
         self,
-        *args,
-        name="Dice",
-        **kwargs,
+        include_background: bool = True,
+        reduction: str = "mean",
+        get_not_nans: bool = False,
+        ignore_empty: bool = True,
+        num_classes: int | None = None,
+        return_with_label: bool | list[str] = False,
     ):
-        super().__init__(
-            metric=mm.DiceMetric(*args, **kwargs),
-            name=name,
+        self.include_background = include_background
+        self.reduction = reduction
+        self.get_not_nans = get_not_nans
+        self.ignore_empty = ignore_empty
+        self.num_classes = num_classes
+        self.return_with_label = return_with_label
+        self.reset()
+
+    def reset(self):
+        self._values = []
+
+    def accumulate(self, learn):
+        pred = learn.pred
+        targ = learn.yb[0] if isinstance(learn.yb, (tuple, list)) else learn.yb
+
+        values = self._compute_tensor(pred, targ)
+        self._values.append(values.detach().cpu())
+
+    def _compute_tensor(self, pred, targ):
+        if pred.ndim < 3:
+            raise ValueError(
+                f"pred should have at least 3 dimensions "
+                f"(batch, channel, spatial), got {pred.ndim}."
+            )
+
+        pred, targ = self._prepare_inputs(pred, targ)
+
+        # B x C x spatial
+        pred = pred.reshape(pred.shape[0], pred.shape[1], -1)
+        targ = targ.reshape(targ.shape[0], targ.shape[1], -1)
+
+        intersection = (pred * targ).sum(dim=2)
+        pred_sum = pred.sum(dim=2)
+        targ_sum = targ.sum(dim=2)
+
+        denominator = pred_sum + targ_sum
+
+        dice = full_like(intersection, float("nan"))
+
+        non_empty = targ_sum > 0
+        dice[non_empty] = (
+            2.0 * intersection[non_empty] / denominator[non_empty]
         )
 
-    def _prepare(self, pred, target):
-        """
-        Convert fastai predictions and targets to MONAI Dice inputs.
+        if not self.ignore_empty:
+            empty_target = targ_sum == 0
+            empty_both = empty_target & (pred_sum == 0)
+            dice[empty_both] = 1.0
 
-        Parameters
-        ----------
-        pred : torch.Tensor
-            Model predictions. Expected shape is ``(B, C, ...)`` for
-            channel-based segmentation outputs.
-        target : torch.Tensor
-            Ground-truth segmentation labels.
+        if not self.include_background:
+            dice = dice[:, 1:]
 
-        Returns
-        -------
-        tuple
-            Prepared ``(pred, target)`` pair suitable for MONAI's
-            ``DiceMetric``.
-        """
+        return dice
 
-        # Binary segmentation: one output channel.
-        if pred.ndim == target.ndim + 1:
-            if pred.shape[1] == 1:
-                pred = (torch.sigmoid(pred) > 0.5).float()
+    def _prepare_inputs(self, pred, targ):
+        # Already channel-formatted.
+        if pred.shape[1] > 1:
+            if targ.ndim == pred.ndim and targ.shape[1] == pred.shape[1]:
+                return pred, targ
 
-            # Multi-class segmentation.
+            # Prediction is one-hot/channel formatted, target is a label map.
+            if targ.ndim == pred.ndim and targ.shape[1] == 1:
+                targ = self._label_to_onehot(targ, pred.shape[1])
+
+            elif targ.ndim == pred.ndim - 1:
+                targ = self._label_to_onehot(targ.unsqueeze(1), pred.shape[1])
+
+            return pred, targ
+
+        # Label-map input.
+        if self.num_classes is None:
+            raise ValueError(
+                "num_classes must be specified when predictions are "
+                "single-channel label maps."
+            )
+
+        pred = self._label_to_onehot(pred, self.num_classes)
+
+        if targ.ndim == pred.ndim and targ.shape[1] == 1:
+            targ = self._label_to_onehot(targ, self.num_classes)
+        elif targ.ndim == pred.ndim - 1:
+            targ = self._label_to_onehot(targ.unsqueeze(1), self.num_classes)
+
+        return pred, targ
+
+    @staticmethod
+    def _label_to_onehot(label, num_classes):
+        label = label.long()
+        shape = (label.shape[0], num_classes, *label.shape[2:])
+
+        onehot = zeros(
+            shape,
+            dtype=float32,
+            device=label.device,
+        )
+
+        return onehot.scatter_(1, label, 1.0)
+
+    def _aggregate(self):
+        if not self._values:
+            return None
+
+        data = cat(self._values, dim=0)
+
+        if self.reduction == "none":
+            value = data
+
+        elif self.reduction == "mean":
+            value = nanmean(data)
+
+        elif self.reduction == "sum":
+            value = nansum(data)
+
+        elif self.reduction == "mean_batch":
+            value = nanmean(data, dim=0)
+
+        elif self.reduction == "mean_channel":
+            value = nanmean(data, dim=1)
+
+        else:
+            raise ValueError(
+                f"Unsupported reduction: {self.reduction!r}. "
+                "Expected one of: 'none', 'mean', 'sum', "
+                "'mean_batch', 'mean_channel'."
+            )
+
+        if self.return_with_label and self.reduction == "mean_batch":
+            if isinstance(self.return_with_label, bool):
+                start = 0 if self.include_background else 1
+                value = {
+                    f"label_{i}": round(v.item(), 4)
+                    for i, v in enumerate(value, start=start)
+                }
             else:
-                pred = pred.argmax(dim=1, keepdim=True)
+                value = {
+                    label: round(v.item(), 4)
+                    for label, v in zip(self.return_with_label, value)
+                }
 
-        # Add channel dimension to label-map targets.
-        if target.ndim == pred.ndim - 1:
-            target = target.unsqueeze(1)
+        if self.get_not_nans:
+            not_nans = sum(~isnan(data), dim=0)
 
-        return pred, target
+            if self.reduction == "mean":
+                not_nans = not_nans.sum()
+
+            return value, not_nans
+
+        return value
+
+    @property
+    def value(self):
+        return self._aggregate()
 
 # %% ../nbs/060_metrics.ipynb #a63e7732
 class DiceMetric(BioMetric):
@@ -448,7 +573,7 @@ class DiceMetric(BioMetric):
     """
 
     _default = mm.DiceMetric
-    _fastai = DiceFastaiMetric
+    _fastai = _FastaiDice
 
 # %% ../nbs/060_metrics.ipynb #37db4336
 class IoUMetric(BioMetric):
@@ -474,61 +599,168 @@ class PanopticQualityMetric(BioMetric):
     _default = mm.PanopticQualityMetric
 
 
-# %% ../nbs/060_metrics.ipynb #249510e0
-class ROCAUCFastaiMetric(FastaiMetric):
+# %% ../nbs/060_metrics.ipynb #ebbd8afc
+def _accuracy_update(
+    y_pred,
+    y,
+    axis=1,
+    is_multilabel=False,
+):
     """
-    Fastai-compatible adapter for MONAI's ``ROCAUCMetric``.
+    Compute the number of correct predictions and examples for accuracy.
 
-    Predictions are treated as continuous scores or probabilities. When
-    predictions are multiclass scores with shape ``[N, C]`` and targets
-    are class indices with shape ``[N]``, targets are converted to one-hot
-    representation before being passed to MONAI.
+    Supports binary, multiclass, and multilabel predictions.
+
+    Parameters
+    ----------
+    y_pred : torch.Tensor
+        Predictions. For multiclass, the class dimension is given by ``axis``.
+    y : torch.Tensor
+        Target labels.
+    axis : int, default=1
+        Class/channel dimension.
+    is_multilabel : bool, default=False
+        Whether the problem is multilabel classification.
+
+    Returns
+    -------
+    tuple
+        ``(num_correct, num_examples)``.
+    """
+    if is_multilabel:
+        y_pred = y_pred.moveaxis(axis, -1)
+        y = y.moveaxis(axis, -1)
+
+        y_pred = y_pred.reshape(-1, y_pred.shape[-1])
+        y = y.reshape(-1, y.shape[-1])
+
+        correct = all(eq(y_pred, y), dim=-1)
+
+    elif y_pred.ndim == y.ndim + 1:
+        # Multiclass: select the predicted class.
+        pred = argmax(y_pred, dim=axis)
+        correct = eq(pred, y)
+
+    else:
+        # Binary classification.
+        correct = eq(y_pred, y)
+
+    correct = correct.reshape(-1)
+
+    return correct.sum().item(), correct.numel()
+
+# %% ../nbs/060_metrics.ipynb #2155ed8b
+class _MonaiAccuracy:
+    """
+    MONAI-compatible implementation of accuracy.
+
+    The implementation follows the semantics of Ignite's ``Accuracy``
+    metric while exposing bioMONAI's backend-independent interface.
     """
 
     def __init__(
         self,
-        *args,
-        num_classes=None,
-        act=None,
-        name="ROCAUC",
-        **kwargs,
+        axis=1,
+        is_multilabel=False,
     ):
-        self.num_classes = num_classes
-        self.act = act
+        self.axis = axis
+        self.is_multilabel = is_multilabel
+        self.reset()
 
-        super().__init__(
-            metric=mm.ROCAUCMetric(*args, **kwargs),
-            name=name,
+    def reset(self):
+        self.num_correct = 0
+        self.num_examples = 0
+
+    def update(self, y_pred, y):
+        num_correct, num_examples = _accuracy_update(
+            y_pred,
+            y,
+            axis=self.axis,
+            is_multilabel=self.is_multilabel,
         )
 
-    def _prepare(self, pred, target):
-        if self.act is not None:
-            pred = self.act(pred)
+        self.num_correct += num_correct
+        self.num_examples += num_examples
 
-        # Multiclass: predictions are [N, C], targets are [N]
-        if pred.ndim == target.ndim + 1:
-            num_classes = self.num_classes or pred.shape[1]
+    def compute(self):
+        if self.num_examples == 0:
+            return None
 
-            if self.num_classes is not None and pred.shape[1] != self.num_classes:
-                raise ValueError(
-                    f"Expected {self.num_classes} classes, got {pred.shape[1]}."
-                )
+        return self.num_correct / self.num_examples
 
-            if target.ndim == 1:
-                target = one_hot(
-                    target.long(),
-                    num_classes=num_classes,
-                )
+    @property
+    def value(self):
+        return self.compute()
 
-        # Already one-hot: leave unchanged
-        elif (
-            pred.ndim == target.ndim
-            and pred.ndim > 1
-            and pred.shape[1] == target.shape[1]
-        ):
-            pass
+# %% ../nbs/060_metrics.ipynb #b3182266
+class _FastaiAccuracy(Metric):
+    """
+    Fastai implementation of the bioMONAI accuracy metric.
 
-        return pred, target
+    Predictions and targets are obtained from ``learn.pred`` and
+    ``learn.yb[0]`` respectively.
+    """
+
+    def __init__(
+        self,
+        axis=1,
+        is_multilabel=False,
+    ):
+        self.axis = axis
+        self.is_multilabel = is_multilabel
+        self.reset()
+
+    def reset(self):
+        self.num_correct = 0
+        self.num_examples = 0
+
+    def accumulate(self, learn):
+        num_correct, num_examples = _accuracy_update(
+            learn.pred,
+            learn.yb[0],
+            axis=self.axis,
+            is_multilabel=self.is_multilabel,
+        )
+
+        self.num_correct += num_correct
+        self.num_examples += num_examples
+
+    @property
+    def value(self):
+        if self.num_examples == 0:
+            return None
+
+        return self.num_correct / self.num_examples
+
+# %% ../nbs/060_metrics.ipynb #ee436af2
+class AccuracyMetric(BioMetric):
+    """
+    Accuracy metric for binary, multiclass, and multilabel classification.
+
+    For multiclass predictions, the class with the largest prediction value
+    along ``axis`` is selected. For binary and multilabel predictions,
+    predictions are compared directly with the target values.
+
+    Accuracy is accumulated as the ratio between the total number of correct
+    predictions and the total number of examples, so batches are weighted
+    according to their number of examples rather than averaged equally.
+
+    Parameters
+    ----------
+    axis : int, default=1
+        Class/channel dimension of multiclass or multilabel predictions.
+    is_multilabel : bool, default=False
+        Whether the task is multilabel classification.
+
+    Notes
+    -----
+    The metric does not apply sigmoid, softmax, or thresholding. Predictions
+    for binary and multilabel tasks must therefore already be in the same
+    representation as the targets.
+    """
+
+    _default = _MonaiAccuracy
+    _fastai = _FastaiAccuracy
 
 # %% ../nbs/060_metrics.ipynb #a86d7472
 class ROCAUCMetric(BioMetric):
@@ -577,7 +809,7 @@ class ROCAUCMetric(BioMetric):
 
     """
     _default = mm.ROCAUCMetric
-    _fastai = ROCAUCFastaiMetric
+    _fastai = fm.RocAuc
 
 # %% ../nbs/060_metrics.ipynb #06247a60
 class AveragePrecisionMetric(BioMetric):

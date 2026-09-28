@@ -1047,9 +1047,12 @@ class TestLearner:
 
         self.pred = preds
         self.xb = xb
-        self.yb = targs
+        self.yb = (targs,)
         self._preds = (preds, targs)
         self._prediction = prediction
+
+        # Minimal fastai Learner interface used by AccumMetric.
+        self.to_detach = lambda x: x.detach()
 
         for key, value in kwargs.items():
             setattr(self, key, value)
