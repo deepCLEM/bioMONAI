@@ -1247,7 +1247,6 @@ class PipelineContext:
         val_data: Raw validation input data.
         task: Pipeline task, such as ``"classification"`` or ``"segmentation"``.
         dataset_name: Name of the selected dataset component.
-        backend: Training backend, such as ``"pytorch"`` or ``"monai"``.
         mode: Current pipeline execution mode.
         records: Loaded or intermediate data records.
         train_ds: Training dataset.
@@ -1264,7 +1263,6 @@ class PipelineContext:
     # task/config
     task: Optional[str] = None
     dataset_name: Optional[str] = None
-    backend: Optional[str] = get_backend()
     mode: str = "train"
 
     # loaded/intermediate state
@@ -2753,8 +2751,7 @@ class BioDataLoaders(DataLoaders):
         # Source-specific options are derived from the common pipeline
         # configuration. Prefixes such as ``train_`` and ``val_`` allow
         # different source options for the two datasets.
-        source_config = {**ctx.config, "backend": ctx.backend}
-        source_splits = split_prefixed_kwargs(source_config)
+        source_splits = split_prefixed_kwargs(dict(ctx.config))
 
         train_kwargs = route_kwargs(
             SourceClass.__init__,
@@ -2890,10 +2887,7 @@ class BioDataLoaders(DataLoaders):
         """
         LoaderClass = LOADER_REGISTRY[ctx.dataset_backend]
 
-        loader = LoaderClass(
-            backend=ctx.backend,
-            **ctx.config,
-        )
+        loader = LoaderClass(**ctx.config)
 
         ctx.dls = loader.build(
             ctx.train_ds,
@@ -3019,7 +3013,7 @@ class BioDataLoaders(DataLoaders):
             **ctx.config,
             "task": ctx.task,
             "dataset_name": ctx.dataset_name,
-            "backend": ctx.backend,
+            "backend": get_backend(),
             "mode": ctx.mode,
         }
 
