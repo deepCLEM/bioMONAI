@@ -12,6 +12,7 @@ __all__ = ['METRIC_BACKENDS', 'register_metric_backend', 'FastaiMetric', 'Metric
            'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric', 'VarianceMetric', 'LabelQualityScore']
 
 # %% ../nbs/060_metrics.ipynb #09106178
+from functools import partial
 # =================================
 # PyTorch
 # =================================

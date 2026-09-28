@@ -667,6 +667,11 @@ class TrainerBackend:
         self.trainer = None
         self.evaluator = None
 
+    @property
+    def recorder(self):
+        """Return the backend training recorder, when available."""
+        return None
+
 
 TrainerBackend._native_signature = _native_signature
 TrainerBackend._accepts_kwargs = _accepts_kwargs
@@ -1068,6 +1073,19 @@ class BioTrainer:
         """
         return self.backend.evaluator
 
+    @property
+    def recorder(self):
+        """
+        Return the training recorder, when supported by the active backend.
+
+        Returns
+        -------
+        Any or None
+            Backend-specific training recorder, or ``None`` when the active
+            backend does not provide one.
+        """
+        return self.backend.recorder
+
 # %% ../nbs/080_engines.ipynb #10830cb5
 def fastai_build_trainer(self):
     """
@@ -1243,6 +1261,10 @@ class FastaiTrainerBackend(TrainerBackend):
         "loss": "loss_fn",
         "save_dir": "model_dir",
     }
+
+    @property
+    def recorder(self):
+        return self.trainer.recorder
 
 
 FastaiTrainerBackend._build_trainer = fastai_build_trainer
