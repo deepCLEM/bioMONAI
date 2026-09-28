@@ -6,6 +6,7 @@
 __all__ = ['METRIC_BACKENDS', 'register_metric_backend', 'FastaiMetric', 'MetricBackend', 'MonaiMetricBackend',
            'FastaiMetricBackend', 'BioMetric', 'MSEMetric', 'SSIMMetric', 'PSNRMetric', 'MSSSIMMetric', 'MAEMetric',
            'RMSEMetric', 'DiceMetric', 'IoUMetric', 'GeneralizedDiceScore', 'PanopticQualityMetric', 'AccuracyMetric',
+           'F1ScoreMetric', 'JaccardMetric', 'PrecisionMetric', 'RecallMetric', 'MatthewsCorrCoefMetric',
            'ROCAUCMetric', 'AveragePrecisionMetric', 'ConfusionMatrixMetric', 'HausdorffDistanceMetric',
            'SurfaceDistanceMetric', 'SurfaceDiceMetric', 'FIDMetric', 'MMDMetric', 'MetricsReloadedBinaryFastai',
            'MetricsReloadedBinary', 'MetricsReloadedCategorical', 'FRCMetric', 'VarianceMetric', 'LabelQualityScore']
@@ -761,6 +762,40 @@ class AccuracyMetric(BioMetric):
 
     _default = _MonaiAccuracy
     _fastai = _FastaiAccuracy
+
+# %% ../nbs/060_metrics.ipynb #db81e89f
+def _monai_confusion_metric(metric_name):
+    return partial(
+        mm.ConfusionMatrixMetric,
+        metric_name=metric_name,
+    )
+
+# %% ../nbs/060_metrics.ipynb #d7615ea1
+class F1ScoreMetric(BioMetric):
+    _default = _monai_confusion_metric("f1 score")
+    _fastai = fm.F1ScoreMulti
+
+
+class JaccardMetric(BioMetric):
+    _default = _monai_confusion_metric("threat score")
+    _fastai = fm.JaccardMulti
+
+
+class PrecisionMetric(BioMetric):
+    _default = _monai_confusion_metric("precision")
+    _fastai = fm.PrecisionMulti
+
+
+class RecallMetric(BioMetric):
+    _default = _monai_confusion_metric("sensitivity")
+    _fastai = fm.RecallMulti
+
+
+class MatthewsCorrCoefMetric(BioMetric):
+    _default = _monai_confusion_metric(
+        "matthews correlation coefficient"
+    )
+    _fastai = fm.MatthewsCorrCoefMulti
 
 # %% ../nbs/060_metrics.ipynb #a86d7472
 class ROCAUCMetric(BioMetric):
