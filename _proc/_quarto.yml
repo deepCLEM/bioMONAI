@@ -3,8 +3,10 @@ project:
 
 format:
   html:
-    theme: minty
-    css: styles.css
+    theme:
+      light:  skriptum.css
+      dark:  skriptum_nord.css
+    toggle: true
     toc: true
     toc-depth: 4
     html-math-method: katex
@@ -53,7 +55,8 @@ website:
         aria-label: Twitter
   sidebar:
     style: floating
-    collapse-level: 2
+    collapse-level: 1
+    logo: images/logo_bioMONAI_full.png
   page-footer:
     left: "Copyright © 2024 Biagio Mandracchia, MIT License"
     right:

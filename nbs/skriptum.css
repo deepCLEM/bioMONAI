@@ -1,0 +1,365 @@
+/*-- scss:defaults --*/
+
+// Quarto Refs
+// Bootstrap Variables: https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/formats/html/bootstrap/_bootstrap-variables.scss
+// Bootstrap Rules: https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/formats/html/bootstrap/_bootstrap-rules.scss
+// How to Handle: https://silviacanelon.com/blog/2023-09-29-hello-quarto/#scss-variables
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap'); //serif
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap'); // Smallcaps
+
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap'); //sans-serif
+
+
+// Custom Color Definitions
+$primary-color: #ffffff;//#fffbf2;   // soft cream
+$primary-color-shade: #f7f6f5; //#faf7f2; // subtle contrast
+
+$highlight-color: #800000; // color highlights
+$highlight-color-shade: #DFB2B2; // hover color for buttons
+
+$dark: #3a3a3a;;  // mostly used for borders
+$font-color: #1b1b1b; // self explanatory 
+
+$font-family-headings: 'Inter', serif;
+$font-family-text: 'Josefin Sans', sans-serif;
+$font-family-smallcaps: 'Inter', serif;
+
+// Bootstrap Color overwrites
+$link-color: $highlight-color;
+$body-bg: $primary-color;
+$code-block-bg: $primary-color-shade; //e1d3d0
+$code-bg: $primary-color-shade;
+$code-color: $font-color;
+$border-color: #ccbbb1; // color of citation border
+$headings-color: $font-color;
+
+$navbar-bg: $primary-color;
+$navbar-fg: $highlight-color;
+$footer-bg: $primary-color;
+$footer-fg: $font-color;
+
+$table-border-width: 0px;
+$table-border-color: $highlight-color;
+
+/*-- scss:rules --*/
+
+// Navbar and Footer
+.navbar {
+  font-family: $font-family-text;
+  font-weight: 400;
+  position: relative;
+  margin: 0vw 5vw 0vw 5vw;
+  border-bottom: 1px solid $dark;
+  min-height: 80px;
+  .navbar-title {
+    font-family: $font-family-headings;
+    font-weight: 800;
+    font-style: normal;
+    color: $font-color;
+  }
+  a:hover {
+    text-decoration: underline solid $highlight-color;
+  }
+  .navbar-brand {
+    // position in middle always
+    position: absolute;
+    left: 50%;
+    margin-left: -30px !important;  /* 50% of your logo width */
+    .navbar-logo {
+      max-height: 60px;
+    }
+  }
+}
+
+.navbar-toggler {
+  box-shadow: none;
+}
+
+.footer {
+  border-top: 1px solid $dark;
+  font-family: $font-family-headings;
+}
+
+// Title Block 
+
+.quarto-title-block {
+  padding-bottom: 2em;
+  padding-top: 5vh;
+  border-bottom: 1px solid $dark;
+}
+
+.quarto-title-meta-heading {
+  font-family: $font-family-headings;
+  color: $highlight-color;
+}
+
+.quarto-title-meta-contents {
+  font-family: $font-family-headings;
+}
+
+header:empty {
+  border-bottom: 0px solid $dark !important; 
+  padding: 0 !important;
+  // remove the line below the title block if there is no title etc
+}
+
+// make the banner darker 
+
+.quarto-title-banner.page-full {
+  background-color: $dark;
+  color: invert($font-color)
+}
+
+#title-block-header.page-full {
+  margin-block-start: 3em;
+  background-color: $dark;
+  border-bottom: 0px;
+  color: invert($font-color);
+
+  h1 {
+    color: invert($font-color);
+  }
+}
+
+// TOC in body
+
+nav#TOC {
+  background-color: $primary-color-shade;
+  padding: 0.5em 1em;
+  margin-bottom: 1em;
+
+  #toc-title {
+    font-size: 1em;
+    font-family: $font-family-headings;
+    margin: 0.0em;
+  }
+
+  li a {
+      font-family: $font-family-headings ;
+      color: $font-color;
+    }
+}
+
+nav.toc-active#TOC {
+  background-color: $primary-color;
+}
+
+nav:not(.toc-active)#TOC {
+  li::marker {
+    content: "→ ";
+  }
+}
+
+@media (max-width: 767.98px) {
+  #quarto-content nav[role='doc-toc'] {
+    display: block;
+  }
+}
+
+// Listing
+
+.quarto-post {
+  border-bottom: 1px solid $dark !important;
+  padding-bottom: 1em;
+
+  // scss to style multiple classes at same time
+  .listing-title {
+    font-family: $font-family-headings;
+    padding-bottom: 0.5em;
+    font-size: 1.5rem;
+    color: $highlight-color !important;
+  }
+  .listing-date {
+    font-family: $font-family-text;
+    color: $highlight-color;
+  }
+  .listing-author {
+    font-family: $font-family-text;
+  }
+}
+
+.card {
+  background-color: $primary-color-shade;
+  border: 0px solid $dark;
+  border-radius: 5px;
+  line-height: 1.2em;
+  .listing-date {
+    font-family: $font-family-headings;
+    color: $highlight-color;
+  }
+  .listing-title {
+    margin-bottom: 0.5em;
+  }
+}
+
+.listing-description {
+  font-family: $font-family-text;
+  font-weight: 300;
+  color: $font-color;
+}
+
+// General
+
+body {
+  font-family: $font-family-text;
+  font-weight: 380;
+  line-height: 1.3em;
+  font-size: 1em;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: $font-family-headings;
+  font-weight: 500;
+  border-bottom: 0px !important;
+  color: $font-color;
+}
+
+//Smallcaps for em tags in strong tags
+strong em {
+  font-family: $font-family-smallcaps;
+  font-weight: 500;
+  font-style: normal;
+}
+
+// Drop Cap for first letter of Smallcaps
+strong em code {
+  font-size: 3rem;
+  font-weight: 700;
+  float: left;
+  line-height: 0.65;
+  margin: 0.1em 0.1em 0.2em 0em;
+  background-color: $primary-color !important;
+  font-family: $font-family-headings;
+}
+
+hr {
+  margin: 2em 20vw 2em 20vw;
+  border-top: 1px solid $dark;
+  border-bottom: 1px solid $dark;
+  height: 4px;
+  opacity: 1;
+}
+
+button {
+  border: 1px solid $highlight-color;
+  padding: 0.2em 1em 0.05em 1em;
+  border-radius: 4px;
+  background-size: 21px 21px;
+  min-width: 60px;
+  color: $highlight-color;
+  margin: 0.2em 0.2em;
+  background-color: transparent;
+  box-shadow: 3px 3px $highlight-color;
+
+  &:hover {
+    background-color: $highlight-color-shade;
+  }
+}
+
+a {
+  font-weight: 300;
+}
+
+pre {
+  background-color: $code-block-bg;
+  padding: 1em;
+  border-radius: 5px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.table {
+  .odd {
+    background-color: $primary-color-shade;
+  }
+  .header {
+    border-bottom: 1px double $dark;
+  }
+}
+
+.blockquote {
+  border-left: 5px solid $highlight-color;
+  padding-left: 1rem;
+  font-family: $font-family-headings;
+  border-radius: .25rem;
+  background-color: $primary-color-shade;
+  text-align: left;
+  color: $font-color;
+  margin: 2em 5vw 2em 5vw;
+
+  em {
+  color: $highlight-color;
+  font-family: $font-family-smallcaps;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  }
+}
+
+// The line above footnotes etc styled the same as HR
+#quarto-appendix.default {
+  border-top: 1px solid $dark;
+}
+
+// Custom Classes
+
+.content-block {
+  border-bottom: 1px solid $dark;
+  margin-bottom: 2em;
+  .h1 {
+    text-align: center;
+  }
+} 
+
+.headroom {
+  background-color: $primary-color;
+}
+
+// for the title block on the start page
+.title-block {
+  background-color: $primary-color-shade;
+  font-size: 20px;
+  border-radius: 5px;
+
+  // rule when title-block and text-block in same div
+  + .text-block {
+    padding: 1em;
+    p {
+      margin: auto
+    }
+  }
+  p {
+    margin: 0;
+  }
+  .img-text {
+    padding: 1em;
+    margin: auto;
+  }
+  .img-fluid {
+    border-radius: 3px 3px 0px 0px;
+  }
+}
+
+.sidebar-navigation {
+  font-family: $font-family-headings;
+
+  .sidebar-item {
+    font-family: $font-family-headings;
+    font-weight: 400;
+  }
+
+  .sidebar-item-text {
+    font-family: $font-family-headings;
+  }
+
+  .sidebar-section {
+    font-family: $font-family-headings;
+  }
+}
+
+.sidebar-logo img {
+  display: block;
+  margin: 1.5rem auto 1rem auto;
+  max-width: 160px;
+  height: auto;
+}

@@ -1,0 +1,275 @@
+/*-- scss:defaults --*/
+
+// Fonts
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+
+// =========================
+// NORD THEME
+// =========================
+
+// Nord palette
+$nord0: #2E3440;
+$nord1: #3B4252;
+$nord2: #434C5E;
+$nord3: #4C566A;
+
+$nord4: #D8DEE9;
+$nord5: #E5E9F0;
+$nord6: #ECEFF4;
+
+$nord8: #88C0D0;
+$nord11: #BF616A;
+
+// Theme mapping
+$primary-color: $nord0;
+$primary-color-shade: $nord1;
+
+$highlight-color: $nord11;
+$highlight-color-shade: $nord3;
+
+$dark: $nord3;
+$font-color: $nord4;
+
+// Typography
+$font-family-headings: 'Inter', serif;
+$font-family-text: 'Josefin Sans', sans-serif;
+$font-family-smallcaps: 'Inter SC', serif;
+
+// Bootstrap overrides
+$link-color: $nord8;
+$body-bg: $primary-color;
+
+$code-block-bg: $nord2;
+$code-bg: $nord2;
+$code-color: $nord5;
+
+$border-color: $nord3;
+$headings-color: $nord6;
+
+$navbar-bg: $nord1;
+$navbar-fg: $nord6;
+
+$footer-bg: $nord1;
+$footer-fg: $nord4;
+
+$table-border-width: 0px;
+$table-border-color: $nord3;
+
+/*-- scss:rules --*/
+
+// Navbar
+.navbar {
+  font-family: $font-family-text;
+  font-weight: 400;
+  position: relative;
+  margin: 0vw 5vw;
+  border-bottom: 1px solid $nord6;
+  min-height: 80px;
+
+  .navbar-title {
+    font-family: $font-family-headings;
+    font-weight: 800;
+    color: $nord6;
+  }
+
+  a:hover {
+    text-decoration: underline solid $nord8;
+  }
+
+  .navbar-brand {
+    position: absolute;
+    left: 50%;
+    margin-left: -30px !important;
+
+    .navbar-logo {
+      max-height: 60px;
+    }
+  }
+}
+
+.navbar-toggler {
+  box-shadow: none;
+}
+
+// Footer
+.footer {
+  border-top: 1px solid $nord3;
+  font-family: $font-family-headings;
+  background-color: $nord1;
+  color: $nord4;
+}
+
+// Title block
+.quarto-title-block {
+  padding-bottom: 2em;
+  padding-top: 5vh;
+  border-bottom: 1px solid $nord3;
+}
+
+.quarto-title-meta-heading {
+  font-family: $font-family-headings;
+  color: $nord11;
+}
+
+.quarto-title-meta-contents {
+  font-family: $font-family-headings;
+}
+
+header:empty {
+  border-bottom: 0 !important;
+  padding: 0 !important;
+}
+
+// Banner
+.quarto-title-banner.page-full {
+  background-color: $nord1;
+  color: $nord6;
+}
+
+#title-block-header.page-full {
+  margin-block-start: 3em;
+  background-color: $nord1;
+  border-bottom: 0;
+  color: $nord6;
+
+  h1 {
+    color: $nord6;
+  }
+}
+
+// TOC
+nav#TOC {
+  background-color: $nord1;
+  padding: 0.5em 1em;
+  margin-bottom: 1em;
+
+  #toc-title {
+    font-size: 1em;
+    font-family: $font-family-headings;
+  }
+
+  li a {
+    font-family: $font-family-headings;
+    color: $nord4;
+  }
+}
+
+nav.toc-active#TOC {
+  background-color: $nord2;
+}
+
+// Listings
+.quarto-post {
+  border-bottom: 1px solid $nord3 !important;
+  padding-bottom: 1em;
+
+  .listing-title {
+    font-family: $font-family-headings;
+    font-size: 1.5rem;
+    color: $nord11 !important;
+  }
+
+  .listing-date {
+    font-family: $font-family-text;
+    color: $nord8;
+  }
+
+  .listing-author {
+    font-family: $font-family-text;
+  }
+}
+
+.card {
+  background-color: $nord1;
+  border-radius: 5px;
+
+  .listing-date {
+    font-family: $font-family-headings;
+    color: $nord8;
+  }
+}
+
+// General
+body {
+  font-family: $font-family-text;
+  font-weight: 380;
+  line-height: 1.3em;
+  font-size: 1rem;
+  color: $font-color;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: $font-family-headings;
+  font-weight: 500;
+  color: $nord6;
+}
+
+// Code
+pre {
+  background-color: $nord2;
+  padding: 1em;
+  border-radius: 5px;
+  font-family: 'Courier New', monospace;
+}
+
+// Buttons
+button {
+  border: 1px solid $nord8;
+  border-radius: 4px;
+  color: $nord8;
+  background-color: transparent;
+  box-shadow: 3px 3px $nord8;
+
+  &:hover {
+    background-color: $nord3;
+  }
+}
+
+// Tables
+.table {
+  color: $nord4;
+
+  .odd {
+    background-color: $nord1;
+  }
+
+  .header {
+    border-bottom: 1px double $nord3;
+  }
+}
+
+// Blockquote
+.blockquote {
+  border-left: 5px solid $nord8;
+  background-color: $nord1;
+  color: $nord4;
+  padding-left: 1rem;
+  margin: 2em 5vw;
+}
+
+// Sidebar
+.sidebar-navigation {
+  font-family: $font-family-text;
+  background-color: $nord1;
+
+  a {
+    color: $nord4;
+  }
+
+  a:hover {
+    color: $nord8;
+  }
+}
+
+// Sidebar logo
+.sidebar-logo img {
+  display: block;
+  margin: 1.5rem auto;
+  max-width: 160px;
+}
+
+.headroom {
+    background-color: $nord1;
+}
