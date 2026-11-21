@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-11-21
+
+### Added
+- Added `BioVolume`, `BioVideo`, and `BioMultiChannel` image types, along with a format-aware `BioImageReader`.
+- Added `ProcessDataset` workflows for dataset processing, patch generation and splitting, and YAML-configured data loading.
+- Added visualization utilities for GIF creation, distribution plots, histograms, KDEs, and statistics tables.
+
+### Changed
+- Reworked image I/O and preprocessing, with improved support for image layouts, metadata, HDF5, and multichannel data.
+- Expanded MONAI transform and fastai metric interoperability.
+- Updated tutorials, examples, benchmarks, and generated documentation.
+
+### Fixed
+- Improved path resolution, image creation and loading, metadata handling, patch preprocessing, and layout normalization.
+
 ## [1.2.0] - 2026-04-07
 
 ### Added
