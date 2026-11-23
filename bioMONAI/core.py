@@ -385,7 +385,8 @@ def evaluate_model(trainer:Learner,                                 # The model 
                 metric_values = compute_metric(p, t, metric)
                 metric_stats = calculate_statistics(metric_values)         
                 # Get the name of the metric function
-                metric_name = getattr(metric, 'func', metric).__name__  # Support AvgMetric or regular functions                
+                metric_func = getattr(metric, 'func', metric)
+                metric_name = getattr(metric_func, '__name__', type(metric_func).__name__)
                 out[metric_name] = metric_values       
                 if show_graph:
                     if use_plotly:
@@ -472,7 +473,8 @@ def evaluate_classification_model(trainer:Learner,              # The trained mo
                 metric_values = compute_metric(p, t, metric)
                 metric_stats = calculate_statistics(metric_values)                
                 # Get the name of the metric function
-                metric_name = getattr(metric, 'func', metric).__name__  # Support AvgMetric or regular functions 
+                metric_func = getattr(metric, 'func', metric)
+                metric_name = getattr(metric_func, '__name__', type(metric_func).__name__)
                 out[metric_name] = metric_values                      
                 if show_graph:
                     if use_plotly:

@@ -408,44 +408,51 @@ class Resize(MonaiTransform):
 # %% ../nbs/005_transforms.ipynb #ac665ddb
 class CropND(Transform):
     """
-    Crops an ND tensor along a specified dimension.
+    Crops an ND tensor along specified dimensions.
 
-    This transform crops an ND tensor along specified dimensions, which could be a channel or spatial dimension.
+    This transform crops an ND tensor along specified dimensions, which could
+    be a channel or spatial dimension.
     """
-    
-    def __init__(self, 
-                 slices: list, # List of slice objects or tuples (start, end) for each dimension
-                 dims: list = None, # List of dimensions to apply the slices. If None, slices are applied to all dimensions.
-                 ):
+
+    def __init__(
+        self,
+        slices: list,  # List of slice objects or tuples (start, end) for each dimension
+        dims: list = None,  # Dimensions to apply slices. If None, applies to all dimensions.
+    ):
         self.slices = [slice(*s) if isinstance(s, tuple) else s for s in slices]
         self.dims = dims
-        
+
+    def _get_slices(self, x):
+        """Generate the slicing tuple for the input tensor."""
+        slices = [slice(None)] * x.ndim
+
+        if self.dims is None:
+            for i, s in enumerate(self.slices):
+                if x.shape[i] >= s.stop - s.start:
+                    slices[i] = s
+        else:
+            for dim, s in zip(self.dims, self.slices):
+                if x.shape[dim] >= s.stop - s.start:
+                    slices[dim] = s
+
+        return tuple(slices)
+
     def encodes(self, x: BioImageBase):
         """Apply cropping to a BioImageBase object."""
         bioimagetype = type(x)
-        slices = [slice(None)] * x.ndim
-        if self.dims is None:
-            for i, s in enumerate(self.slices):
-                if x.shape[i] >= s.stop - s.start:
-                    slices[i] = s
-        else:
-            for dim, s in zip(self.dims, self.slices):
-                if x.shape[dim] >= s.stop - s.start:
-                    slices[dim] = s
-        return bioimagetype(x[tuple(slices)])
-    
+        return bioimagetype(x[self._get_slices(x)], meta=x.meta)
+
+    def encodes(self, x: MetaTensor):
+        """Apply cropping to a MONAI MetaTensor."""
+        return x[self._get_slices(x)]
+
+    def encodes(self, x: torch.Tensor):
+            """Apply cropping to a MONAI MetaTensor."""
+            return x[self._get_slices(x)]
+
     def encodes(self, x: np.ndarray):
         """Apply cropping to a NumPy array."""
-        slices = [slice(None)] * x.ndim
-        if self.dims is None:
-            for i, s in enumerate(self.slices):
-                if x.shape[i] >= s.stop - s.start:
-                    slices[i] = s
-        else:
-            for dim, s in zip(self.dims, self.slices):
-                if x.shape[dim] >= s.stop - s.start:
-                    slices[dim] = s
-        return x[tuple(slices)]
+        return x[self._get_slices(x)]
 
 # %% ../nbs/005_transforms.ipynb #01606d8a
 class RandCameraNoise(RandTransform):
@@ -782,68 +789,127 @@ def _scale_intensity_range(x,   # The input image to scale.
 
 # %% ../nbs/005_transforms.ipynb #1f6fe6dd
 class ScaleImage(Transform):
-    """Image normalization."""
-    def __init__(x,                 # The input image to scale.
-                 min=0.0,           # The minimum intensity value.
-                 max=1.0,           # The maximum intensity value.
-                 axis=None,         # The axis or axes along which to compute the minimum and maximum values.
-                 eps=1e-20,         # A small value to prevent division by zero.
-                 dtype=np_float32,  # The data type to use for the output image.
-                 ):
+    """Scale image intensities to a specified range."""
+
+    def __init__(
+        self,
+        min=0.0,          # Minimum output intensity.
+        max=1.0,          # Maximum output intensity.
+        axis=None,        # Axes along which to compute min and max.
+        eps=1e-20,        # Small value to prevent division by zero.
+        dtype=np_float32, # Output data type.
+    ):
         store_attr()
 
-    def encodes(self, x: BioImageBase):
-        """Apply intensity scaling to a BioImageBase object."""
-        bioimagetype = type(x)
-        y = _scale_intensity_range(x, x.min(), x.max(), eps=self.eps, dtype=self.dtype)
-        y *= self.max
-        y += self.min
-        return bioimagetype(y)
-    
-    def encodes(self, x: np.ndarray):
-        """Apply intensity scaling to a NumPy array."""
+    def _scale(self, x):
+        """Scale intensities to [self.min, self.max]."""
         mi = x.min(axis=self.axis, keepdims=True)
         ma = x.max(axis=self.axis, keepdims=True)
-        y = (x - mi) / (ma - mi + self.eps)  # Normalize to [0, 1]
-        y = y * (self.max - self.min) + self.min  # Scale to [min, max]
+        y = (x - mi) / (ma - mi + self.eps)
+        y = y * (self.max - self.min) + self.min
         return y.astype(self.dtype)
 
+    def encodes(self, x: BioImageBase):
+        """Scale a BioImageBase while preserving its type."""
+        bioimagetype = type(x)
+        return bioimagetype(self._scale(x))
+
+    def encodes(self, x: MetaTensor):
+        """Scale a MetaTensor while preserving its metadata."""
+        meta = x.meta
+        y = self._scale(x)
+        return MetaTensor(y, meta=meta)
+
+    def encodes(self, x: torch.Tensor):
+        """Scale a PyTorch tensor."""
+        return self._scale(x)
+
+    def encodes(self, x: np.ndarray):
+        """Scale a NumPy array."""
+        return self._scale(x)
 
 # %% ../nbs/005_transforms.ipynb #567bbaab
 class ScaleImagePercentiles(Transform):
     """Percentile-based image normalization."""
-    def __init__(x,                 # The input image to scale.
-                 pmin=3,            # The minimum percentile value.
-                 pmax=99.8,         # The maximum percentile value.
-                 axis=None,         # The axis or axes along which to compute the minimum and maximum values.
-                 clip=True,         # If True, clips the output values to the specified range.
-                 b_min=0.0,         # The minimum intensity value.
-                 b_max=1.0,         # The maximum intensity value.
-                 eps=1e-20,         # A small value to prevent division by zero.
-                 dtype=np_float32,  # The data type to use for the output image.
-                 ):
+
+    def __init__(
+        self,
+        pmin=3,             # Lower percentile.
+        pmax=99.8,          # Upper percentile.
+        axis=None,          # Axis or axes along which percentiles are computed.
+        clip=True,          # Whether to clip the scaled values.
+        b_min=0.0,          # Minimum output intensity.
+        b_max=1.0,          # Maximum output intensity.
+        eps=1e-20,          # Small value to prevent division by zero.
+        dtype=np_float32,   # Output data type.
+    ):
         store_attr()
 
-    def encodes(self, x: BioImageBase):
-        """Apply percentile-based normalization to a BioImageBase object."""
-        bioimagetype = type(x)
-        mi = percentile(x, self.pmin, axis=self.axis, keepdims=True)
-        ma = percentile(x, self.pmax, axis=self.axis, keepdims=True)
-        if self.clip:
-            return bioimagetype(np.clip(_scale_intensity_range(x, mi, ma, eps=self.eps, dtype=self.dtype), self.b_min, self.b_max))
-        return bioimagetype(_scale_intensity_range(x, mi, ma, eps=self.eps, dtype=self.dtype))
-    
-    def encodes(self, x: np.ndarray):
-        """Apply percentile-based normalization to a NumPy array."""
+    def _scale_numpy(self, x):
+        """Percentile-based scaling for NumPy arrays."""
         mi = np.percentile(x, self.pmin, axis=self.axis, keepdims=True)
         ma = np.percentile(x, self.pmax, axis=self.axis, keepdims=True)
+
         scaled = (x - mi) / (ma - mi + self.eps)
         scaled = scaled.astype(self.dtype)
 
         if self.clip:
-            return np.clip(scaled, self.b_min, self.b_max)
+            scaled = np.clip(scaled, self.b_min, self.b_max)
+
         return scaled
 
+    def _scale_tensor(self, x):
+        """Percentile-based scaling for PyTorch tensors."""
+        if self.axis is None:
+            mi = torch.quantile(x, self.pmin / 100., keepdim=True)
+            ma = torch.quantile(x, self.pmax / 100., keepdim=True)
+        else:
+            dims = self.axis if isinstance(self.axis, tuple) else (self.axis,)
+            dims = tuple(d % x.ndim for d in dims)
+
+            # torch.quantile requires reduction dimensions to be flattened.
+            perm = tuple(d for d in range(x.ndim) if d not in dims) + dims
+            xp = x.permute(perm) if perm != tuple(range(x.ndim)) else x
+
+            n = int(np.prod([x.shape[d] for d in dims]))
+            xp = xp.reshape(*[x.shape[d] for d in range(x.ndim) if d not in dims], n)
+
+            mi = torch.quantile(xp, self.pmin / 100., dim=-1, keepdim=True)
+            ma = torch.quantile(xp, self.pmax / 100., dim=-1, keepdim=True)
+
+            # Restore the reduced dimensions to their original positions.
+            remaining = [d for d in range(x.ndim) if d not in dims]
+            shape = [1] * x.ndim
+            for i, d in enumerate(remaining):
+                shape[d] = mi.shape[i]
+            mi, ma = mi.reshape(shape), ma.reshape(shape)
+
+        scaled = (x - mi) / (ma - mi + self.eps)
+        scaled = scaled.to(dtype=getattr(torch, str(self.dtype).replace("torch.", ""), self.dtype)
+                           if isinstance(self.dtype, torch.dtype)
+                           else torch.float32)
+
+        if self.clip:
+            scaled = scaled.clamp(self.b_min, self.b_max)
+
+        return scaled
+
+    def encodes(self, x: BioImageBase):
+        """Normalize a BioImageBase while preserving its type."""
+        bioimagetype = type(x)
+        return bioimagetype(self._scale_numpy(x))
+
+    def encodes(self, x: MetaTensor):
+        """Normalize a MetaTensor while preserving its metadata."""
+        return MetaTensor(self._scale_tensor(x), meta=x.meta)
+
+    def encodes(self, x: torch.Tensor):
+        """Normalize a PyTorch tensor."""
+        return self._scale_tensor(x)
+
+    def encodes(self, x: np.ndarray):
+        """Normalize a NumPy array."""
+        return self._scale_numpy(x)
 
 # %% ../nbs/005_transforms.ipynb #21775c1d
 class ScaleImageVariance(Transform):
@@ -1291,25 +1357,42 @@ from skimage.color import rgb2hed, hed2rgb
 
 # %% ../nbs/005_transforms.ipynb #1da05998
 class RGB2HED(Transform):
-    """Convert RGB images to HED color space."""
+    """Convert RGB images from RGB to HED color space."""
+
+    def _convert(self, x):
+        """Scale the image to [0, 1] and convert RGB to HED."""
+        x = ScaleIntensity()(x)
+        x = x.numpy() if isinstance(x, torch.Tensor) else x
+        return rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)
+
     def encodes(self, x: BioImageBase):
+        """Convert a BioImageBase while preserving its type and metadata."""
         bioimagetype = type(x)
-        x = ScaleIntensity()(x).numpy()  # Ensure the image is scaled to [0, 1] before conversion
-        ihc = rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
-        return bioimagetype(torchTensor(ihc))  # Return the converted image with the same type as the input
-    
+        meta = x.meta
+        return bioimagetype(torchTensor(self._convert(x)), meta=meta)
+
+    def encodes(self, x: MetaTensor):
+        """Convert a MONAI MetaTensor while preserving its metadata."""
+        meta = x.meta
+        return MetaTensor(torchTensor(self._convert(x)), meta=meta)
+
+    def encodes(self, x: torch.Tensor):
+        """Convert a PyTorch tensor to HED."""
+        return torchTensor(self._convert(x))
+
     def encodes(self, x: np.ndarray):
-        x = ScaleIntensity()(x)  # Ensure the image is scaled to [0, 1] before conversion
-        return rgb2hed(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for rgb2hed, then back to (C, H, W)
+        """Convert a NumPy array to HED."""
+        return self._convert(x)
 
 # %% ../nbs/005_transforms.ipynb #516c0f4f
 class HED2RGB(Transform):
     """Convert HED images back to RGB color space."""
     def encodes(self, x: BioImageBase):
         bioimagetype = type(x)
+        meta = x.meta
         x = ScaleIntensity()(x).numpy()  # Ensure the image is scaled to [0, 1] before conversion
         rgb = hed2rgb(x.transpose(1, 2, 0)).transpose(2, 0, 1)  # Convert from (C, H, W) to (H, W, C) for hed2rgb, then back to (C, H, W)
-        return bioimagetype(torchTensor(rgb))  # Return the converted image with the same type as the input
+        return bioimagetype(torchTensor(rgb), meta=meta)  # Return the converted image with the same type and metadata as the input
     
     def encodes(self, x: np.ndarray):
         x = ScaleIntensity()(x)  # Ensure the image is scaled to [0, 1] before conversion
