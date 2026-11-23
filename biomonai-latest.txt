@@ -2,12 +2,12 @@ conda create -n biomonai_latest python=3.11.5 -y
 conda activate biomonai_latest
 conda install quilt3=7.0.0
 
-pip install nbdev==3.0.10 fastai==2.8.6 fastcore==1.12.12 fastdownload=0.0.7 fastprogress==1.0.5  
+pip install nbdev==3.0.10 fastai==2.8.6 fastcore==1.12.12 fastdownload==0.0.7 fastprogress==1.0.5  
 pip install beartype==0.16.4 plum-dispatch==2.2.2 
 pip install notebook==7.5.3 ipykernel==7.2.0
 
 pip install scipy==1.17.0 ipywidgets==8.1.8
-pip install bioio3.2.0 bioio-ome-zarr==3.2.2 bioio-ome-tiff==1.4.0 bioio-imageio==1.3.0 bioio-lif==1.4.2 bioio-tifffile==1.3.0
+pip install bioio==3.2.0 bioio-ome-zarr==3.2.2 bioio-ome-tiff==1.4.0 bioio-imageio==1.3.0 bioio-lif==1.4.2 bioio-tifffile==1.3.0
 
 pip install h5py==3.15.1 medmnist==3.0.2 monai==1.5.2 nvidia-cudnn-cu11==8.5.0.96 opencv-python==4.13.0.92 pillow==12.1.1 plotly==6.5.2 pooch==1.9.0 scikit_image==0.26.0 scikit_learn==1.8.0 tifffile==2026.1.28 torchio==0.21.3 tqdm==4.67.3   
 pip install zarr==3.1.5 numcodecs==0.16.5
