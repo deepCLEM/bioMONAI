@@ -3997,7 +3997,10 @@ def _extract_split_kwargs(kwargs):
         "train_fraction",
         "valid_fraction",
         "split_column",
-        "stratify"
+        "random_seed",
+        "stratify",
+        "add_is_valid",
+        "shuffle",
     ]
     return {k: kwargs[k] for k in allowed if k in kwargs}
 
