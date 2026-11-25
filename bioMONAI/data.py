@@ -826,6 +826,7 @@ def build_source(data, **kwargs):
     return source_cls(data, **kwargs)
 
 # %% ../nbs/001_data.ipynb #f998bcd6
+@register_source("dataframe")
 class DataFrameSource:
     def __init__(
         self,
@@ -3436,6 +3437,98 @@ class SlidingWindowSplitter(BioSplitter):
             )
         )
 
+    def pad_input(
+        self,
+        inputs: torch.Tensor,
+        pad_size: Sequence[int] | None = None,
+    ):
+        """Pad spatial dimensions using the specified or calculated padding."""
+
+        spatial_axes = self._get_spatial_axes(inputs)
+
+        if pad_size is None:
+            spatial_shape = tuple(
+                inputs.shape[axis] for axis in spatial_axes
+            )
+            spatial_ndim = len(spatial_shape)
+
+            patch_size, overlap, offset = (
+                self._get_valid_shape_parameters(spatial_shape)
+            )
+
+            pad_size, _ = self._calculate_pad_size(
+                spatial_shape,
+                spatial_ndim,
+                patch_size,
+                offset,
+                overlap,
+            )
+
+        pad_size = tuple(pad_size)
+
+        if self.pad_mode is not None and any(pad_size):
+            inputs = self._pad_spatial(
+                inputs,
+                pad_size,
+                spatial_axes,
+                mode=self.pad_mode,
+                value=self.pad_value,
+            )
+
+        return inputs, pad_size
+
+    def split_pair(self, inputs, targets, target_patch_size=None):
+
+        spatial_axes = self._get_spatial_axes(inputs)
+        spatial_shape = tuple(inputs.shape[i] for i in spatial_axes)
+
+        patch_size, overlap, offset = (
+            self._get_valid_shape_parameters(spatial_shape)
+        )
+
+        pad_size, _ = self._calculate_pad_size(
+            spatial_shape,
+            len(spatial_shape),
+            patch_size,
+            offset,
+            overlap,
+        )
+
+        inputs, _ = self.pad_input(inputs, pad_size)
+        targets, _ = self.pad_input(targets, pad_size)
+
+        start_padding = pad_size[1::2]
+
+        if any(start_padding):
+            offset = tuple(
+                off + p for off, p in zip(offset, start_padding)
+            )
+
+        spatial_shape = tuple(inputs.shape[i] for i in spatial_axes)
+
+        if target_patch_size is None:
+            target_patch_size = patch_size
+
+        for loc in iter_patch_position(
+            spatial_shape, patch_size, offset, overlap, False
+        ):
+            x = self._get_patch(inputs, loc, patch_size, spatial_axes)
+            y = self._get_patch(
+                targets, loc, target_patch_size,
+                self._get_spatial_axes(targets)
+            )
+
+            original_loc = tuple(
+                l - p for l, p in zip(loc, start_padding)
+            )
+
+            if self.filter_fn is None or self.filter_fn(x, original_loc):
+                yield (
+                    convert_to_tensor(x, device=self.device),
+                    convert_to_tensor(y, device=self.device),
+                    original_loc,
+                )
+
     def __call__(
         self,
         inputs: Any,
@@ -3594,6 +3687,121 @@ class RandomPatchSplitter(BioSplitter):
     def get_padded_shape(self, spatial_shape: Sequence[int]) -> tuple:
         return tuple(spatial_shape)
 
+    def split_pair(
+        self,
+        inputs: torch.Tensor,
+        targets: torch.Tensor,
+        target_patch_size: Sequence[int] | None = None,
+    ):
+        """
+        Extract paired random patches from inputs and targets.
+
+        Both patches share the same spatial location. Padding is
+        calculated from the input and applied to both tensors.
+        """
+        if not isinstance(inputs, torch.Tensor):
+            raise ValueError(
+                f"Input must be a torch.Tensor. Got {type(inputs)}."
+            )
+
+        if not isinstance(targets, torch.Tensor):
+            raise ValueError(
+                f"Target must be a torch.Tensor. Got {type(targets)}."
+            )
+
+        input_axes = self._get_spatial_axes(inputs)
+        target_axes = self._get_spatial_axes(targets)
+
+        spatial_shape = tuple(inputs.shape[i] for i in input_axes)
+
+        patch_size, offset = self._get_valid_shape_parameters(
+            spatial_shape
+        )
+
+        if target_patch_size is None:
+            target_patch_size = patch_size
+        else:
+            target_patch_size = ensure_tuple_rep(
+                target_patch_size, len(target_axes)
+            )
+
+        # Calculate padding from the input dimensions.
+        pad_size, _ = SlidingWindowSplitter._calculate_pad_size(
+            self,
+            spatial_shape,
+            len(spatial_shape),
+            patch_size,
+            offset,
+            (0,) * len(spatial_shape),
+        )
+
+        # Pad both tensors identically.
+        if self.pad_mode is not None and any(pad_size):
+            inputs = self._pad_spatial(
+                inputs,
+                pad_size,
+                input_axes,
+                mode=self.pad_mode,
+                value=self.pad_value,
+            )
+
+            targets = self._pad_spatial(
+                targets,
+                pad_size,
+                target_axes,
+                mode=self.pad_mode,
+                value=self.pad_value,
+            )
+
+        # Update spatial dimensions after padding.
+        spatial_shape = tuple(inputs.shape[i] for i in input_axes)
+
+        start_padding = pad_size[1::2]
+        sampling_offset = tuple(
+            off + pad for off, pad in zip(offset, start_padding)
+        )
+
+        passed_patches = 0
+        attempts = 0
+        max_attempts = self.num_patches * 10
+
+        while (
+            passed_patches < self.num_patches
+            and attempts < max_attempts
+        ):
+            loc = self._sample_location(
+                spatial_shape,
+                patch_size,
+                sampling_offset,
+            )
+
+            input_patch = self._get_patch(
+                inputs, loc, patch_size, input_axes
+            )
+
+            target_patch = self._get_patch(
+                targets, loc, target_patch_size, target_axes
+            )
+
+            # Return coordinates relative to the original images.
+            original_loc = tuple(
+                l - p for l, p in zip(loc, start_padding)
+            )
+
+            if (
+                self.filter_fn is None
+                or self.filter_fn(input_patch, original_loc)
+            ):
+                passed_patches += 1
+
+                yield (
+                    convert_to_tensor(input_patch, device=self.device),
+                    convert_to_tensor(target_patch, device=self.device),
+                    original_loc,
+                )
+
+            attempts += 1
+
     def __call__(self, inputs: Any):
         spatial_axes = self._get_spatial_axes(inputs)
         spatial_shape = tuple(
@@ -3646,7 +3854,10 @@ def _process_single_image(
     data_path = row[input_key]
     gt_path   = row[target_key]
 
-    image_name = _get_image_name(data_path)
+    image_name = _get_image_name(
+        data_path,
+        include_parent=kwargs.get("include_parent", False)
+    )
 
     # Resolve transforms
     if isinstance(image_transforms, dict):
@@ -3691,7 +3902,11 @@ def _process_single_image(
     splitter_kwargs = route_kwargs(image_splitter, kwargs)
     splitter = image_splitter(patch_size=patch_size, **splitter_kwargs)
 
-    patches = splitter(data_img)
+    patches = splitter.split_pair(
+        data_img,
+        gt_img,
+        target_patch_size=gt_patch_size,
+    )
 
     # --------------------------------------------------
     # Create HDF5 groups
@@ -3708,11 +3923,8 @@ def _process_single_image(
     # Save patches
     # --------------------------------------------------
     patch_paths = []
-    for idx, (data_patch, loc) in enumerate(patches):
 
-        gt_patch = splitter._get_patch(
-            gt_img, location=loc, patch_size=gt_patch_size
-        )
+    for idx, (data_patch, gt_patch, loc) in enumerate(patches):
 
         if x_patch_transforms or y_patch_transforms:
             for tfm in x_patch_transforms or []:
@@ -3754,7 +3966,7 @@ def _resolve_columns(df, colmap):
 
 def _store_metadata(group, meta, patch_size, patch_transforms):
     for k, v in meta.items():
-        group.attrs[k] = str(v)
+        group.attrs[str(k)] = str(v)
 
     group.attrs["patch_size"] = str(patch_size)
     group.attrs['affine'] = meta['affine']
@@ -3763,8 +3975,22 @@ def _store_metadata(group, meta, patch_size, patch_transforms):
         group.attrs['patch_transforms'] = str(patch_transforms_info)
         group.attrs['patch_transforms'] = str(patch_transforms_info)
 
-def _get_image_name(path):
-    return os.path.splitext(os.path.basename(path))[0]
+def _get_image_name(path, include_parent=False):
+    """Extract an image identifier, optionally including its parent directory."""
+    name = os.path.basename(os.fspath(path))
+
+    for ext in (".nii.gz", ".nii.bz2", ".tar.gz"):
+        if name.lower().endswith(ext):
+            name = name[:-len(ext)]
+            break
+    else:
+        name = os.path.splitext(name)[0]
+
+    if include_parent:
+        parent = os.path.basename(os.path.dirname(os.path.normpath(path)))
+        name = f"{parent}_{name}" if parent else name
+
+    return name
 
 def _extract_split_kwargs(kwargs):
     allowed = [

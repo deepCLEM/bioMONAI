@@ -5,14 +5,71 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "bioMONAI"
 dynamic = ["version"]
-description = "Deep learning library biomedical data built on top of MONAI and fastai"
+description = "Deep learning library for biomedical imaging built on top of MONAI and fastai"
 readme = "README.md"
-requires-python = ">=3.7"
-license = {text = "Apache-2.0"}
-authors = [{name = "bmandracchia", email = "biagio.mandracchia@uva.es"}]
-keywords = ['monai', 'pytorch', 'nbdev', 'jupyter', 'notebook', 'python']
-classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 2 - Pre-Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
-dependencies = []
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "bmandracchia", email = "biagio.mandracchia@uva.es" }
+]
+keywords = [
+    "monai",
+    "pytorch",
+    "nbdev",
+    "jupyter",
+    "notebook",
+    "python",
+    "biomedical-imaging"
+]
+classifiers = [
+    "Natural Language :: English",
+    "Intended Audience :: Developers",
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only"
+]
+
+dependencies = [
+    "torch",
+    "monai>=1.5",
+    "fastai>=2.8",
+    "fastcore",
+    "numpy",
+    "scipy",
+    "beartype",
+    "plum-dispatch",
+    "fastprogress",
+    "tqdm",
+    "pillow",
+    "matplotlib",
+    "bioio",
+    "bioio-imageio",
+    "bioio-lif",
+    "bioio-ome-tiff",
+    "bioio-ome-zarr",
+    "bioio-tifffile",
+    "ome-types",
+    "tifffile",
+    "imageio",
+    "imagecodecs",
+    "h5py",
+    "nibabel",
+    "opencv-python",
+    "scikit-image",
+    "torchio",
+    "simpleitk",
+    "medmnist",
+    "pooch",
+    "quilt3",
+    "plotly",
+    "pandas",
+    "scikit-learn",
+    "dask",
+    "distributed",
+    "xarray",
+    "zarr",
+    "numcodecs",
+]
 
 [project.urls]
 Repository = "https://github.com/deepCLEM/bioMONAI"
@@ -22,12 +79,17 @@ Documentation = "https://deepCLEM.github.io/bioMONAI"
 bioMONAI = "bioMONAI._modidx:d"
 
 [project.optional-dependencies]
-dev = ['nbdev==3.0.10']
+dev = [
+    "nbdev==3.0.10",
+    "notebook",
+    "ipykernel",
+    "ipywidgets",
+]
 
 [tool.setuptools.dynamic]
-version = {attr = "bioMONAI.__version__"}
+version = { attr = "bioMONAI.__version__" }
 
 [tool.setuptools.packages.find]
-include = ["bioMONAI"]
+include = ["bioMONAI*"]
 
 [tool.nbdev]
