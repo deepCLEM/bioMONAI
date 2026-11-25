@@ -377,24 +377,30 @@ def evaluate_model(trainer:Learner,                                 # The model 
         display_statistics_table(loss_stats, loss_name, as_dataframe=as_dataframe)
             
     if metrics is not None:
-            if not isinstance(metrics, list):
-                metrics = [metrics]
-            # Loop through each metric
-            for metric in metrics:
-                # Calculate metric values for each prediction-target pair
-                metric_values = compute_metric(p, t, metric)
-                metric_stats = calculate_statistics(metric_values)         
-                # Get the name of the metric function
-                metric_func = getattr(metric, 'func', metric)
-                metric_name = getattr(metric_func, '__name__', type(metric_func).__name__)
-                out[metric_name] = metric_values       
-                if show_graph:
-                    if use_plotly:
-                        plot_dist(losses, title=loss_name)
-                    else:
-                        plot_histogram_and_kde(losses, loss_stats, bw_method, loss_name)
-                if show_table:
-                    display_statistics_table(metric_stats, metric_name, as_dataframe=as_dataframe)
+        if not isinstance(metrics, list):
+            metrics = [metrics]
+
+        for metric in metrics:
+            metric_values = compute_metric(p, t, metric)
+            metric_stats = calculate_statistics(metric_values)
+
+            metric_func = getattr(metric, 'func', metric)
+            metric_name = getattr(metric_func, '__name__', type(metric_func).__name__)
+
+            out[metric_name] = metric_values
+
+            if show_graph:
+                if use_plotly:
+                    plot_dist(metric_values, title=metric_name)
+                else:
+                    plot_histogram_and_kde(
+                        metric_values, metric_stats, bw_method, metric_name
+                    )
+
+            if show_table:
+                display_statistics_table(
+                    metric_stats, metric_name, as_dataframe=as_dataframe
+                )
 
     return out
 
