@@ -4021,6 +4021,7 @@ def ProcessDataset(
     compression=None,
     data_kwargs={},
     save_patch_csv=False,
+    overwrite=False,
     **kwargs
 ):
     """
@@ -4035,6 +4036,16 @@ def ProcessDataset(
     """
 
     os.makedirs(output_folder, exist_ok=True)
+
+    # --------------------------------------------------
+    # Check existing dataset
+    # --------------------------------------------------
+    h5_path = os.path.join(output_folder, f"{output_filename}.h5")
+
+    if os.path.exists(h5_path) and not overwrite:
+        print(f"Dataset already exists: {h5_path}")
+        print("Skipping ProcessDataset.")
+        return h5_path
 
     # --------------------------------------------------
     # Load dataframe
@@ -4063,7 +4074,6 @@ def ProcessDataset(
     # --------------------------------------------------
     # Create HDF5 file
     # --------------------------------------------------
-    h5_path = os.path.join(output_folder, f"{output_filename}.h5")
     patch_rows = {"train": [], "valid": [], "test": []}
 
     with h5py.File(h5_path, "w") as hf:
